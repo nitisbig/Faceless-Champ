@@ -63,6 +63,21 @@ frames, and check their media metadata and audio, run:
 uv run python examples/render_all.py
 ```
 
+## Narrated training project
+
+The [good-math project](training%20project/good-math/README.md) follows a supplied
+layout reference with serif text, outline icons, and simple diagram animations.
+Its 12 visual beats and word highlights use the original SRT timestamps.
+Downloaded fonts, icons, and licenses live in the shared `assets/` folders.
+
+```bash
+uv run python 'training project/good-math/render.py' --preview
+uv run python 'training project/good-math/render.py'
+```
+
+The library now includes `SubtitleTrack`, `Captions`, `Icon`, and `Arrow`, plus
+`Scene.at()`, `wait_until()`, and `remove()` for narration-driven authoring.
+
 ## Documentation
 
 - [API reference](docs/api.md): components, scenes, animation, composition, and exports.
@@ -81,7 +96,7 @@ uv run ruff format --check src tests examples
 uv build
 ```
 
-v0.1 exports MP4 using a CPU renderer. Camera animation, charts, subtitles, video
+v0.1 exports MP4 using a CPU renderer. Camera animation, charts, video
 import, graphical editing, and GPU rendering are future work. Linux is the verified
 platform. Animated GIFs are decoded and cached in memory; long or very large GIFs
 can consume substantial memory. Video frames are streamed rather than accumulated.

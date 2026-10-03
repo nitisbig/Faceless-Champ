@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,6 +12,7 @@ from typing import Any, Self
 from .animation import Animation, interpolate, smooth
 from .audio import AudioClip
 from .components import Canvas, Component, finite
+from .subtitles import Captions
 
 
 class Renderable:
@@ -42,6 +44,7 @@ class Entry:
     start: float
     initial: dict
     tracks: list[Track]
+    end: float | None = None
 
     def state_at(self, time: float) -> dict:
         state = self.initial.copy()
@@ -84,13 +87,62 @@ class Scene(Renderable):
     @property
     def duration(self) -> float:
         self.build()
-        return max([self._cursor] + [a.start + a.duration for a in self.audio])
+        caption_ends = [
+            min(e.start + e.component.track.duration, e.end if e.end is not None else float("inf"))
+            for e in self.entries
+            if isinstance(e.component, Captions)
+        ]
+        return max([self._cursor] + [a.start + a.duration for a in self.audio] + caption_ends)
+
+    @property
+    def time(self) -> float:
+        """The current visual authoring cursor, in seconds."""
+        return self._cursor
+
+    @contextmanager
+    def at(self, time: float):
+        """Author a block at an absolute time, then keep the furthest cursor.
+
+        Independent objects can be scheduled out of order. Animations of the
+        same object's property must still be authored in chronological order.
+        """
+        time = finite(time, "time", 0)
+        previous = self._cursor
+        self._cursor = time
+        try:
+            yield self
+        finally:
+            self._cursor = max(previous, self._cursor)
+
+    def wait_until(self, time: float) -> Self:
+        time = finite(time, "time", 0)
+        if time < self._cursor - 1e-9:
+            raise ValueError("wait_until cannot move backward; use with scene.at(time)")
+        self._cursor = max(time, self._cursor)
+        return self
+
+    def remove(self, *components: Component) -> Self:
+        """End component lifetimes at the cursor without adding an animation."""
+        for component in components:
+            entry = self._objects.get(component)
+            if entry is None or entry.end is not None:
+                raise ValueError("remove requires a component currently in the scene")
+            if self._cursor < entry.start:
+                raise ValueError("Cannot remove a component before its start")
+            if any(t.start + t.duration > self._cursor + 1e-9 for t in entry.tracks):
+                raise ValueError("Cannot remove a component before its animations end")
+        for component in components:
+            self._objects[component].end = self._cursor
+        return self
 
     def add(self, *components: Component) -> Self:
         for component in components:
             if not isinstance(component, Component):
                 raise TypeError("Scene.add requires visual components")
             if component in self._objects:
+                entry = self._objects[component]
+                if entry.end is not None:
+                    raise ValueError("Removed components cannot be re-added; create a new instance")
                 continue
             entry = Entry(deepcopy(component), self._cursor, component.state(), [])
             self.entries.append(entry)
@@ -127,6 +179,14 @@ class Scene(Renderable):
                 if identity in seen:
                     raise ValueError(f"Overlapping animations for property {key}")
                 seen.add(identity)
+                entry = self._objects.get(animation.component)
+                if entry is not None:
+                    if entry.end is not None or self._cursor < entry.start:
+                        raise ValueError("Animation is outside the component's lifetime")
+                    if any(t.property == key and t.start + t.duration > self._cursor + 1e-9 for t in entry.tracks):
+                        raise ValueError(
+                            f"Animations for {key} must be authored in chronological order without overlaps"
+                        )
         for animation in animations:
             self.add(animation.component)
             entry = self._objects[animation.component]

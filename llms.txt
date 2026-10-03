@@ -15,4 +15,9 @@ positive Y down; component anchors default to center. play() advances time and r
 its arguments concurrently. Audio start defaults to the current cursor, not zero.
 Export with render() or faceless-champ render file.py SceneName -o output.mp4.
 Use Sequence for cuts/crossfades and Grid for simultaneous row-major panels.
-No camera, charts, subtitle system, video import, or graphical editor in v0.1.
+Use SubtitleTrack.from_srt() for exact cue times, Captions for word highlighting,
+and with scene.at(time) for absolute scheduling. Add captions at zero for source
+audio timestamps. Use Arrow for drawable connectors and Icon for tinted PNGs.
+wait_until() advances to an absolute time; remove() ends a visual's lifetime.
+The narrated example is in training project/good-math/render.py and scene/story.py.
+No camera, charts, video import, or graphical editor in v0.1.

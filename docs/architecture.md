@@ -29,8 +29,16 @@ that understands it. v0.1 does not have a global plugin registry.
 
 The renderer caches font instances, decoded image/GIF assets, and static sprites
 per renderer instance. Dynamic typewriter and outline frames are not retained.
-Memory therefore depends on source assets and current frame dimensions, not video
-length; decoding all frames of a large GIF is a known exception.
+Caption sprites are cached by phrase and active cue, so caption memory depends on
+the number of distinct cue states as well as output resolution. GIFs decode all
+frames into memory. Video frames themselves are streamed to the encoder.
+
+`SubtitleTrack` stores immutable, nonoverlapping SRT cues and uses binary search
+for active-cue lookup. Captions evaluate against component age; nested compositions
+therefore apply their normal time offsets without changing subtitle timestamps.
+`Scene.at()` changes the authoring cursor temporarily and preserves the furthest
+time reached. Tracks on each component property remain chronological. Entry end
+times allow removed objects to be skipped, including during out-of-order sampling.
 
 Export uses a temporary directory beside the output. Explicit overwrite uses atomic
 replacement; default publication uses an exclusive hard link to avoid a race that

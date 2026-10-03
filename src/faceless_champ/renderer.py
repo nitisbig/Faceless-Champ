@@ -10,7 +10,8 @@ from typing import Protocol
 from PIL import Image as PILImage
 from PIL import ImageColor, ImageDraw, ImageFont, ImageOps
 
-from .components import Circle, Image, Line, Shape, Text, Triangle
+from .components import Arrow, Circle, Icon, Image, Line, Shape, Text, Triangle
+from .subtitles import Captions
 from .timeline import Grid, Renderable, Scene, Sequence
 
 
@@ -28,7 +29,7 @@ class PillowRenderer:
         self._fonts = {}
         self._sprites = {}
 
-    def _font(self, component: Text, size: int):
+    def _font(self, component: Text | Captions, size: int):
         path = component.font or str(Path(__file__).parent / "assets" / "DejaVuSans.ttf")
         key = (path, size)
         if key not in self._fonts:
@@ -63,11 +64,18 @@ class PillowRenderer:
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
-                if isinstance(c, Text):
+                if isinstance(c, (Text, Captions)):
                     self._font(c, round(c.font_size))
                     ImageColor.getcolor(c.color, "RGBA")
+                    if isinstance(c, Captions):
+                        ImageColor.getcolor(c.highlight_color, "RGBA")
+                        ImageColor.getcolor(c.future_color, "RGBA")
+                        for phrase in c.phrases:
+                            self._caption_sprite(c, 1, phrase[0].start)
                 elif isinstance(c, Image):
                     self._image(c.path)
+                    if isinstance(c, Icon):
+                        ImageColor.getcolor(c.color, "RGBA")
                 elif isinstance(c, Shape):
                     for color in (c.fill, c.stroke):
                         if color is not None:
@@ -126,7 +134,7 @@ class PillowRenderer:
         result = PILImage.new("RGBA", big, scene.canvas.bg)
         factor = min(big[0] / scene.canvas.width, big[1] / scene.canvas.height)
         for entry in sorted(scene.entries, key=lambda e: e.component.z_index):
-            if time < entry.start:
+            if time < entry.start or (entry.end is not None and time >= entry.end):
                 continue
             state = entry.state_at(time)
             if state["opacity"] <= 0:
@@ -156,6 +164,8 @@ class PillowRenderer:
         return result
 
     def _sprite(self, c, state, factor, age):
+        if isinstance(c, Captions):
+            return self._caption_sprite(c, factor, age)
         # Dynamic reveal/draw frames are deliberately not retained in the cache.
         static = state["reveal"] == 1 and state["draw"] == 1
         frame_index = 0
@@ -184,12 +194,36 @@ class PillowRenderer:
         elif isinstance(c, Image):
             size = (max(1, round(c.width * factor)), max(1, round(c.height * factor)))
             source = frames[frame_index]
+            if isinstance(c, Icon):
+                source = PILImage.new("RGBA", source.size, c.color)
+                tint_alpha = ImageColor.getcolor(c.color, "RGBA")[3]
+                source.putalpha(frames[frame_index].getchannel("A").point(lambda a: round(a * tint_alpha / 255)))
             if c.fit == "cover":
                 sprite = ImageOps.fit(source, size, method=PILImage.Resampling.LANCZOS)
             else:
                 fit = ImageOps.contain(source, size, method=PILImage.Resampling.LANCZOS)
                 sprite = PILImage.new("RGBA", size)
                 sprite.alpha_composite(fit, ((size[0] - fit.width) // 2, (size[1] - fit.height) // 2))
+        elif isinstance(c, Arrow):
+            width = max(1, round(c.stroke_width * factor))
+            length, tip = c.width * factor, c.tip_size * factor
+            pad = math.ceil(tip + width)
+            sprite = PILImage.new("RGBA", (math.ceil(length) + pad * 2 + 1, pad * 2 + 1))
+            progress = max(0, min(1, state["draw"]))
+            if c.stroke and c.stroke_width > 0 and progress > 0:
+                draw = ImageDraw.Draw(sprite)
+                end = pad + length * progress
+                draw.line([(pad, pad), (end, pad)], fill=c.stroke, width=width)
+                visible_tip = tip * min(1, max(0, (progress - 0.85) / 0.15))
+                if visible_tip:
+                    draw.polygon(
+                        [
+                            (end, pad),
+                            (end - visible_tip, pad - visible_tip / 2),
+                            (end - visible_tip, pad + visible_tip / 2),
+                        ],
+                        fill=c.stroke,
+                    )
         else:
             width = max(1, round(c.stroke_width * factor))
             w, h = max(1, round(c.width * factor)), max(1, round(c.height * factor))
@@ -228,4 +262,44 @@ class PillowRenderer:
                 draw.line(visible, fill=c.stroke, width=width, joint="curve")
         if static:
             self._sprites[key] = sprite
+        return sprite
+
+    def _caption_sprite(self, c: Captions, factor: float, age: float):
+        phrase = c.phrase_at(age)
+        if not phrase:
+            return PILImage.new("RGBA", (1, 1))
+        active = c.track.active_at(age)
+        finished = sum(cue.end <= age for cue in phrase)
+        key = (c, factor, phrase[0].index, active.index if active else None, finished)
+        if key in self._sprites:
+            return self._sprites[key]
+        font = self._font(c, max(1, round(c.font_size * factor)))
+        width = max(1, round(c.width * factor))
+        space = font.getlength(" ")
+        lines, line, used = [], [], 0.0
+        for cue in phrase:
+            for word in cue.text.split():
+                length = font.getlength(word)
+                if length + 4 > width:
+                    raise ValueError(f"Caption word {word!r} exceeds width; increase width or reduce font_size")
+                if line and used + space + length + 4 > width:
+                    lines.append((line, used))
+                    line, used = [], 0.0
+                if line:
+                    used += space
+                line.append((word, cue, length))
+                used += length
+        if line:
+            lines.append((line, used))
+        ascent, descent = font.getmetrics()
+        step = ascent + descent + round(c.spacing * factor)
+        sprite = PILImage.new("RGBA", (width, step * len(lines) + 4))
+        draw = ImageDraw.Draw(sprite)
+        for row, (words, length) in enumerate(lines):
+            x = (width - length) / 2
+            for word, cue, word_length in words:
+                color = c.highlight_color if active == cue else (c.color if age >= cue.end else c.future_color)
+                draw.text((x, 2 + ascent + row * step), word, font=font, fill=color, anchor="ls")
+                x += word_length + space
+        self._sprites[key] = sprite
         return sprite

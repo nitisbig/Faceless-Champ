@@ -21,8 +21,14 @@ Read [the API](../../docs/api.md) for supported constructors and
   duration is its longest child. Crossfades need enough duration in adjacent scenes.
 - Start with ql previews. Render to output/ and inspect representative decoded frames
   and media metadata. Add a final wait() when an animation's endpoint needs a hold.
+- For narration, read SubtitleTrack.from_srt() and schedule visual events with
+  scene.at(track.cue(number).start). Add Captions at zero for absolute audio timing.
+  Preserve the source transcript and cue times; caption grouping does not retime it.
+- Use Icon for tintable transparent PNGs and Arrow for drawable diagram spokes.
+  FadeOut then remove() components when their lifetime ends. Use fresh instances
+  when bringing a removed visual back. Animate each property chronologically.
 - Reuse the bundled default font or an explicit local TTF/OTF. Do not invent camera,
-  chart, subtitle, video-import, or graphical-editor APIs absent from v0.1.
+  chart, video-import, or graphical-editor APIs absent from v0.1.
 
 Typical command:
 

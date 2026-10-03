@@ -115,6 +115,14 @@ class Image(Component):
         self.fit = fit
 
 
+class Icon(Image):
+    """Tint a transparent raster icon with a color, preserving its alpha mask."""
+
+    def __init__(self, path: str | Path, *, size: float = 120, color: str = "white", **kwargs: Any) -> None:
+        super().__init__(path, width=size, height=size, **kwargs)
+        self.color = color
+
+
 class Shape(Component):
     def __init__(
         self,
@@ -155,3 +163,24 @@ class Line(Shape):
 
     def __init__(self, length: float = 200, **kwargs: Any) -> None:
         super().__init__(width=length, height=1, **kwargs)
+
+
+class Arrow(Line):
+    """An arrow between two design-pixel points; supports Draw and transforms."""
+
+    def __init__(
+        self, start: tuple[float, float], end: tuple[float, float], *, tip_size: float = 18, **kwargs: Any
+    ) -> None:
+        if len(start) != 2 or len(end) != 2:
+            raise ValueError("Arrow endpoints need x and y")
+        start = tuple(finite(v, "arrow start") for v in start)
+        end = tuple(finite(v, "arrow end") for v in end)
+        length = math.dist(start, end)
+        if length < 1:
+            raise ValueError("Arrow endpoints must be at least one pixel apart")
+        kwargs.setdefault("position", tuple((a + b) / 2 for a, b in zip(start, end)))
+        kwargs.setdefault("rotation", math.degrees(math.atan2(end[1] - start[1], end[0] - start[0])))
+        super().__init__(length, **kwargs)
+        self.tip_size = finite(tip_size, "tip_size", 1)
+        if self.tip_size > length:
+            raise ValueError("Arrow tip_size must fit its length")

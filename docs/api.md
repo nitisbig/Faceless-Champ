@@ -28,11 +28,13 @@ Use animation builders for changes over time.
 | --- | --- |
 | `Text(text, ...)` | `font=None`, `font_size=64`, `color="white"`, `align="left"`, `spacing=8` |
 | `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"` |
+| `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |
 | `Rectangle(...)` | `width=200`, `height=200` |
 | `Square(side=200, ...)` | Equal width and height |
 | `Circle(radius=100, ...)` | Diameter is twice the radius |
 | `Triangle(...)` | `width=200`, `height=200`; upward-pointing triangle |
 | `Line(length=200, ...)` | Horizontal line; use rotation for other directions |
+| `Arrow(start, end, ...)` | Two `(x, y)` endpoints; `tip_size=18`; supports `Draw` |
 
 Shapes accept `fill=None`, `stroke="white"`, `stroke_width=4`.
 `None` disables fill/stroke. Lines have no fill. Shape raster bounds include stroke
@@ -47,6 +49,11 @@ Images accept PNG, JPG/JPEG, WebP, and GIF files. `contain` preserves the entire
 with transparent padding; `cover` crops to fill. GIF timing starts when the component
 is added and loops while visible. Non-GIF formats use their first frame.
 
+Icons use transparent raster assets and retain their original alpha masks; source
+RGB colors are replaced by `color`. SVG inputs should be exported to PNG first.
+Arrow position and rotation are calculated from its endpoints; ordinary component
+transforms can then move, rotate, or scale it. Arrowheads use the stroke color.
+
 ## Scenes and animation
 
 Subclass `Scene(canvas=None)` and implement `construct(self)`.
@@ -58,14 +65,23 @@ You can also use a plain Scene and call authoring methods directly.
 | `add(*components)` | Introduce visuals at the cursor; adding the same object twice is a no-op |
 | `play(*animations, run_time=1, rate_func=smooth)` | Run animations concurrently and advance the cursor |
 | `wait(duration=1)` | Advance the cursor while holding current visuals |
+| `time` | Current authoring cursor, in seconds |
+| `at(time)` | Context manager for authoring at an absolute scene time; keeps the furthest cursor afterward |
+| `wait_until(time)` | Advance to an absolute time; rejects moving backward |
+| `remove(*components)` | End visual lifetimes at the cursor; use new instances to reintroduce visuals |
 | `add_audio(path, ...)` | Schedule audio without advancing the cursor |
 | `build()` | Construct once and return the scene |
-| `duration` | Maximum of visual cursor and audio clip end times |
+| `duration` | Maximum of visual cursor, audio clip ends, and caption track ends |
 | `render(output, **options)` | Export through the top-level render function |
 
 `play()` automatically adds components that are not already present. Timings are
 seconds. Positive animation durations are required. A scene must have positive
 duration to export. Objects persist after animations; FadeOut hides them.
+
+Independent objects may be scheduled out of order with `at()`. Animations of the
+same object's property must be authored in chronological order and cannot overlap.
+Removal cannot precede the object's start or the end of its authored animations.
+Removed objects are excluded from rendering at and after their removal timestamp.
 
 Animations: `FadeIn(component)`, `FadeOut(component)`, `Typewriter(text)`, and
 `Draw(shape)`. Typewriter reveals Unicode code points; complex grapheme clusters
@@ -113,6 +129,43 @@ fade_in=0, fade_out=0)` accepts WAV, MP3, and M4A.
   to prevent clipping when summing loud tracks.
 - Exports with audio use 48 kHz stereo AAC at 192 kbit/s. Exports without clips have
   no audio stream. Silence pads audio to the video duration.
+
+## SRT and captions
+
+`SubtitleTrack.from_srt(path)` reads UTF-8/BOM SRT with LF or CRLF line endings.
+`SubtitleTrack.parse_srt(text)` parses an in-memory string. Comma and dot timestamp
+separators and multiline cue text are supported. Malformed timestamps, duplicate
+cue numbers, empty cue text, reversed intervals, overlaps, and out-of-order cues
+raise `ValueError`. Tracks contain at least one cue.
+
+`SubtitleCue(index, start, end, text)` is immutable. `track.cues` contains the ordered
+cue tuple. `track.cue(index)` looks up an original SRT number; absent numbers raise
+`KeyError`. `track.duration` is the last cue's end time. `track.active_at(time)` uses
+`start <= time < end`, returning `None` in gaps. Cues are never retimed.
+
+`Captions(track, font=None, font_size=42, width=1440, color="#292724",
+highlight_color="#e56c35", future_color="#99938b", max_words=7, max_duration=3,
+spacing=8, **component_options)` displays centered phrases, wraps at `width`, and
+highlights the active cue. Completed cues use `color`; future cues use
+`future_color`. A word-per-cue file highlights words; sentence cues highlight the
+whole cue. Phrases break at punctuation and the configured word/duration limits;
+an individual cue is kept intact even if it exceeds those limits. A single word
+wider than the caption box raises an error; reduce the font size or increase width.
+
+Cue times are relative to the caption component's introduction time. Add it at time
+zero for absolute audio timestamps. Adding captions extends the scene to their last
+cue, unless explicitly removed earlier. `Captions.phrase_at(time)` and
+`track.phrases(max_words=7, max_duration=3)` expose the same phrase segmentation.
+Caption lookup is deterministic, including when frames render out of order.
+
+```python
+track = SubtitleTrack.from_srt("cue-per-word.srt")
+scene = Scene()
+scene.add(Captions(track, position=(960, 1000)))
+scene.add_audio("audio.mp3", start=0)
+with scene.at(track.cue(4).start):
+    scene.play(FadeIn(Text("a student", position=(960, 540))), run_time=0.25)
+```
 
 ## Rendering and settings
 

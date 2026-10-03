@@ -34,3 +34,28 @@ composition timing. These are signal measurements, not a subjective listening re
 Artifacts and preview PNGs are in `output/`, which is ignored by Git. Run
 `uv run python examples/render_all.py` to regenerate them and `output/verification.json`.
 The 4K test confirms a short export; it is not a long-video performance benchmark.
+
+## Good-math additions
+
+Verified on 2026-10-03 after adding SRT cues, captions, absolute scene timing,
+component lifetimes, tintable icons, and drawable arrows:
+
+- **49 pytest cases passed**. Added coverage includes SRT boundary/gap handling,
+  BOM/CRLF/multiline inputs, invalid cues, phrase limits, caption wrapping and
+  highlighting, composition offsets, out-of-order rendering, timed lifetimes,
+  temporal animation conflicts, icon alpha/tint, and arrow drawing.
+- Ruff lint/format checks passed for source, tests, examples, and good-math scripts.
+- The complete narrated preview exported as 1280×720 H.264 at 24 fps with AAC,
+  starting at zero, for 60.208333 seconds (the 60.2-second scene rounded to a frame).
+- The 12-frame storyboard and decoded preview frames were inspected for spacing,
+  typography, arrows, and caption placement. A 1920×1080 frame was rendered from
+  a different working directory to check path independence and supersampling.
+- Comparing decoded source/export audio from 1–2 seconds gave correlation 0.999726
+  and exported narration RMS 0.232559, confirming preserved narration alignment.
+  The preview includes a short final hold after narration ends.
+
+Run `uv run python 'training project/good-math/render.py' --preview --overwrite`
+to regenerate the preview, or `--frames` to regenerate the storyboard in the
+project's `output/` folder. The downloaded asset licenses and source/checksum
+manifest are in the shared `assets/` folder. Wheel/distribution checks above
+describe the original v0.1 baseline; those were not repeated for these additions.

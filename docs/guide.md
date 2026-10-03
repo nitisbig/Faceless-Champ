@@ -22,6 +22,32 @@ class Caption(Scene):
         self.play(FadeOut(text), run_time=0.4)
 ```
 
+## Syncing a narration to word cues
+
+```python
+from faceless_champ import Captions, SubtitleTrack
+
+track = SubtitleTrack.from_srt("cue-per-word.srt")
+self.add(Captions(track, position=(960, 1008)))  # Add at zero for audio timestamps.
+self.add_audio("audio.mp3", start=0)
+with self.at(track.cue(4).start):
+    self.play(FadeIn(Text("a student", position=(960, 540))), run_time=0.24)
+```
+
+Use original SRT cue numbers as event markers. `at()` lets you schedule independent
+objects at absolute times without accumulating the lengths of preceding animations.
+Each block restores the furthest authoring cursor. Author animations of the same
+property in chronological order; overlapping or earlier insertions are rejected.
+Use `wait_until()` to finish at an absolute time. Fade an object out, then `remove()`
+it to end its lifetime. Reintroduce it with a new instance.
+
+Captions use short phrases with word highlighting when supplied word-level cues.
+They preserve all text, including transcript artifacts. Source times remain exact;
+video frames sample those times at the requested frame rate, so a cue shorter than
+one frame may not appear in the video. Increase fps when those short cues matter.
+
+See `training project/good-math/scene/story.py` for the complete narrated example.
+
 ## Sequence and grid
 
 ```python
