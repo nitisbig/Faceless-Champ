@@ -15,6 +15,7 @@ from .animation import (
     SpinIn,
     Typewriter,
     Wiggle,
+    Write,
     ZoomIn,
     ZoomOut,
     ease_in,
@@ -23,29 +24,49 @@ from .animation import (
     smooth,
 )
 from .cli import main as main
-from .components import Arrow, Canvas, Circle, Component, Icon, Image, Line, Rectangle, Square, Text, Triangle
+from .colors import COLOR_SCHEMES, ColorScheme, with_alpha
+from .components import (
+    Arrow,
+    Canvas,
+    Circle,
+    Component,
+    Equation,
+    Icon,
+    Image,
+    Line,
+    Polyline,
+    Rectangle,
+    Square,
+    Text,
+    Triangle,
+)
 from .export import ExportSettings, render
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
-from .timeline import Grid, Scene, Sequence
+from .timeline import Grid, Layer, Scene, Sequence
 
 __all__ = [
+    "COLOR_SCHEMES",
     "Animation",
     "Arrow",
     "BounceIn",
     "Canvas",
     "Captions",
     "Circle",
+    "ColorScheme",
     "Component",
     "Draw",
+    "Equation",
     "ExportSettings",
     "FadeIn",
     "FadeOut",
     "Grid",
     "Icon",
     "Image",
+    "Layer",
     "Line",
     "PillowRenderer",
+    "Polyline",
     "PopIn",
     "PopOut",
     "Pulse",
@@ -64,6 +85,7 @@ __all__ = [
     "Triangle",
     "Typewriter",
     "Wiggle",
+    "Write",
     "ZoomIn",
     "ZoomOut",
     "ease_in",
@@ -71,5 +93,6 @@ __all__ = [
     "linear",
     "render",
     "smooth",
+    "with_alpha",
 ]
 __version__ = "0.1.0"

@@ -1,0 +1,72 @@
+{
+  "downloads": [
+    {
+      "file": "fonts/SpaceGrotesk[wght].ttf",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf",
+      "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72"
+    },
+    {
+      "file": "fonts/spacegrotesk-OFL.txt",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacegrotesk/OFL.txt",
+      "sha256": "564ce565c371c5e5bbf286006565a7c9aa55a9f56e7ca58d56e05d649dd61a72"
+    },
+    {
+      "file": "fonts/DMSans[opsz,wght].ttf",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/DMSans%5Bopsz%2Cwght%5D.ttf",
+      "sha256": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d"
+    },
+    {
+      "file": "fonts/dmsans-OFL.txt",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/OFL.txt",
+      "sha256": "9af36190332437f5ecd09974de43c1f7c77a310a996cdd8ceb25628b458840e1"
+    },
+    {
+      "file": "icons/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf",
+      "source": "https://raw.githubusercontent.com/google/material-design-icons/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf",
+      "sha256": "5ca6cdf74da4018e8a7687995c9e392b1a7ec49588fade2be3a97a2a06dd3262"
+    },
+    {
+      "file": "icons/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].codepoints",
+      "source": "https://raw.githubusercontent.com/google/material-design-icons/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.codepoints",
+      "sha256": "225bd09137103cb7746bc93dc08d08764c9f0c3bd04f4b958d4a3c3c19432dd6"
+    },
+    {
+      "file": "icons/LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/google/material-design-icons/master/LICENSE",
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+    },
+    {
+      "file": "sfx/equation-render/tick.wav",
+      "source": "Original procedural audio; CC0-1.0",
+      "sha256": "a2f50bc63e9c888b299d8b43593dd12ea6011aa35ede10a6e157359deb4502b0"
+    },
+    {
+      "file": "sfx/equation-render/resolve.wav",
+      "source": "Original procedural audio; CC0-1.0",
+      "sha256": "9205dc2e2d7d7d0847cef5f2a17964fa9acf72eaab7e6f9dc922cd8b9e06de4f"
+    },
+    {
+      "file": "sfx/equation-render/transition.wav",
+      "source": "Original procedural audio; CC0-1.0",
+      "sha256": "b94cc444eba008017abe5198b9957f3b7dae2e2ebbc658667ce1ad2790b392e8"
+    }
+  ],
+  "icons": [
+    "square_foot",
+    "calculate",
+    "trending_up",
+    "payments",
+    "show_chart",
+    "area_chart",
+    "bolt",
+    "device_hub",
+    "analytics",
+    "graphic_eq"
+  ],
+  "icon_style": {
+    "FILL": 0,
+    "GRAD": 0,
+    "opsz": 48,
+    "wght": 300
+  }
+}

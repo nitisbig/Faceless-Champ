@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections import OrderedDict
 from itertools import pairwise
 from pathlib import Path
 from typing import Protocol
@@ -10,9 +11,9 @@ from typing import Protocol
 from PIL import Image as PILImage
 from PIL import ImageColor, ImageDraw, ImageFont, ImageOps
 
-from .components import Arrow, Circle, Icon, Image, Line, Shape, Text, Triangle
+from .components import Arrow, Circle, Equation, Icon, Image, Line, Polyline, Rectangle, Shape, Text, Triangle, finite
 from .subtitles import Captions
-from .timeline import Grid, Renderable, Scene, Sequence
+from .timeline import Grid, Layer, Renderable, Scene, Sequence
 
 
 class Renderer(Protocol):
@@ -21,22 +22,43 @@ class Renderer(Protocol):
 
 
 class PillowRenderer:
-    def __init__(self, antialias: int = 2):
+    def __init__(self, antialias: int = 2, *, frame_cache_mb: float = 64):
         if antialias not in (1, 2, 3, 4):
             raise ValueError("antialias must be 1, 2, 3, or 4")
         self.antialias = antialias
         self._images = {}
         self._fonts = {}
         self._sprites = {}
+        self._equations = {}
+        self._math_parser = None
+        self._math_vector_parser = None
+        self._scene_frames = OrderedDict()
+        self._frame_cache_limit = round(finite(frame_cache_mb, "frame_cache_mb", 0) * 1024 * 1024)
+        self._frame_cache_bytes = 0
 
     def _font(self, component: Text | Captions, size: int):
         path = component.font or str(Path(__file__).parent / "assets" / "DejaVuSans.ttf")
-        key = (path, size)
+        weight = getattr(component, "font_weight", None)
+        key = (path, size, weight)
         if key not in self._fonts:
             try:
                 self._fonts[key] = ImageFont.truetype(path, size)
             except OSError as exc:
                 raise ValueError(f"Cannot load font: {path}") from exc
+            if weight is not None:
+                font = self._fonts[key]
+                try:
+                    axes = font.get_variation_axes()
+                except OSError as exc:
+                    del self._fonts[key]
+                    raise ValueError("font_weight requires a variable font with a Weight axis") from exc
+                axis = next((i for i, a in enumerate(axes) if a["name"].lower() == b"weight"), None)
+                if axis is None or not axes[axis]["minimum"] <= weight <= axes[axis]["maximum"]:
+                    del self._fonts[key]
+                    raise ValueError("font_weight must fit the variable font's Weight axis")
+                values = [a["default"] for a in axes]
+                values[axis] = weight
+                font.set_variation_by_axes(values)
         return self._fonts[key]
 
     def _image(self, path: Path):
@@ -57,14 +79,17 @@ class PillowRenderer:
         return self._images[key]
 
     def validate(self, node: Renderable) -> None:
-        if not isinstance(node, (Scene, Sequence, Grid)):
-            raise TypeError("Expected Scene, Sequence, or Grid")
+        if not isinstance(node, (Scene, Sequence, Grid, Layer)):
+            raise TypeError("Expected Scene, Sequence, Grid, or Layer")
         ImageColor.getcolor(node.canvas.bg, "RGBA")
         _ = node.duration
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
-                if isinstance(c, (Text, Captions)):
+                if isinstance(c, Equation):
+                    ImageColor.getcolor(c.color, "RGBA")
+                    self._equation(c, 1)
+                elif isinstance(c, (Text, Captions)):
                     self._font(c, round(c.font_size))
                     ImageColor.getcolor(c.color, "RGBA")
                     if isinstance(c, Captions):
@@ -107,16 +132,24 @@ class PillowRenderer:
             return first
         if isinstance(node, Grid):
             sx, sy = size[0] / node.canvas.width, size[1] / node.canvas.height
-            cw = (node.canvas.width - node.gap * (node.columns - 1)) / node.columns
-            ch = (node.canvas.height - node.gap * (node.rows - 1)) / node.rows
-            for i, child in enumerate(node.children):
+            top, right_pad, bottom_pad, left = node.padding
+            cw = (node.canvas.width - left - right_pad - node.gap * (node.columns - 1)) / node.columns
+            ch = (node.canvas.height - top - bottom_pad - node.gap * (node.rows - 1)) / node.rows
+            for i, (start, child) in enumerate(zip(node.start_times, node.children)):
+                if time < start:
+                    continue
                 col, row = i % node.columns, i // node.columns
-                x, y = round(col * (cw + node.gap) * sx), round(row * (ch + node.gap) * sy)
-                right, bottom = round((col * (cw + node.gap) + cw) * sx), round((row * (ch + node.gap) + ch) * sy)
+                x, y = round((left + col * (cw + node.gap)) * sx), round((top + row * (ch + node.gap)) * sy)
+                right = round((left + col * (cw + node.gap) + cw) * sx)
+                bottom = round((top + row * (ch + node.gap) + ch) * sy)
                 cell = self._fit(
-                    child, min(time, child.duration), (max(1, right - x), max(1, bottom - y)), node.canvas.bg
+                    child, min(time - start, child.duration), (max(1, right - x), max(1, bottom - y)), node.canvas.bg
                 )
                 background.alpha_composite(cell, (x, y))
+            return background
+        if isinstance(node, Layer):
+            for child in node.children:
+                background.alpha_composite(self._fit(child, min(time, child.duration), size, "#00000000"))
             return background
         raise TypeError(f"Unsupported renderable: {type(node).__name__}")
 
@@ -129,18 +162,37 @@ class PillowRenderer:
         return result
 
     def _scene(self, scene, time, size):
-        aa = self.antialias
-        big = (size[0] * aa, size[1] * aa)
-        result = PILImage.new("RGBA", big, scene.canvas.bg)
-        factor = min(big[0] / scene.canvas.width, big[1] / scene.canvas.height)
+        visible = []
         for entry in sorted(scene.entries, key=lambda e: e.component.z_index):
             if time < entry.start or (entry.end is not None and time >= entry.end):
                 continue
             state = entry.state_at(time)
-            if state["opacity"] <= 0:
-                continue
-            c = entry.component
-            sprite = self._sprite(c, state, factor, max(0, time - entry.start))
+            if state["opacity"] > 0:
+                visible.append((entry.component, state, max(0, time - entry.start)))
+        signature = (
+            scene.canvas,
+            size,
+            tuple(
+                (
+                    c,
+                    tuple(state.items()),
+                    age
+                    if isinstance(c, Captions) or (isinstance(c, Image) and c.path.suffix.lower() == ".gif")
+                    else None,
+                )
+                for c, state, age in visible
+            ),
+        )
+        cached = self._scene_frames.get(scene)
+        if cached is not None and cached[0] == signature:
+            self._scene_frames.move_to_end(scene)
+            return cached[1].copy()
+        aa = self.antialias
+        big = (size[0] * aa, size[1] * aa)
+        result = PILImage.new("RGBA", big, scene.canvas.bg)
+        factor = min(big[0] / scene.canvas.width, big[1] / scene.canvas.height)
+        for c, state, age in visible:
+            sprite = self._sprite(c, state, factor, age)
             w, h = sprite.size
             scale = state["scale"]
             if scale != 1:
@@ -161,6 +213,17 @@ class PillowRenderer:
             result.alpha_composite(sprite, (round(x - sprite.width / 2), round(y - sprite.height / 2)))
         if aa > 1:
             result = result.resize(size, PILImage.Resampling.LANCZOS)
+        # One frame per scene within an LRU byte budget. Copies protect caller edits.
+        previous = self._scene_frames.pop(scene, None)
+        if previous is not None:
+            self._frame_cache_bytes -= previous[1].width * previous[1].height * 4
+        cost = result.width * result.height * 4
+        if cost <= self._frame_cache_limit:
+            while self._frame_cache_bytes + cost > self._frame_cache_limit:
+                _, (_, old) = self._scene_frames.popitem(last=False)
+                self._frame_cache_bytes -= old.width * old.height * 4
+            self._scene_frames[scene] = (signature, result.copy())
+            self._frame_cache_bytes += cost
         return result
 
     def _sprite(self, c, state, factor, age):
@@ -179,7 +242,15 @@ class PillowRenderer:
         key = (c, factor, frame_index)
         if static and key in self._sprites:
             return self._sprites[key]
-        if isinstance(c, Text):
+        if isinstance(c, Equation):
+            sprite = self._equation(c, factor)
+            if state["reveal"] < 1:
+                visible = max(0, min(sprite.width, math.floor(sprite.width * state["reveal"])))
+                revealed = PILImage.new("RGBA", sprite.size)
+                if visible:
+                    revealed.paste(sprite.crop((0, 0, visible, sprite.height)), (0, 0))
+                sprite = revealed
+        elif isinstance(c, Text):
             font = self._font(c, max(1, round(c.font_size * factor)))
             spacing = round(c.spacing * factor)
             draw = ImageDraw.Draw(PILImage.new("RGBA", (1, 1)))
@@ -230,7 +301,24 @@ class PillowRenderer:
             sprite = PILImage.new("RGBA", (w + width * 2, h + width * 2))
             draw = ImageDraw.Draw(sprite)
             x, y = width, width
-            if isinstance(c, Circle):
+            if isinstance(c, Polyline):
+                points = [(x + px * factor, y + py * factor) for px, py in c.points]
+                if c.closed:
+                    points.append(points[0])
+            elif isinstance(c, Rectangle) and c.corner_radius:
+                radius = c.corner_radius * factor
+                points = []
+                for cx, cy, start in (
+                    (x + w - radius, y + radius, -90),
+                    (x + w - radius, y + h - radius, 0),
+                    (x + radius, y + h - radius, 90),
+                    (x + radius, y + radius, 180),
+                ):
+                    for step in range(13):
+                        angle = math.radians(start + step * 90 / 12)
+                        points.append((cx + radius * math.cos(angle), cy + radius * math.sin(angle)))
+                points.append(points[0])
+            elif isinstance(c, Circle):
                 points = [
                     (
                         x + w / 2 + w / 2 * math.cos(a * math.tau / 180 - math.pi / 2),
@@ -245,7 +333,8 @@ class PillowRenderer:
             else:
                 points = [(x, y), (x + w, y), (x + w, y + h), (x, y + h), (x, y)]
             progress = max(0, min(1, state["draw"]))
-            if c.fill and not isinstance(c, Line) and progress >= 1:
+            can_fill = not isinstance(c, Line) and (not isinstance(c, Polyline) or c.closed)
+            if c.fill and can_fill and progress >= 1:
                 draw.polygon(points, fill=c.fill)
             if c.stroke and c.stroke_width > 0 and progress > 0:
                 lengths = [math.dist(a, b) for a, b in pairwise(points)]
@@ -260,9 +349,112 @@ class PillowRenderer:
                         visible.append((a[0] + (b[0] - a[0]) * ratio, a[1] + (b[1] - a[1]) * ratio))
                         break
                 draw.line(visible, fill=c.stroke, width=width, joint="curve")
+                if isinstance(c, Polyline) and c.line_cap == "round" and not c.closed:
+                    radius = width / 2
+                    for px, py in (visible[0], visible[-1]):
+                        draw.ellipse((px - radius, py - radius, px + radius, py + radius), fill=c.stroke)
         if static:
             self._sprites[key] = sprite
         return sprite
+
+    def _equation(self, c: Equation, factor: float):
+        key = (c.expression, c.font_size, c.fontset, c.color, c.max_width, tuple(sorted(c.color_map.items())), factor)
+        if key in self._equations:
+            return self._equations[key]
+        try:
+            import numpy as np
+            from matplotlib import rc_context
+            from matplotlib.font_manager import FontProperties
+            from matplotlib.mathtext import MathTextParser
+        except ImportError as exc:
+            raise RuntimeError(
+                "Equation requires the equations extra: install 'faceless-champ[equations]' "
+                "or run 'uv sync --extra equations' in this checkout"
+            ) from exc
+        if self._math_parser is None:
+            self._math_parser = MathTextParser("agg")
+        with rc_context({"mathtext.default": "it"}):
+            try:
+                prop = FontProperties(size=max(1, c.font_size * factor), math_fontfamily=c.fontset)
+                if c.color_map:
+                    sprite = self._colored_equation(c, prop)
+                else:
+                    parsed = self._math_parser.parse(f"${c.expression}$", dpi=72, prop=prop)
+            except ValueError as exc:
+                raise ValueError(f"Invalid Equation {c.expression!r}: {exc}") from exc
+        if not c.color_map:
+            mask = PILImage.fromarray(np.asarray(parsed.image).copy())
+            color = ImageColor.getcolor(c.color, "RGBA")
+            sprite = PILImage.new("RGBA", mask.size, color)
+            if color[3] != 255:
+                mask = mask.point(lambda alpha: round(alpha * color[3] / 255))
+            sprite.putalpha(mask)
+        box = sprite.getbbox()
+        if box:
+            sprite = sprite.crop(box)
+        if c.max_width is not None and sprite.width > c.max_width * factor:
+            ratio = c.max_width * factor / sprite.width
+            sprite = sprite.resize(
+                (max(1, round(sprite.width * ratio)), max(1, round(sprite.height * ratio))), PILImage.Resampling.LANCZOS
+            )
+        self._equations[key] = sprite
+        return sprite
+
+    def _colored_equation(self, c, prop):
+        """Color positioned math glyphs after typesetting the complete expression."""
+        import numpy as np
+        from matplotlib import ft2font
+        from matplotlib.backends.backend_agg import RendererAgg
+        from matplotlib.mathtext import MathTextParser
+        from matplotlib.path import Path as MathPath
+        from matplotlib.transforms import Affine2D, Bbox
+
+        if self._math_vector_parser is None:
+            self._math_vector_parser = MathTextParser("path")
+        parser = self._math_vector_parser
+        base = tuple(v / 255 for v in ImageColor.getcolor(c.color, "RGBA"))
+        colors = {}
+        for symbol, color in c.color_map.items():
+            parsed_symbol = parser.parse(f"${symbol}$", dpi=72, prop=prop)
+            if len(parsed_symbol.glyphs) != 1 or parsed_symbol.rects:
+                raise ValueError(f"color_map key {symbol!r} must represent one math glyph")
+            code = parsed_symbol.glyphs[0][2]
+            rgba = tuple(v / 255 for v in ImageColor.getcolor(color, "RGBA"))
+            if code in colors and colors[code] != rgba:
+                raise ValueError(f"color_map contains conflicting aliases for {symbol!r}")
+            colors[code] = rgba
+        parsed = parser.parse(f"${c.expression}$", dpi=72, prop=prop)
+        paths = []
+        flags = ft2font.LoadFlags.NO_HINTING if hasattr(ft2font, "LoadFlags") else ft2font.LOAD_NO_HINTING
+        for glyph in parsed.glyphs:
+            font, size, code = glyph[:3]
+            x, y = glyph[-2:]
+            font.set_size(size, 72)
+            # Matplotlib 3.11 includes the glyph index; 3.9/3.10 return five fields.
+            if len(glyph) == 6:
+                font.load_glyph(glyph[3], flags=flags)
+            else:
+                font.load_char(code, flags=flags)
+            vertices, codes = font.get_path()
+            if len(vertices):
+                path = MathPath(vertices, codes).transformed(Affine2D().translate(x, y))
+                paths.append((path, colors.get(code, base)))
+        for x, y, width, height in parsed.rects:
+            path = MathPath.unit_rectangle().transformed(Affine2D().scale(width, height).translate(x, y))
+            paths.append((path, base))
+        if not paths:
+            return PILImage.new("RGBA", (1, 1))
+        bounds = Bbox.union([path.get_extents() for path, _ in paths])
+        left, bottom = math.floor(bounds.x0), math.floor(bounds.y0)
+        renderer = RendererAgg(math.ceil(bounds.x1 - left) + 4, math.ceil(bounds.y1 - bottom) + 4, 72)
+        gc = renderer.new_gc()
+        gc.set_linewidth(0)
+        gc.set_antialiased(True)
+        transform = Affine2D().translate(2 - left, 2 - bottom)
+        for path, rgba in paths:
+            renderer.draw_path(gc, path, transform, rgbFace=rgba)
+        gc.restore()
+        return PILImage.fromarray(np.asarray(renderer.buffer_rgba()).copy())
 
     def _caption_sprite(self, c: Captions, factor: float, age: float):
         phrase = c.phrase_at(age)

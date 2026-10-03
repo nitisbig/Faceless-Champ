@@ -91,6 +91,32 @@ scenes, use `child.build().wait(1)` to append a hold after construction. Calling
 `wait()` before construction prepends time to a lazily constructed scene.
 Composition is a tree of scenes and layouts; do not create cycles in `children`.
 
+## Consistent colors and readable equations
+
+Choose a `ColorScheme` and pass the same roles to the formula symbols, graph paths,
+and their labels. For instance, use primary for a triangle's horizontal side,
+secondary for its vertical side, and tertiary for its hypotenuse. Keep operators
+and supporting copy in the scheme's text and muted roles, and use axis/grid roles
+for reference lines. A translucent fill can use `with_alpha(scheme.tertiary, .18)`.
+The `paper` preset has darker series colors suited to its light surface.
+
+Use `Equation(color_map={"a": scheme.primary, "b": scheme.secondary})` for matching
+symbol colors, including Greek keys such as `r"\mu"`. Color maps select individual
+glyphs throughout the formula, including letters inside roman text; supply a map
+appropriate to that particular expression. The example's `SYMBOL_ROLES` in
+`scene/equations.py` makes the assignments explicit.
+
+For readable variable fonts, pass `Text(font=path, font_weight=500)`. Rounded
+Polyline caps soften graph endpoints without blurring their geometry. Preview
+and export with `antialias=2` for smooth curves and type; raising antialias adds
+rendering work. The equation example uses CRF 18 for previews and 16 for final
+exports to preserve small symbols.
+
+```bash
+uv run --extra equations python 'training project/equation-render/render.py' --color-scheme midnight
+uv run --extra equations python 'training project/equation-render/render.py' --color-scheme paper --frames
+```
+
 ## Audio and imported assets
 
 ```python

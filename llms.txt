@@ -15,6 +15,17 @@ positive Y down; component anchors default to center. play() advances time and r
 its arguments concurrently. Audio start defaults to the current cursor, not zero.
 Export with render() or faceless-champ render file.py SceneName -o output.mp4.
 Use Sequence for cuts/crossfades and Grid for simultaneous row-major panels.
+Grid supports padding and start_times for staggered panels; offsets apply to audio.
+Layer composites transparent canvases in order for shared headings and overlays.
+Equation typesets TeX-style expressions with the optional equations extra; Write
+reveals formulas without changing their layout. Polyline draws curves and closed
+filled paths. Rectangle supports corner_radius. The one-minute example is in
+training project/equation-render/render.py and its scene/ directory.
+ColorScheme.named("midnight"/"paper"/"ocean") supplies reusable visual roles;
+with_alpha() creates shaded fills. Equation.color_map colors individual symbols
+and Greek commands without reflow; matching glyphs anywhere receive their colors.
+Polyline(line_cap="round") supports smooth graph endpoints. Text.font_weight sets
+the Weight axis of an explicit variable font; omit it for a static font.
 Use SubtitleTrack.from_srt() for exact cue times, Captions for word highlighting,
 and with scene.at(time) for absolute scheduling. Add captions at zero for source
 audio timestamps. Use Arrow for drawable connectors and Icon for tinted PNGs.

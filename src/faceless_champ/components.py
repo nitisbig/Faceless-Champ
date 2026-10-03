@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import math
+import re
+from collections.abc import Mapping
 from dataclasses import dataclass
+from itertools import pairwise
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Self
 
@@ -90,6 +93,7 @@ class Text(Component):
         color: str = "white",
         align: str = "left",
         spacing: float = 8,
+        font_weight: float | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -101,6 +105,50 @@ class Text(Component):
         self.font_size = finite(font_size, "font_size", 1)
         self.color, self.align = color, align
         self.spacing = finite(spacing, "spacing", 0)
+        self.font_weight = None if font_weight is None else finite(font_weight, "font_weight", 1)
+
+
+class Equation(Component):
+    """TeX-style math typeset with the optional Matplotlib MathText engine.
+
+    Pass an expression without dollar delimiters. ``max_width`` scales long
+    expressions down to fit a design-pixel width, retaining their aspect ratio.
+    """
+
+    def __init__(
+        self,
+        expression: str,
+        *,
+        font_size: float = 64,
+        color: str = "white",
+        fontset: str = "stix",
+        max_width: float | None = None,
+        color_map: Mapping[str, str] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        if not isinstance(expression, str):
+            raise TypeError("expression must be a string")
+        if not expression.strip() or "$" in expression or "\n" in expression:
+            raise ValueError("Equation needs a nonempty, single-line expression without dollar delimiters")
+        if fontset not in {"stix", "stixsans", "cm", "dejavusans", "dejavuserif"}:
+            raise ValueError("Unsupported MathText fontset")
+        self.expression, self.fontset, self.color = expression, fontset, color
+        self.font_size = finite(font_size, "font_size", 1)
+        self.max_width = None if max_width is None else finite(max_width, "max_width", 1)
+        if color_map is not None and not isinstance(color_map, Mapping):
+            raise TypeError("color_map must map individual symbols to colors")
+        self.color_map = dict(color_map or {})
+        for symbol, symbol_color in self.color_map.items():
+            if (
+                not isinstance(symbol, str)
+                or not symbol.strip()
+                or symbol in {"$", "\\"}
+                or not (len(symbol) == 1 or re.fullmatch(r"\\[A-Za-z]+", symbol))
+            ):
+                raise ValueError("color_map keys must be a single character or TeX symbol command such as \\mu")
+            if not isinstance(symbol_color, str):
+                raise TypeError("color_map values must be color strings")
 
 
 class Image(Component):
@@ -141,7 +189,11 @@ class Shape(Component):
 
 
 class Rectangle(Shape):
-    pass
+    def __init__(self, *, corner_radius: float = 0, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.corner_radius = finite(corner_radius, "corner_radius", 0)
+        if self.corner_radius > min(self.width, self.height) / 2:
+            raise ValueError("corner_radius must fit the rectangle")
 
 
 class Square(Rectangle):
@@ -163,6 +215,30 @@ class Line(Shape):
 
     def __init__(self, length: float = 200, **kwargs: Any) -> None:
         super().__init__(width=length, height=1, **kwargs)
+
+
+class Polyline(Shape):
+    """A drawable path through canvas points, optionally closed and filled.
+
+    Its default position is the points' bounding-box center. Explicit position
+    replaces that center; transforms work like those of every other shape.
+    """
+
+    def __init__(self, points, *, closed: bool = False, line_cap: str = "butt", **kwargs: Any) -> None:
+        points = tuple(tuple(finite(v, "point") for v in p) for p in points)
+        if len(points) < (3 if closed else 2) or any(len(p) != 2 for p in points):
+            raise ValueError("Polyline needs at least two (x, y) points; closed paths need three")
+        if not any(a != b for a, b in pairwise(points)):
+            raise ValueError("Polyline needs distinct points")
+        left, top = min(p[0] for p in points), min(p[1] for p in points)
+        right, bottom = max(p[0] for p in points), max(p[1] for p in points)
+        kwargs.setdefault("position", ((left + right) / 2, (top + bottom) / 2))
+        super().__init__(width=max(1, right - left), height=max(1, bottom - top), **kwargs)
+        self.points = tuple((x - left, y - top) for x, y in points)
+        self.closed = closed
+        if line_cap not in {"butt", "round"}:
+            raise ValueError("line_cap must be butt or round")
+        self.line_cap = line_cap
 
 
 class Arrow(Line):

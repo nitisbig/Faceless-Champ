@@ -320,7 +320,14 @@ class Sequence(Renderable):
 
 class Grid(Renderable):
     def __init__(
-        self, *children: Renderable, rows: int = 2, columns: int = 3, canvas: Canvas | None = None, gap: float = 0
+        self,
+        *children: Renderable,
+        rows: int = 2,
+        columns: int = 3,
+        canvas: Canvas | None = None,
+        gap: float = 0,
+        padding: float | tuple[float, float, float, float] = 0,
+        start_times: list[float] | tuple[float, ...] | None = None,
     ) -> None:
         if any(not isinstance(x, int) or isinstance(x, bool) or x <= 0 for x in (rows, columns)):
             raise ValueError("rows and columns must be positive integers")
@@ -330,9 +337,39 @@ class Grid(Renderable):
         self.rows, self.columns = rows, columns
         self.canvas = canvas or Canvas()
         self.gap = finite(gap, "gap", 0)
-        if self.gap * (columns - 1) >= self.canvas.width or self.gap * (rows - 1) >= self.canvas.height:
-            raise ValueError("Grid gaps leave no room for cells")
+        if isinstance(padding, (int, float)):
+            padding = (padding,) * 4
+        if len(padding) != 4:
+            raise ValueError("padding must be a number or (top, right, bottom, left)")
+        self.padding = tuple(finite(v, "padding", 0) for v in padding)
+        top, right, bottom, left = self.padding
+        if (
+            left + right + self.gap * (columns - 1) >= self.canvas.width
+            or top + bottom + self.gap * (rows - 1) >= self.canvas.height
+        ):
+            raise ValueError("Grid gaps and padding leave no room for cells")
+        if start_times is not None and len(start_times) != len(children):
+            raise ValueError("start_times needs one offset per child")
+        self.start_times = tuple(finite(t, "start time", 0) for t in (start_times or [0] * len(children)))
 
     @property
     def duration(self) -> float:
-        return max(c.duration for c in self.children)
+        return max(start + child.duration for start, child in zip(self.start_times, self.children))
+
+
+class Layer(Renderable):
+    """Composite children in order on one canvas, mixing their audio.
+
+    Use transparent child canvases (``bg="#00000000"``) for overlays. Shorter
+    children hold their final frame, as they do in a Grid.
+    """
+
+    def __init__(self, *children: Renderable, canvas: Canvas | None = None) -> None:
+        if not children:
+            raise ValueError("Layer requires children")
+        self.children = list(children)
+        self.canvas = canvas or children[0].canvas
+
+    @property
+    def duration(self) -> float:
+        return max(child.duration for child in self.children)

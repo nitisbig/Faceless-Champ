@@ -12,7 +12,7 @@ from pathlib import Path
 from .audio import require_tools
 from .components import Canvas, finite
 from .renderer import PillowRenderer, Renderer
-from .timeline import Grid, Renderable, Scene, Sequence
+from .timeline import Grid, Layer, Renderable, Scene, Sequence
 
 
 @dataclass(frozen=True)
@@ -77,6 +77,9 @@ def _audio_events(node, offset=0.0, envelopes=()):
                     fades.append(("out", offset + start + child.duration - node.crossfade, node.crossfade))
             result.extend(_audio_events(child, offset + start, tuple(fades)))
     elif isinstance(node, Grid):
+        for start, child in zip(node.start_times, node.children):
+            result.extend(_audio_events(child, offset + start, envelopes))
+    elif isinstance(node, Layer):
         for child in node.children:
             result.extend(_audio_events(child, offset, envelopes))
     return result
@@ -124,7 +127,7 @@ def render(
     if settings is not None and options:
         raise ValueError("Use settings or keyword export options, not both")
     if not isinstance(node, Renderable):
-        raise TypeError("Expected a Scene, Sequence, or Grid")
+        raise TypeError("Expected a Scene, Sequence, Grid, or Layer")
     settings = settings or ExportSettings(**options)
     output = Path(output).resolve()
     if output.suffix.lower() != ".mp4":

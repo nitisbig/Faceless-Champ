@@ -19,6 +19,20 @@ Read [the API](../../docs/api.md) for supported constructors and
   cursor. Audio may extend scene duration without advancing the visual cursor.
 - Use Sequence for successive scenes and Grid for simultaneous panels. A grid's
   duration is its longest child. Crossfades need enough duration in adjacent scenes.
+- Grid accepts padding (top, right, bottom, left) and start_times per child for
+  staggered reveals; its duration includes the offsets, which also shift audio.
+  Use Layer with transparent child canvases for a shared heading over a grid.
+- Use Equation for single-line TeX-style expressions without dollar delimiters and
+  Write for a left-to-right formula reveal. This needs the optional equations extra
+  (`uv sync --extra equations`); MathText does not require system LaTeX. max_width
+  fits long formulas. Use Polyline for drawable curves and closed filled regions,
+  and Rectangle(corner_radius=...) for rounded cards.
+- Use ColorScheme.named("midnight"), "paper", or "ocean" to coordinate background,
+  surface, text, axis, and series roles. Match Equation(color_map=...) symbols to
+  graph colors and labels. Keys are individual characters or TeX symbol commands;
+  matches include roman-text glyphs, so choose a map for each expression.
+  with_alpha() makes shaded fills; Polyline(line_cap="round") rounds endpoints.
+  Text(font_weight=...) needs an explicit variable font with a Weight axis.
 - Start with ql previews. Render to output/ and inspect representative decoded frames
   and media metadata. Add a final wait() when an animation's endpoint needs a hold.
 - For narration, read SubtitleTrack.from_srt() and schedule visual events with

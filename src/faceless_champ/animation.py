@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Self
 
-from .components import Component, Shape, Text, finite
+from .components import Component, Equation, Shape, Text, finite
 
 
 def linear(t: float) -> float:
@@ -71,6 +71,13 @@ def Typewriter(component: Text) -> Animation:
     if not isinstance(component, Text):
         raise TypeError("Typewriter requires Text")
     return Animation(component, {"reveal": 1.0}, {"reveal": 0.0})
+
+
+def Write(component: Equation) -> Animation:
+    """Reveal a fully typeset equation from left to right without reflow."""
+    if not isinstance(component, Equation):
+        raise TypeError("Write requires Equation")
+    return Animation(component, {"reveal": 1.0}, {"reveal": 0.0}, rate_func=linear)
 
 
 def Draw(component: Shape) -> Animation:

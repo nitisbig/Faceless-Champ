@@ -9,6 +9,9 @@ authors = [
 requires-python = ">=3.12"
 dependencies = ["Pillow>=10.4,<13"]
 
+[project.optional-dependencies]
+equations = ["matplotlib>=3.9,<4"]
+
 [project.scripts]
 faceless-champ = "faceless_champ:main"
 

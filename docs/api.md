@@ -26,15 +26,17 @@ Use animation builders for changes over time.
 
 | Component | Specific arguments |
 | --- | --- |
-| `Text(text, ...)` | `font=None`, `font_size=64`, `color="white"`, `align="left"`, `spacing=8` |
+| `Text(text, ...)` | `font=None`, `font_size=64`, `color="white"`, `align="left"`, `spacing=8`, `font_weight=None` |
+| `Equation(expression, ...)` | `font_size=64`, `color="white"`, `fontset="stix"`, `max_width=None`, `color_map=None`; requires the `equations` extra |
 | `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"` |
 | `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |
-| `Rectangle(...)` | `width=200`, `height=200` |
+| `Rectangle(...)` | `width=200`, `height=200`, `corner_radius=0`; radius must fit inside the rectangle |
 | `Square(side=200, ...)` | Equal width and height |
 | `Circle(radius=100, ...)` | Diameter is twice the radius |
 | `Triangle(...)` | `width=200`, `height=200`; upward-pointing triangle |
 | `Line(length=200, ...)` | Horizontal line; use rotation for other directions |
 | `Arrow(start, end, ...)` | Two `(x, y)` endpoints; `tip_size=18`; supports `Draw` |
+| `Polyline(points, ...)` | At least two canvas `(x, y)` points; `closed=False`, `line_cap="butt"` or `"round"`; closed paths need three points and can have fill |
 
 Shapes accept `fill=None`, `stroke="white"`, `stroke_width=4`.
 `None` disables fill/stroke. Lines have no fill. Shape raster bounds include stroke
@@ -44,6 +46,9 @@ Text accepts an explicit TTF/OTF font file; `None` uses the bundled DejaVu Sans.
 Newlines are supported; `align` is left, center, or right alignment within multiline
 text. There is no automatic wrapping, rich text, font-family lookup, or guaranteed
 fallback for characters absent from the selected font.
+`font_weight` sets the Weight axis of an explicit variable font. Values must fit
+that font's axis range; static fonts reject this option. `None` preserves the font's
+default weight. The renderer keeps separate cached instances for each weight.
 
 Images accept PNG, JPG/JPEG, WebP, and GIF files. `contain` preserves the entire image
 with transparent padding; `cover` crops to fill. GIF timing starts when the component
@@ -53,6 +58,62 @@ Icons use transparent raster assets and retain their original alpha masks; sourc
 RGB colors are replaced by `color`. SVG inputs should be exported to PNG first.
 Arrow position and rotation are calculated from its endpoints; ordinary component
 transforms can then move, rotate, or scale it. Arrowheads use the stroke color.
+
+Polyline position defaults to the points' bounding-box center. Explicit position
+replaces that center; its points retain their local geometry. `Draw` reveals the
+path by cumulative segment length. Closed paths gain their fill at full draw
+progress; use `FadeIn` for a shaded area that should fade instead. Rectangle rounded
+corners also support partial `Draw` outlines. `line_cap="round"` rounds the visible
+endpoints of open polylines, including during Draw; closed paths have no end caps.
+
+Equation accepts a single raw TeX-style math expression without dollar delimiters,
+for example `Equation(r"x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}")`. Install with
+`pip install 'faceless-champ[equations]'` or `uv sync --extra equations`. MathText
+supports a subset of TeX, including fractions, integrals, limits, radicals, and Greek
+letters; full LaTeX packages/environments are not supported. Fontsets are `stix`,
+`stixsans`, `cm`, `dejavusans`, and `dejavuserif`. `max_width` shrinks a formula to
+fit design pixels while preserving its aspect ratio. `Write(equation)` reveals the
+already typeset sprite from left to right, preserving layout and position. MathText
+is imported only when an Equation renders; ordinary scenes keep the Pillow-only
+dependency footprint. Invalid expressions fail during renderer validation.
+
+`color_map` maps individual symbols to colors: keys are single characters or TeX
+symbol commands such as `r"\mu"`, `r"\sigma"`, and `r"\prime"`. Matching glyphs,
+including repeated symbols and superscripts, receive the mapped color; other
+glyphs, operators, fraction bars, and radical bars retain `color`. Whole words,
+subexpressions, and arbitrary TeX groups are not keys. Conflicting Unicode/TeX
+aliases for one symbol are rejected. Layout is calculated for the entire formula
+before glyph coloring, so Write, scaling, width limits, and fractions retain their
+geometry. Colors can include alpha.
+
+```python
+scheme = ColorScheme.named("midnight")
+formula = Equation(r"a^2+b^2=c^2", color=scheme.text,
+                   color_map={"a": scheme.primary, "b": scheme.secondary,
+                              "c": scheme.tertiary}, position=(960, 540))
+self.play(Write(formula))
+```
+
+## Color schemes
+
+`ColorScheme.named(name)` selects `midnight`, `paper`, or `ocean`. `COLOR_SCHEMES`
+is the read-only mapping of preset names to immutable scheme objects. Fields are
+`name`, `background`, `surface`, `text`, `muted`, `axis`, `border`, `grid`, `primary`,
+`secondary`, `tertiary`, and `highlight`. Construct `ColorScheme(...)` with overrides
+or use `dataclasses.replace()` to adapt a preset. Color values are validated on
+construction. Selecting a scheme does not implicitly recolor existing components;
+pass its roles to the relevant component constructors.
+
+`scheme.color(role)` resolves a named color role. `scheme.series(index)` cycles
+through primary, secondary, tertiary, and highlight; the index must be a
+nonnegative integer. `with_alpha(color, opacity)` returns an RGBA hex color and
+multiplies any existing alpha, with opacity in `[0, 1]`.
+
+```python
+scheme = ColorScheme.named("paper")
+curve = Polyline(points, stroke=scheme.primary, stroke_width=4, line_cap="round")
+area = Polyline(area_points, closed=True, fill=with_alpha(scheme.primary, .18), stroke=None)
+```
 
 ## Scenes and animation
 
@@ -164,11 +225,23 @@ must fit each child; interior children need space for both fades without triple
 overlap. Children are proportionally fitted into the sequence canvas, which
 inherits the first child's canvas unless supplied explicitly.
 
-`Grid(*children, rows=2, columns=3, canvas=None, gap=0)` fills cells in row-major order.
-Children start at zero and remain clipped to their cells; unused cells show the
-canvas background. The default grid canvas is 1920×1080. Gap uses design pixels.
-Duration is the longest child duration; shorter children hold their final visual
-state, while their audio ends. Letterboxing preserves child aspect ratios.
+`Grid(*children, rows=2, columns=3, canvas=None, gap=0, padding=0, start_times=None)`
+fills cells in row-major order. Padding is a design-pixel number for all edges or
+`(top, right, bottom, left)`. Gap and padding must leave positive cell dimensions.
+Children start at zero by default; `start_times` supplies one nonnegative offset
+per child. A cell shows the grid background before its child starts. Visuals and
+audio are both shifted by the offset. Children remain clipped to their cells;
+unused cells show the canvas background. The default canvas is 1920×1080.
+Duration is the largest offset plus its child's duration; shorter children hold
+their final visual state, while their audio ends. Letterboxing preserves child
+aspect ratios.
+
+`Layer(*children, canvas=None)` composites children in addition order on one canvas,
+mixing their audio. Its canvas defaults to the first child's canvas. Use transparent
+child canvases (`Canvas(bg="#00000000")`) for overlays such as a grid over shared
+headings or captions. Opaque child backgrounds cover earlier children. Children
+are proportionally fitted, and duration is the longest child duration. Shorter
+children hold their final frames; sounds keep their original durations.
 
 ## Audio
 
@@ -221,6 +294,13 @@ with scene.at(track.cue(4).start):
 ```
 
 ## Rendering and settings
+
+`PillowRenderer(antialias=2, frame_cache_mb=64)` caches unchanged scene frames within
+a configurable memory budget in MiB. The cache is invalidated by visible animation
+states, component lifetimes, canvas/resolution changes, GIF ages, and caption ages.
+Returned frames can be modified without changing cached frames. Set
+`frame_cache_mb=0` to disable this cache. It uses a least-recently-used eviction policy
+and retains at most one frame per scene; video frames are still streamed to FFmpeg.
 
 `render(node, output, *, settings=None, renderer=None, overwrite=False, **options)`
 returns the absolute output `Path`. Pass either `ExportSettings(...)` or its fields

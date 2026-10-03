@@ -5,7 +5,7 @@ The engine separates authoring from rasterization and encoding:
 1. Components describe static visual properties in design pixels.
 2. Scene construction snapshots components and records per-property animation tracks.
 3. Timeline evaluation computes state at arbitrary times without modifying components.
-4. Sequence and Grid map global time and bounds into their child compositions.
+4. Sequence, Grid, and Layer map global time and bounds into their child compositions.
 5. PillowRenderer rasterizes and composites one frame at a time.
 6. Export streams RGB frames to FFmpeg and builds an audio graph from leaf clips.
 
@@ -14,6 +14,10 @@ recursively with global offsets and ancestor crossfade envelopes. FFmpeg trims a
 resamples clips, applies local fades, delays them, applies composition fades, mixes,
 pads, and encodes. Sample-based timestamp normalization after delay avoids invalid
 timestamps from FFmpeg 6.1's inserted silence.
+
+Grid padding defines the cell region; each child has an optional start offset that
+shifts both visuals and audio. Layer composites fitted children in order, retaining
+transparent child backgrounds. Neither composition changes scene authoring tracks.
 
 `Renderer` is a protocol with `validate(node)` and
 `frame(node, time, size) -> PIL.Image.Image`. A replacement renderer must return the
@@ -35,6 +39,19 @@ that understands it. v0.1 does not have a global plugin registry.
 
 The renderer caches font instances, decoded image/GIF assets, and static sprites
 per renderer instance. Dynamic typewriter and outline frames are not retained.
+It also keeps the last rendered frame per scene within a configurable 64 MiB LRU
+budget. Evaluated visible component states determine reuse, so holds avoid repeated
+rasterization; GIF and caption ages invalidate dynamic content. Canvas, resolution,
+lifetimes, and new visuals also invalidate the cache. Returned images are independent
+copies. `PillowRenderer(frame_cache_mb=0)` disables the scene-frame cache.
+Equation sprites are cached by expression, fontset, color, symbol color map, font
+size, width limit, and render scale. Write masks those sprites without reparsing
+partial TeX. Colored formulas use MathText's complete vector layout and rasterize
+the positioned glyph outlines with their assigned colors; fraction/radical bars
+retain the base color. The optional MathText parser loads only when rendering an
+Equation. Variable font caches include weight, so separately weighted text does
+not share mutable variation settings. ColorScheme contains validated, immutable
+visual roles and adds no dependency beyond Pillow.
 Caption sprites are cached by phrase and active cue, so caption memory depends on
 the number of distinct cue states as well as output resolution. GIFs decode all
 frames into memory. Video frames themselves are streamed to the encoder.

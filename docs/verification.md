@@ -78,3 +78,55 @@ Verified on 2026-10-03 after adding 11 motion presets and keyframe/relative trac
   motion preview is `training project/good-math/output/good-math-motion-preview.mp4`;
   the effect log and audit are `animations.json` and `motion-verification.json`
   in the same output folder.
+
+## Equation render and composition additions
+
+Verified on 2026-10-03 with the optional `equations` extra (Matplotlib 3.11.2):
+
+- **101 pytest cases passed**. New coverage checks stable formula reveals and width
+  limits, invalid math syntax, helpful missing-dependency errors, drawable path
+  length, rounded corners, polygon fills, delayed grid boundaries and padding,
+  transparent layers, held frames, and nested audio offsets/crossfade envelopes.
+- Ruff lint, formatting, and whitespace checks passed for the library, tests,
+  examples, and equation-render scripts.
+- The complete preview exported as 1280×720 H.264 at 24 fps, with 1,440 video
+  frames and 48 kHz stereo AAC. Both streams start at zero and last exactly
+  **60.000000 seconds**. Full video/audio decoding completed without errors.
+- The ten-equation storyboard, three complete 1920×1080 canvases, and decoded
+  transition/final frames were inspected. Body copy uses supported font glyphs;
+  math symbols use the equation renderer. The grids are 2×2, 2×2, and 2×1.
+- Decoded sound effects peak at −22.8 dBFS; they are deliberately quiet and
+  sparse. This is a signal measurement, not a subjective listening review.
+
+Run `uv run --extra equations python 'training project/equation-render/render.py'
+--preview --overwrite` to regenerate the preview, or use `--frames` for the
+storyboard. Downloaded fonts/icons, original effects, licenses, and provenance
+are in the shared `assets/` directory. A default export selects 1080p/30 fps;
+the full video checked here is the 720p preview.
+
+## Color schemes and rendering quality
+
+Verified on 2026-10-03 after adding coordinated palettes and per-symbol math colors:
+
+- **117 pytest cases passed**, including the previous scene/export checks. New
+  coverage includes palette validation, alpha multiplication, glyph coloring with
+  unchanged formula geometry, Greek aliases, color-map validation, weighted font
+  cache isolation, rounded path caps, scene-cache invalidation, caller image edits,
+  out-of-order animation sampling, LRU eviction, and disabled frame caching.
+- Ruff lint/format and whitespace checks passed. Public color APIs also imported
+  successfully through the installed editable library from outside the checkout.
+- Storyboards for `midnight`, `paper`, and `ocean` were generated, with completed
+  canvases checked for text contrast, distinct graph quantities, formula alignment,
+  and readable type. A decoded preview frame confirmed the exported symbol colors.
+- The refreshed midnight preview uses antialias 2 and CRF 18. It fully decoded
+  without errors: H.264 at 1280×720/24 fps, 1,440 frames, 48 kHz stereo AAC, and
+  exactly 60.000000 seconds on both streams. Default final exports use CRF 16.
+- In a focused benchmark of twelve held 720p frames from the first completed
+  canvas, rasterization took 6.7736 seconds with the scene cache disabled and
+  1.3423 seconds with the 64 MiB cache. The final RGBA hashes were identical.
+  This measures a static hold; it is not a full-video speedup estimate.
+
+The refreshed preview remains `training project/equation-render/output/equations-preview.mp4`.
+Preset storyboards are under `output/frames/<scheme>/`, and symbol color assignments
+are recorded in `output/timeline-<scheme>.json`. Renderer frame caching is bounded
+and configurable with `PillowRenderer(frame_cache_mb=...)`.

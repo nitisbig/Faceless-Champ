@@ -81,6 +81,32 @@ The scene also demonstrates pop, slide, zoom, bounce, spin, pulse, shake, and wi
 presets alongside fades, drawing, typewriter reveals, and transform builders.
 See the [animation API](docs/api.md#scenes-and-animation) for reusable presets.
 
+## Animated equation training project
+
+The [equation-render project](training%20project/equation-render/README.md) presents
+ten useful equations in one minute: two 2×2 canvases followed by a 2×1 canvas.
+Each equation has a typeset formula, animated diagram, and example. Panels reveal
+one at a time, with crossfades between canvases and quiet sound effects.
+
+```bash
+uv sync --extra equations
+uv run --extra equations python 'training project/equation-render/render.py' --preview
+uv run --extra equations python 'training project/equation-render/render.py'
+```
+
+This example adds optional `Equation`/`Write` support, `Polyline` paths, rounded
+rectangles, padded grids with delayed starts, and transparent `Layer` compositions.
+Downloaded Google fonts and Material icons, their licenses, and original sound
+effects are stored in the shared `assets/` folders. MathText handles formulas
+without requiring a separate LaTeX installation.
+
+Choose `--color-scheme midnight`, `paper`, or `ocean` for coordinated equation,
+graph, and canvas colors. Formula symbols share colors with their graph quantities.
+The library exposes `ColorScheme`, `Equation(color_map=...)`, variable font
+`Text(font_weight=...)`, rounded Polyline caps, and `with_alpha()` for shaded areas.
+Unchanged scene frames are reused within a configurable memory budget, reducing
+the rendering work during held panels while preserving animation and caption timing.
+
 ## Documentation
 
 - [API reference](docs/api.md): components, scenes, animation, composition, and exports.
