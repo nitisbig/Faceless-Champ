@@ -77,6 +77,9 @@ uv run python 'training project/good-math/render.py'
 
 The library now includes `SubtitleTrack`, `Captions`, `Icon`, and `Arrow`, plus
 `Scene.at()`, `wait_until()`, and `remove()` for narration-driven authoring.
+The scene also demonstrates pop, slide, zoom, bounce, spin, pulse, shake, and wiggle
+presets alongside fades, drawing, typewriter reveals, and transform builders.
+See the [animation API](docs/api.md#scenes-and-animation) for reusable presets.
 
 ## Documentation
 

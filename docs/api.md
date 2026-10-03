@@ -63,7 +63,7 @@ You can also use a plain Scene and call authoring methods directly.
 | Method | Behavior |
 | --- | --- |
 | `add(*components)` | Introduce visuals at the cursor; adding the same object twice is a no-op |
-| `play(*animations, run_time=1, rate_func=smooth)` | Run animations concurrently and advance the cursor |
+| `play(*animations, run_time=1, rate_func=None)` | Run animations concurrently; preset easing or smooth by default |
 | `wait(duration=1)` | Advance the cursor while holding current visuals |
 | `time` | Current authoring cursor, in seconds |
 | `at(time)` | Context manager for authoring at an absolute scene time; keeps the furthest cursor afterward |
@@ -87,6 +87,35 @@ Animations: `FadeIn(component)`, `FadeOut(component)`, `Typewriter(text)`, and
 `Draw(shape)`. Typewriter reveals Unicode code points; complex grapheme clusters
 may appear in stages. Draw traces a shape's outline and displays its fill at the end.
 
+Motion presets accept any component, including text, icons, shapes, and captions:
+
+| Animation | Parameters and behavior |
+| --- | --- |
+| `SlideIn` | `direction="up"`, `distance=80`; fade and slide into the resting position |
+| `SlideOut` | `direction="down"`, `distance=80`; fade and move away from the current position |
+| `ZoomIn` | `from_scale=0.6`; grow from a fraction of the current scale while fading in |
+| `ZoomOut` | `to_scale=0.6`; shrink to a fraction of the current scale while fading out |
+| `PopIn` | `from_scale=0.45`, `overshoot=1.14`; grow past resting size, then settle |
+| `PopOut` | `to_scale=0.45`, `overshoot=1.08`; grow slightly, then shrink and fade out |
+| `BounceIn` | `distance=80`; rise from below, bounce past the target, and settle |
+| `SpinIn` | `angle=-35`, `from_scale=0.7`; rotate, scale, and fade into place |
+| `Pulse` | `factor=1.12`, `cycles=1`; scale up and back without drift |
+| `Shake` | `distance=14`, `direction="horizontal"`, `cycles=2`; translate back and forth |
+| `Wiggle` | `angle=8`, `cycles=2`; rock back and forth around the current rotation |
+
+Slide direction is the direction of travel: `SlideIn(..., direction="up")` starts
+below the target. Directions are up, down, left, and right. Shake directions are
+horizontal or vertical. Distances use design pixels; angles use degrees; scales
+and factors must be positive. Cycle counts must be positive integers. Pulse,
+shake, and wiggle restore the exact current timeline transform at the end.
+Zoom presets scale individual components around their anchors.
+
+```python
+self.play(PopIn(icon), SlideIn(label, direction="up"), run_time=0.5)
+self.play(Pulse(icon), Wiggle(label, angle=3), run_time=0.6)
+self.play(SlideOut(icon), ZoomOut(label), run_time=0.35)
+```
+
 ```python
 self.play(
     title.animate.move_to(960, 300).scale_to(1.2).rotate_to(5),
@@ -98,8 +127,32 @@ self.play(
 Builder targets are absolute values. Chain different properties on the same builder.
 Two concurrent animations cannot target the same component property. Subsequent
 `play()` calls interpolate from the previous target. Built-in easing functions are
-`linear` and `smooth`; custom easing is a deterministic callable mapping `[0,1]` to
-`[0,1]` with endpoints zero and one.
+`linear`, `smooth`, `ease_in`, and `ease_out`; custom easing is a deterministic
+callable mapping `[0,1]` to `[0,1]` with endpoints zero and one. Presets select their
+own easing. An explicit `play(rate_func=...)` overrides easing for every animation
+in that call; without it, each animation uses its own easing or falls back to smooth.
+
+`Animation(component, targets, starts=None, keyframes=None, relative=(),
+rate_func=None)` also supports custom motion. Keyframes map animated properties to
+`(progress, value)` pairs. Progress must increase strictly from 0 to 1, values must
+satisfy normal property validation, and the last value must match the target. The
+first value defines the starting state and must match `starts` when provided.
+Easing applies within each keyframe segment. Exact values at progress 0 and 1
+are used at those boundaries. Final values hold afterward, including when frames
+sample out of order.
+
+`relative` can name animated position, rotation, and scale properties. Position
+and rotation use offsets; scale uses multipliers. All relative values resolve from
+the current timeline state when `play()` schedules the animation, including after
+earlier movements or scaling. Invalid keyframes reject the whole play call before
+components or tracks are added.
+
+```python
+self.play(Animation(
+    icon, {"scale": 1}, relative=("scale",),
+    keyframes={"scale": ((0, 1), (0.5, 1.2), (1, 1))},
+), run_time=0.6)
+```
 
 ## Composition
 

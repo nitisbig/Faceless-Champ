@@ -22,6 +22,32 @@ class Caption(Scene):
         self.play(FadeOut(text), run_time=0.4)
 ```
 
+## Motion presets
+
+Pair icons with their labels and play their entrance animations concurrently:
+
+```python
+from faceless_champ import PopIn, SlideIn, Pulse, Wiggle, SlideOut, ZoomOut
+
+self.play(PopIn(icon), SlideIn(label, direction="up"), run_time=0.5)
+self.play(Pulse(icon), Wiggle(label, angle=3), run_time=0.6)
+self.play(SlideOut(icon), ZoomOut(label), run_time=0.35)
+self.remove(icon, label)
+```
+
+Zooms and pops affect individual components. Slide direction describes movement;
+an upward entrance starts below the resting position. Scale factors are relative
+to the evaluated timeline state, so emphasis effects still return to the right
+size after earlier scaling. Shake and wiggle also return to the current transform.
+Entrances animate opacity together with movement; do not also apply FadeIn to the
+same component in that call. Typewriter and Draw animate different properties and
+may be combined with a motion preset. Explicit `rate_func` overrides preset easing.
+
+The good-math scene exercises every preset and all four animation builder methods.
+Its `ENTRANCES`, `EXITS`, and `EMPHASES` constants select the motion rotation.
+Every render writes `output/animations.json` with effect names, affected visuals,
+and timings. Late narration cues use shorter entrances to fit their scene boundary.
+
 ## Syncing a narration to word cues
 
 ```python

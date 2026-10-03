@@ -59,3 +59,22 @@ to regenerate the preview, or `--frames` to regenerate the storyboard in the
 project's `output/` folder. The downloaded asset licenses and source/checksum
 manifest are in the shared `assets/` folder. Wheel/distribution checks above
 describe the original v0.1 baseline; those were not repeated for these additions.
+
+## Motion presets
+
+Verified on 2026-10-03 after adding 11 motion presets and keyframe/relative tracks:
+
+- **89 pytest cases passed**. New coverage includes nondefault transforms, pop
+  overshoot, bounded opacity, all slide directions, exits after earlier transforms,
+  repeated emphasis without drift, bounce/spin intermediate values, easing
+  overrides, invalid keyframes, atomic rejection, and absolute-time conflicts.
+- Lint and formatting checks passed for source, tests, examples, and project scripts.
+- The complete good-math motion preview exported and decoded without errors:
+  1280×720 H.264, 30 fps, 60.2 seconds, with AAC narration starting at zero.
+- An audit of all 175 scene entries confirmed every diagram visual has animation
+  tracks, all 19 named effects/builder operations occur, the 38 icons animate,
+  resting transforms return correctly before exits, and node cue starts are intact.
+- Decoded entrance, emphasis, and ending frames were visually inspected. The
+  motion preview is `training project/good-math/output/good-math-motion-preview.mp4`;
+  the effect log and audit are `animations.json` and `motion-verification.json`
+  in the same output folder.

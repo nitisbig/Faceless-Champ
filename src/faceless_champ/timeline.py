@@ -6,10 +6,11 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
+from itertools import pairwise
 from pathlib import Path
 from typing import Any, Self
 
-from .animation import Animation, interpolate, smooth
+from .animation import Animation, interpolate, relative_value, smooth
 from .audio import AudioClip
 from .components import Canvas, Component, finite
 from .subtitles import Captions
@@ -36,6 +37,20 @@ class Track:
     initial: object
     target: object
     easing: Callable[[float], float]
+    keyframes: tuple[tuple[float, object], ...] | None = None
+
+    def value_at(self, time: float):
+        progress = (time - self.start) / self.duration
+        if progress <= 0:
+            return self.initial
+        if progress >= 1:
+            return self.target
+        if self.keyframes:
+            for (left, initial), (right, target) in pairwise(self.keyframes):
+                if progress <= right:
+                    local = (progress - left) / (right - left)
+                    return interpolate(initial, target, self.easing(local))
+        return interpolate(self.initial, self.target, self.easing(progress))
 
 
 @dataclass
@@ -50,8 +65,7 @@ class Entry:
         state = self.initial.copy()
         for track in self.tracks:
             if time >= track.start:
-                progress = min(1.0, (time - track.start) / track.duration)
-                state[track.property] = interpolate(track.initial, track.target, track.easing(progress))
+                state[track.property] = track.value_at(time)
         return state
 
 
@@ -149,37 +163,42 @@ class Scene(Renderable):
             self._objects[component] = entry
         return self
 
-    def play(self, *animations: Animation, run_time: float = 1.0, rate_func: Callable[[float], float] = smooth) -> Self:
+    def play(
+        self, *animations: Animation, run_time: float = 1.0, rate_func: Callable[[float], float] | None = None
+    ) -> Self:
         duration = finite(run_time, "run_time", 0.000001)
         if not animations:
             raise ValueError("play requires at least one animation")
-        if not callable(rate_func):
+        if rate_func is not None and not callable(rate_func):
             raise TypeError("rate_func must be callable")
         seen = set()
+        prepared = []
         for animation in animations:
             if not isinstance(animation, Animation) or not animation.targets:
                 raise TypeError("play requires nonempty animations")
             if not isinstance(animation.component, Component):
                 raise TypeError("Animation requires a Component")
+            if animation.rate_func is not None and not callable(animation.rate_func):
+                raise TypeError("Animation rate_func must be callable")
+            if set(animation.starts or {}) - set(animation.targets):
+                raise ValueError("Animation starts must refer to animated properties")
+            if set(animation.keyframes or {}) - set(animation.targets):
+                raise ValueError("Keyframes must refer to animated properties")
+            if set(animation.relative) - (set(animation.targets) & {"position", "scale", "rotation"}):
+                raise ValueError("Relative properties must be animated position, scale, or rotation")
             for properties in (animation.targets, animation.starts or {}):
                 for key, value in properties.items():
                     if key not in animation.component.state():
                         raise ValueError(f"Unsupported animation property: {key}")
-                    if key == "position":
-                        if not isinstance(value, tuple) or len(value) != 2:
-                            raise ValueError("Animated position must be an (x, y) tuple")
-                        for coordinate in value:
-                            finite(coordinate, "position")
-                    else:
-                        finite(value, key, 0.001 if key == "scale" else (None if key == "rotation" else 0))
-                        if key in {"opacity", "reveal", "draw"} and value > 1:
-                            raise ValueError(f"{key} must be <= 1")
+                    _validate_animated_value(key, value)
+            entry = self._objects.get(animation.component)
+            state = entry.state_at(self._cursor) if entry is not None else animation.component.state()
+            tracks = []
             for key in animation.targets:
                 identity = (animation.component, key)
                 if identity in seen:
                     raise ValueError(f"Overlapping animations for property {key}")
                 seen.add(identity)
-                entry = self._objects.get(animation.component)
                 if entry is not None:
                     if entry.end is not None or self._cursor < entry.start:
                         raise ValueError("Animation is outside the component's lifetime")
@@ -187,13 +206,54 @@ class Scene(Renderable):
                         raise ValueError(
                             f"Animations for {key} must be authored in chronological order without overlaps"
                         )
-        for animation in animations:
-            self.add(animation.component)
-            entry = self._objects[animation.component]
-            state = entry.state_at(self._cursor)
-            for key, target in animation.targets.items():
-                initial = (animation.starts or {}).get(key, state[key])
-                entry.tracks.append(Track(key, self._cursor, duration, initial, target, rate_func))
+                base = state[key]
+                initial = (animation.starts or {}).get(key, base)
+                target = animation.targets[key]
+                relative = key in animation.relative
+                if relative:
+                    initial = (
+                        relative_value(key, base, animation.starts[key]) if key in (animation.starts or {}) else base
+                    )
+                    target = relative_value(key, base, target)
+                frames = None
+                if key in (animation.keyframes or {}):
+                    points = animation.keyframes[key]
+                    if len(points) < 2:
+                        raise ValueError("Keyframes need at least two points")
+                    frames = []
+                    previous = -1.0
+                    for point in points:
+                        if not isinstance(point, (tuple, list)) or len(point) != 2:
+                            raise ValueError("Keyframes need (progress, value) pairs")
+                        progress, value = point
+                        progress = finite(progress, "keyframe progress", 0)
+                        if progress > 1 or progress <= previous:
+                            raise ValueError("Keyframe progress must increase strictly within [0, 1]")
+                        _validate_animated_value(key, value)
+                        value = relative_value(key, base, value) if relative else value
+                        _validate_animated_value(key, value)
+                        frames.append((progress, value))
+                        previous = progress
+                    if frames[0][0] != 0 or frames[-1][0] != 1:
+                        raise ValueError("Keyframes must include progress 0 and 1")
+                    if frames[-1][1] != target:
+                        raise ValueError("Last keyframe must match the animation target")
+                    if key in (animation.starts or {}) and frames[0][1] != initial:
+                        raise ValueError("First keyframe must match the explicit animation start")
+                    initial = frames[0][1]
+                    frames = tuple(frames)
+                _validate_animated_value(key, initial)
+                _validate_animated_value(key, target)
+                tracks.append(
+                    Track(
+                        key, self._cursor, duration, initial, target, rate_func or animation.rate_func or smooth, frames
+                    )
+                )
+            prepared.append((animation.component, tracks))
+        # Validate the whole play call before changing the scene.
+        for component, tracks in prepared:
+            self.add(component)
+            self._objects[component].tracks.extend(tracks)
         self._cursor += duration
         return self
 
@@ -216,6 +276,18 @@ class Scene(Renderable):
             AudioClip(path, self._cursor if start is None else start, trim_start, trim_end, volume, fade_in, fade_out)
         )
         return self
+
+
+def _validate_animated_value(key: str, value) -> None:
+    if key == "position":
+        if not isinstance(value, tuple) or len(value) != 2:
+            raise ValueError("Animated position must be an (x, y) tuple")
+        for coordinate in value:
+            finite(coordinate, "position")
+    else:
+        finite(value, key, 0.001 if key == "scale" else (None if key == "rotation" else 0))
+        if key in {"opacity", "reveal", "draw"} and value > 1:
+            raise ValueError(f"{key} must be <= 1")
 
 
 class Sequence(Renderable):

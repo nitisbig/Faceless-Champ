@@ -11,6 +11,5 @@ wheels/
 
 # Generated media and tool caches
 output/
-training project/
 .pytest_cache/
 .ruff_cache/

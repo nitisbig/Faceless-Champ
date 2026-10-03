@@ -27,6 +27,12 @@ Read [the API](../../docs/api.md) for supported constructors and
 - Use Icon for tintable transparent PNGs and Arrow for drawable diagram spokes.
   FadeOut then remove() components when their lifetime ends. Use fresh instances
   when bringing a removed visual back. Animate each property chronologically.
+- Use SlideIn/Out, ZoomIn/Out, PopIn/Out, BounceIn, and SpinIn for entrances/exits.
+  Pulse, Shake, and Wiggle emphasize a visual and return to its current transform.
+  These are component effects. Combine icon/label animations in one play call.
+  Motion entrances already animate opacity; do not add FadeIn on the same object.
+  Use explicit play(rate_func=...) to override preset easing. Custom Animation
+  keyframes must increase from progress 0 to 1 and end at the declared target.
 - Reuse the bundled default font or an explicit local TTF/OTF. Do not invent camera,
   chart, video-import, or graphical-editor APIs absent from v0.1.
 

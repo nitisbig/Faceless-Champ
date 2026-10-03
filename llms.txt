@@ -19,5 +19,8 @@ Use SubtitleTrack.from_srt() for exact cue times, Captions for word highlighting
 and with scene.at(time) for absolute scheduling. Add captions at zero for source
 audio timestamps. Use Arrow for drawable connectors and Icon for tinted PNGs.
 wait_until() advances to an absolute time; remove() ends a visual's lifetime.
+Motion presets: SlideIn/Out, ZoomIn/Out, PopIn/Out, BounceIn, SpinIn, Pulse, Shake,
+and Wiggle. Animation supports keyframes and relative transform values. Explicit
+play(rate_func=...) overrides preset easing; default easing falls back to smooth.
 The narrated example is in training project/good-math/render.py and scene/story.py.
 No camera, charts, video import, or graphical editor in v0.1.

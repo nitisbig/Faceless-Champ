@@ -21,8 +21,14 @@ requested dimensions, support deterministic frame sampling, and validate support
 node/component types. Pass it with `render(..., renderer=custom_renderer)`.
 The current exporter still owns FFmpeg, audio, and output publication.
 
-`Animation(component, targets, starts=None)` represents property interpolation.
+`Animation(component, targets, starts=None, keyframes=None, relative=(),
+rate_func=None)` represents property interpolation.
 Built-in properties are position, scale, rotation, opacity, reveal, and draw.
+Keyframe tracks interpolate within normalized segments and use exact endpoints.
+Relative transforms resolve against the component's evaluated state at scheduling
+time: position/rotation offsets and scale multipliers. Play calls prepare and
+validate every track before mutating the scene. Presets use this same track model;
+the renderer needs no animation-specific logic.
 A custom easing function must be deterministic. The base Component and renderer
 protocol provide extension points; adding a new visual type requires a renderer
 that understands it. v0.1 does not have a global plugin registry.
