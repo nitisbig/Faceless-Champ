@@ -1,0 +1,18 @@
+# Faceless Champ
+
+> Python 3.12+ video authoring library. Manim-style scenes, Pillow frames, FFmpeg MP4.
+
+- [Quickstart](README.md)
+- [API](docs/api.md)
+- [Timing, composition, audio, troubleshooting](docs/guide.md)
+- [Renderer and timeline architecture](docs/architecture.md)
+- [Runnable examples](examples/showcase.py)
+- [Authoring skill](skills/faceless-champ/SKILL.md)
+
+Import from faceless_champ. Subclass Scene and override construct(). Use add(),
+play(), wait(), and add_audio(). Coordinates are design pixels, top-left origin,
+positive Y down; component anchors default to center. play() advances time and runs
+its arguments concurrently. Audio start defaults to the current cursor, not zero.
+Export with render() or faceless-champ render file.py SceneName -o output.mp4.
+Use Sequence for cuts/crossfades and Grid for simultaneous row-major panels.
+No camera, charts, subtitle system, video import, or graphical editor in v0.1.

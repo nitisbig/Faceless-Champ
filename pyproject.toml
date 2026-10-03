@@ -1,0 +1,29 @@
+[project]
+name = "faceless-champ"
+version = "0.1.0"
+description = "Programmatic animated video editing for developers and AI agents"
+readme = "README.md"
+authors = [
+    { name = "Nitesh Ghimire", email = "niteshghimire223@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = ["Pillow>=10.4,<13"]
+
+[project.scripts]
+faceless-champ = "faceless_champ:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.uv.build-backend]
+source-include = ["docs/**", "examples/**", "tests/**", "skills/**", "llms.txt", "uv.lock"]
