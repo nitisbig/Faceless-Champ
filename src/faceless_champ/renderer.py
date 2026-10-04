@@ -9,13 +9,14 @@ from pathlib import Path
 from typing import Protocol
 
 from PIL import Image as PILImage
-from PIL import ImageColor, ImageDraw, ImageFont, ImageOps
+from PIL import ImageColor, ImageDraw, ImageOps
 
 from .charts import Chart
 from .charts.drawing import draw_chart
 from .components import (
     Arrow,
     Circle,
+    Ellipse,
     Equation,
     Icon,
     Image,
@@ -30,6 +31,7 @@ from .components import (
 )
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
+from .typography import DEFAULT_FONT, load_font
 
 
 class Renderer(Protocol):
@@ -53,28 +55,11 @@ class PillowRenderer:
         self._frame_cache_bytes = 0
 
     def _font(self, component: Text | Captions, size: int):
-        path = component.font or str(Path(__file__).parent / "assets" / "DejaVuSans.ttf")
+        path = component.font or DEFAULT_FONT
         weight = getattr(component, "font_weight", None)
         key = (path, size, weight)
         if key not in self._fonts:
-            try:
-                self._fonts[key] = ImageFont.truetype(path, size)
-            except OSError as exc:
-                raise ValueError(f"Cannot load font: {path}") from exc
-            if weight is not None:
-                font = self._fonts[key]
-                try:
-                    axes = font.get_variation_axes()
-                except OSError as exc:
-                    del self._fonts[key]
-                    raise ValueError("font_weight requires a variable font with a Weight axis") from exc
-                axis = next((i for i, a in enumerate(axes) if a["name"].lower() == b"weight"), None)
-                if axis is None or not axes[axis]["minimum"] <= weight <= axes[axis]["maximum"]:
-                    del self._fonts[key]
-                    raise ValueError("font_weight must fit the variable font's Weight axis")
-                values = [a["default"] for a in axes]
-                values[axis] = weight
-                font.set_variation_by_axes(values)
+            self._fonts[key] = load_font(path, size, weight)
         return self._fonts[key]
 
     def _image(self, path: Path):
@@ -353,7 +338,7 @@ class PillowRenderer:
                         angle = math.radians(start + step * 90 / 12)
                         points.append((cx + radius * math.cos(angle), cy + radius * math.sin(angle)))
                 points.append(points[0])
-            elif isinstance(c, Circle):
+            elif isinstance(c, (Circle, Ellipse)):
                 points = [
                     (
                         x + w / 2 + w / 2 * math.cos(a * math.tau / 180 - math.pi / 2),

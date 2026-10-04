@@ -42,4 +42,10 @@ Ranked bar axes adjust automatically unless fixed with x_axis=Axis(limits=(0, ma
 Number(value, format_spec=",.0f", prefix="", suffix="", formatter=None, width=None)
 inherits Text options and supports .animate.value_to(value), including signed values.
 The 45-second light-mode example is training project/company-growth/render.py.
+ChartStyle accepts font/font_weight and title_font/title_font_weight, sharing Text
+font validation. line_width sets chart stroke width. RankedBarChart accepts bar_height,
+corner_radius, and show_markers. LineChart(end_labels=True) labels final series points.
+Ellipse(width=..., height=...) is a drawable Shape with independent dimensions.
+The company-growth example follows layout.png with ivory, serif fonts, and fine line art.
+render(progress=callback) reports completed and total frame counts for render feedback.
 No camera, video import, or graphical editor in v0.1.

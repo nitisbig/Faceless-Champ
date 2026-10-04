@@ -6,6 +6,7 @@ import math
 import os
 import subprocess
 import tempfile
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -121,11 +122,18 @@ def render(
     settings: ExportSettings | None = None,
     renderer: Renderer | None = None,
     overwrite: bool = False,
+    progress: Callable[[int, int], None] | None = None,
     **options,
 ) -> Path:
-    """Render to MP4. Pass an ExportSettings object or its fields as keywords."""
+    """Render to MP4. ``progress(completed_frames, total_frames)`` is optional.
+
+    Pass an ExportSettings object or its fields as keywords. Progress starts at
+    zero and runs after each streamed frame; publication follows encoder completion.
+    """
     if settings is not None and options:
         raise ValueError("Use settings or keyword export options, not both")
+    if progress is not None and not callable(progress):
+        raise TypeError("progress must be callable")
     if not isinstance(node, Renderable):
         raise TypeError("Expected a Scene, Sequence, Grid, or Layer")
     settings = settings or ExportSettings(**options)
@@ -142,6 +150,8 @@ def render(
     frame_count = math.ceil(duration * settings.fps - 1e-9)
     export_duration = frame_count / settings.fps
     events = _audio_events(node)
+    if progress is not None:
+        progress(0, frame_count)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="faceless-champ-", dir=output.parent) as temporary:
         temporary = Path(temporary)
@@ -193,6 +203,8 @@ def render(
                 for index in range(frame_count):
                     frame = renderer.frame(node, index / settings.fps, size).convert("RGB")
                     process.stdin.write(frame.tobytes())
+                    if progress is not None:
+                        progress(index + 1, frame_count)
                 process.stdin.close()
                 returncode = process.wait()
                 if returncode:

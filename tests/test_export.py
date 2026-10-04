@@ -62,6 +62,24 @@ def test_crossfade_audio_envelope(tmp_path, tone):
     assert window(1.7, 1.8) < 0.001
 
 
+def test_render_frame_progress_and_invalid_callback(tmp_path):
+    reports = []
+    output = render(
+        Scene(Canvas(160, 90)).wait(1),
+        tmp_path / "progress.mp4",
+        width=160,
+        height=90,
+        fps=2,
+        preset="ultrafast",
+        progress=lambda completed, total: reports.append((completed, total)),
+    )
+    assert output.is_file()
+    assert reports == [(0, 2), (1, 2), (2, 2)]
+    with pytest.raises(TypeError, match="progress must be callable"):
+        render(Scene().wait(1), tmp_path / "invalid.mp4", progress=True)
+    assert not (tmp_path / "invalid.mp4").exists()
+
+
 def test_encoder_failure_cleans_up(tmp_path, monkeypatch):
     from faceless_champ import export
 

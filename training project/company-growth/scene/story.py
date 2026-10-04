@@ -1,4 +1,4 @@
-"""A 45-second editorial data story. Rendering and chart behavior live in the library."""
+"""An airy, serif-led 45-second company-growth story composed from the library."""
 
 from __future__ import annotations
 
@@ -7,48 +7,67 @@ from dataclasses import replace
 from pathlib import Path
 
 from faceless_champ import (
+    Arrow,
     Axis,
     Canvas,
     ChartReveal,
     ChartStyle,
     Circle,
     ColorScheme,
+    Draw,
+    Ellipse,
     FadeIn,
     Line,
     LineChart,
     Number,
-    PieChart,
+    Polyline,
     RankedBarChart,
-    Rectangle,
     Scene,
     Sequence,
-    SlideIn,
     Text,
     linear,
 )
 
 PROJECT = Path(__file__).resolve().parents[1]
 ROOT = PROJECT.parents[1]
-FONT = ROOT / "assets" / "fonts" / "DMSans[opsz,wght].ttf"
-FONT = FONT if FONT.is_file() else None
+SERIF = ROOT / "assets" / "fonts" / "CormorantGaramond[wght].ttf"
+ITALIC = ROOT / "assets" / "fonts" / "CormorantGaramond-Italic[wght].ttf"
+SANS = ROOT / "assets" / "fonts" / "DMSans[opsz,wght].ttf"
+SERIF = SERIF if SERIF.is_file() else None
+ITALIC = ITALIC if ITALIC.is_file() else SERIF
+SANS = SANS if SANS.is_file() else None
 SCHEME = replace(
     ColorScheme.named("paper"),
-    name="company-light",
-    background="#F5F4EF",
-    text="#172A38",
-    muted="#566772",
-    surface="#FFFFFF",
-    grid="#E8ECEE",
-    border="#DCE3E5",
-    primary="#296553",
+    name="company-ivory",
+    background="#FAF7F2",
+    surface="#FAF7F2",
+    text="#282622",
+    muted="#777168",
+    axis="#CFC7BC",
+    border="#DED6CC",
+    grid="#EDE6DD",
+    primary="#DF6F38",
+    tertiary="#5C755B",
 )
 CANVAS = Canvas(1920, 1080, SCHEME.background)
 CROSSFADE = 0.35
+COMPANY_COLORS = {
+    "NVIDIA": SCHEME.primary,
+    "Microsoft": SCHEME.tertiary,
+    "Apple": "#302D28",
+    "Alphabet": "#777168",
+    "Amazon": "#514B43",
+    "Meta": "#6C6257",
+    "SpaceX": "#3F3B35",
+    "Broadcom": "#857467",
+    "Tesla": "#62594E",
+    "Micron": "#77816D",
+}
 CHAPTERS = [
-    {"start": 0, "end": 4, "title": "Ten giants. Sixteen years.", "preview": 2.6},
-    {"start": 4, "end": 30, "title": "The ranking race", "preview": 17.9},
-    {"start": 30, "end": 39, "title": "Growth in perspective", "preview": 37.4},
-    {"start": 39, "end": 45, "title": "The latest top ten", "preview": 43.5},
+    {"start": 0, "end": 4, "title": "A different scale", "preview": 2.6},
+    {"start": 4, "end": 30, "title": "The companies, moving", "preview": 17.9},
+    {"start": 30, "end": 39, "title": "Growth has many shapes", "preview": 37.4},
+    {"start": 39, "end": 45, "title": "Where they stand", "preview": 43.5},
 ]
 
 
@@ -67,348 +86,291 @@ def money(value):
     return f"${value / 1000:.2f}T" if value >= 1000 else f"${value:.1f}B"
 
 
-def chart_style(data, *, font_size=24, legend=False):
+def chart_style(data, *, font_size=30):
     return ChartStyle(
         scheme=SCHEME,
-        colors=tuple(c["color"] for c in data["companies"]),
+        colors=tuple(COMPANY_COLORS[c["name"]] for c in data["companies"]),
+        font=SERIF,
+        font_weight=400 if SERIF else None,
         font_size=font_size,
-        title_size=28,
-        legend=legend,
+        title_font=SERIF,
+        title_font_weight=400 if SERIF else None,
+        title_size=38,
+        grid=False,
+        legend=False,
+        line_width=2.4,
     )
 
 
-def text(value, x, y, size=28, *, color=None, weight=500, **kwargs):
+def text(value, x, y, size=32, *, color=None, italic=False, small=False, weight=400, **kwargs):
+    font = SANS if small else (ITALIC if italic else SERIF)
     return Text(
         value,
-        font=FONT,
-        font_weight=weight if FONT else None,
+        font=font,
+        font_weight=weight if font else None,
         font_size=size,
         color=color or SCHEME.text,
         position=(x, y),
-        anchor="top_left",
+        align="center",
+        spacing=8,
         **kwargs,
     )
 
 
-def panel(x, y, width, height, *, fill=None):
-    return Rectangle(
+def number(value, x, y, size, *, width=450, italic=False, color=None, **kwargs):
+    font = ITALIC if italic else SERIF
+    return Number(
+        value,
+        font=font,
+        font_weight=400 if font else None,
+        font_size=size,
         width=width,
-        height=height,
-        corner_radius=22,
-        fill=fill or SCHEME.surface,
-        stroke=SCHEME.border,
-        stroke_width=1,
+        align="center",
+        color=color or SCHEME.text,
         position=(x, y),
-        anchor="top_left",
+        **kwargs,
     )
 
 
+def appear(scene, *components, at=0, duration=0.6):
+    with scene.at(at):
+        scene.play(*(FadeIn(c) for c in components), run_time=duration)
+
+
 def header(scene, chapter, title, subtitle):
-    scene.add(text("FACELESS CHAMP  /  DATA STORIES", 72, 43, 22, color=SCHEME.primary, weight=700))
-    scene.add(text(f"{chapter:02d}  /  COMPANY GROWTH", 1440, 43, 22, color=SCHEME.muted))
-    scene.add(text(title, 72, 103, 62, weight=700))
-    scene.add(text(subtitle, 76, 184, 26, color=SCHEME.muted))
+    appear(scene, text(title, 960, 105, 76), at=0, duration=0.6)
+    appear(scene, text(subtitle, 960, 173, 25, color=SCHEME.muted), at=0.15, duration=0.5)
+    with scene.at(0):
+        scene.add(text(f"{chapter:02d} / 04", 1790, 50, 18, color=SCHEME.muted, small=True))
 
 
-def footer(scene, chapter, *, detail="Nominal USD • market capitalization • fixed latest top-ten cohort"):
-    scene.add(Line(length=1776, stroke=SCHEME.border, stroke_width=1, position=(960, 977)))
-    scene.add(text(detail, 76, 1000, 21, color=SCHEME.muted))
-    scene.add(text("Sources: CompaniesMarketCap / StockAnalysis", 1240, 1000, 20, color=SCHEME.muted))
-    for i in range(4):
-        scene.add(
-            Rectangle(
-                width=64,
-                height=4,
-                fill=SCHEME.primary if i == chapter - 1 else SCHEME.border,
-                stroke=None,
-                position=(76 + i * 74, 1048),
-                anchor="top_left",
-            )
-        )
+def footer(scene, detail):
+    with scene.at(0):
+        scene.add(text(detail, 960, 1007, 19, color=SCHEME.muted, small=True))
+        scene.add(text("CompaniesMarketCap · StockAnalysis", 960, 1044, 16, color=SCHEME.muted, small=True))
 
 
 def intro(data):
     scene = Scene(CANVAS)
-    scene.add(text("FACELESS CHAMP  /  DATA STORIES", 76, 52, 22, color=SCHEME.primary, weight=700))
-    scene.add(text("US PUBLIC COMPANIES", 76, 246, 25, color=SCHEME.primary, weight=700))
-    headline = text("Ten giants.\nSixteen years.", 70, 300, 116, weight=700, spacing=4)
-    scene.play(SlideIn(headline, direction="up", distance=26), run_time=0.65)
+    header(scene, 1, "A different scale.", "Ten U.S. public companies · 2010 to October 2026")
+    baseline = sum(v for v in values_at(data, 2010).values() if v is not None)
+    total = sum(values_at(data, 2026).values())
+    coins = [
+        Ellipse(width=106, height=25, stroke=SCHEME.text, stroke_width=2.3, position=(390, 332 + i * 20))
+        for i in range(3)
+    ]
+    curve = Polyline(
+        [(1435, 380), (1460, 374), (1485, 364), (1510, 351), (1535, 335), (1560, 315), (1585, 289)],
+        stroke=SCHEME.primary,
+        stroke_width=3,
+        line_cap="round",
+    )
     with scene.at(0.25):
-        scene.play(FadeIn(text("How today's largest companies grew in value.", 78, 605, 31)), run_time=0.6)
-    scene.add(text("2010", 78, 724, 66, weight=600))
-    scene.add(Line(length=180, stroke=SCHEME.primary, stroke_width=3, position=(350, 763)))
-    scene.add(text("OCT 2026", 480, 737, 43, weight=600))
-    scene.add(text("A market-cap story • 45 seconds", 78, 838, 26, color=SCHEME.muted))
-    scene.add(panel(1036, 205, 804, 685))
-    latest = values_at(data, 2026)
-    donut = PieChart(
-        latest.keys(),
-        latest.values(),
-        hole=0.77,
-        width=740,
-        height=545,
-        style=chart_style(data),
-        position=(1440, 505),
+        scene.play(*(Draw(c) for c in coins), Draw(curve), run_time=0.8)
+    appear(
+        scene,
+        number(baseline / 1000, 390, 484, 104, format_spec=".2f", prefix="$", suffix="T"),
+        text("the listed value in 2010", 390, 562, 32),
+        at=0.45,
     )
-    with scene.at(0.35):
-        scene.play(ChartReveal(donut), run_time=1.1)
-    scene.add(text("LATEST TOP-TEN VALUE", 1251, 423, 23, color=SCHEME.muted, weight=600))
-    total = Number(
-        sum(latest.values()) / 1000,
-        format_spec=".1f",
-        prefix="$",
-        suffix="T",
-        font=FONT,
-        font_weight=700 if FONT else None,
-        font_size=92,
-        color=SCHEME.text,
-        width=420,
-        align="center",
-        anchor="top_left",
-        position=(1230, 477),
+    appear(
+        scene,
+        number(total / 1000, 1530, 484, 104, format_spec=".1f", prefix="$", suffix="T"),
+        text("the listed value today", 1530, 562, 32),
+        at=0.55,
     )
-    scene.add(total)
-    scene.add(text("October 2026 snapshot", 1268, 596, 26, color=SCHEME.muted))
-    scene.add(text("10 companies, shown in consistent colors", 1160, 814, 25, color=SCHEME.muted))
-    footer(scene, 1)
+    appear(scene, text("growth", 960, 504, 112, color=SCHEME.primary, italic=True), at=0.3)
+    arrows = [
+        Arrow((810, 484), (618, 416), stroke=SCHEME.muted, stroke_width=2, tip_size=17),
+        Arrow((1110, 484), (1310, 416), stroke=SCHEME.muted, stroke_width=2, tip_size=17),
+        Arrow((960, 606), (960, 726), stroke=SCHEME.muted, stroke_width=2, tip_size=17),
+    ]
+    with scene.at(0.75):
+        scene.play(*(Draw(a) for a in arrows), run_time=0.7)
+    for i in range(10):
+        dot = Circle(radius=8, fill=SCHEME.text, stroke=None, position=(825 + i * 30, 797))
+        appear(scene, dot, at=0.9 + i * 0.045, duration=0.3)
+    appear(scene, text("ten companies", 960, 866, 43), at=1.25)
+    footer(scene, "The latest top ten, followed back in time · missing public observations are left unvalued")
     scene.wait_until(4 + CROSSFADE)
     return scene
 
 
 def race(data):
     scene = Scene(CANVAS)
-    header(scene, 2, "How the ranking changed", "Today's ten largest US public companies, traced back to 2010")
-    scene.add(panel(72, 246, 1280, 688))
-    scene.add(panel(1384, 246, 456, 688))
+    header(scene, 2, "The companies, moving.", "Market capitalization · a fixed group of ten · nominal U.S. dollars")
     chart = RankedBarChart(
         values_at(data, 2010),
-        width=1256,
-        height=657,
-        label_width=180,
-        value_width=190,
+        width=1230,
+        height=690,
+        label_width=200,
+        value_width=194,
         missing_label="No public data",
         value_formatter=money,
+        bar_height=7,
+        corner_radius=0,
+        show_markers=False,
         x_axis=Axis(formatter=money),
-        style=chart_style(data, font_size=23),
-        position=(84, 261),
+        style=chart_style(data),
+        position=(90, 254),
         anchor="top_left",
     )
-    scene.play(ChartReveal(chart), run_time=0.45)
-    scene.add(text("OBSERVATION", 1414, 283, 22, color=SCHEME.muted, weight=600))
-    year = Number(
-        2010,
-        format_spec=".0f",
-        font=FONT,
-        font_weight=700 if FONT else None,
-        font_size=108,
-        color=SCHEME.text,
-        width=388,
-        align="left",
-        position=(1408, 330),
-        anchor="top_left",
-    )
-    scene.add(year)
-    scene.add(text("PUBLIC VALUE SHOWN", 1414, 524, 22, color=SCHEME.muted, weight=600))
-    total = Number(
+    with scene.at(0.15):
+        scene.play(ChartReveal(chart), run_time=0.7)
+    year = number(2010, 1580, 348, 170, italic=True, width=476, format_spec=".0f")
+    total = number(
         sum(v for v in values_at(data, 2010).values() if v is not None) / 1000,
+        1580,
+        648,
+        102,
+        width=476,
         format_spec=".2f",
         prefix="$",
         suffix="T",
-        font=FONT,
-        font_size=70,
-        font_weight=600 if FONT else None,
-        color=SCHEME.primary,
-        width=394,
-        anchor="top_left",
-        position=(1412, 574),
     )
-    scene.add(total)
-    scene.add(Line(length=372, stroke=SCHEME.border, stroke_width=2, position=(1612, 470)))
-    marker = Circle(radius=6, fill=SCHEME.primary, stroke=None, position=(1426, 470))
-    scene.add(marker)
+    with scene.at(0):
+        scene.add(year, total)
+        scene.add(text("public value shown", 1580, 560, 30, color=SCHEME.muted))
+        scene.add(Line(length=320, stroke=SCHEME.border, stroke_width=1.5, position=(1580, 473)))
+        scene.add(text("2010", 1420, 503, 21, color=SCHEME.muted), text("2026", 1740, 503, 21, color=SCHEME.muted))
+    marker = Circle(radius=4, fill=SCHEME.primary, stroke=None, position=(1420, 473))
+    with scene.at(0):
+        scene.add(marker)
     notes = [
-        (0, "A smaller starting line", "Apple leads this group.\nSome public histories\nbegin after 2010."),
-        (3.575, "A new public entrant", "Facebook's public series\nbegins in 2012. It later\nbecomes Meta."),
-        (9.475, "The scale expands", "The same company colors\nfollow every move\nthrough the ranking."),
-        (15.375, "The trillion-dollar era", "Several companies cross\nfrom billions into\ntrillions of dollars."),
-        (18.325, "Growth can reverse", "The 2022 observations\nshow a broad decline\nacross these companies."),
-        (19.8, "A broad rebound", "Several values recover\nfrom their 2022 lows\nin the following years."),
-        (22.75, "A changing leader", "NVIDIA climbs to the top\nof this group as chip\nvaluations expand."),
-        (24.225, "The latest snapshot", "SpaceX appears in the\n2026 source. Earlier years\nhave no public data."),
+        (0, "A smaller beginning.", "Apple leads this group."),
+        (3.575, "Another name joins.", "Facebook's public history begins."),
+        (9.475, "Technology scales.", "The same names move in value."),
+        (15.375, "Into the trillions.", "Several companies cross $1T."),
+        (18.325, "A year of retreat.", "2022 brings broad declines."),
+        (19.8, "A broad recovery.", "Values recover from their lows."),
+        (22.75, "A new leader.", "NVIDIA rises to the top."),
+        (24.225, "The latest view.", "SpaceX enters the public data."),
     ]
     for i, (start, title, body) in enumerate(notes):
         end = notes[i + 1][0] if i + 1 < len(notes) else 26 + CROSSFADE
-        title_c, body_c = (
-            text(title, 1414, 714, 26, weight=700),
-            text(body, 1414, 762, 24, color=SCHEME.muted, spacing=8),
-        )
-        with scene.at(start):
-            scene.add(title_c, body_c)
+        title_c = text(title, 1580, 802, 43)
+        body_c = text(body, 1580, 866, 28, color=SCHEME.muted)
+        appear(scene, title_c, body_c, at=start, duration=0.3)
         with scene.at(end):
             scene.remove(title_c, body_c)
     for target_year in range(2011, 2027):
-        start = 1.0 + (target_year - 2011) * 1.475
-        target = values_at(data, target_year)
-        previous = values_at(data, target_year - 1)
-        continuing_total = sum(v for name, v in target.items() if v is not None and previous[name] is not None) / 1000
-        final_total = sum(v for v in target.values() if v is not None) / 1000
-        # Do not imply a monthly observation: all interpolation is labeled below.
+        start = 1 + (target_year - 2011) * 1.475
+        target, previous = values_at(data, target_year), values_at(data, target_year - 1)
+        continuing = sum(v for name, v in target.items() if v is not None and previous[name] is not None) / 1000
+        final = sum(v for v in target.values() if v is not None) / 1000
         with scene.at(start):
             scene.play(
                 chart.animate.data_to(target),
-                total.animate.value_to(continuing_total),
-                marker.animate.move_to(1426 + (target_year - 2010) / 16 * 372, 470),
+                total.animate.value_to(continuing),
+                marker.animate.move_to(1420 + (target_year - 2010) / 16 * 320, 473),
                 run_time=1.1,
                 rate_func=linear,
             )
-        # Keep the displayed date on the preceding snapshot until the transition ends.
         with scene.at(start + 1.1):
             scene.play(
-                year.animate.value_to(target_year), total.animate.value_to(final_total), run_time=0.04, rate_func=linear
+                year.animate.value_to(target_year), total.animate.value_to(final), run_time=0.04, rate_func=linear
             )
+    year_label = text("year-end observation", 1580, 421, 26, color=SCHEME.muted, italic=True)
     with scene.at(0):
-        year_label = text("YEAR-END • 2010–2025", 1414, 446, 19, color=SCHEME.muted)
         scene.add(year_label)
     with scene.at(24.225):
         scene.remove(year_label)
-        scene.add(text("LATEST • OCTOBER 2026", 1414, 446, 19, color=SCHEME.muted))
-    with scene.at(0):
-        footer(
-            scene,
-            2,
-            detail="Ranks within this fixed cohort • transitions interpolate annual observations • scale adjusts",
-        )
+        scene.add(text("October snapshot", 1580, 421, 26, color=SCHEME.muted, italic=True))
+    footer(scene, "Ranks within the latest cohort · transitions interpolate annual observations · bar scale adjusts")
     scene.wait_until(26 + CROSSFADE)
     return scene
 
 
 def perspective(data):
     scene = Scene(CANVAS)
-    header(
-        scene,
-        3,
-        "Size and growth tell different stories",
-        "Market value in dollars, and multiples of the 2010 baseline",
-    )
-    scene.add(panel(72, 246, 1180, 688), panel(1284, 246, 556, 688))
+    header(scene, 3, "Growth has many shapes.", "Value in dollars, and value relative to a 2010 beginning")
     selected = [data["companies"][i] for i in (0, 1, 2, 3)]
     series = {
         c["name"]: [(2010 + i, c["market_cap_billions"][str(2010 + i)] / 1000) for i in range(17)] for c in selected
     }
+    style = replace(chart_style(data), colors=tuple(COMPANY_COLORS[c["name"]] for c in selected))
     lines = LineChart(
         series,
-        width=1132,
-        height=613,
-        title="Four largest today • nominal USD trillions",
-        x_axis=Axis(limits=(2010, 2026), ticks=(2010, 2014, 2018, 2022, 2026), formatter=lambda v: f"{v:.0f}"),
-        y_axis=Axis(limits=(0, 6), ticks=(0, 1, 2, 3, 4, 5, 6), formatter=lambda v: f"${v:.0f}T"),
-        style=ChartStyle(scheme=SCHEME, colors=tuple(c["color"] for c in selected), font_size=23, title_size=25),
-        position=(96, 269),
+        width=1270,
+        height=630,
+        end_labels=True,
+        x_axis=Axis(limits=(2010, 2026), ticks=(2010, 2018, 2026), formatter=lambda v: f"{v:.0f}"),
+        y_axis=Axis(limits=(0, 6), ticks=(0, 3, 6), formatter=lambda v: f"${v:.0f}T"),
+        style=style,
+        position=(86, 268),
         anchor="top_left",
     )
-    scene.play(ChartReveal(lines), run_time=2.1)
-    scene.add(text("2026 endpoint = October snapshot; other points = year-end", 148, 882, 22, color=SCHEME.muted))
-    scene.add(text("GROWTH MULTIPLES", 1314, 284, 22, color=SCHEME.muted, weight=700))
+    with scene.at(0.2):
+        scene.play(ChartReveal(lines), run_time=2.1)
+    appear(scene, text("four largest today", 725, 236, 29, color=SCHEME.muted, italic=True), at=0.4)
+    appear(scene, text("from their 2010 baseline", 1590, 260, 29, color=SCHEME.muted, italic=True), at=0.4)
     eligible = [c for c in data["companies"] if "2010" in c["market_cap_billions"]]
     eligible.sort(key=lambda c: c["market_cap_billions"]["2026"] / c["market_cap_billions"]["2010"], reverse=True)
     for i, c in enumerate(eligible[:3]):
-        y = 354 + i * 164
-        scene.add(text(c["name"], 1320, y, 29, weight=600))
-        multiple = Number(
-            0,
-            format_spec=".0f",
-            suffix="×",
-            font=FONT,
-            font_weight=700 if FONT else None,
-            font_size=73,
-            width=410,
-            color=c["color"],
-            position=(1316, y + 46),
-            anchor="top_left",
+        y = 380 + i * 206
+        multiple = number(
+            1, 1590, y, 96, italic=True, suffix="×", width=460, color=SCHEME.primary if i == 0 else SCHEME.text
         )
         with scene.at(0.5 + i * 0.25):
             scene.play(
                 multiple.animate.value_to(c["market_cap_billions"]["2026"] / c["market_cap_billions"]["2010"]),
-                run_time=1.6,
+                run_time=1.8,
             )
-    scene.add(text("Latest market cap / 2010 market cap", 1320, 859, 23, color=SCHEME.muted))
-    scene.add(text("Eight comparable histories; top three shown", 1320, 895, 21, color=SCHEME.muted))
-    footer(
-        scene, 3, detail="Growth multiples use only companies with 2010 data • market-cap growth is not total return"
+        appear(scene, text(c["name"], 1590, y + 76, 37), at=0.55 + i * 0.25)
+    appear(
+        scene, text("eight comparable histories;\nthe three largest multiples", 1590, 925, 25, color=SCHEME.muted), at=1
     )
+    footer(scene, "2026 = October snapshot; earlier points = year-end · market-cap growth is not total return")
     scene.wait_until(9 + CROSSFADE)
     return scene
 
 
 def latest(data):
     scene = Scene(CANVAS)
-    header(scene, 4, "The latest top ten", "United States • public companies • October 2026 snapshot")
-    scene.add(panel(72, 246, 1198, 688), panel(1302, 246, 538, 688))
+    header(scene, 4, "Where they stand.", "October 2026 · the latest ten U.S. public companies")
     chart = RankedBarChart(
         values_at(data, 2026),
-        width=1168,
-        height=647,
-        label_width=180,
-        value_width=136,
+        width=1230,
+        height=690,
+        label_width=200,
+        value_width=194,
         value_formatter=money,
-        x_axis=Axis(limits=(0, 6000), ticks=(0, 2000, 4000, 6000), formatter=money),
-        style=chart_style(data, font_size=24),
-        position=(88, 267),
+        bar_height=7,
+        corner_radius=0,
+        show_markers=False,
+        x_axis=Axis(limits=(0, 6000), ticks=(0, 3000, 6000), formatter=money),
+        style=chart_style(data),
+        position=(90, 254),
         anchor="top_left",
     )
-    scene.play(ChartReveal(chart), run_time=0.8)
+    with scene.at(0.15):
+        scene.play(ChartReveal(chart), run_time=0.9)
     final = values_at(data, 2026)
     total = sum(final.values())
-    scene.add(text("COMBINED MARKET CAP", 1334, 287, 24, color=SCHEME.muted, weight=700))
-    scene.add(
-        Number(
-            total / 1000,
-            format_spec=".1f",
-            prefix="$",
-            suffix="T",
-            font=FONT,
-            font_weight=700 if FONT else None,
-            font_size=89,
-            width=457,
-            color=SCHEME.primary,
-            anchor="top_left",
-            position=(1328, 342),
-        )
-    )
-    share = sum(list(final.values())[:4]) / total * 100
-    scene.add(text("FOUR LARGEST / TOP TEN", 1334, 502, 23, color=SCHEME.muted, weight=700))
-    scene.add(
-        Number(
-            share,
-            format_spec=".0f",
-            suffix="%",
-            font=FONT,
-            font_weight=700 if FONT else None,
-            font_size=82,
-            width=436,
-            color=SCHEME.text,
-            anchor="top_left",
-            position=(1330, 551),
-        )
-    )
-    scene.add(Rectangle(width=442, height=15, fill=SCHEME.grid, stroke=None, position=(1338, 663), anchor="top_left"))
-    scene.add(
-        Rectangle(
-            width=442 * share / 100,
-            height=15,
-            fill=SCHEME.primary,
-            stroke=None,
-            position=(1338, 663),
-            anchor="top_left",
-        )
-    )
-    scene.add(text("Same names.\nA very different scale.", 1332, 730, 37, weight=700, spacing=8))
-    scene.add(text("Data observed 04 Oct 2026", 1336, 879, 23, color=SCHEME.muted))
-    footer(
+    appear(scene, text("together", 1580, 307, 39, italic=True), at=0.3)
+    appear(
         scene,
-        4,
-        detail="Fixed cohort selected at the latest snapshot • full data and methodology included with this project",
+        number(total / 1000, 1580, 423, 126, width=530, prefix="$", suffix="T", format_spec=".1f"),
+        text("in public market value", 1580, 517, 29, color=SCHEME.muted),
+        at=0.45,
     )
+    arrow = Arrow((1580, 577), (1580, 650), stroke=SCHEME.muted, stroke_width=2, tip_size=15)
+    with scene.at(0.75):
+        scene.play(Draw(arrow), run_time=0.6)
+    share = sum(list(final.values())[:4]) / total * 100
+    appear(
+        scene,
+        number(share, 1580, 732, 100, italic=True, suffix="%", format_spec=".0f", color=SCHEME.primary),
+        text("held by four companies", 1580, 815, 32),
+        at=0.9,
+    )
+    for i in range(10):
+        dot = Circle(
+            radius=6, fill=SCHEME.primary if i < 4 else SCHEME.border, stroke=None, position=(1472 + i * 24, 874)
+        )
+        appear(scene, dot, at=1.1 + i * 0.035, duration=0.35)
+    appear(scene, text("the four largest, within this group", 1580, 929, 24, color=SCHEME.muted), at=1.25)
+    footer(scene, "Fixed latest top-ten cohort · market capitalization in nominal USD · observed 04 October 2026")
     scene.wait_until(6)
     return scene
 
@@ -424,6 +386,8 @@ def timeline(video):
         "canvas": [video.canvas.width, video.canvas.height],
         "background": SCHEME.background,
         "color_scheme": "light",
+        "design": "Ivory, serif typography, thin line art",
+        "reference": "layout.png",
         "chapters": CHAPTERS,
         "metric": "Market capitalization",
         "snapshot": "October 2026",

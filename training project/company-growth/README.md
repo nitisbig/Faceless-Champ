@@ -9,10 +9,18 @@ All scene components import `faceless_champ` from the main checkout's `src` fold
 Reusable chart behavior, numeric animation, and rendering improvements live in the
 main library. This folder contains only scene composition, source data, and a CLI.
 
+The design follows [layout.png](layout.png): warm ivory, thin charcoal line art,
+Cormorant Garamond regular and italic typography, open space, and restrained orange
+and sage accents. Small utility captions use DM Sans. Introductory diagrams trace
+in, labels fade in, and rankings move between snapshots. There are no external
+image dependencies in the render; the reference is used to guide the composition.
+Custom chart fonts, endpoint labels, thin-bar controls, and `Ellipse` are reusable
+main-library capabilities.
+
 From the Faceless Champ repository root:
 
 ```bash
-uv run python 'training project/company-growth/render.py' --preview
+uv run python 'training project/company-growth/render.py' --preview --overwrite
 uv run python 'training project/company-growth/render.py' --overwrite
 uv run python 'training project/company-growth/render.py' --frames
 uv run python 'training project/company-growth/render.py' --frame 29.3
@@ -34,7 +42,7 @@ their generated images.
 
 | Time | Visual |
 | --- | --- |
-| 0–4s | Introduction and the latest group's value as a donut |
+| 0–4s | Open line-art diagram connecting past value, present value, and ten companies |
 | 4–30s | Horizontal ranking race with stable company colors and live labels |
 | 30–39s | Absolute trend lines and baseline growth multiples |
 | 39–45s | Final ten-company ranking, combined value, and concentration |
@@ -42,7 +50,8 @@ their generated images.
 ## Data and methodology
 
 [market-cap.json](data/market-cap.json) contains the offline, reproducible snapshot,
-source URLs, company colors, missing observations, and methodology notes.
+source URLs, missing observations, and methodology notes. The scene supplies its
+reference-inspired palette through the library's `ChartStyle`.
 The latest cohort was selected from
 [CompaniesMarketCap's US ranking](https://companiesmarketcap.com/usa/largest-companies-in-the-usa-by-market-cap/)
 on **4 October 2026**. Values come from each company's linked market-cap history.

@@ -55,7 +55,8 @@ pie = PieChart(["Equity", "Bonds", "Cash"], [50, 35, 15], hole=.5)
   Categories use evenly spaced positions; numeric `x_axis` limits/scales/ticks do
   not apply to this categorical axis. Its label can still be set.
 - **RankedBarChart(values, top_n=None, label_width=180, value_width=100,
-  value_formatter=None, missing_label="No data"):** a mapping of category names
+  value_formatter=None, missing_label="No data", bar_height=None,
+  corner_radius=4, show_markers=True):** a mapping of category names
   to nonnegative values or `None`. Bars sort by value, with stable ties and colors.
   `chart.animate.data_to(mapping)` animates both values and row positions, retaining
   category names and order. Crossing labels are separated to remain readable.
@@ -65,9 +66,14 @@ pie = PieChart(["Equity", "Bonds", "Cash"], [50, 35, 15], hole=.5)
   Ranked bars require linear axes starting at zero. Label widths are design pixels;
   increase them when formatted labels do not fit. The value formatter defaults
   to `x_axis.format`. Ranked bars have inline labels, without a separate legend.
-- **LineChart(series):** each named series contains nonempty `(x, y)` pairs.
+  `bar_height` sets a design-pixel thickness; `None` uses automatic sizing.
+  `corner_radius` controls rounding; `show_markers=False` removes identity dots.
+- **LineChart(series, end_labels=False):** each named series contains nonempty `(x, y)` pairs.
   Points connect in supplied order; they are not sorted. Single points are shown
   as dots. Functions must be sampled by the caller.
+  `end_labels=True` reserves space for series names at their final points, separates
+  colliding labels, and shows them when the reveal is complete. Endpoint labels
+  follow interpolated data during transitions. A legend can be disabled separately.
 - **ScatterPlot(series, sizes=None):** same point data. Optional sizes are
   nonnegative radii in design pixels, flattened in series insertion order.
 - **Histogram(samples, bins=10):** bins is a positive integer or increasing edge
@@ -124,8 +130,22 @@ chart = LineChart(
 
 Themes include `midnight`, `paper`, and `ocean`. Series colors cycle through the
 provided colors or the theme's four series colors. Legends wrap into rows. Charts
-use the bundled font and theme surface background. Transform the chart as a whole
+use the bundled font by default and the theme surface background. Transform the chart as a whole
 using the standard component animation builder.
+
+`ChartStyle(font=path, font_weight=400)` uses a custom font for chart labels and
+legends. `title_font` and `title_font_weight` override title typography; omitted
+values inherit the label font and weight. Weights require a variable font with a
+Weight axis. Font loading and validation are shared with `Text`, and the bounded
+chart font cache includes the path, size, and weight. `line_width` controls line
+chart, vector, and scatter mark stroke/radius defaults in design pixels (default: 2).
+
+```python
+style = ChartStyle(
+    scheme=ColorScheme.named("paper"), font="my-serif.ttf", font_weight=400,
+    font_size=28, title_size=40, line_width=2.4, grid=False, legend=False,
+)
+```
 
 ## Animation and fixed domains
 

@@ -90,7 +90,18 @@ def main():
             return
         output = args.output or directory / f"company-growth{'-preview' if args.preview else ''}.mp4"
         print(f"Rendering {video.duration:.2f}s / {size[0]}×{size[1]} / {settings.fps:g} fps / light mode…", flush=True)
-        print(video.render(output, settings=settings, renderer=renderer, overwrite=args.overwrite), flush=True)
+        interval = max(1, round(settings.fps * 2))
+
+        def report_progress(completed, total):
+            if completed == 0 or completed == total or completed % interval == 0:
+                print(f"  Frames {completed}/{total} ({completed / total:.0%})", flush=True)
+
+        print(
+            video.render(
+                output, settings=settings, renderer=renderer, overwrite=args.overwrite, progress=report_progress
+            ),
+            flush=True,
+        )
     except (ValueError, TypeError, FileNotFoundError, FileExistsError, RuntimeError) as exc:
         parser.exit(1, f"company-growth: {exc}\n")
 

@@ -28,6 +28,7 @@ Use animation builders for changes over time.
 | --- | --- |
 | `Text(text, ...)` | `font=None`, `font_size=64`, `color="white"`, `align="left"`, `spacing=8`, `font_weight=None` |
 | `Number(value, ...)` | Text options plus `format_spec=",.0f"`, `prefix=""`, `suffix=""`, `formatter=None`, `width=None`; animate with `.animate.value_to(value)` |
+| `Ellipse(...)` | Shape options with independent `width` and `height`; supports `Draw`, fill, stroke, and transforms |
 | `Equation(expression, ...)` | `font_size=64`, `color="white"`, `fontset="stix"`, `max_width=None`, `color_map=None`; requires the `equations` extra |
 | `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"` |
 | `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |
@@ -303,9 +304,13 @@ Returned frames can be modified without changing cached frames. Set
 `frame_cache_mb=0` to disable this cache. It uses a least-recently-used eviction policy
 and retains at most one frame per scene; video frames are still streamed to FFmpeg.
 
-`render(node, output, *, settings=None, renderer=None, overwrite=False, **options)`
+`render(node, output, *, settings=None, renderer=None, overwrite=False, progress=None, **options)`
 returns the absolute output `Path`. Pass either `ExportSettings(...)` or its fields
 as keyword options, not both.
+
+`progress=callback` reports `(completed_frames, total_frames)` at zero and after
+every streamed frame. The callback is optional and should return quickly. The final
+file is published after the encoder finishes.
 
 | Setting | Default | Values |
 | --- | --- | --- |

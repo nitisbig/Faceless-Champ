@@ -3,6 +3,7 @@
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from PIL import ImageColor
 
@@ -19,11 +20,23 @@ class ChartStyle:
     title_size: float = 24
     grid: bool = True
     legend: bool = True
+    font: str | Path | None = None
+    font_weight: float | None = None
+    title_font: str | Path | None = None
+    title_font_weight: float | None = None
+    line_width: float = 2
 
     def __post_init__(self):
         object.__setattr__(self, "colors", tuple(self.colors))
         finite(self.font_size, "font_size", 1)
         finite(self.title_size, "title_size", 1)
+        finite(self.line_width, "line_width", 0.1)
+        for name in ("font", "title_font"):
+            if getattr(self, name) is not None:
+                object.__setattr__(self, name, str(getattr(self, name)))
+        for name in ("font_weight", "title_font_weight"):
+            if getattr(self, name) is not None:
+                object.__setattr__(self, name, finite(getattr(self, name), name, 1))
         for color in self.colors:
             ImageColor.getcolor(color, "RGBA")
 
@@ -126,6 +139,9 @@ class RankedBarChart(Chart):
         value_width=100,
         value_formatter=None,
         missing_label="No data",
+        bar_height=None,
+        corner_radius=4,
+        show_markers=True,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -142,6 +158,9 @@ class RankedBarChart(Chart):
             raise TypeError("value_formatter must be callable")
         self.value_formatter = value_formatter or self.x_axis.format
         self.missing_label = str(missing_label)
+        self.bar_height = None if bar_height is None else finite(bar_height, "bar_height", 0.1)
+        self.corner_radius = finite(corner_radius, "corner_radius", 0)
+        self.show_markers = bool(show_markers)
         if self.x_axis.scale != "linear" or (self.x_axis.limits and self.x_axis.limits[0] != 0):
             raise ValueError("Ranked bars require a linear x axis starting at zero")
         self.data = self.normalize(values)
@@ -169,8 +188,9 @@ class RankedBarChart(Chart):
 class LineChart(Chart):
     cartesian = True
 
-    def __init__(self, series, **kwargs):
+    def __init__(self, series, *, end_labels=False, **kwargs):
         super().__init__(**kwargs)
+        self.end_labels = bool(end_labels)
         self.names = labels(series)
         rows = tuple(tuple(tuple(point) for point in series[name]) for name in self.names)
         self.lengths = tuple(len(row) for row in rows)

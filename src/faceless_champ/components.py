@@ -243,6 +243,10 @@ class Circle(Shape):
         super().__init__(width=radius * 2, height=radius * 2, **kwargs)
 
 
+class Ellipse(Shape):
+    """An ellipse with independent design-pixel width and height."""
+
+
 class Triangle(Shape):
     pass
 

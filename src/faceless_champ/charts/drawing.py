@@ -3,18 +3,28 @@
 import math
 from functools import lru_cache
 from itertools import pairwise
-from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
+from ..typography import load_font
 from . import BarChart, Heatmap, Histogram, LineChart, NetworkGraph, PieChart, RankedBarChart, ScatterPlot, VectorField
 from .scales import palette_color, project, sankey_geometry, separate_positions, ticks
 
 
 @lru_cache(maxsize=64)
-def _font(size):
-    path = str(Path(__file__).parents[1] / "assets" / "DejaVuSans.ttf")
-    return ImageFont.truetype(path, size)
+def _font(size, path=None, weight=None):
+    return load_font(path, size, weight)
+
+
+def _style_fonts(style, factor):
+    return (
+        _font(max(1, round(style.font_size * factor)), style.font, style.font_weight),
+        _font(
+            max(1, round(style.title_size * factor)),
+            style.title_font or style.font,
+            style.title_font_weight if style.title_font_weight is not None else style.font_weight,
+        ),
+    )
 
 
 def draw_ranked_bars(c, state, factor):
@@ -22,8 +32,7 @@ def draw_ranked_bars(c, state, factor):
     width, height = max(1, round(c.width * factor)), max(1, round(c.height * factor))
     image = Image.new("RGBA", (width, height), s.scheme.surface)
     d = ImageDraw.Draw(image)
-    font = _font(max(1, round(s.font_size * factor)))
-    title_font = _font(max(1, round(s.title_size * factor)))
+    font, title_font = _style_fonts(s, factor)
     fs = s.font_size * factor
     n = len(c.categories)
     values, ranks, availability = state["data"][:n], state["data"][n : 2 * n], state["data"][2 * n :]
@@ -60,18 +69,21 @@ def draw_ranked_bars(c, state, factor):
             raise ValueError("Ranked category label exceeds label_width")
         color = s.color(i)
         known = availability[i] >= 1 - 1e-9
-        d.ellipse((24 * factor, label_y - fs / 6, 24 * factor + fs / 3, label_y + fs / 6), fill=color)
+        if c.show_markers:
+            d.ellipse((24 * factor, label_y - fs / 6, 24 * factor + fs / 3, label_y + fs / 6), fill=color)
         d.text((left - 12 * factor, label_y), name, font=font, fill=s.scheme.text, anchor="rm")
         if abs(label_y - y) > factor:
             d.line((left - 8 * factor, label_y, left, min(lower, max(top, y))), fill=color, width=max(1, round(factor)))
         end = left + min(1, max(0, project(values[i], bounds))) * (right - left) * progress
         if known and end > left:
-            bar_height = min(row_height * 0.62, fs * 1.55)
+            bar_height = (
+                min(row_height * 0.62, fs * 1.55) if c.bar_height is None else min(row_height, c.bar_height * factor)
+            )
             y0, y1 = max(top, y - bar_height / 2), min(lower, y + bar_height / 2)
             if y1 > y0:
                 d.rounded_rectangle(
                     (left, y0, end, y1),
-                    radius=min(4 * factor, (end - left) / 2, (y1 - y0) / 2),
+                    radius=min(c.corner_radius * factor, (end - left) / 2, (y1 - y0) / 2),
                     fill=color,
                 )
         label = str(c.value_formatter(values[i])) if known else c.missing_label
@@ -96,8 +108,7 @@ def draw_chart(chart, state, factor):
     width, height = max(1, round(c.width * factor)), max(1, round(c.height * factor))
     image = Image.new("RGBA", (width, height), s.scheme.surface)
     d = ImageDraw.Draw(image)
-    font = _font(max(1, round(s.font_size * factor)))
-    title_font = _font(max(1, round(s.title_size * factor)))
+    font, title_font = _style_fonts(s, factor)
     fs = s.font_size * factor
 
     def text(x, y, value, *, anchor="mm", color=None, title=False):
@@ -128,6 +139,9 @@ def draw_chart(chart, state, factor):
             text(x + fs, y, name, anchor="lm")
             x += size
     left, top, right = 24 * factor, (58 if c.title else 24) * factor, width - 24 * factor
+    end_labels = isinstance(c, LineChart) and not isinstance(c, ScatterPlot) and c.end_labels
+    if end_labels:
+        right -= max(d.textlength(name, font=font) for name in c.names) + 20 * factor
     if c.cartesian:
         yt = ticks(c.y_bounds, c.y_axis)
         left += max((d.textlength(c.y_axis.format(v), font=font) for v in yt), default=0) + 12 * factor
@@ -186,7 +200,7 @@ def draw_chart(chart, state, factor):
     md = ImageDraw.Draw(marks)
     progress = min(1, max(0, state["reveal"]))
     values = state["data"]
-    lw = max(1, round(2 * factor))
+    lw = max(1, round(s.line_width * factor))
 
     def arrow(a, b, color, line_width=lw):
         if a == b:
@@ -346,4 +360,15 @@ def draw_chart(chart, state, factor):
     # Clip marks only; tick labels, legends, titles and node labels stay outside the plot.
     crop = (math.ceil(left), math.ceil(top), math.floor(right) + 1, math.floor(lower) + 1)
     image.alpha_composite(marks.crop(crop), crop[:2])
+    if end_labels and progress >= 1 - 1e-9:
+        endpoints, offset = [], 0
+        for count in c.lengths:
+            offset += count * 2
+            endpoints.append((xp(values[offset - 2]), yp(values[offset - 1])))
+        positions = separate_positions([y for _, y in endpoints], fs * 1.3, (top + fs / 2, lower - fs / 2))
+        for i, (y, (end_x, end_y)) in enumerate(zip(positions, endpoints)):
+            end_x, end_y = min(right, max(left, end_x)), min(lower, max(top, end_y))
+            if abs(y - end_y) > factor or end_x < right - factor:
+                d.line((end_x, end_y, right + 6 * factor, y), fill=s.color(i), width=max(1, round(factor)))
+            text(right + 10 * factor, y, c.names[i], anchor="lm", color=s.color(i))
     return image
