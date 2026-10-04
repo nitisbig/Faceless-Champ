@@ -191,6 +191,8 @@ class Scene(Renderable):
                     if key not in animation.component.state():
                         raise ValueError(f"Unsupported animation property: {key}")
                     _validate_animated_value(key, value)
+                    if key == "data":
+                        animation.component.validate_data(value)
             entry = self._objects.get(animation.component)
             state = entry.state_at(self._cursor) if entry is not None else animation.component.state()
             tracks = []
@@ -230,6 +232,8 @@ class Scene(Renderable):
                         if progress > 1 or progress <= previous:
                             raise ValueError("Keyframe progress must increase strictly within [0, 1]")
                         _validate_animated_value(key, value)
+                        if key == "data":
+                            animation.component.validate_data(value)
                         value = relative_value(key, base, value) if relative else value
                         _validate_animated_value(key, value)
                         frames.append((progress, value))
@@ -279,7 +283,12 @@ class Scene(Renderable):
 
 
 def _validate_animated_value(key: str, value) -> None:
-    if key == "position":
+    if key == "data":
+        if not isinstance(value, tuple) or not value:
+            raise ValueError("Animated data must be a nonempty numeric tuple")
+        for item in value:
+            finite(item, "data")
+    elif key == "position":
         if not isinstance(value, tuple) or len(value) != 2:
             raise ValueError("Animated position must be an (x, y) tuple")
         for coordinate in value:

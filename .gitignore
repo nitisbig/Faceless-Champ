@@ -11,5 +11,6 @@ wheels/
 
 # Generated media and tool caches
 output/
+**/output/
 .pytest_cache/
 .ruff_cache/

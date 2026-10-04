@@ -11,6 +11,8 @@ from typing import Protocol
 from PIL import Image as PILImage
 from PIL import ImageColor, ImageDraw, ImageFont, ImageOps
 
+from .charts import Chart
+from .charts.drawing import draw_chart
 from .components import Arrow, Circle, Equation, Icon, Image, Line, Polyline, Rectangle, Shape, Text, Triangle, finite
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
@@ -86,7 +88,9 @@ class PillowRenderer:
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
-                if isinstance(c, Equation):
+                if isinstance(c, Chart):
+                    draw_chart(c, entry.initial, 1)
+                elif isinstance(c, Equation):
                     ImageColor.getcolor(c.color, "RGBA")
                     self._equation(c, 1)
                 elif isinstance(c, (Text, Captions)):
@@ -227,6 +231,9 @@ class PillowRenderer:
         return result
 
     def _sprite(self, c, state, factor, age):
+        if isinstance(c, Chart):
+            # The bounded scene-frame cache handles holds; never retain per-frame chart sprites.
+            return draw_chart(c, state, factor)
         if isinstance(c, Captions):
             return self._caption_sprite(c, factor, age)
         # Dynamic reveal/draw frames are deliberately not retained in the cache.

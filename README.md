@@ -129,3 +129,11 @@ v0.1 exports MP4 using a CPU renderer. Camera animation, charts, video
 import, graphical editing, and GPU rendering are future work. Linux is the verified
 platform. Animated GIFs are decoded and cached in memory; long or very large GIFs
 can consume substantial memory. Video frames are streamed rather than accumulated.
+
+### Data-driven charts
+
+Render and animate bar, line, scatter, histogram, heatmap, network, vector-field,
+Sankey, and pie charts directly from Python data. Charts support scientific axes,
+themes, reveal animations, and transitions between matching datasets, with no extra
+dependencies. See the [charting guide](docs/charts.md) and
+[renderable showcase](examples/charts/render.py).

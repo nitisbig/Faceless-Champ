@@ -333,3 +333,12 @@ faceless-champ render example.py SceneOrFactory -o output.mp4 \
 The named symbol can be a Scene class, an existing composition, or a zero-argument
 factory returning one. Python files execute normally; resolve local assets relative
 to `Path(__file__).parent` for independence from the current working directory.
+
+## Data-driven charts
+
+`BarChart`, `LineChart`, `ScatterPlot`, `Histogram`, `Heatmap`, `NetworkGraph`,
+`VectorField`, `SankeyChart`, and `PieChart` are reusable components accepting Python
+data. Configure axes with `Axis` and presentation with `ChartStyle`.
+`ChartReveal(chart)` animates marks; `chart.animate.data_to(data)` transitions
+between matching datasets. See [the charting guide](charts.md) for input contracts,
+examples, fixed-domain behavior, and the renderable showcase.

@@ -39,6 +39,14 @@ class AnimationBuilder(Animation):
     def __init__(self, component: Component) -> None:
         super().__init__(component, {})
 
+    def data_to(self, data) -> Self:
+        from .charts import Chart
+
+        if not isinstance(self.component, Chart):
+            raise TypeError("data_to requires a Chart")
+        self.targets["data"] = self.component.transition_data(data)
+        return self
+
     def move_to(self, x: float, y: float) -> Self:
         self.targets["position"] = (finite(x, "x"), finite(y, "y"))
         return self
@@ -254,3 +262,12 @@ def interpolate(a, b, t):
     if isinstance(a, tuple):
         return tuple(x + (y - x) * t for x, y in zip(a, b))
     return a + (b - a) * t
+
+
+def ChartReveal(component) -> Animation:
+    """Reveal chart marks while retaining axes and labels."""
+    from .charts import Chart
+
+    if not isinstance(component, Chart):
+        raise TypeError("ChartReveal requires a Chart")
+    return Animation(component, {"reveal": 1.0}, {"reveal": 0.0}, rate_func=linear)
