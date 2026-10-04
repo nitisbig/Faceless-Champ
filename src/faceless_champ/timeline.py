@@ -294,7 +294,7 @@ def _validate_animated_value(key: str, value) -> None:
         for coordinate in value:
             finite(coordinate, "position")
     else:
-        finite(value, key, 0.001 if key == "scale" else (None if key == "rotation" else 0))
+        finite(value, key, 0.001 if key == "scale" else (None if key in {"rotation", "value"} else 0))
         if key in {"opacity", "reveal", "draw"} and value > 1:
             raise ValueError(f"{key} must be <= 1")
 

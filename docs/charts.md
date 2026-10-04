@@ -54,6 +54,17 @@ pie = PieChart(["Equity", "Bonds", "Cash"], [50, 35, 15], hole=.5)
   and negative values separately. Linear bars include zero in automatic limits.
   Categories use evenly spaced positions; numeric `x_axis` limits/scales/ticks do
   not apply to this categorical axis. Its label can still be set.
+- **RankedBarChart(values, top_n=None, label_width=180, value_width=100,
+  value_formatter=None, missing_label="No data"):** a mapping of category names
+  to nonnegative values or `None`. Bars sort by value, with stable ties and colors.
+  `chart.animate.data_to(mapping)` animates both values and row positions, retaining
+  category names and order. Crossing labels are separated to remain readable.
+  Missing values have labels but no bar; a new observation appears at the known
+  endpoint of a transition. `top_n` limits visible rows. Automatic x limits follow
+  the largest visible value; `x_axis=Axis(limits=(0, maximum))` fixes the scale.
+  Ranked bars require linear axes starting at zero. Label widths are design pixels;
+  increase them when formatted labels do not fit. The value formatter defaults
+  to `x_axis.format`. Ranked bars have inline labels, without a separate legend.
 - **LineChart(series):** each named series contains nonempty `(x, y)` pairs.
   Points connect in supplied order; they are not sorted. Single points are shown
   as dots. Functions must be sampled by the caller.
@@ -134,7 +145,7 @@ changes are rejected before rendering. Successive transitions start from the pre
 timeline state; they do not mutate the source component. Built-in easing functions
 keep interpolation within valid endpoints; custom easing should stay within `[0,1]`.
 
-Automatic axis and heatmap color limits are derived once from the initial data and
+Except for ranked bars, automatic axis and heatmap color limits are derived once from the initial data and
 remain fixed. Set explicit limits to cover all animation keyframes. Marks outside
 axis limits are clipped; labels are drawn separately. Sankey layout positions stay
 fixed while ribbon and node sizes recompute from the interpolated weights.
@@ -142,6 +153,39 @@ fixed while ribbon and node sizes recompute from the interpolated weights.
 Charts work in `Scene`, `Grid`, `Layer`, and `Sequence`. Rendering any frame out of
 order is deterministic. Chart sprites are not accumulated per frame; held scene
 frames use the renderer's existing bounded cache.
+
+## Ranking races and live numbers
+
+`Number` displays an interpolated numeric value, using the normal scene animation
+builder. Its `format_spec`, `prefix`, `suffix`, or callable `formatter` control text.
+An optional `width` keeps the alignment box stable as digits change. Signed values
+are supported. Width overflow is rejected rather than silently clipping text.
+Dynamic number sprites are not retained in the renderer's sprite cache; chart fonts
+use a bounded cache shared by chart types.
+
+```python
+from faceless_champ import Canvas, ColorScheme, ChartStyle, Number, RankedBarChart, Scene
+
+chart = RankedBarChart(
+    {"Alpha": 8, "Beta": 4, "New entrant": None},
+    style=ChartStyle(scheme=ColorScheme.named("paper")),
+    position=(400, 300),
+)
+year = Number(2010, format_spec=".0f", width=180, font_size=50, color="#14202e", position=(960, 100))
+scene = Scene(Canvas(1280, 720, "#f2f0eb"))
+scene.add(chart, year)
+scene.play(chart.animate.data_to({"Alpha": 12, "Beta": 18, "New entrant": 6}),
+           year.animate.value_to(2011), run_time=2)
+```
+
+The [`company-growth` training project](../training%20project/company-growth/README.md)
+composes these public APIs into a 45-second light-mode video with a sourced offline
+data snapshot, ranking race, trend lines, and summary. Render it with:
+
+```bash
+uv run python 'training project/company-growth/render.py' --preview
+uv run python 'training project/company-growth/render.py' --frames
+```
 
 ## Showcase
 

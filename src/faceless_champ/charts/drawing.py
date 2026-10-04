@@ -1,23 +1,103 @@
 """Pillow chart sprites. Marks are clipped independently of labels and axes."""
 
 import math
+from functools import lru_cache
 from itertools import pairwise
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from . import BarChart, Heatmap, Histogram, LineChart, NetworkGraph, PieChart, ScatterPlot, VectorField
-from .scales import palette_color, project, sankey_geometry, ticks
+from . import BarChart, Heatmap, Histogram, LineChart, NetworkGraph, PieChart, RankedBarChart, ScatterPlot, VectorField
+from .scales import palette_color, project, sankey_geometry, separate_positions, ticks
+
+
+@lru_cache(maxsize=64)
+def _font(size):
+    path = str(Path(__file__).parents[1] / "assets" / "DejaVuSans.ttf")
+    return ImageFont.truetype(path, size)
+
+
+def draw_ranked_bars(c, state, factor):
+    s = c.style
+    width, height = max(1, round(c.width * factor)), max(1, round(c.height * factor))
+    image = Image.new("RGBA", (width, height), s.scheme.surface)
+    d = ImageDraw.Draw(image)
+    font = _font(max(1, round(s.font_size * factor)))
+    title_font = _font(max(1, round(s.title_size * factor)))
+    fs = s.font_size * factor
+    n = len(c.categories)
+    values, ranks, availability = state["data"][:n], state["data"][n : 2 * n], state["data"][2 * n :]
+    left = (24 + c.label_width) * factor
+    right = width - (24 + c.value_width) * factor
+    top = (64 if c.title else 24) * factor
+    lower = height - (fs * 2.5 + (fs * 1.6 if c.x_axis.label else 0))
+    row_height = (lower - top) / c.top_n
+    if right <= left + 10 or row_height < fs * 1.5:
+        raise ValueError("Ranked chart is too small for its labels; increase width/height or reduce font size")
+    if c.title:
+        d.text((24 * factor, 16 * factor), c.title, font=title_font, fill=s.scheme.text, anchor="lt")
+    maximum = max((v for v, a in zip(values, availability) if a >= 1 - 1e-9), default=0)
+    bounds = c.x_axis.limits or (0.0, max(maximum * 1.08, 1.0))
+    for value in ticks(bounds, c.x_axis):
+        x = left + project(value, bounds) * (right - left)
+        if s.grid:
+            d.line((x, top, x, lower), fill=s.scheme.grid, width=max(1, round(factor)))
+        label = c.x_axis.format(value)
+        d.text((x, lower + fs * 0.6), label, font=font, fill=s.scheme.muted, anchor="mt")
+    progress = min(1, max(0, state["reveal"]))
+    visible = [i for i in range(n) if ranks[i] < c.top_n]
+    centers = [top + (ranks[i] + 0.5) * row_height for i in visible]
+    label_positions = dict(zip(visible, separate_positions(centers, fs * 1.3, (top + fs / 2, lower - fs / 2))))
+    # Draw in rank order for deterministic overlap during crossings. Category
+    # colors stay tied to input identity, never to the current rank.
+    for i in sorted(range(n), key=lambda i: (ranks[i], i), reverse=True):
+        if ranks[i] >= c.top_n:
+            continue
+        y = top + (ranks[i] + 0.5) * row_height
+        label_y = label_positions[i]
+        name = c.categories[i]
+        if d.textlength(name, font=font) > c.label_width * factor - fs * 1.2:
+            raise ValueError("Ranked category label exceeds label_width")
+        color = s.color(i)
+        known = availability[i] >= 1 - 1e-9
+        d.ellipse((24 * factor, label_y - fs / 6, 24 * factor + fs / 3, label_y + fs / 6), fill=color)
+        d.text((left - 12 * factor, label_y), name, font=font, fill=s.scheme.text, anchor="rm")
+        if abs(label_y - y) > factor:
+            d.line((left - 8 * factor, label_y, left, min(lower, max(top, y))), fill=color, width=max(1, round(factor)))
+        end = left + min(1, max(0, project(values[i], bounds))) * (right - left) * progress
+        if known and end > left:
+            bar_height = min(row_height * 0.62, fs * 1.55)
+            y0, y1 = max(top, y - bar_height / 2), min(lower, y + bar_height / 2)
+            if y1 > y0:
+                d.rounded_rectangle(
+                    (left, y0, end, y1),
+                    radius=min(4 * factor, (end - left) / 2, (y1 - y0) / 2),
+                    fill=color,
+                )
+        label = str(c.value_formatter(values[i])) if known else c.missing_label
+        if d.textlength(label, font=font) > c.value_width * factor:
+            raise ValueError("Ranked value label exceeds value_width")
+        d.text(
+            (right + 12 * factor, label_y),
+            label,
+            font=font,
+            fill=s.scheme.text if known else s.scheme.muted,
+            anchor="lm",
+        )
+    if c.x_axis.label:
+        d.text(((left + right) / 2, height - fs * 0.5), c.x_axis.label, font=font, fill=s.scheme.muted, anchor="mb")
+    return image
 
 
 def draw_chart(chart, state, factor):
+    if isinstance(chart, RankedBarChart):
+        return draw_ranked_bars(chart, state, factor)
     c, s = chart, chart.style
     width, height = max(1, round(c.width * factor)), max(1, round(c.height * factor))
     image = Image.new("RGBA", (width, height), s.scheme.surface)
     d = ImageDraw.Draw(image)
-    font_path = str(Path(__file__).parents[1] / "assets" / "DejaVuSans.ttf")
-    font = ImageFont.truetype(font_path, max(1, round(s.font_size * factor)))
-    title_font = ImageFont.truetype(font_path, max(1, round(s.title_size * factor)))
+    font = _font(max(1, round(s.font_size * factor)))
+    title_font = _font(max(1, round(s.title_size * factor)))
     fs = s.font_size * factor
 
     def text(x, y, value, *, anchor="mm", color=None, title=False):

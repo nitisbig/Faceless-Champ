@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Self
 
-from .components import Component, Equation, Shape, Text, finite
+from .components import Component, Equation, Number, Shape, Text, finite
 
 
 def linear(t: float) -> float:
@@ -45,6 +45,12 @@ class AnimationBuilder(Animation):
         if not isinstance(self.component, Chart):
             raise TypeError("data_to requires a Chart")
         self.targets["data"] = self.component.transition_data(data)
+        return self
+
+    def value_to(self, value: float) -> Self:
+        if not isinstance(self.component, Number):
+            raise TypeError("value_to requires a Number")
+        self.targets["value"] = finite(value, "value")
         return self
 
     def move_to(self, x: float, y: float) -> Self:

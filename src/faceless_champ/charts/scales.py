@@ -60,6 +60,23 @@ def project(value, bounds, scale="linear"):
     return (value - lo) / (hi - lo)
 
 
+def separate_positions(positions, minimum_gap, bounds):
+    """Keep labels near their marks while preventing overlap during crossings."""
+    if not positions:
+        return ()
+    order = sorted(range(len(positions)), key=lambda i: (positions[i], i))
+    placed = []
+    for i in order:
+        placed.append(max(bounds[0], positions[i], placed[-1] + minimum_gap if placed else bounds[0]))
+    placed[-1] = min(placed[-1], bounds[1])
+    for i in range(len(placed) - 2, -1, -1):
+        placed[i] = min(placed[i], placed[i + 1] - minimum_gap)
+    result = [0.0] * len(positions)
+    for i, y in zip(order, placed):
+        result[i] = y
+    return tuple(result)
+
+
 def ticks(bounds, axis):
     lo, hi = bounds
     if axis.ticks is not None:

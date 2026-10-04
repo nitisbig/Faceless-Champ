@@ -125,7 +125,7 @@ uv run ruff format --check src tests examples
 uv build
 ```
 
-v0.1 exports MP4 using a CPU renderer. Camera animation, charts, video
+v0.1 exports MP4 using a CPU renderer. Camera animation, video
 import, graphical editing, and GPU rendering are future work. Linux is the verified
 platform. Animated GIFs are decoded and cached in memory; long or very large GIFs
 can consume substantial memory. Video frames are streamed rather than accumulated.
@@ -137,3 +137,22 @@ Sankey, and pie charts directly from Python data. Charts support scientific axes
 themes, reveal animations, and transitions between matching datasets, with no extra
 dependencies. See the [charting guide](docs/charts.md) and
 [renderable showcase](examples/charts/render.py).
+
+### Company-growth training project
+
+The [company-growth example](training%20project/company-growth/README.md) renders
+a 45-second light-mode video of the latest US top-ten public-company cohort from
+2010 to an October 2026 market-cap snapshot. Its scene imports the main library's
+`RankedBarChart` (animated ranks, stable colors, missing data, readable crossing
+labels) and `Number` (formatted live numeric animation). Chart fonts are cached
+within a fixed limit; dynamic chart and number sprites do not accumulate.
+
+```bash
+uv run python 'training project/company-growth/render.py' --preview --overwrite
+uv run python 'training project/company-growth/render.py' --frames
+uv run python 'training project/company-growth/render.py' --overwrite
+```
+
+The project's `render.py` supports preview, full-quality video, individual frames,
+storyboards, output paths, and overwrite controls. Source data and methodology are
+included for reproducible feedback.

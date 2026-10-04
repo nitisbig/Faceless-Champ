@@ -34,4 +34,12 @@ Motion presets: SlideIn/Out, ZoomIn/Out, PopIn/Out, BounceIn, SpinIn, Pulse, Sha
 and Wiggle. Animation supports keyframes and relative transform values. Explicit
 play(rate_func=...) overrides preset easing; default easing falls back to smooth.
 The narrated example is in training project/good-math/render.py and scene/story.py.
-No camera, charts, video import, or graphical editor in v0.1.
+Charts include BarChart, RankedBarChart, LineChart, ScatterPlot, Histogram, Heatmap,
+NetworkGraph, SankeyChart, VectorField, and PieChart. See docs/charts.md.
+RankedBarChart accepts category-to-value mappings, including None for missing data.
+Use .animate.data_to() for interpolated ranks and values with stable category colors.
+Ranked bar axes adjust automatically unless fixed with x_axis=Axis(limits=(0, max)).
+Number(value, format_spec=",.0f", prefix="", suffix="", formatter=None, width=None)
+inherits Text options and supports .animate.value_to(value), including signed values.
+The 45-second light-mode example is training project/company-growth/render.py.
+No camera, video import, or graphical editor in v0.1.

@@ -27,6 +27,7 @@ Use animation builders for changes over time.
 | Component | Specific arguments |
 | --- | --- |
 | `Text(text, ...)` | `font=None`, `font_size=64`, `color="white"`, `align="left"`, `spacing=8`, `font_weight=None` |
+| `Number(value, ...)` | Text options plus `format_spec=",.0f"`, `prefix=""`, `suffix=""`, `formatter=None`, `width=None`; animate with `.animate.value_to(value)` |
 | `Equation(expression, ...)` | `font_size=64`, `color="white"`, `fontset="stix"`, `max_width=None`, `color_map=None`; requires the `equations` extra |
 | `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"` |
 | `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |

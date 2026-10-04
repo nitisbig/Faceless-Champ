@@ -107,6 +107,65 @@ class BarChart(Chart):
         domain(values, self.y_axis)
 
 
+class RankedBarChart(Chart):
+    """Horizontal bars with stable colors, animated ranks, and live value labels.
+
+    ``values`` maps category names to nonnegative values or ``None`` (missing).
+    ``data_to`` retains category identity/order and interpolates both lengths and
+    rank positions. Missing values appear only at the next known snapshot.
+    Automatic limits follow the largest currently visible value; explicit linear
+    x-axis limits provide a fixed scale. ``top_n`` can show a subset of categories.
+    """
+
+    def __init__(
+        self,
+        values,
+        *,
+        top_n=None,
+        label_width=180,
+        value_width=100,
+        value_formatter=None,
+        missing_label="No data",
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        if not isinstance(values, Mapping):
+            raise TypeError("values must map categories to values")
+        self.categories = labels(values)
+        n = len(self.categories)
+        if top_n is not None and (isinstance(top_n, bool) or not isinstance(top_n, int) or not 1 <= top_n <= n):
+            raise ValueError("top_n must be a positive integer no larger than the category count")
+        self.top_n = n if top_n is None else top_n
+        self.label_width = finite(label_width, "label_width", 1)
+        self.value_width = finite(value_width, "value_width", 1)
+        if value_formatter is not None and not callable(value_formatter):
+            raise TypeError("value_formatter must be callable")
+        self.value_formatter = value_formatter or self.x_axis.format
+        self.missing_label = str(missing_label)
+        if self.x_axis.scale != "linear" or (self.x_axis.limits and self.x_axis.limits[0] != 0):
+            raise ValueError("Ranked bars require a linear x axis starting at zero")
+        self.data = self.normalize(values)
+
+    def normalize(self, data):
+        if not isinstance(data, Mapping) or tuple(data) != self.categories:
+            raise ValueError("Category names and order must remain unchanged")
+        values = tuple(0.0 if v is None else finite(v, "value", 0) for v in data.values())
+        available = tuple(0.0 if v is None else 1.0 for v in data.values())
+        order = sorted(range(len(values)), key=lambda i: (-available[i], -values[i], i))
+        ranks = [0.0] * len(values)
+        for rank, i in enumerate(order):
+            ranks[i] = float(rank)
+        return values + tuple(ranks) + available
+
+    def validate_data(self, values):
+        super().validate_data(values)
+        n = len(self.categories)
+        if any(v < 0 for v in values[:n]) or any(not 0 <= v <= n - 1 for v in values[n : 2 * n]):
+            raise ValueError("Ranked bar values and ranks must be nonnegative and ranks must fit the categories")
+        if any(not 0 <= v <= 1 for v in values[2 * n :]):
+            raise ValueError("Ranked bar availability must be in [0, 1]")
+
+
 class LineChart(Chart):
     cartesian = True
 
@@ -315,6 +374,7 @@ __all__ = [
     "LineChart",
     "NetworkGraph",
     "PieChart",
+    "RankedBarChart",
     "SankeyChart",
     "ScatterPlot",
     "VectorField",

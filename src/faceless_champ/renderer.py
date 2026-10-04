@@ -13,7 +13,21 @@ from PIL import ImageColor, ImageDraw, ImageFont, ImageOps
 
 from .charts import Chart
 from .charts.drawing import draw_chart
-from .components import Arrow, Circle, Equation, Icon, Image, Line, Polyline, Rectangle, Shape, Text, Triangle, finite
+from .components import (
+    Arrow,
+    Circle,
+    Equation,
+    Icon,
+    Image,
+    Line,
+    Number,
+    Polyline,
+    Rectangle,
+    Shape,
+    Text,
+    Triangle,
+    finite,
+)
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
 
@@ -236,6 +250,20 @@ class PillowRenderer:
             return draw_chart(c, state, factor)
         if isinstance(c, Captions):
             return self._caption_sprite(c, factor, age)
+        if isinstance(c, Number):
+            font = self._font(c, max(1, round(c.font_size * factor)))
+            text = c.format(state["value"])
+            d = ImageDraw.Draw(PILImage.new("RGBA", (1, 1)))
+            box = d.textbbox((0, 0), text or " ", font=font)
+            text_width = math.ceil(box[2] - box[0])
+            width = text_width if c.width is None else round(c.width * factor)
+            if width < text_width:
+                raise ValueError("Number text exceeds its fixed width")
+            sprite = PILImage.new("RGBA", (max(1, width) + 4, max(1, math.ceil(box[3] - box[1])) + 4))
+            x = 0 if c.align == "left" else (width - text_width if c.align == "right" else (width - text_width) / 2)
+            visible = text[: math.floor(len(text) * state["reveal"] + 1e-9)]
+            ImageDraw.Draw(sprite).text((x + 2 - box[0], 2 - box[1]), visible, font=font, fill=c.color)
+            return sprite
         # Dynamic reveal/draw frames are deliberately not retained in the cache.
         static = state["reveal"] == 1 and state["draw"] == 1
         frame_index = 0

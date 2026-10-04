@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from itertools import pairwise
 from pathlib import Path
@@ -106,6 +106,43 @@ class Text(Component):
         self.color, self.align = color, align
         self.spacing = finite(spacing, "spacing", 0)
         self.font_weight = None if font_weight is None else finite(font_weight, "font_weight", 1)
+
+
+class Number(Text):
+    """Animated numeric text, optionally held in a fixed-width aligned box.
+
+    Use ``number.animate.value_to(value)`` with ordinary scene timing. A custom
+    formatter receives the interpolated value; no per-frame sprites are retained.
+    """
+
+    def __init__(
+        self,
+        value: float,
+        *,
+        format_spec: str = ",.0f",
+        prefix: str = "",
+        suffix: str = "",
+        formatter: Callable[[float], str] | None = None,
+        width: float | None = None,
+        **kwargs: Any,
+    ) -> None:
+        self.value = finite(value, "value")
+        if formatter is not None and not callable(formatter):
+            raise TypeError("formatter must be callable")
+        self.format_spec, self.prefix, self.suffix = format_spec, str(prefix), str(suffix)
+        self.formatter = formatter
+        self.width = None if width is None else finite(width, "width", 1)
+        super().__init__(self.format(self.value), **kwargs)
+
+    def format(self, value: float) -> str:
+        result = str(self.formatter(value)) if self.formatter else format(value, self.format_spec)
+        result = self.prefix + result + self.suffix
+        if "\n" in result:
+            raise ValueError("Number formatters must produce a single line")
+        return result
+
+    def state(self) -> dict:
+        return {**super().state(), "value": self.value}
 
 
 class Equation(Component):
