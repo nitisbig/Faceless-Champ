@@ -20,6 +20,7 @@ from .components import (
     Equation,
     Icon,
     Image,
+    ImageSlot,
     Line,
     Number,
     Polyline,
@@ -40,7 +41,7 @@ class Renderer(Protocol):
 
 
 class PillowRenderer:
-    def __init__(self, antialias: int = 2, *, frame_cache_mb: float = 64):
+    def __init__(self, antialias: int = 2, *, frame_cache_mb: float = 64, caption_cache_mb: float = 32):
         if antialias not in (1, 2, 3, 4):
             raise ValueError("antialias must be 1, 2, 3, or 4")
         self.antialias = antialias
@@ -53,6 +54,10 @@ class PillowRenderer:
         self._scene_frames = OrderedDict()
         self._frame_cache_limit = round(finite(frame_cache_mb, "frame_cache_mb", 0) * 1024 * 1024)
         self._frame_cache_bytes = 0
+        self._caption_sprites = OrderedDict()
+        self._caption_layouts = OrderedDict()
+        self._caption_cache_limit = round(finite(caption_cache_mb, "caption_cache_mb", 0) * 1024 * 1024)
+        self._caption_cache_bytes = 0
 
     def _font(self, component: Text | Captions, size: int):
         path = component.font or DEFAULT_FONT
@@ -64,6 +69,32 @@ class PillowRenderer:
 
     def _image(self, component: Image):
         path = component.path
+        if (
+            isinstance(component, ImageSlot)
+            and path is not None
+            and (component.mode == "placeholder" or (component.mode == "auto" and not path.exists()))
+        ):
+            key = ("placeholder", component)
+            if key not in self._images:
+                size = (max(1, round(component.width)), max(1, round(component.height)))
+                sprite = PILImage.new("RGBA", size, component.placeholder_fill)
+                draw = ImageDraw.Draw(sprite)
+                draw.rectangle((0, 0, size[0] - 1, size[1] - 1), outline=component.placeholder_stroke, width=2)
+                font = load_font(component.placeholder_font, round(component.placeholder_font_size))
+                box = draw.multiline_textbbox((0, 0), component.label, font=font, align="center")
+                ratio = min(1, (size[0] - 16) / max(1, box[2] - box[0]), (size[1] - 16) / max(1, box[3] - box[1]))
+                if ratio < 1:
+                    font = load_font(component.placeholder_font, max(1, round(component.placeholder_font_size * ratio)))
+                draw.multiline_text(
+                    (size[0] / 2, size[1] / 2),
+                    component.label,
+                    font=font,
+                    fill=component.placeholder_color,
+                    anchor="mm",
+                    align="center",
+                )
+                self._images[key] = ([sprite], [0.1])
+            return self._images[key]
         key = path.resolve() if path is not None else component.source_bytes
         if key not in self._images:
             if path is not None and not path.is_file():
@@ -71,14 +102,19 @@ class PillowRenderer:
             if path is not None and path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp", ".gif"}:
                 raise ValueError("Images must be PNG, JPEG, WebP, or GIF")
             frames, durations = [], []
-            with PILImage.open(path if path is not None else BytesIO(component.source_bytes)) as source:
-                if source.format not in {"PNG", "JPEG", "WEBP", "GIF"}:
-                    raise ValueError("Images must be PNG, JPEG, WebP, or GIF")
-                count = getattr(source, "n_frames", 1) if source.format == "GIF" else 1
-                for index in range(count):
-                    source.seek(index)
-                    frames.append(ImageOps.exif_transpose(source).convert("RGBA"))
-                    durations.append(max(0.01, source.info.get("duration", 100) / 1000))
+            try:
+                with PILImage.open(path if path is not None else BytesIO(component.source_bytes)) as source:
+                    if source.format not in {"PNG", "JPEG", "WEBP", "GIF"}:
+                        raise ValueError("Images must be PNG, JPEG, WebP, or GIF")
+                    count = getattr(source, "n_frames", 1) if source.format == "GIF" else 1
+                    for index in range(count):
+                        source.seek(index)
+                        frames.append(ImageOps.exif_transpose(source).convert("RGBA"))
+                        durations.append(max(0.01, source.info.get("duration", 100) / 1000))
+            except OSError as exc:
+                if isinstance(component, ImageSlot):
+                    raise ValueError(f"Cannot decode image: {path or 'in-memory source'}") from exc  # noqa: TRY004
+                raise
             self._images[key] = (frames, durations)
         return self._images[key]
 
@@ -184,7 +220,9 @@ class PillowRenderer:
                 (
                     c,
                     tuple(state.items()),
-                    age if isinstance(c, Captions) or (isinstance(c, Image) and len(self._image(c)[0]) > 1) else None,
+                    self._caption_state(c, age)
+                    if isinstance(c, Captions)
+                    else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None),
                 )
                 for c, state, age in visible
             ),
@@ -496,15 +534,20 @@ class PillowRenderer:
         gc.restore()
         return PILImage.fromarray(np.asarray(renderer.buffer_rgba()).copy())
 
-    def _caption_sprite(self, c: Captions, factor: float, age: float):
+    @staticmethod
+    def _caption_state(c: Captions, age: float):
         phrase = c.phrase_at(age)
         if not phrase:
-            return PILImage.new("RGBA", (1, 1))
+            return None
         active = c.track.active_at(age)
         finished = sum(cue.end <= age for cue in phrase)
-        key = (c, factor, phrase[0].index, active.index if active else None, finished)
-        if key in self._sprites:
-            return self._sprites[key]
+        return (phrase[0].index, active.index if active else None, finished)
+
+    def _caption_layout(self, c: Captions, factor: float, phrase):
+        key = (c, factor, phrase[0].index)
+        if key in self._caption_layouts:
+            self._caption_layouts.move_to_end(key)
+            return self._caption_layouts[key]
         font = self._font(c, max(1, round(c.font_size * factor)))
         width = max(1, round(c.width * factor))
         space = font.getlength(" ")
@@ -525,6 +568,25 @@ class PillowRenderer:
             lines.append((line, used))
         ascent, descent = font.getmetrics()
         step = ascent + descent + round(c.spacing * factor)
+        layout = (font, width, lines, ascent, step)
+        if self._caption_cache_limit:
+            if len(self._caption_layouts) >= 128:
+                self._caption_layouts.popitem(last=False)
+            self._caption_layouts[key] = layout
+        return layout
+
+    def _caption_sprite(self, c: Captions, factor: float, age: float):
+        state = self._caption_state(c, age)
+        if state is None:
+            return PILImage.new("RGBA", (1, 1))
+        key = (c, factor, state)
+        if key in self._caption_sprites:
+            self._caption_sprites.move_to_end(key)
+            return self._caption_sprites[key]
+        phrase = c.phrase_at(age)
+        active = c.track.active_at(age)
+        font, width, lines, ascent, step = self._caption_layout(c, factor, phrase)
+        space = font.getlength(" ")
         sprite = PILImage.new("RGBA", (width, step * len(lines) + 4))
         draw = ImageDraw.Draw(sprite)
         for row, (words, length) in enumerate(lines):
@@ -533,5 +595,11 @@ class PillowRenderer:
                 color = c.highlight_color if active == cue else (c.color if age >= cue.end else c.future_color)
                 draw.text((x, 2 + ascent + row * step), word, font=font, fill=color, anchor="ls")
                 x += word_length + space
-        self._sprites[key] = sprite
+        cost = sprite.width * sprite.height * 4
+        if cost <= self._caption_cache_limit:
+            while self._caption_cache_bytes + cost > self._caption_cache_limit:
+                _, old = self._caption_sprites.popitem(last=False)
+                self._caption_cache_bytes -= old.width * old.height * 4
+            self._caption_sprites[key] = sprite
+            self._caption_cache_bytes += cost
         return sprite

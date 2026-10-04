@@ -1,5 +1,39 @@
 # Authoring guide
 
+## Narrated previews and image reservations
+
+Keep a continuous narration/caption overlay at zero when composing multiple
+chapters. Build the visuals with cue-derived durations in `Sequence(crossfade=0)`
+and combine them with the overlay using `Layer`. Crossfades shorten a sequence;
+account for that overlap when synchronizing to narration. Component fades within
+a chapter leave the source clock intact.
+
+```python
+from faceless_champ import ImageSlot, SubtitleTrack
+
+track = SubtitleTrack.from_srt("cue-per-word.srt", overlap_tolerance=0.001)
+scene.add(ImageSlot("image/1.png", width=800, height=500, fit="cover",
+                    position=(960, 540)))
+scene.render("output/detail-preview.mp4", start_time=12, end_time=18,
+             width=960, height=540, fps=15, antialias=1)
+```
+
+Opt into overlap tolerance only when the source requires it. Cue timestamps remain
+unchanged, and default parsing remains strict. Use original cue indices to schedule
+visuals, including extremely short cues; do not replace the word track with a
+retimed phrase transcript. Captions already group words into readable phrases.
+
+ImageSlot's auto mode shows a labeled box until the path exists. Force
+`mode="placeholder"` when checking placement, or `mode="required"` when all images
+should be supplied. Run with a fresh renderer after adding/replacing files.
+Placeholder styling belongs to the component; an example CLI should only select
+the mode and supply its scene paths. Corrupt existing files are errors.
+
+For long narration, `PillowRenderer(caption_cache_mb=32)` bounds highlighted caption
+sprites separately from the scene-frame budget. Layouts reuse word measurements.
+Set `caption_cache_mb=0` to compare uncached output. The Country Economy project
+demonstrates these APIs with short previews and a complete source-clock composition.
+
 ## Layout and timing
 
 Think in design pixels, independent of output resolution. Place a centered title at

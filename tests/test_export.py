@@ -62,6 +62,74 @@ def test_crossfade_audio_envelope(tmp_path, tone):
     assert window(1.7, 1.8) < 0.001
 
 
+def test_source_range_rebases_composition_audio_and_visuals(tmp_path, tone):
+    from faceless_champ import PillowRenderer
+
+    first = Scene(Canvas(160, 90, "red")).wait(1)
+    second = Scene(Canvas(160, 90, "blue")).wait(2)
+    second.add_audio(tone, start=0.25, trim_start=0.2, trim_end=1.2, fade_in=0.2, fade_out=0.2)
+    video = Sequence(first, second)
+
+    class RecordingRenderer(PillowRenderer):
+        def __init__(self):
+            super().__init__(1)
+            self.times = []
+
+        def frame(self, node, time, size):
+            if node is video:
+                self.times.append(time)
+            return super().frame(node, time, size)
+
+    renderer = RecordingRenderer()
+    output = render(
+        video,
+        tmp_path / "range.mp4",
+        renderer=renderer,
+        width=160,
+        height=90,
+        fps=10,
+        preset="ultrafast",
+        start_time=1,
+        end_time=2.5,
+    )
+    assert renderer.times == pytest.approx([1 + i / 10 for i in range(15)])
+    assert float(probe(output)["format"]["duration"]) == pytest.approx(1.5, abs=0.02)
+    samples = decode_audio(output)
+    window = lambda start, end: rms(samples[int(start * 48000) : int(end * 48000)])
+    assert window(0.05, 0.2) < 0.001
+    assert window(0.26, 0.3) < window(0.6, 0.8) * 0.4
+    assert window(0.6, 0.8) > 0.08
+    assert window(1.2, 1.24) < window(0.6, 0.8) * 0.4
+    assert window(1.3, 1.45) < 0.001
+
+
+def test_range_preserves_crossfade_envelope(tmp_path, tone):
+    first = Scene(Canvas(160, 90)).wait(1.5)
+    first.add_audio(tone, start=0, trim_end=1.5, volume=0.6)
+    output = render(
+        Sequence(first, Scene(Canvas(160, 90)).wait(1.5), crossfade=0.5),
+        tmp_path / "range-fade.mp4",
+        width=160,
+        height=90,
+        fps=10,
+        preset="ultrafast",
+        start_time=0.5,
+        end_time=2,
+    )
+    samples = decode_audio(output)
+    window = lambda start, end: rms(samples[int(start * 48000) : int(end * 48000)])
+    assert window(0.8, 0.9) < window(0.1, 0.2) * 0.5
+    assert window(1.05, 1.3) < 0.001
+
+
+@pytest.mark.parametrize("start,end", [(-1, 1), (0, 0), (1, 0.5), (0, 3), (float("nan"), 1)])
+def test_invalid_range_does_not_publish(tmp_path, start, end):
+    output = tmp_path / "bad-range.mp4"
+    with pytest.raises(ValueError):
+        render(Scene().wait(2), output, start_time=start, end_time=end)
+    assert not output.exists()
+
+
 def test_render_frame_progress_and_invalid_callback(tmp_path):
     reports = []
     output = render(

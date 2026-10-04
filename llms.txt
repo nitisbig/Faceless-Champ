@@ -55,3 +55,18 @@ animate; Pillow inputs snapshot their current frame. No implicit URL downloads.
 Polyline(draw_by="x") reveals strictly increasing open paths by horizontal time.
 The 30-second AI logo example is training project/ai-comapny-graph/render.py;
 its counts and relative origins are explicitly illustrative, not reported history.
+ImageSlot(path, mode="auto"/"placeholder"/"required", label=None, ...) reserves an
+image box and uses the normal image fitting and animation pipeline. Missing auto
+assets show their filename; existing corrupt assets are errors. Placeholder fill,
+stroke, text color, font, and font size are configurable. A fresh renderer picks
+up newly supplied images. The country-economy example uses image/1.png through 6.png.
+SubtitleTrack constructors accept overlap_tolerance=0.0 (strict by default). Opt
+into 0.001 for known millisecond source overlaps; source cues are never retimed.
+render(start_time=0.0, end_time=None) exports a source-clock range of visuals and
+mixed narration with original fades/offsets preserved. End defaults to node.duration.
+PillowRenderer(caption_cache_mb=32) bounds caption sprites separately from held
+scene frames and reuses up to 128 phrase layouts. Caption states allow held-frame
+reuse between words. Both cache budgets accept zero to disable retention.
+training project/country-economy/render.py defaults to a 960x540, 15 fps opening
+preview, with --image placeholder, --scene, --range, --frame, and --storyboard modes.
+Its 14 scenes match the supplied narration; financial figures are illustrative.

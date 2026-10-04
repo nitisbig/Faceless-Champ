@@ -86,7 +86,7 @@ def _audio_events(node, offset=0.0, envelopes=()):
     return result
 
 
-def _audio_command(events, duration):
+def _audio_command(events, duration, start_time=0.0):
     inputs, filters, labels = [], [], []
     for i, (clip, start, envelopes) in enumerate(events):
         inputs.extend(["-i", str(clip.path.resolve())])
@@ -110,7 +110,8 @@ def _audio_command(events, duration):
         labels.append(f"[{label}]")
     filters.append(
         "".join(labels)
-        + f"amix=inputs={len(labels)}:normalize=0:duration=longest,apad,atrim=duration={duration}[audio]"
+        + f"amix=inputs={len(labels)}:normalize=0:duration=longest,apad,"
+        + f"atrim=start={start_time}:end={start_time + duration},asetpts=PTS-STARTPTS[audio]"
     )
     return inputs, ";".join(filters)
 
@@ -123,12 +124,15 @@ def render(
     renderer: Renderer | None = None,
     overwrite: bool = False,
     progress: Callable[[int, int], None] | None = None,
+    start_time: float = 0.0,
+    end_time: float | None = None,
     **options,
 ) -> Path:
     """Render to MP4. ``progress(completed_frames, total_frames)`` is optional.
 
     Pass an ExportSettings object or its fields as keywords. Progress starts at
     zero and runs after each streamed frame; publication follows encoder completion.
+    A source-clock range trims both visuals and mixed audio without moving events.
     """
     if settings is not None and options:
         raise ValueError("Use settings or keyword export options, not both")
@@ -145,8 +149,13 @@ def render(
     require_tools()
     size = settings.dimensions(node.canvas)
     renderer = renderer or PillowRenderer(settings.antialias)
+    source_duration = finite(node.duration, "duration", 0.000001)
+    start_time = finite(start_time, "start_time", 0)
+    end_time = source_duration if end_time is None else finite(end_time, "end_time", 0)
+    if not start_time < end_time <= source_duration:
+        raise ValueError("Render range must satisfy 0 <= start_time < end_time <= duration")
     renderer.validate(node)
-    duration = finite(node.duration, "duration", 0.000001)
+    duration = end_time - start_time
     frame_count = math.ceil(duration * settings.fps - 1e-9)
     export_duration = frame_count / settings.fps
     events = _audio_events(node)
@@ -174,7 +183,7 @@ def render(
             "pipe:0",
         ]
         if events:
-            inputs, graph = _audio_command(events, export_duration)
+            inputs, graph = _audio_command(events, export_duration, start_time)
             command.extend(
                 inputs + ["-filter_complex", graph, "-map", "0:v:0", "-map", "[audio]", "-c:a", "aac", "-b:a", "192k"]
             )
@@ -201,7 +210,7 @@ def render(
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=log)
             try:
                 for index in range(frame_count):
-                    frame = renderer.frame(node, index / settings.fps, size).convert("RGB")
+                    frame = renderer.frame(node, start_time + index / settings.fps, size).convert("RGB")
                     process.stdin.write(frame.tobytes())
                     if progress is not None:
                         progress(index + 1, frame_count)

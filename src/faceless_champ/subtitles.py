@@ -39,9 +39,10 @@ class SubtitleCue:
 
 
 class SubtitleTrack:
-    """An ordered, nonoverlapping collection of cues. Times are never retimed."""
+    """Ordered cues, optionally tolerating small overlaps without retiming."""
 
-    def __init__(self, cues: Iterable[SubtitleCue]) -> None:
+    def __init__(self, cues: Iterable[SubtitleCue], *, overlap_tolerance: float = 0.0) -> None:
+        self.overlap_tolerance = finite(overlap_tolerance, "overlap_tolerance", 0)
         self.cues = tuple(cues)
         if not self.cues:
             raise ValueError("Subtitle track needs at least one cue")
@@ -51,16 +52,16 @@ class SubtitleTrack:
         if len(self._by_index) != len(self.cues):
             raise ValueError("Subtitle cue indices must be unique")
         for previous, cue in zip(self.cues, self.cues[1:]):
-            if cue.start < previous.end:
+            if cue.start < previous.start or cue.start < previous.end - self.overlap_tolerance - 1e-9:
                 raise ValueError(f"Cues {previous.index} and {cue.index} overlap or are out of order")
         self._starts = tuple(cue.start for cue in self.cues)
 
     @classmethod
-    def from_srt(cls, path: str | Path) -> SubtitleTrack:
-        return cls.parse_srt(Path(path).read_text(encoding="utf-8-sig"))
+    def from_srt(cls, path: str | Path, *, overlap_tolerance: float = 0.0) -> SubtitleTrack:
+        return cls.parse_srt(Path(path).read_text(encoding="utf-8-sig"), overlap_tolerance=overlap_tolerance)
 
     @classmethod
-    def parse_srt(cls, text: str) -> SubtitleTrack:
+    def parse_srt(cls, text: str, *, overlap_tolerance: float = 0.0) -> SubtitleTrack:
         text = text.lstrip("\ufeff").replace("\r\n", "\n").replace("\r", "\n").strip()
         cues = []
         for block_number, block in enumerate(re.split(r"\n(?:[ \t]*\n)+", text), 1):
@@ -73,11 +74,11 @@ class SubtitleTrack:
                 )
             except (ValueError, IndexError) as exc:
                 raise ValueError(f"Invalid SRT block {block_number}: {exc}") from exc
-        return cls(cues)
+        return cls(cues, overlap_tolerance=overlap_tolerance)
 
     @property
     def duration(self) -> float:
-        return self.cues[-1].end
+        return max(cue.end for cue in self.cues)
 
     def cue(self, index: int) -> SubtitleCue:
         """Look up the original SRT cue number (one-based, not a list offset)."""

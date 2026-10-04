@@ -235,6 +235,38 @@ class Image(Component):
         return result
 
 
+class ImageSlot(Image):
+    """An image reservation that renders a labeled box until its asset exists.
+
+    ``auto`` uses a local image when available, ``placeholder`` always shows the
+    box, and ``required`` behaves like Image. Asset changes are picked up by a
+    fresh renderer. Existing corrupt files are errors, never hidden as boxes.
+    """
+
+    def __init__(
+        self,
+        path: str | Path,
+        *,
+        mode: str = "auto",
+        label: str | None = None,
+        placeholder_fill: str = "#F4F3EE",
+        placeholder_stroke: str = "#B1ADA1",
+        placeholder_color: str = "#292724",
+        placeholder_font: str | Path | None = None,
+        placeholder_font_size: float = 30,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(path, **kwargs)
+        if mode not in {"auto", "placeholder", "required"}:
+            raise ValueError("ImageSlot mode must be auto, placeholder, or required")
+        self.mode = mode
+        self.label = self.path.name if label is None else str(label)
+        self.placeholder_fill, self.placeholder_stroke = placeholder_fill, placeholder_stroke
+        self.placeholder_color = placeholder_color
+        self.placeholder_font = str(placeholder_font) if placeholder_font else None
+        self.placeholder_font_size = finite(placeholder_font_size, "placeholder_font_size", 1)
+
+
 class Icon(Image):
     """Tint a transparent raster icon with a color, preserving its alpha mask."""
 

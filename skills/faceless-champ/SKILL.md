@@ -68,3 +68,25 @@ Use --overwrite only when replacing the chosen output is intended.
 - The `training project/ai-comapny-graph` example has a root render.py with preview,
   storyboard, single-frame, output, and overwrite options. Its data is fictional:
   retain the visible disclaimer and never describe it as historical adoption.
+
+- Reserve missing artwork with ImageSlot(path, mode="auto", width=..., height=...).
+  Auto loads existing files and draws labeled boxes for absent files; placeholder
+  always forces boxes; required fails on missing files. Configure placeholder colors
+  and font on the component, and keep asset-mode selection in the project CLI.
+  Replace files and create a fresh renderer to load them. Existing corrupt files
+  must surface as errors instead of being silently replaced by placeholders.
+- SubtitleTrack accepts overlap_tolerance=0.0 on constructors and SRT loaders.
+  Keep the default strict; opt into a small known source rounding overlap such as
+  0.001 seconds without editing cue times. Latest-starting cues win accepted overlaps.
+- Export short synchronized previews with render(start_time=..., end_time=...).
+  Times refer to the original composition/audio clock. A Layer with continuous
+  captions and audio over a cut-only Sequence avoids cumulative scene timing drift.
+  Component fades can soften those cuts without changing chapter duration.
+- Long narration uses bounded caption sprites via PillowRenderer(caption_cache_mb=32),
+  separate from frame_cache_mb. Phrase layouts reuse measurements and held caption
+  states reuse frames. Use zero budgets when checking cached/uncached parity.
+- The country-economy example defaults to a 960×540 / 15 fps opening preview and has
+  --image placeholder, --scene, --range, --frame, and --storyboard options. Its entire
+  narration requires explicit --all-preview. Start visual QA with a storyboard and
+  short clips. Its six numbered image prompts are in img-info.md; fonts and symbols
+  reuse licensed assets in the main checkout. Keep the financial examples illustrative.

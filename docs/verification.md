@@ -154,3 +154,39 @@ historical adoption. Default exports use 2× supersampling; previews use 1× for
 frame with 2× supersampling was also checked from outside the repository.
 An additional 2× full-preview render was interrupted by the execution environment;
 the completed 1× preview remained intact through the atomic export mechanism.
+
+## Country Economy, image slots, and narration ranges
+
+Verified on 2026-10-04:
+
+- **196 pytest cases passed**. New coverage checks opt-in subtitle overlaps with
+  exact timestamp preservation, image-slot modes and asset replacement, fitting,
+  transforms, corrupt asset errors, bounded caption caching and pixel parity,
+  held-frame reuse, and ranged audio/visual exports with composition offsets/fades.
+- Ruff lint/format and Git whitespace checks passed. The project's `python3`
+  entry point also exported a frame while invoked from outside the repository.
+- The complete composition contains **14 chapters, 344 chapter components,
+  154 visual events, and 991 original word cues**. Four source overlaps of 1 ms
+  are accepted explicitly; both subtitle files and the source audio remain intact.
+  Chapter text bounds stay inside the design canvas and above the caption band.
+- **37 storyboard frames** cover chapters and key moments. Before/during/after
+  samples were checked for the spending bar, 20% borrowing rate, doubled local
+  repayment cost, and closing confidence reveal. Each check has distinct frames;
+  the final Confidence entrance begins on original cue 990 at 359.1s.
+- Only four short low-quality clips were rendered: the opening (16.733333s),
+  deficit chapter (9.066667s), borrowing rates (7s), and currency conversion (10s).
+  All are **960×540, H.264, 15 fps**, with stereo 48 kHz AAC. Both streams begin
+  at zero; fractional source intervals round up to whole video frames.
+- All four clips decoded fully through FFmpeg without errors. Correlation of their
+  decoded audio with the corresponding trimmed source audio exceeded **0.9998**,
+  verifying source-time alignment after re-encoding. This is a signal check, not
+  a subjective listening assessment. A decoded deficit-animation frame was inspected.
+- The complete six-minute video was **not rendered**. `--all-preview` remains an
+  explicit option. Existing licensed fonts and symbols were reused from shared
+  assets; no new dependency or asset download was needed. Asset hashes, sources,
+  and license paths are recorded in `assets/country-economy-sources.json`.
+
+Run `python3 'training project/country-economy/render.py' --image placeholder`
+for the opening, or add `--storyboard`, `--scene deficit`, or `--range 120 127`.
+Artifacts and detailed checks are in the project's `output/`, including
+`timeline.json`, `media-verification.json`, and `scene-verification.json`.

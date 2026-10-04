@@ -107,6 +107,24 @@ The library exposes `ColorScheme`, `Equation(color_map=...)`, variable font
 Unchanged scene frames are reused within a configurable memory budget, reducing
 the rendering work during held panels while preserving animation and caption timing.
 
+## Country-economy training project
+
+The [Country Economy example](training%20project/country-economy/README.md) matches
+14 finance chapters to an existing six-minute narration and 991 word cues. It
+uses numbered image slots, charts, diagrams, and highlighted phrase captions.
+
+```bash
+python3 'training project/country-economy/render.py' --image placeholder
+python3 'training project/country-economy/render.py' --image placeholder --storyboard
+python3 'training project/country-economy/render.py' --image placeholder --scene deficit
+```
+
+The default exports only the 16.7-second opening at 960×540 / 15 fps. Replace slots
+with `image/1.png` through `6.png` and use the default auto image mode. See the
+project's `img-info.md` for prompts. Reusable main-library additions are `ImageSlot`,
+explicit subtitle overlap tolerance, `render(start_time=..., end_time=...)`, and
+bounded caption caching with reusable phrase layouts.
+
 ## Documentation
 
 - [API reference](docs/api.md): components, scenes, animation, composition, and exports.

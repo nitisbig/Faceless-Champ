@@ -113,3 +113,41 @@ def test_cue_validation(kwargs):
     values = {"index": 1, "start": 0, "end": 1, "text": "hello"} | kwargs
     with pytest.raises(ValueError):
         SubtitleCue(**values)
+
+
+def test_small_overlaps_opt_in_preserve_source_and_latest_cue(tmp_path):
+    srt = SRT.replace("00:00:00,330 -->", "00:00:00,329 -->")
+    with pytest.raises(ValueError, match="overlap"):
+        SubtitleTrack.parse_srt(srt)
+    path = tmp_path / "overlap.srt"
+    path.write_text(srt)
+    track = SubtitleTrack.from_srt(path, overlap_tolerance=0.001)
+    assert track.cue(1).end == 0.33
+    assert track.cue(2).start == 0.329
+    assert track.active_at(0.3289) == track.cue(1)
+    assert track.active_at(0.329) == track.cue(2)
+    assert track.duration == 0.57
+    with pytest.raises(ValueError):
+        SubtitleTrack.parse_srt(srt, overlap_tolerance=0.0005)
+    with pytest.raises(ValueError):
+        SubtitleTrack([SubtitleCue(1, 1, 2, "a"), SubtitleCue(2, 0.5, 3, "b")], overlap_tolerance=10)
+    for invalid in (-1, float("nan"), float("inf")):
+        with pytest.raises(ValueError):
+            SubtitleTrack.parse_srt(srt, overlap_tolerance=invalid)
+
+
+def test_caption_cache_bounded_equivalent_and_reuses_held_frames():
+    track = SubtitleTrack([SubtitleCue(i + 1, i / 2, (i + 1) / 2, f"word{i}.") for i in range(80)])
+    scene = Scene(Canvas(320, 180, "white")).add(Captions(track, font_size=22, width=280, position=(160, 90)))
+    cached = PillowRenderer(1, caption_cache_mb=0.05)
+    uncached = PillowRenderer(1, frame_cache_mb=0, caption_cache_mb=0)
+    for i in range(80):
+        time = i / 2 + 0.1
+        assert cached.frame(scene, time, (320, 180)).tobytes() == uncached.frame(scene, time, (320, 180)).tobytes()
+        assert cached._caption_cache_bytes <= cached._caption_cache_limit
+    assert len(cached._caption_sprites) < 80
+    assert not uncached._caption_sprites and not uncached._caption_layouts
+    cached.frame(scene, 0.1, (320, 180))
+    held = cached._scene_frames[scene][1]
+    cached.frame(scene, 0.2, (320, 180))
+    assert cached._scene_frames[scene][1] is held

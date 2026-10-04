@@ -31,6 +31,7 @@ Use animation builders for changes over time.
 | `Ellipse(...)` | Shape options with independent `width` and `height`; supports `Draw`, fill, stroke, and transforms |
 | `Equation(expression, ...)` | `font_size=64`, `color="white"`, `fontset="stix"`, `max_width=None`, `color_map=None`; requires the `equations` extra |
 | `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"`, `trim=False`, `tint=None`; also `Image.from_source(source, ...)` |
+| `ImageSlot(path, ...)` | Image options plus `mode="auto"`, `label=None`, and placeholder styling; reserves an image box without requiring the asset |
 | `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |
 | `Rectangle(...)` | `width=200`, `height=200`, `corner_radius=0`; radius must fit inside the rectangle |
 | `Square(side=200, ...)` | Equal width and height |
@@ -55,6 +56,14 @@ default weight. The renderer keeps separate cached instances for each weight.
 Images accept PNG, JPG/JPEG, WebP, and GIF files. `contain` preserves the entire image
 with transparent padding; `cover` crops to fill. GIF timing starts when the component
 is added and loops while visible. Non-GIF formats use their first frame.
+
+`ImageSlot` uses `mode="auto"` to load an existing image or show a labeled placeholder
+when absent. `mode="placeholder"` always shows the box; `mode="required"` requires
+the image. Existing corrupt files raise errors. `label=None` displays the filename.
+Placeholder options are `placeholder_fill="#F4F3EE"`, `placeholder_stroke="#B1ADA1"`,
+`placeholder_color="#292724"`, `placeholder_font=None`, and `placeholder_font_size=30`.
+Labels shrink to fit the slot. Ordinary placement, fitting, and animation apply;
+asset replacement is detected by a fresh renderer, such as the next CLI run.
 
 Icons use transparent raster assets and retain their original alpha masks; source
 RGB colors are replaced by `color`. SVG inputs should be exported to PNG first.
@@ -260,15 +269,22 @@ fade_in=0, fade_out=0)` accepts WAV, MP3, and M4A.
 
 ## SRT and captions
 
-`SubtitleTrack.from_srt(path)` reads UTF-8/BOM SRT with LF or CRLF line endings.
-`SubtitleTrack.parse_srt(text)` parses an in-memory string. Comma and dot timestamp
+`SubtitleTrack.from_srt(path, *, overlap_tolerance=0.0)` reads UTF-8/BOM SRT with LF or CRLF line endings.
+`SubtitleTrack.parse_srt(text, *, overlap_tolerance=0.0)` parses an in-memory string. Comma and dot timestamp
 separators and multiline cue text are supported. Malformed timestamps, duplicate
 cue numbers, empty cue text, reversed intervals, overlaps, and out-of-order cues
 raise `ValueError`. Tracks contain at least one cue.
 
+`SubtitleTrack(cues, *, overlap_tolerance=0.0)` accepts the same nonnegative finite
+tolerance in seconds. The default rejects overlaps; opt into a small value such
+as `0.001` for rounding overlaps in word-timed transcripts. Original cue text,
+indices, starts, and ends remain intact. During an accepted overlap, the
+latest-starting cue wins (the later listed cue wins if starts are equal).
+Decreasing starts remain invalid regardless of tolerance.
+
 `SubtitleCue(index, start, end, text)` is immutable. `track.cues` contains the ordered
 cue tuple. `track.cue(index)` looks up an original SRT number; absent numbers raise
-`KeyError`. `track.duration` is the last cue's end time. `track.active_at(time)` uses
+`KeyError`. `track.duration` is the greatest cue end time. `track.active_at(time)` uses
 `start <= time < end`, returning `None` in gaps. Cues are never retimed.
 
 `Captions(track, font=None, font_size=42, width=1440, color="#292724",
@@ -297,16 +313,27 @@ with scene.at(track.cue(4).start):
 
 ## Rendering and settings
 
-`PillowRenderer(antialias=2, frame_cache_mb=64)` caches unchanged scene frames within
+`PillowRenderer(antialias=2, frame_cache_mb=64, caption_cache_mb=32)` caches unchanged scene frames within
 a configurable memory budget in MiB. The cache is invalidated by visible animation
-states, component lifetimes, canvas/resolution changes, GIF ages, and caption ages.
+states, component lifetimes, canvas/resolution changes, GIF ages, and caption states.
 Returned frames can be modified without changing cached frames. Set
 `frame_cache_mb=0` to disable this cache. It uses a least-recently-used eviction policy
 and retains at most one frame per scene; video frames are still streamed to FFmpeg.
+Caption sprites have their own bounded LRU budget, `caption_cache_mb`, in MiB.
+Zero disables that cache and phrase-layout retention. Phrase layouts are reused
+across highlights and retained for at most 128 phrase/scale combinations.
 
-`render(node, output, *, settings=None, renderer=None, overwrite=False, progress=None, **options)`
+`render(node, output, *, settings=None, renderer=None, overwrite=False, progress=None,
+start_time=0.0, end_time=None, **options)`
 returns the absolute output `Path`. Pass either `ExportSettings(...)` or its fields
 as keyword options, not both.
+
+`start_time` and `end_time` select a source-clock interval satisfying
+`0 <= start_time < end_time <= node.duration`. An omitted end uses the composition
+duration. Frame samples retain original absolute times; mixed audio is trimmed
+and rebased after local and composition fades. This works with Scene, Sequence,
+Grid, and Layer and does not alter their source timelines. Duration rounds up to
+a whole video frame; existing whole-video defaults are unchanged.
 
 `progress=callback` reports `(completed_frames, total_frames)` at zero and after
 every streamed frame. The callback is optional and should return quickly. The final
