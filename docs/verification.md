@@ -130,3 +130,27 @@ The refreshed preview remains `training project/equation-render/output/equations
 Preset storyboards are under `output/frames/<scheme>/`, and symbol color assignments
 are recorded in `output/timeline-<scheme>.json`. Renderer frame caching is bounded
 and configurable with `PillowRenderer(frame_cache_mb=...)`.
+
+## Image sources and AI audience example
+
+Verified on 2026-10-04:
+
+- **185 pytest cases passed**. Added source parity and snapshot tests, transparent
+  trimming/tint checks, invalid source handling, in-memory GIF playback across
+  cached frames, and horizontal polyline reveal validation.
+- Ruff lint/format and Git whitespace checks passed for the library, tests,
+  examples, and the new training project.
+- The full 30-second illustrative preview exported as 1280×720 H.264, 24 fps,
+  720 frames. FFmpeg fully decoded the export without errors. The scene is silent.
+- Six storyboard frames and a decoded mid-animation frame were inspected for
+  readable disclosures, logo contrast, continuous curves, and marker alignment.
+- No additional runtime dependencies or build configuration changes are required;
+  the new image-source API uses the existing Pillow dependency.
+
+Run `uv run python 'training project/ai-comapny-graph/render.py' --preview`.
+The training project's original folder spelling is retained. All user counts and
+relative origins are fictional; they do not assert company founding dates or
+historical adoption. Default exports use 2× supersampling; previews use 1× for speed. A 1080p
+frame with 2× supersampling was also checked from outside the repository.
+An additional 2× full-preview render was interrupted by the execution environment;
+the completed 1× preview remained intact through the atomic export mechanism.

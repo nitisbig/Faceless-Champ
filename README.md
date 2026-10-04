@@ -156,3 +156,18 @@ uv run python 'training project/company-growth/render.py' --overwrite
 The project's `render.py` supports preview, full-quality video, individual frames,
 storyboards, output paths, and overwrite controls. Source data and methodology are
 included for reproducible feedback.
+
+### Image sources and AI audience example
+
+Use `Image.from_source(path_or_bytes_or_pillow_image, trim=True, tint="#C15F3C")`
+to import and normalize logos. Existing `Image(path)` calls remain supported.
+`Polyline(draw_by="x")` reveals continuous time graphs along their horizontal axis.
+See [image source details](docs/api.md#importing-image-sources).
+
+```bash
+uv run python 'training project/ai-comapny-graph/render.py' --preview
+uv run python 'training project/ai-comapny-graph/render.py' --frames
+```
+
+This 30-second example uses five supplied logos and explicitly fictional user
+counts. Scene code lives under `scene/`; reusable behavior lives in the main library.

@@ -167,3 +167,29 @@ Run `uv run pytest -q` for unit and FFmpeg integration tests. Then run
 `uv run python examples/render_all.py` for three 720p showcase exports, preview
 frames, audio measurements, and short 1080p/4K checks. Inspect the previews and
 videos under `output/`; machine checks cannot establish aesthetic quality.
+
+## Logos and in-memory images
+
+```python
+from pathlib import Path
+from faceless_champ import Image
+
+logo = Image.from_source(
+    Path(__file__).parent / "logo" / "openai.png",
+    width=64, height=64, trim=True, tint="#C15F3C",
+    position=(200, 300),
+)
+# Encoded data and Pillow images use the same API:
+# logo = Image.from_source(png_bytes, width=64, height=64)
+```
+
+Use `trim` for uneven transparent margins and `tint` for monochrome designs.
+Retain original colors by omitting `tint`. Do not pass URLs; download assets
+explicitly before authoring if needed. Keep image paths relative to the scene's
+file, rather than the process working directory.
+
+The 30-second `training project/ai-comapny-graph/render.py` example uses five
+provided logos, a white/terracotta palette, continuous time-revealed paths, and
+keyframed markers and counters. Its user counts and relative origins are expressly
+fictional. The persistent on-screen disclosure must remain when changing its
+illustrative values. Use `--preview`, `--frames`, or `--frame 15` for feedback.

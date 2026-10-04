@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import math
 from collections import OrderedDict
+from io import BytesIO
 from itertools import pairwise
-from pathlib import Path
 from typing import Protocol
 
 from PIL import Image as PILImage
@@ -62,15 +62,18 @@ class PillowRenderer:
             self._fonts[key] = load_font(path, size, weight)
         return self._fonts[key]
 
-    def _image(self, path: Path):
-        key = path.resolve()
+    def _image(self, component: Image):
+        path = component.path
+        key = path.resolve() if path is not None else component.source_bytes
         if key not in self._images:
-            if not path.is_file():
+            if path is not None and not path.is_file():
                 raise FileNotFoundError(f"Image file not found: {path}")
-            if path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp", ".gif"}:
+            if path is not None and path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp", ".gif"}:
                 raise ValueError("Images must be PNG, JPEG, WebP, or GIF")
             frames, durations = [], []
-            with PILImage.open(path) as source:
+            with PILImage.open(path if path is not None else BytesIO(component.source_bytes)) as source:
+                if source.format not in {"PNG", "JPEG", "WEBP", "GIF"}:
+                    raise ValueError("Images must be PNG, JPEG, WebP, or GIF")
                 count = getattr(source, "n_frames", 1) if source.format == "GIF" else 1
                 for index in range(count):
                     source.seek(index)
@@ -101,7 +104,9 @@ class PillowRenderer:
                         for phrase in c.phrases:
                             self._caption_sprite(c, 1, phrase[0].start)
                 elif isinstance(c, Image):
-                    self._image(c.path)
+                    self._image(c)
+                    if c.tint is not None:
+                        ImageColor.getcolor(c.tint, "RGBA")
                     if isinstance(c, Icon):
                         ImageColor.getcolor(c.color, "RGBA")
                 elif isinstance(c, Shape):
@@ -179,9 +184,7 @@ class PillowRenderer:
                 (
                     c,
                     tuple(state.items()),
-                    age
-                    if isinstance(c, Captions) or (isinstance(c, Image) and c.path.suffix.lower() == ".gif")
-                    else None,
+                    age if isinstance(c, Captions) or (isinstance(c, Image) and len(self._image(c)[0]) > 1) else None,
                 )
                 for c, state, age in visible
             ),
@@ -253,7 +256,7 @@ class PillowRenderer:
         static = state["reveal"] == 1 and state["draw"] == 1
         frame_index = 0
         if isinstance(c, Image):
-            frames, durations = self._image(c.path)
+            frames, durations = self._image(c)
             clock = age % sum(durations)
             for frame_index, duration in enumerate(durations):
                 if clock < duration:
@@ -285,10 +288,24 @@ class PillowRenderer:
         elif isinstance(c, Image):
             size = (max(1, round(c.width * factor)), max(1, round(c.height * factor)))
             source = frames[frame_index]
-            if isinstance(c, Icon):
-                source = PILImage.new("RGBA", source.size, c.color)
-                tint_alpha = ImageColor.getcolor(c.color, "RGBA")[3]
-                source.putalpha(frames[frame_index].getchannel("A").point(lambda a: round(a * tint_alpha / 255)))
+            if c.trim:
+                # Use a union across frames to prevent animated assets from wobbling.
+                boxes = [frame.getchannel("A").getbbox() for frame in frames]
+                boxes = [box for box in boxes if box is not None]
+                if boxes:
+                    box = (
+                        min(b[0] for b in boxes),
+                        min(b[1] for b in boxes),
+                        max(b[2] for b in boxes),
+                        max(b[3] for b in boxes),
+                    )
+                    source = source.crop(box)
+            tint = c.color if isinstance(c, Icon) else c.tint
+            if tint is not None:
+                alpha = source.getchannel("A")
+                source = PILImage.new("RGBA", source.size, tint)
+                tint_alpha = ImageColor.getcolor(tint, "RGBA")[3]
+                source.putalpha(alpha.point(lambda a: round(a * tint_alpha / 255)))
             if c.fit == "cover":
                 sprite = ImageOps.fit(source, size, method=PILImage.Resampling.LANCZOS)
             else:
@@ -357,7 +374,10 @@ class PillowRenderer:
             if c.fill and can_fill and progress >= 1:
                 draw.polygon(points, fill=c.fill)
             if c.stroke and c.stroke_width > 0 and progress > 0:
-                lengths = [math.dist(a, b) for a, b in pairwise(points)]
+                lengths = [
+                    b[0] - a[0] if isinstance(c, Polyline) and c.draw_by == "x" else math.dist(a, b)
+                    for a, b in pairwise(points)
+                ]
                 remaining = sum(lengths) * progress
                 visible = [points[0]]
                 for a, b, length in zip(points, points[1:], lengths):

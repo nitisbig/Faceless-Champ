@@ -67,3 +67,10 @@ Export uses a temporary directory beside the output. Explicit overwrite uses ato
 replacement; default publication uses an exclusive hard link to avoid a race that
 could overwrite a file created while rendering. This requires a filesystem with
 hard-link support. Source media is never modified.
+
+Image components may carry encoded source bytes instead of a path. Renderer asset
+keys use resolved paths or immutable encoded bytes; scene-frame signatures include
+age for any decoded multi-frame image, including GIF bytes without a file suffix.
+Trimming uses the union of frame alpha bounds, and tinting preserves source alpha.
+Polyline x-based reveal measures horizontal segment extent instead of arc length,
+so one cached source geometry can follow a shared chart time cursor.

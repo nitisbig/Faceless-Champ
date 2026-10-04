@@ -30,7 +30,7 @@ Use animation builders for changes over time.
 | `Number(value, ...)` | Text options plus `format_spec=",.0f"`, `prefix=""`, `suffix=""`, `formatter=None`, `width=None`; animate with `.animate.value_to(value)` |
 | `Ellipse(...)` | Shape options with independent `width` and `height`; supports `Draw`, fill, stroke, and transforms |
 | `Equation(expression, ...)` | `font_size=64`, `color="white"`, `fontset="stix"`, `max_width=None`, `color_map=None`; requires the `equations` extra |
-| `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"` |
+| `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"`, `trim=False`, `tint=None`; also `Image.from_source(source, ...)` |
 | `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |
 | `Rectangle(...)` | `width=200`, `height=200`, `corner_radius=0`; radius must fit inside the rectangle |
 | `Square(side=200, ...)` | Equal width and height |
@@ -38,7 +38,7 @@ Use animation builders for changes over time.
 | `Triangle(...)` | `width=200`, `height=200`; upward-pointing triangle |
 | `Line(length=200, ...)` | Horizontal line; use rotation for other directions |
 | `Arrow(start, end, ...)` | Two `(x, y)` endpoints; `tip_size=18`; supports `Draw` |
-| `Polyline(points, ...)` | At least two canvas `(x, y)` points; `closed=False`, `line_cap="butt"` or `"round"`; closed paths need three points and can have fill |
+| `Polyline(points, ...)` | At least two canvas `(x, y)` points; `closed=False`, `line_cap="butt"` or `"round"`, `draw_by="length"` or `"x"`; closed paths need three points and can have fill |
 
 Shapes accept `fill=None`, `stroke="white"`, `stroke_width=4`.
 `None` disables fill/stroke. Lines have no fill. Shape raster bounds include stroke
@@ -63,7 +63,7 @@ transforms can then move, rotate, or scale it. Arrowheads use the stroke color.
 
 Polyline position defaults to the points' bounding-box center. Explicit position
 replaces that center; its points retain their local geometry. `Draw` reveals the
-path by cumulative segment length. Closed paths gain their fill at full draw
+path by cumulative segment length by default, or by horizontal progress with `draw_by="x"`. Closed paths gain their fill at full draw
 progress; use `FadeIn` for a shaded area that should fade instead. Rectangle rounded
 corners also support partial `Draw` outlines. `line_cap="round"` rounds the visible
 endpoints of open polylines, including during Draw; closed paths have no end caps.
@@ -348,3 +348,27 @@ data. Configure axes with `Axis` and presentation with `ChartStyle`.
 `ChartReveal(chart)` animates marks; `chart.animate.data_to(data)` transitions
 between matching datasets. See [the charting guide](charts.md) for input contracts,
 examples, fixed-domain behavior, and the renderable showcase.
+
+### Importing image sources
+
+`Image.from_source(source, **kwargs)` accepts a local `str`/`Path`, encoded
+`bytes`/`bytearray`/`memoryview`, or a Pillow image. The same constructor options
+apply: `width`, `height`, `fit`, `trim=False`, and `tint=None`. PNG, JPEG, WebP,
+and GIF are supported. No URL fetching or network access is performed.
+
+Pillow inputs snapshot the current frame as RGBA (including EXIF orientation);
+encoded GIF bytes retain frame durations and looping. Caller mutation or closing a
+Pillow image does not change the imported asset. Paths remain lazily decoded by
+the renderer, as before. `image.path` is `None` for in-memory imports.
+
+`trim=True` removes transparent padding before fitting; animated sources use the
+union of all frame alpha bounds to avoid size changes. It does not remove opaque
+backgrounds. `tint="#C15F3C"` replaces RGB while preserving alpha (and multiplying
+by the tint's alpha). `Icon` inherits source import and trimming; its `color` takes
+precedence over `tint`. The renderer caches decoded sources and fitted sprites.
+
+`Polyline(..., draw_by="x")` makes `Draw` reveal by horizontal progress rather
+than path length. It requires an open path with strictly increasing x coordinates.
+Combine with `rate_func=linear` for a time graph. The default `draw_by="length"`
+retains the existing behavior. This renders one continuous path without seams
+from stitching many separately rasterized segments.

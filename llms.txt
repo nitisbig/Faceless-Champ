@@ -49,3 +49,9 @@ Ellipse(width=..., height=...) is a drawable Shape with independent dimensions.
 The company-growth example follows layout.png with ivory, serif fonts, and fine line art.
 render(progress=callback) reports completed and total frame counts for render feedback.
 No camera, video import, or graphical editor in v0.1.
+Image.from_source accepts local paths, encoded bytes, and Pillow images. trim=True
+removes transparent margins; tint sets RGB while preserving alpha. In-memory GIFs
+animate; Pillow inputs snapshot their current frame. No implicit URL downloads.
+Polyline(draw_by="x") reveals strictly increasing open paths by horizontal time.
+The 30-second AI logo example is training project/ai-comapny-graph/render.py;
+its counts and relative origins are explicitly illustrative, not reported history.

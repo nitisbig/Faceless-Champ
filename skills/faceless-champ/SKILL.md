@@ -57,3 +57,14 @@ uv run faceless-champ render script.py MyScene -o output/my_scene.mp4 -q ql
 ```
 
 Use --overwrite only when replacing the chosen output is intended.
+
+- Import raster assets with `Image.from_source(path_or_encoded_bytes_or_pillow)`.
+  Pillow inputs snapshot the current frame; GIF bytes retain animation. URLs are
+  not sources. Use `trim=True` for transparent padding and `tint=...` to preserve
+  alpha while applying a palette. `Icon.from_source(..., color=...)` also works.
+- Use `Polyline(draw_by="x")` with `Draw` and linear easing for horizontal time
+  reveals; x coordinates must strictly increase and the path must be open. Render
+  one continuous curve, not hundreds of tiny shapes that can produce seams.
+- The `training project/ai-comapny-graph` example has a root render.py with preview,
+  storyboard, single-frame, output, and overwrite options. Its data is fictional:
+  retain the visible disclaimer and never describe it as historical adoption.

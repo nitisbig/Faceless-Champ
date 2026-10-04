@@ -6,6 +6,7 @@ import math
 import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from io import BytesIO
 from itertools import pairwise
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Self
@@ -189,15 +190,49 @@ class Equation(Component):
 
 
 class Image(Component):
+    """Raster image with contain/cover fitting and optional alpha trimming/tint.
+
+    Use from_source for encoded bytes or a Pillow image. In-memory sources are snapshotted;
+    Pillow inputs capture their current frame, while encoded GIFs retain animation.
+    """
+
     def __init__(
-        self, path: str | Path, *, width: float = 400, height: float = 300, fit: str = "contain", **kwargs: Any
+        self,
+        path: str | Path,
+        *,
+        width: float = 400,
+        height: float = 300,
+        fit: str = "contain",
+        trim: bool = False,
+        tint: str | None = None,
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         if fit not in {"contain", "cover"}:
             raise ValueError("fit must be contain or cover")
-        self.path = Path(path)
+        self.path: Path | None = Path(path)
+        self.source_bytes: bytes | None = None
         self.width, self.height = finite(width, "width", 1), finite(height, "height", 1)
-        self.fit = fit
+        self.fit, self.trim, self.tint = fit, bool(trim), tint
+
+    @classmethod
+    def from_source(cls, source, **kwargs) -> Self:
+        """Import a local path, encoded bytes, or Pillow image; no network I/O."""
+        from PIL import Image as PILImage
+        from PIL import ImageOps
+
+        if isinstance(source, (str, Path)):
+            return cls(source, **kwargs)
+        if isinstance(source, PILImage.Image):
+            buffer = BytesIO()
+            ImageOps.exif_transpose(source).convert("RGBA").save(buffer, format="PNG")
+            source = buffer.getvalue()
+        if not isinstance(source, (bytes, bytearray, memoryview)):
+            raise TypeError("source must be a local path, encoded bytes, or Pillow image")
+        result = cls("memory.png", **kwargs)
+        result.path = None
+        result.source_bytes = bytes(source)
+        return result
 
 
 class Icon(Image):
@@ -265,7 +300,9 @@ class Polyline(Shape):
     replaces that center; transforms work like those of every other shape.
     """
 
-    def __init__(self, points, *, closed: bool = False, line_cap: str = "butt", **kwargs: Any) -> None:
+    def __init__(
+        self, points, *, closed: bool = False, line_cap: str = "butt", draw_by: str = "length", **kwargs: Any
+    ) -> None:
         points = tuple(tuple(finite(v, "point") for v in p) for p in points)
         if len(points) < (3 if closed else 2) or any(len(p) != 2 for p in points):
             raise ValueError("Polyline needs at least two (x, y) points; closed paths need three")
@@ -277,6 +314,11 @@ class Polyline(Shape):
         super().__init__(width=max(1, right - left), height=max(1, bottom - top), **kwargs)
         self.points = tuple((x - left, y - top) for x, y in points)
         self.closed = closed
+        if draw_by not in {"length", "x"}:
+            raise ValueError("draw_by must be length or x")
+        if draw_by == "x" and (closed or any(b[0] <= a[0] for a, b in pairwise(points))):
+            raise ValueError("draw_by=x requires an open path with strictly increasing x coordinates")
+        self.draw_by = draw_by
         if line_cap not in {"butt", "round"}:
             raise ValueError("line_cap must be butt or round")
         self.line_cap = line_cap
