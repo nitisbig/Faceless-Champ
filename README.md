@@ -133,6 +133,32 @@ bounded caption caching with reusable phrase layouts.
 - [Agent entry point](llms.txt) and [authoring skill](skills/faceless-champ/SKILL.md).
 - [Verification record](docs/verification.md): test and sample-render results.
 
+## Groups and measured layout
+
+Keep diagrams together with `Group`, including nested groups and independent member
+animations. Layout helpers measure text, image boxes, and shapes before placement:
+
+```python
+from faceless_champ import Circle, FadeIn, Group, Text
+
+dot = Circle(40, fill="#48e0cb", stroke=None)
+label = Text("Input", font_size=32).next_to(dot, direction="down", gap=20)
+diagram = Group(dot, label).move_to(960, 540)
+self.play(FadeIn(diagram))
+self.play(diagram.animate.scale_to(1.2).rotate_to(10),
+          dot.animate.opacity_to(0.6))
+```
+
+Use `Group(...).arrange(direction="right", gap=40)` for consistent edge spacing,
+`component.align_to(other, edge="left")` for alignment, and `component.bounds`
+for measured design-pixel edges. Create groups and finish their initial layouts
+before adding them to a scene. See [the API](docs/api.md#groups-and-measured-layout)
+for coordinate and lifetime rules, and render the self-contained example:
+
+```bash
+uv run faceless-champ render examples/groups.py GroupedDiagram -o output/groups.mp4 -q ql
+```
+
 ## Development
 
 ```bash

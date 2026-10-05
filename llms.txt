@@ -15,6 +15,15 @@ positive Y down; component anchors default to center. play() advances time and r
 its arguments concurrently. Audio start defaults to the current cursor, not zero.
 Export with render() or faceless-champ render file.py SceneName -o output.mp4.
 Use Sequence for cuts/crossfades and Grid for simultaneous row-major panels.
+Group(*components) creates nested visual hierarchies with independent member
+animations. Create groups before adding members to a Scene; membership is fixed.
+Group transforms preserve original member coordinates. Parent opacity multiplies
+member opacity, and parent z_index contains member stacking. remove(group) ends
+all descendant lifetimes. Use Group.arrange(direction="right", gap=20),
+component.next_to(other, direction="down", gap=20), align_to(other, edge="left"),
+shift(dx, dy), and component.bounds for measured initial layouts before add().
+Bounds has left/top/right/bottom, width/height, and center in design pixels.
+See docs/api.md#groups-and-measured-layout and examples/groups.py.
 Grid supports padding and start_times for staggered panels; offsets apply to audio.
 Layer composites transparent canvases in order for shared headings and overlays.
 Equation typesets TeX-style expressions with the optional equations extra; Write

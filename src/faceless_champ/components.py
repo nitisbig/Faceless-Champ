@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
     from .animation import AnimationBuilder
+    from .layout import Bounds
 
 
 def finite(value: float, name: str, minimum: float | None = None) -> float:
@@ -65,6 +66,33 @@ class Component:
 
     def move_to(self, x: float, y: float) -> Self:
         self.position = (finite(x, "x"), finite(y, "y"))
+        return self
+
+    def shift(self, dx: float, dy: float) -> Self:
+        """Translate the initial layout in design pixels; call before Scene.add()."""
+        return self.move_to(self.position[0] + finite(dx, "dx"), self.position[1] + finite(dy, "dy"))
+
+    @property
+    def bounds(self) -> Bounds:
+        """Measured, axis-aligned initial layout bounds in design pixels."""
+        from .layout import bounds
+
+        return bounds(self)
+
+    def next_to(
+        self, other: Component | Bounds, *, direction: str = "right", gap: float = 20, align: str = "center"
+    ) -> Self:
+        """Place beside a component or Bounds, with an edge-to-edge gap."""
+        from .layout import next_to
+
+        next_to(self, other, direction=direction, gap=gap, align=align)
+        return self
+
+    def align_to(self, other: Component | Bounds, *, edge: str = "left") -> Self:
+        """Align an edge or center axis to a component or Bounds."""
+        from .layout import align_to
+
+        align_to(self, other, edge=edge)
         return self
 
     @property

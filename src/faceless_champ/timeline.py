@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from contextlib import contextmanager
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import pairwise
 from pathlib import Path
 from typing import Any, Self
@@ -13,6 +13,7 @@ from typing import Any, Self
 from .animation import Animation, interpolate, relative_value, smooth
 from .audio import AudioClip
 from .components import Canvas, Component, finite
+from .layout import Group
 from .subtitles import Captions
 
 
@@ -60,6 +61,14 @@ class Entry:
     initial: dict
     tracks: list[Track]
     end: float | None = None
+    parent: Entry | None = field(default=None, repr=False, compare=False)
+    children: list[Entry] = field(default_factory=list, repr=False, compare=False)
+
+    def ancestors(self):
+        parent = self.parent
+        while parent is not None:
+            yield parent
+            parent = parent.parent
 
     def state_at(self, time: float) -> dict:
         state = self.initial.copy()
@@ -102,7 +111,10 @@ class Scene(Renderable):
     def duration(self) -> float:
         self.build()
         caption_ends = [
-            min(e.start + e.component.track.duration, e.end if e.end is not None else float("inf"))
+            min(
+                [e.start + e.component.track.duration]
+                + [ancestor.end for ancestor in (e, *e.ancestors()) if ancestor.end is not None]
+            )
             for e in self.entries
             if isinstance(e.component, Captions)
         ]
@@ -143,24 +155,81 @@ class Scene(Renderable):
                 raise ValueError("remove requires a component currently in the scene")
             if self._cursor < entry.start:
                 raise ValueError("Cannot remove a component before its start")
-            if any(t.start + t.duration > self._cursor + 1e-9 for t in entry.tracks):
+            if any(
+                t.start + t.duration > self._cursor + 1e-9
+                for descendant in self._descendants(entry)
+                for t in descendant.tracks
+            ):
                 raise ValueError("Cannot remove a component before its animations end")
         for component in components:
-            self._objects[component].end = self._cursor
+            for entry in self._descendants(self._objects[component]):
+                entry.end = min(entry.end, self._cursor) if entry.end is not None else self._cursor
         return self
 
-    def add(self, *components: Component) -> Self:
+    @staticmethod
+    def _descendants(entry):
+        yield entry
+        for child in entry.children:
+            yield from Scene._descendants(child)
+
+    def _prepare_add(self, components):
+        """Validate a whole hierarchy before adding any snapshots or ownership."""
+        memberships = {}
+
+        def inspect(group, visiting):
+            if group in visiting:
+                raise ValueError("Group hierarchy cannot contain cycles")
+            visiting = visiting | {group}
+            for child in group.children:
+                if not isinstance(child, Component):
+                    raise TypeError("Group members must be Components")
+                if child in memberships and memberships[child] is not group:
+                    raise ValueError("A component cannot belong to multiple groups")
+                memberships[child] = group
+                if isinstance(child, Group):
+                    inspect(child, visiting)
+
         for component in components:
             if not isinstance(component, Component):
                 raise TypeError("Scene.add requires visual components")
+            if isinstance(component, Group) and component not in self._objects:
+                inspect(component, set())
+        prepared = []
+        seen = set()
+
+        def visit(component, parent=None):
+            if component in seen:
+                return
+            seen.add(component)
             if component in self._objects:
                 entry = self._objects[component]
                 if entry.end is not None:
                     raise ValueError("Removed components cannot be re-added; create a new instance")
-                continue
-            entry = Entry(deepcopy(component), self._cursor, component.state(), [])
+                if parent is not None:
+                    raise ValueError(
+                        "Create groups before adding their members; existing components cannot be reparented"
+                    )
+                return
+            prepared.append((component, parent))
+            if isinstance(component, Group):
+                for child in component.children:
+                    visit(child, component)
+
+        for component in components:
+            if component not in memberships:
+                visit(component)
+        return prepared
+
+    def add(self, *components: Component) -> Self:
+        prepared = self._prepare_add(components)
+        snapshots = [(component, parent, deepcopy(component)) for component, parent in prepared]
+        for component, parent, snapshot in snapshots:
+            parent_entry = self._objects[parent] if parent is not None else None
+            entry = Entry(snapshot, self._cursor, component.state(), [], parent=parent_entry)
             self.entries.append(entry)
             self._objects[component] = entry
+            if parent_entry is not None:
+                parent_entry.children.append(entry)
         return self
 
     def play(
@@ -178,6 +247,13 @@ class Scene(Renderable):
                 raise TypeError("play requires nonempty animations")
             if not isinstance(animation.component, Component):
                 raise TypeError("Animation requires a Component")
+            if isinstance(animation.component, Group) and set(animation.targets) - {
+                "position",
+                "scale",
+                "rotation",
+                "opacity",
+            }:
+                raise ValueError("Groups support position, scale, rotation, and opacity animations")
             if animation.rate_func is not None and not callable(animation.rate_func):
                 raise TypeError("Animation rate_func must be callable")
             if set(animation.starts or {}) - set(animation.targets):
@@ -207,7 +283,10 @@ class Scene(Renderable):
                     raise ValueError(f"Overlapping animations for property {key}")
                 seen.add(identity)
                 if entry is not None:
-                    if entry.end is not None or self._cursor < entry.start:
+                    if any(
+                        ancestor.end is not None or self._cursor < ancestor.start
+                        for ancestor in (entry, *entry.ancestors())
+                    ):
                         raise ValueError("Animation is outside the component's lifetime")
                     if any(t.property == key and t.start + t.duration > self._cursor + 1e-9 for t in entry.tracks):
                         raise ValueError(
@@ -262,8 +341,8 @@ class Scene(Renderable):
                 )
             prepared.append((animation.component, tracks))
         # Validate the whole play call before changing the scene.
+        self.add(*(component for component, _ in prepared))
         for component, tracks in prepared:
-            self.add(component)
             self._objects[component].tracks.extend(tracks)
         self._cursor += duration
         return self

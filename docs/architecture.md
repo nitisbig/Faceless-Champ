@@ -40,6 +40,22 @@ A custom easing function must be deterministic. The base Component and renderer
 protocol provide extension points; adding a new visual type requires a renderer
 that understands it. v0.1 does not have a global plugin registry.
 
+Group addition validates ownership before snapshotting the hierarchy into flat
+scene entries with parent/child links. Parents and members have independent
+property tracks. The renderer traverses siblings by z_index, evaluates active
+lifetimes, and applies parent transforms from the innermost ancestor outward.
+Parent scale and rotation affect both member positions and sprites; opacity
+multiplies. Ancestor states participate in frame-cache signatures, while member
+ages continue to invalidate animated images and captions. Removing a group checks
+all descendant tracks and ends descendant lifetimes, including caption duration.
+Group membership is fixed and already-added components cannot be reparented.
+
+Layout helpers use design-scale sprite measurements (including raster padding)
+and transformed rectangle corners. Fixed image/chart/map viewports do not require
+asset decoding to measure. Captions reserve their largest phrase dimensions.
+Bounds and layout operate on initial source objects before scene snapshots, and
+add no new runtime dependency; typeset equation measurement retains its extra.
+
 The renderer caches font instances, decoded image/GIF assets, and static sprites
 per renderer instance. Dynamic typewriter and outline frames are not retained.
 It also keeps the last rendered frame per scene within a configurable 64 MiB LRU
