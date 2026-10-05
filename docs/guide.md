@@ -12,10 +12,8 @@ a chapter leave the source clock intact.
 from faceless_champ import ImageSlot, SubtitleTrack
 
 track = SubtitleTrack.from_srt("cue-per-word.srt", overlap_tolerance=0.001)
-scene.add(ImageSlot("image/1.png", width=800, height=500, fit="cover",
-                    position=(960, 540)))
-scene.render("output/detail-preview.mp4", start_time=12, end_time=18,
-             width=960, height=540, fps=15, antialias=1)
+scene.add(ImageSlot("image/1.png", width=800, height=500, fit="cover", position=(960, 540)))
+scene.render("output/detail-preview.mp4", start_time=12, end_time=18, width=960, height=540, fps=15, antialias=1)
 ```
 
 Opt into overlap tolerance only when the source requires it. Cue timestamps remain
@@ -60,6 +58,7 @@ are not scheduled edits: create a new component or use its animation builder.
 
 ```python
 from faceless_champ import Scene, Text, FadeIn, FadeOut
+
 
 class Caption(Scene):
     def construct(self):
@@ -128,8 +127,7 @@ See `training project/good-math/scene/story.py` for the complete narrated exampl
 from faceless_champ import Canvas, Grid, Sequence
 
 # Each expression creates a separate instance of Caption from above.
-panels = Grid(*(Caption() for _ in range(6)), rows=2, columns=3,
-              gap=16, canvas=Canvas(bg="#101b30"))
+panels = Grid(*(Caption() for _ in range(6)), rows=2, columns=3, gap=16, canvas=Canvas(bg="#101b30"))
 video = Sequence(Caption(), panels, Caption(), crossfade=0.4)
 video.render("output/composition.mp4", quality="ql")
 ```
@@ -173,12 +171,11 @@ from faceless_champ import Scene, Image, FadeIn
 
 ASSETS = Path(__file__).resolve().parent / "assets"
 
+
 class Media(Scene):
     def construct(self):
-        self.add_audio(ASSETS / "music.wav", start=0, trim_end=4,
-                       volume=0.3, fade_in=0.2, fade_out=0.5)
-        self.play(FadeIn(Image(ASSETS / "photo.png", width=1200, height=700,
-                               position=(960, 540), fit="cover")))
+        self.add_audio(ASSETS / "music.wav", start=0, trim_end=4, volume=0.3, fade_in=0.2, fade_out=0.5)
+        self.play(FadeIn(Image(ASSETS / "photo.png", width=1200, height=700, position=(960, 540), fit="cover")))
         self.wait(3)
 ```
 
@@ -224,7 +221,10 @@ from faceless_champ import Image
 
 logo = Image.from_source(
     Path(__file__).parent / "logo" / "openai.png",
-    width=64, height=64, trim=True, tint="#C15F3C",
+    width=64,
+    height=64,
+    trim=True,
+    tint="#C15F3C",
     position=(200, 300),
 )
 # Encoded data and Pillow images use the same API:
@@ -241,3 +241,12 @@ provided logos, a white/terracotta palette, continuous time-revealed paths, and
 keyframed markers and counters. Its user counts and relative origins are expressly
 fictional. The persistent on-screen disclosure must remain when changing its
 illustrative values. Use `--preview`, `--frames`, or `--frame 15` for feedback.
+
+## Motion graphics authoring
+
+Use [motion graphics](motion-graphics.md) for property animation, local masks,
+finite schedules, and progress indicators. Add complete groups before scheduling
+members. Use `Scene.at()` to overlap independent schedules; `Repeat(..., cycles=N)`
+requires a finite count. Check the evaluated box with `scene.bounds_at(target, t)`
+when geometry changes. Preview the self-contained `examples/motion_graphics/render.py`
+at 960×540 before increasing resolution or adding deep mask hierarchies.

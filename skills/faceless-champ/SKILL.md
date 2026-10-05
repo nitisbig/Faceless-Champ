@@ -90,3 +90,22 @@ Use --overwrite only when replacing the chosen output is intended.
   narration requires explicit --all-preview. Start visual QA with a storyboard and
   short clips. Its six numbered image prompts are in img-info.md; fonts and symbols
   reuse licensed assets in the main checkout. Keep the financial examples illustrative.
+
+- Motion graphics: use fill_to/stroke_to/color_to, width_to/height_to,
+  stroke_width_to/corner_radius_to, and scale_xy_to on supported components.
+  Colors interpolate straight RGBA; explicit transparent same-hue colors avoid
+  hue shifts. scale_x/scale_y multiply uniform scale. Scene.bounds_at measures
+  animated geometry; component.bounds remains an initial-layout measurement.
+- Use Stagger(lag=seconds), Succession, and Repeat(cycles=N, ping_pong=True).
+  duration sets direct leaf duration; nested schedules retain their own run_time.
+  Explicit play(run_time=...) scales the entire schedule. Two ping-pong cycles
+  traverse forward then backward. Conflicting property tracks fail atomically.
+- Attach RectangleMask, CircleMask, or normalized polygon ShapeMask before add().
+  Masks are local to sprite centers or group pivots. Animate mask_to dimensions
+  and position; Wipe reuses the alpha-mask compositor. Form groups before adding
+  members. Keep masked hierarchies shallow for CPU previews.
+- ProgressBar, ProgressRing, Gauge, LoadingDots and Checkmark animate via
+  progress_to in [0,1]. Countdown is a nonnegative Number animated with value_to(0).
+  LoadingDots has identical endpoints for finite Repeat loops. These components
+  never start implicit clocks. See docs/motion-graphics.md and the self-contained
+  examples/motion_graphics/render.py for timing and validation examples.

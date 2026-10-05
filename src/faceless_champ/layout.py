@@ -38,9 +38,12 @@ class Bounds:
 
 
 def transform_point(point, origin, state):
-    """Apply a clockwise, uniform parent transform around its reference origin."""
+    """Apply local X/Y scaling and clockwise rotation around the parent origin."""
     angle = math.radians(state["rotation"])
-    x, y = ((value - pivot) * state["scale"] for value, pivot in zip(point, origin))
+    x, y = (
+        (value - pivot) * state["scale"] * state.get(axis, 1)
+        for value, pivot, axis in zip(point, origin, ("scale_x", "scale_y"))
+    )
     return (
         state["position"][0] + x * math.cos(angle) - y * math.sin(angle),
         state["position"][1] + x * math.sin(angle) + y * math.cos(angle),
@@ -72,7 +75,10 @@ def _points(component, renderer):
     state = component.state()
     center = component.position
     if component.anchor == "top_left":
-        center = (center[0] + w * component.scale / 2, center[1] + h * component.scale / 2)
+        center = (
+            center[0] + w * component.scale * component.scale_x / 2,
+            center[1] + h * component.scale * component.scale_y / 2,
+        )
     state = {**state, "position": center}
     return [
         transform_point(point, (0, 0), state)

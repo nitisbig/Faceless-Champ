@@ -232,7 +232,45 @@ class Scene(Renderable):
                 parent_entry.children.append(entry)
         return self
 
-    def play(
+    def bounds_at(self, component: Component, time: float):
+        """Conservative world bounds including animated geometry and ancestors.
+
+        Masks, opacity and lifetimes do not shrink the reserved layout box.
+        """
+        from copy import copy
+
+        self.build()
+        time = finite(time, "time", 0)
+        if component not in self._objects:
+            raise ValueError("bounds_at requires a component in the scene")
+
+        def evaluated(entry):
+            result = copy(entry.component)
+            for key, value in entry.state_at(time).items():
+                if hasattr(result, key):
+                    setattr(
+                        result, key, tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} else value
+                    )
+            if isinstance(result, Group):
+                result._children = tuple(evaluated(child) for child in entry.children)
+            return result
+
+        entry = self._objects[component]
+        result = evaluated(entry)
+        for parent in entry.ancestors():
+            wrapper = evaluated(parent)
+            wrapper._children = (result,)
+            result = wrapper
+        return result.bounds
+
+    def play(self, *animations, run_time=None, rate_func=None) -> Self:
+        from .scheduling import Schedule, play_schedule
+
+        if any(isinstance(a, Schedule) for a in animations):
+            return play_schedule(self, animations, run_time, rate_func)
+        return self._play(*animations, run_time=1 if run_time is None else run_time, rate_func=rate_func)
+
+    def _play(
         self, *animations: Animation, run_time: float = 1.0, rate_func: Callable[[float], float] | None = None
     ) -> Self:
         duration = finite(run_time, "run_time", 0.000001)
@@ -252,8 +290,15 @@ class Scene(Renderable):
                 "scale",
                 "rotation",
                 "opacity",
+                "scale_x",
+                "scale_y",
+                "mask_position",
+                "mask_width",
+                "mask_height",
+                "wipe",
+                "clip",
             }:
-                raise ValueError("Groups support position, scale, rotation, and opacity animations")
+                raise ValueError("Groups support transforms, opacity, masks, and wipe animations")
             if animation.rate_func is not None and not callable(animation.rate_func):
                 raise TypeError("Animation rate_func must be callable")
             if set(animation.starts or {}) - set(animation.targets):
@@ -272,6 +317,11 @@ class Scene(Renderable):
                         finite(value, key)
                     else:
                         _validate_animated_value(key, value)
+                    if key == "value":
+                        from .indicators import Countdown
+
+                        if isinstance(animation.component, Countdown):
+                            finite(value, key, 0)
                     if key == "data":
                         animation.component.validate_data(value)
             entry = self._objects.get(animation.component)
@@ -318,6 +368,11 @@ class Scene(Renderable):
                         if progress > 1 or progress <= previous:
                             raise ValueError("Keyframe progress must increase strictly within [0, 1]")
                         _validate_animated_value(key, value)
+                        if key == "value":
+                            from .indicators import Countdown
+
+                            if isinstance(animation.component, Countdown):
+                                finite(value, key, 0)
                         if key == "data":
                             animation.component.validate_data(value)
                         value = relative_value(key, base, value) if relative else value
@@ -369,7 +424,18 @@ class Scene(Renderable):
 
 
 def _validate_animated_value(key: str, value) -> None:
-    if key == "data":
+    if key == "clip":
+        if not isinstance(value, tuple) or len(value) != 4 or any(not 0 <= finite(v, key) <= 1 for v in value):
+            raise ValueError("clip requires four normalized coordinates")
+        if value[0] > value[2] or value[1] > value[3]:
+            raise ValueError("clip edges must be ordered")
+    elif key in {"fill", "stroke", "color"}:
+        if not isinstance(value, tuple) or len(value) != 4:
+            raise ValueError("Animated colors must be RGBA tuples; use color builders")
+        for channel in value:
+            if not 0 <= finite(channel, key) <= 255:
+                raise ValueError("Color channels must be in [0, 255]")
+    elif key == "data":
         if not isinstance(value, tuple) or not value:
             raise ValueError("Animated data must be a nonempty numeric tuple")
         for item in value:
@@ -380,7 +446,7 @@ def _validate_animated_value(key: str, value) -> None:
             raise ValueError("latitude must be between -90 and 90")
     elif key == "zoom":
         finite(value, key, 0.001)
-    elif key == "position":
+    elif key in {"position", "mask_position"}:
         if not isinstance(value, tuple) or len(value) != 2:
             raise ValueError("Animated position must be an (x, y) tuple")
         for coordinate in value:
@@ -389,9 +455,11 @@ def _validate_animated_value(key: str, value) -> None:
         finite(
             value,
             key,
-            0.001 if key == "scale" else (None if key in {"rotation", "value", "longitude", "map_rotation"} else 0),
+            0.001
+            if key in {"scale", "scale_x", "scale_y", "width", "height"}
+            else (None if key in {"rotation", "value", "longitude", "map_rotation"} else 0),
         )
-        if key in {"opacity", "reveal", "draw"} and value > 1:
+        if key in {"opacity", "reveal", "draw", "progress", "wipe"} and value > 1:
             raise ValueError(f"{key} must be <= 1")
 
 

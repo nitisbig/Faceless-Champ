@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import math
 from collections import OrderedDict
+from copy import copy
 from io import BytesIO
 from itertools import pairwise
 from typing import Protocol
 
 from PIL import Image as PILImage
-from PIL import ImageColor, ImageDraw, ImageOps
+from PIL import ImageChops, ImageColor, ImageDraw, ImageOps
 
 from .charts import Chart
 from .charts.drawing import draw_chart
@@ -128,6 +129,10 @@ class PillowRenderer:
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
+                from .indicators import ProgressBar
+
+                if isinstance(c, ProgressBar):
+                    continue
                 if isinstance(c, Group):
                     continue
                 elif isinstance(c, Map):
@@ -250,7 +255,16 @@ class PillowRenderer:
         big = (size[0] * aa, size[1] * aa)
         result = PILImage.new("RGBA", big, scene.canvas.bg)
         factor = min(big[0] / scene.canvas.width, big[1] / scene.canvas.height)
-        for c, state, age, parents in visible:
+        enhanced = any(
+            e.component.mask is not None
+            or e.state_at(time)["clip"] != (0, 0, 1, 1)
+            or e.state_at(time)["scale_x"] != 1
+            or e.state_at(time)["scale_y"] != 1
+            for e in scene.entries
+        )
+        if enhanced:
+            result = self._affine_scene(scene, time, big, factor)
+        for c, state, age, parents in [] if enhanced else visible:
             sprite = self._sprite(c, state, factor, age)
             w, h = sprite.size
             x, y = state["position"]
@@ -291,7 +305,130 @@ class PillowRenderer:
             self._frame_cache_bytes += cost
         return result
 
+    def _affine_scene(self, scene, time, size, factor):
+        from .layout import Bounds
+        from .motion import inverse, matrix, multiply, point
+
+        base = (factor, 0, 0, factor, 0, 0)
+
+        def warp(sprite, transform):
+            return sprite.transform(
+                size, PILImage.Transform.AFFINE, inverse(transform), resample=PILImage.Resampling.BICUBIC
+            )
+
+        def visit(entry, parent, inherited_opacity=1):
+            c, state = entry.component, entry.state_at(time)
+            layer = PILImage.new("RGBA", size)
+            if time < entry.start or (entry.end is not None and time >= entry.end) or state["opacity"] <= 0:
+                return layer
+            if isinstance(c, Group):
+                world = multiply(parent, matrix(state, c._origin))
+                for child in sorted(entry.children, key=lambda e: e.component.z_index):
+                    layer.alpha_composite(visit(child, world, inherited_opacity * state["opacity"]))
+                if state["clip"] != (0, 0, 1, 1):
+
+                    def evaluated(child):
+                        view = copy(child.component)
+                        for key, value in child.state_at(time).items():
+                            if hasattr(view, key):
+                                setattr(
+                                    view,
+                                    key,
+                                    tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} else value,
+                                )
+                        if isinstance(view, Group):
+                            view._children = tuple(evaluated(e) for e in child.children)
+                        return view
+
+                    boxes = [evaluated(child).bounds for child in entry.children]
+                    box = Bounds(
+                        min(b.left for b in boxes),
+                        min(b.top for b in boxes),
+                        max(b.right for b in boxes),
+                        max(b.bottom for b in boxes),
+                    )
+                local_center = c._origin
+            else:
+                sprite = self._sprite(c, state, factor, max(0, time - entry.start))
+                w, h = sprite.width / factor, sprite.height / factor
+                local = dict(state)
+                if c.anchor == "top_left":
+                    local["position"] = (
+                        state["position"][0] + w * state["scale"] * state["scale_x"] / 2,
+                        state["position"][1] + h * state["scale"] * state["scale_y"] / 2,
+                    )
+                world = multiply(parent, matrix(local))
+                raster = multiply(world, (1 / factor, 0, 0, 1 / factor, -w / 2, -h / 2))
+                layer = warp(sprite, raster)
+                box = Bounds(-w / 2, -h / 2, w / 2, h / 2)
+                local_center = (0, 0)
+
+            def apply_mask(points):
+                mask = PILImage.new("L", size)
+                draw = ImageDraw.Draw(mask)
+                if points:
+                    draw.polygon([point(world, x, y) for x, y in points], fill=255)
+                layer.putalpha(ImageChops.multiply(layer.getchannel("A"), mask))
+
+            if c.mask is not None:
+                mw, mh = state["mask_width"], state["mask_height"]
+                mx, my = state["mask_position"]
+                mx += local_center[0]
+                my += local_center[1]
+                if not mw or not mh:
+                    points = []
+                elif c.mask.kind == "ellipse":
+                    points = [
+                        (mx + mw / 2 * math.cos(i * math.tau / 180), my + mh / 2 * math.sin(i * math.tau / 180))
+                        for i in range(180)
+                    ]
+                else:
+                    normalized = c.mask.points if c.mask.kind == "polygon" else ((0, 0), (1, 0), (1, 1), (0, 1))
+                    points = [(mx + (x - 0.5) * mw, my + (y - 0.5) * mh) for x, y in normalized]
+                apply_mask(points)
+            if state["clip"] != (0, 0, 1, 1):
+                l, t, r, b = state["clip"]
+                apply_mask(
+                    []
+                    if l == r or t == b
+                    else [
+                        (box.left + x * box.width, box.top + y * box.height)
+                        for x, y in ((l, t), (r, t), (r, b), (l, b))
+                    ]
+                )
+            opacity = inherited_opacity * state["opacity"]
+            if not isinstance(c, Group) and opacity < 1:
+                layer.putalpha(layer.getchannel("A").point(lambda a: round(a * opacity)))
+            return layer
+
+        result = PILImage.new("RGBA", size, scene.canvas.bg)
+        for entry in sorted((e for e in scene.entries if e.parent is None), key=lambda e: e.component.z_index):
+            result.alpha_composite(visit(entry, base))
+        return result
+
     def _sprite(self, c, state, factor, age):
+        from .indicators import ProgressBar, draw_indicator
+
+        if isinstance(c, ProgressBar):
+            return draw_indicator(c, state, factor, self)
+        # A temporary style view avoids mutating snapshots and retaining intermediate sprites.
+        dynamic = any(
+            key in state and state[key] != value
+            for key, value in c.state().items()
+            if key in {"fill", "stroke", "color", "width", "height", "stroke_width", "corner_radius"}
+        )
+        if dynamic:
+            original = c
+            c = copy(c)
+            for key in ("fill", "stroke", "color", "width", "height", "stroke_width", "corner_radius"):
+                if key in state:
+                    value = state[key]
+                    setattr(c, key, tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} else value)
+            if isinstance(c, Polyline):
+                c.points = tuple((x * c.width / original.width, y * c.height / original.height) for x, y in c.points)
+        else:
+            dynamic = False
+
         if isinstance(c, Map):
             return draw_map(c, state, factor)
         if isinstance(c, Chart):
@@ -314,7 +451,7 @@ class PillowRenderer:
             ImageDraw.Draw(sprite).text((x + 2 - box[0], 2 - box[1]), visible, font=font, fill=c.color)
             return sprite
         # Dynamic reveal/draw frames are deliberately not retained in the cache.
-        static = state["reveal"] == 1 and state["draw"] == 1
+        static = not dynamic and state["reveal"] == 1 and state["draw"] == 1
         frame_index = 0
         if isinstance(c, Image):
             frames, durations = self._image(c)
@@ -404,7 +541,7 @@ class PillowRenderer:
                 if c.closed:
                     points.append(points[0])
             elif isinstance(c, Rectangle) and c.corner_radius:
-                radius = c.corner_radius * factor
+                radius = min(c.corner_radius, c.width / 2, c.height / 2) * factor
                 points = []
                 for cx, cy, start in (
                     (x + w - radius, y + radius, -90),

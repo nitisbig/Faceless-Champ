@@ -245,3 +245,55 @@ Artifacts and detailed checks are in the project's `output/`, including
 - Membership is fixed before scene addition; existing members cannot be reparented.
   Layout bounds describe initial sprite rectangles and do not implement text wrapping,
   collision detection, or time-evaluated layout constraints.
+
+## Motion graphics milestone — 2026-10-05
+
+Implemented in the public library with no new runtime dependencies:
+animated straight-RGBA shape/text colors, shape dimensions/strokes/radii, independent
+X/Y scales with nested affine rendering, evaluated bounds, finite nested schedules,
+local alpha masks and wipes, and six progress/indicator components.
+
+Validation commands and results:
+
+- `.venv/bin/pytest -q`: **296 passed**, including 38 motion-graphics cases.
+  Coverage includes interpolation and exact endpoints; invalid values and atomic
+  scheduler conflicts; nested/interleaved schedules, ping-pong keyframes/easing,
+  absolute timing and lifetimes; affine transforms; group masks and transparency;
+  GIF/caption clocks; out-of-order frames; animated bounds; dynamic sprite retention.
+- `.venv/bin/ruff check .`: passed.
+- `.venv/bin/ruff format --check .`: 89 files already formatted. Existing Python
+  snippets in README/API/guide/chart documentation were normalized by the formatter.
+- `git diff --check`: passed.
+- `uv build --offline --cache-dir /tmp/faceless-motion-uv-cache`: source archive
+  and wheel built successfully. No optional math/maps dependencies are needed by
+  this milestone.
+- Installed the wheel into `/tmp/faceless-motion-wheel`, independently of the
+  checkout, with Pillow 12.3.0. `uv pip check` passed. An isolated Python smoke check
+  verified all public exports, masked affine/color rendering, repeat determinism,
+  all five progress visuals and Countdown. ZIP integrity and source archive
+  manifests include the new modules, documentation, example, and tests.
+- Rendered `examples/motion_graphics/render.py` to
+  `output/motion_graphics/showcase.mp4`: **960×540, 24 fps, 18 seconds, 432 frames**.
+  The final showcase uses 2× antialiasing. Six stills sample property morphs, nested
+  nonuniform transforms, local masks/wipes, and all six indicators. Representative
+  stills and a decoded video frame were visually inspected for spacing, clipping,
+  typography and transparency. FFmpeg full decoding and ffprobe metadata checks
+  are the media acceptance checks.
+
+Reproduction:
+
+```bash
+.venv/bin/python examples/motion_graphics/render.py --frames
+.venv/bin/python examples/motion_graphics/render.py --overwrite
+ffprobe -v error -select_streams v:0 \
+  -show_entries stream=width,height,avg_frame_rate,nb_frames,duration \
+  -of json output/motion_graphics/showcase.mp4
+ffmpeg -v error -i output/motion_graphics/showcase.mp4 -f null -
+```
+
+Material tradeoffs: straight sRGB interpolation is not linear-light mixing; masks
+are hard-edged local rectangle/ellipse/polygon masks with antialiasing rather than
+raster/gradient masks; repeats expand finite timeline tracks; affine mask layers
+cost CPU and memory proportional to canvas area and nesting depth. Group opacity
+continues multiplying member opacity, and layout bounds remain conservative,
+unclipped boxes. These choices are documented in `docs/motion-graphics.md`.
