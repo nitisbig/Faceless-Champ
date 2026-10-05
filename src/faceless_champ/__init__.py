@@ -61,6 +61,7 @@ from .components import (
 )
 from .export import ExportSettings, render
 from .flags import Flag, flag_path, supported_flags
+from .layout import Bounds, Group
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
@@ -73,6 +74,7 @@ __all__ = [
     "Axis",
     "BarChart",
     "BounceIn",
+    "Bounds",
     "Canvas",
     "Captions",
     "Chart",
@@ -90,6 +92,7 @@ __all__ = [
     "FadeOut",
     "Flag",
     "Grid",
+    "Group",
     "Heatmap",
     "Histogram",
     "Icon",

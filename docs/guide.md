@@ -41,6 +41,19 @@ Think in design pixels, independent of output resolution. Place a centered title
 image boxes. Scale multiplies component dimensions; rotation is clockwise and
 always happens around the center. Layers sort by `z_index`, then insertion order.
 
+Use measured layout helpers before adding components. For an icon with a label,
+call `label.next_to(icon, direction="down", gap=20)`, then
+`Group(icon, label).move_to(960, 540)`. Arrange several groups with
+`Group(*cards).arrange(gap=40)` or align a heading using
+`heading.align_to(diagram, edge="left")`. These helpers account for font metrics,
+rotation, and scale; they do not automatically wrap text or resolve every overlap.
+
+Group diagrams before `add()`. Moving or scaling a group leaves its member
+coordinates intact, so independent member animation targets use those original
+coordinates. Parent transforms apply afterward. A group can animate at the same
+time as its members, and nested groups preserve local stacking and timing.
+See [the group API](api.md#groups-and-measured-layout) for precise rules.
+
 Each `play()` is a timeline step. Multiple arguments animate together; separate calls
 animate sequentially. `wait()` creates a hold. Direct style changes after `add()`
 are not scheduled edits: create a new component or use its animation builder.
@@ -69,7 +82,8 @@ self.play(SlideOut(icon), ZoomOut(label), run_time=0.35)
 self.remove(icon, label)
 ```
 
-Zooms and pops affect individual components. Slide direction describes movement;
+Zooms and pops affect a component, or the whole hierarchy when applied to a Group.
+Slide direction describes movement;
 an upward entrance starts below the resting position. Scale factors are relative
 to the evaluated timeline state, so emphasis effects still return to the right
 size after earlier scaling. Shake and wiggle also return to the current transform.

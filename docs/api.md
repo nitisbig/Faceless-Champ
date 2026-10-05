@@ -106,6 +106,77 @@ formula = Equation(r"a^2+b^2=c^2", color=scheme.text,
 self.play(Write(formula))
 ```
 
+## Groups and measured layout
+
+`Group(*children, **component_options)` is a visual component containing one or
+more components, including nested Groups. Its immutable `children` tuple preserves
+member order. A component can appear only once within a hierarchy and cannot
+belong to multiple groups in one scene. Construct a group before adding its
+members to the scene; already-added members cannot be reparented. Adding a group
+automatically adds and snapshots its entire hierarchy. Subsequent `add(member)`
+is a no-op, and member animations use the same snapshot and timeline.
+
+The default group pivot is the center of its members' measured bounding box.
+`anchor="top_left"` instead selects the box's upper-left corner. This reference
+pivot is fixed at construction: group position, scale, and rotation transform the
+whole layout relative to it, without rewriting member coordinates. An explicit
+`position` or `move_to()` moves the pivot. Scaling is uniform, rotation is clockwise,
+and nested transforms compose from the innermost group outward. Child positions
+and child movement targets remain in their original, untransformed coordinate space.
+
+Groups support `.animate.move_to()`, `.scale_to()`, `.rotate_to()`, `.opacity_to()`,
+custom keyframes for those properties, and component motion/fade presets. Member
+animations can run simultaneously with parent transforms, including `Typewriter`,
+`Draw`, numeric animation, chart transitions, and geographic animation. Group and
+member opacity multiply. Members retain their own GIF/caption introduction clocks.
+`Scene.remove(group)` removes the entire hierarchy and checks outstanding member
+animations; removed members cannot be reintroduced or animated again.
+
+Group stacking is hierarchical: a group's `z_index` orders its whole subtree
+against its siblings. Member `z_index` values order siblings inside that group;
+they do not escape the parent stacking order. Ties preserve insertion order.
+
+| Helper | Behavior |
+| --- | --- |
+| `component.bounds` | Initial layout `Bounds(left, top, right, bottom)` with `width`, `height`, and `center` |
+| `component.shift(dx, dy)` | Translate the component's initial position |
+| `component.next_to(other, direction="right", gap=20, align="center")` | Place beside a component or Bounds using a nonnegative edge-to-edge gap |
+| `component.align_to(other, edge="left")` | Align `left`, `right`, `top`, `bottom`, `center_x`, `center_y`, or `center` |
+| `group.arrange(direction="right", gap=20, align="center")` | Arrange members in tuple order, preserving the fixed pivot |
+
+Directions are `right`, `left`, `down`, and `up`. Horizontal layouts permit cross-axis
+alignment `center`, `top`, or `bottom`; vertical layouts permit `center`, `left`,
+or `right`. Helpers return the component/group for chaining. Invalid layouts are
+rejected before positions change. Arrange gaps are measured before the parent's
+scale/rotation, so parent scaling also scales their spacing.
+
+Bounds account for component scale, rotation, anchors, and nested transforms.
+They describe complete initial sprites, including raster padding rather than
+only visible ink. Image/chart/map boxes use their declared dimensions; missing
+image files can therefore be reserved before rendering. Text is measured with
+the selected font. Equation measurement requires the `equations` extra. Caption
+bounds reserve the widest/tallest phrase. Bounds are conservative axis-aligned
+rectangles, not collision detection or automatic text wrapping. Pixel rounding
+at export resolutions may vary edges by a pixel.
+
+Layout helpers operate before `Scene.add()` and do not schedule timeline edits.
+After adding, direct mutations and `.bounds` refer to the source component's
+initial layout, not its evaluated animated state; use animation builders for
+scheduled transforms.
+
+```python
+from faceless_champ import Circle, FadeIn, Group, Text
+
+dot = Circle(40, fill="#48e0cb", stroke=None)
+label = Text("Input", font_size=32).next_to(dot, direction="down", gap=20)
+diagram = Group(dot, label).move_to(960, 540)
+self.play(FadeIn(diagram), run_time=0.5)
+self.play(diagram.animate.scale_to(1.2).rotate_to(10),
+          dot.animate.opacity_to(0.6), run_time=1)
+```
+
+See [examples/groups.py](../examples/groups.py) for a nested connected diagram.
+
 ## Country flags
 
 `Flag(country_code, width=120, height=80, ...)` loads one of the 254 bundled PNGs

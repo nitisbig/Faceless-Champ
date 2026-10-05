@@ -224,3 +224,24 @@ Artifacts and detailed checks are in the project's `output/`, including
   FFmpeg decoded the entire video without errors. Inspected the final gallery frame,
   including Nepal's transparent outline, rectangular flags, and Switzerland's square flag.
   Reproduce with `uv run faceless-champ render examples/flags.py FlagsShowcase -o output/flags/flags.mp4 -q ql --fps 12`.
+
+## Object groups and measured layouts (2026-10-05)
+
+- Added `Group` and `Bounds`, with `arrange`, `next_to`, `align_to`, and `shift` helpers.
+  Nested group movement, uniform scaling, clockwise rotation, and inherited opacity
+  compose with independent member animations and local stacking order.
+- Full suite: **258 passed**, including **30 new group/layout cases**. Coverage includes
+  measured text and rotated/scaled edge spacing in all four directions, center/edge
+  alignment, nested transforms, simultaneous member animation, snapshot isolation,
+  out-of-order frame sampling, caption lifetimes, GIF timing, ownership validation,
+  atomic rejection, and identity-group equivalence at multiple export resolutions.
+- Ruff lint/format checks and `git diff --check` passed. Built wheel and source distribution.
+  An installed wheel rendered grouped text/shapes from `/tmp` with network access and
+  NumPy/Matplotlib imports blocked, confirming ordinary grouping needs no new dependency.
+- Rendered `output/groups.mp4`: **6 seconds, 960×540, 24 FPS, 144 H.264 frames**.
+  FFmpeg decoded the full video without errors. Visually inspected the rotating connected
+  diagram, measured labels, and independent center-node scaling.
+- Reproduce with `uv run faceless-champ render examples/groups.py GroupedDiagram -o output/groups.mp4 --width 960 --height 540 --fps 24 --antialias 2`.
+- Membership is fixed before scene addition; existing members cannot be reparented.
+  Layout bounds describe initial sprite rectangles and do not implement text wrapping,
+  collision detection, or time-evaluated layout constraints.

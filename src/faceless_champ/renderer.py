@@ -30,6 +30,7 @@ from .components import (
     Triangle,
     finite,
 )
+from .layout import Group, transform_point
 from .maps import Map, draw_map
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
@@ -127,7 +128,9 @@ class PillowRenderer:
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
-                if isinstance(c, Map):
+                if isinstance(c, Group):
+                    continue
+                elif isinstance(c, Map):
                     draw_map(c, entry.initial, min(1, 64 / max(c.width, c.height)))
                 elif isinstance(c, Chart):
                     draw_chart(c, entry.initial, 1)
@@ -210,12 +213,20 @@ class PillowRenderer:
 
     def _scene(self, scene, time, size):
         visible = []
-        for entry in sorted(scene.entries, key=lambda e: e.component.z_index):
-            if time < entry.start or (entry.end is not None and time >= entry.end):
-                continue
-            state = entry.state_at(time)
-            if state["opacity"] > 0:
-                visible.append((entry.component, state, max(0, time - entry.start)))
+
+        def collect(entries, parents=()):
+            for entry in sorted(entries, key=lambda e: e.component.z_index):
+                if time < entry.start or (entry.end is not None and time >= entry.end):
+                    continue
+                state = entry.state_at(time)
+                if state["opacity"] <= 0:
+                    continue
+                if isinstance(entry.component, Group):
+                    collect(entry.children, ((entry.component._origin, state),) + parents)
+                else:
+                    visible.append((entry.component, state, max(0, time - entry.start), parents))
+
+        collect([entry for entry in scene.entries if entry.parent is None])
         signature = (
             scene.canvas,
             size,
@@ -223,11 +234,12 @@ class PillowRenderer:
                 (
                     c,
                     tuple(state.items()),
+                    tuple((origin, tuple(parent.items())) for origin, parent in parents),
                     self._caption_state(c, age)
                     if isinstance(c, Captions)
                     else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None),
                 )
-                for c, state, age in visible
+                for c, state, age, parents in visible
             ),
         )
         cached = self._scene_frames.get(scene)
@@ -238,25 +250,31 @@ class PillowRenderer:
         big = (size[0] * aa, size[1] * aa)
         result = PILImage.new("RGBA", big, scene.canvas.bg)
         factor = min(big[0] / scene.canvas.width, big[1] / scene.canvas.height)
-        for c, state, age in visible:
+        for c, state, age, parents in visible:
             sprite = self._sprite(c, state, factor, age)
             w, h = sprite.size
+            x, y = state["position"]
+            if c.anchor == "top_left":
+                # Preserve the existing pixel-rounded unrotated anchor box.
+                x += max(1, round(w * state["scale"])) / factor / 2
+                y += max(1, round(h * state["scale"])) / factor / 2
             scale = state["scale"]
+            rotation, opacity = state["rotation"], state["opacity"]
+            for origin, parent in parents:
+                x, y = transform_point((x, y), origin, parent)
+                scale *= parent["scale"]
+                rotation += parent["rotation"]
+                opacity *= parent["opacity"]
             if scale != 1:
                 sprite = sprite.resize(
                     (max(1, round(w * scale)), max(1, round(h * scale))), PILImage.Resampling.LANCZOS
                 )
-            w, h = sprite.size
-            x, y = (v * factor for v in state["position"])
-            # Rotate around the sprite center. Top-left anchors refer to its unrotated box.
-            if c.anchor == "top_left":
-                x += w / 2
-                y += h / 2
-            if state["rotation"]:
-                sprite = sprite.rotate(-state["rotation"], resample=PILImage.Resampling.BICUBIC, expand=True)
-            if state["opacity"] < 1:
+            x, y = x * factor, y * factor
+            if rotation:
+                sprite = sprite.rotate(-rotation, resample=PILImage.Resampling.BICUBIC, expand=True)
+            if opacity < 1:
                 sprite = sprite.copy()
-                sprite.putalpha(sprite.getchannel("A").point(lambda a, opacity=state["opacity"]: round(a * opacity)))
+                sprite.putalpha(sprite.getchannel("A").point(lambda a, opacity=opacity: round(a * opacity)))
             result.alpha_composite(sprite, (round(x - sprite.width / 2), round(y - sprite.height / 2)))
         if aa > 1:
             result = result.resize(size, PILImage.Resampling.LANCZOS)
