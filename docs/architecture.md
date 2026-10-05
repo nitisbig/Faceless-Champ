@@ -102,3 +102,18 @@ use normal decoding. Resolution, transforms, fitting, and animation remain share
 As with ordinary images, replacing files requires a fresh renderer.
 Polyline x-based reveal measures horizontal segment extent instead of arc length,
 so one cached source geometry can follow a shared chart time cursor.
+
+Motion graphics adds evaluated visual-property snapshots and transient raster style
+views. Color tracks use four-channel straight RGBA tuples. Dynamic shape/text sprites
+bypass the static sprite cache. Indicators render directly from progress; Countdown
+reuses Number. Scene.bounds_at measures evaluated geometry through ancestor transforms.
+Schedules flatten and sort leaf events, validate against a copied timeline, then
+publish tracks atomically while preserving existing Entry identities. Repetition
+reuses the first traversal's resolved values, reversing easing and keyframes for
+ping-pong; it expands finite tracks at authoring time.
+Masked or nonuniform states use composed affine transforms and temporary RGBA layers.
+Group masks clip composited descendants; member opacity and source ages retain their
+existing meaning. The common alpha-mask path handles both attached masks and wipe
+clips. This path costs canvas-area work per layer and depth; it avoids per-frame
+retained mask/sprite caches and adds no dependency. Ordinary scenes keep their prior
+sprite transform path. See motion-graphics.md for public semantics and tradeoffs.

@@ -39,6 +39,54 @@ class AnimationBuilder(Animation):
     def __init__(self, component: Component) -> None:
         super().__init__(component, {})
 
+    def _to(self, key, value):
+        from .timeline import _validate_animated_value
+
+        if key not in self.component.state():
+            raise ValueError(f"Unsupported animation property: {key}")
+        _validate_animated_value(key, value)
+        self.targets[key] = value if isinstance(value, tuple) else finite(value, key)
+        return self
+
+    def fill_to(self, color) -> Self:
+        from .motion import rgba
+
+        return self._to("fill", rgba(color))
+
+    def stroke_to(self, color) -> Self:
+        from .motion import rgba
+
+        return self._to("stroke", rgba(color))
+
+    def color_to(self, color) -> Self:
+        from .motion import rgba
+
+        return self._to("color", rgba(color))
+
+    def width_to(self, value) -> Self:
+        return self._to("width", value)
+
+    def height_to(self, value) -> Self:
+        return self._to("height", value)
+
+    def stroke_width_to(self, value) -> Self:
+        return self._to("stroke_width", value)
+
+    def corner_radius_to(self, value) -> Self:
+        return self._to("corner_radius", value)
+
+    def scale_xy_to(self, x, y) -> Self:
+        return self._to("scale_x", x)._to("scale_y", y)
+
+    def progress_to(self, value) -> Self:
+        return self._to("progress", value)
+
+    def mask_to(self, *, position=None, width=None, height=None) -> Self:
+        for key, value in (("mask_position", position), ("mask_width", width), ("mask_height", height)):
+            if value is not None:
+                self._to(key, tuple(value) if key == "mask_position" else value)
+        return self
+
     def data_to(self, data) -> Self:
         from .charts import Chart
 
@@ -50,7 +98,9 @@ class AnimationBuilder(Animation):
     def value_to(self, value: float) -> Self:
         if not isinstance(self.component, Number):
             raise TypeError("value_to requires a Number")
-        self.targets["value"] = finite(value, "value")
+        from .indicators import Countdown
+
+        self.targets["value"] = finite(value, "value", 0 if isinstance(self.component, Countdown) else None)
         return self
 
     def move_to(self, x: float, y: float) -> Self:

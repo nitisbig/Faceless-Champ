@@ -10,7 +10,9 @@ from faceless_champ import Axis, BarChart, Canvas, ChartReveal, Scene
 chart = BarChart(
     ["Q1", "Q2", "Q3"],
     {"Revenue": [3, 5, 4], "Costs": [-2, -3, -2]},
-    width=1000, height=580, position=(640, 360),
+    width=1000,
+    height=580,
+    position=(640, 360),
     title="Quarterly cash flow",
     y_axis=Axis(limits=(-4, 8), unit="M", label="USD millions"),
 )
@@ -31,22 +33,27 @@ measures labels and raises a useful error if they leave no usable plot area.
 
 ```python
 from faceless_champ import (
-    Axis, BarChart, Heatmap, Histogram, LineChart, NetworkGraph,
-    PieChart, SankeyChart, ScatterPlot, VectorField,
+    Axis,
+    BarChart,
+    Heatmap,
+    Histogram,
+    LineChart,
+    NetworkGraph,
+    PieChart,
+    SankeyChart,
+    ScatterPlot,
+    VectorField,
 )
 
 bars = BarChart(["A", "B"], {"One": [2, -1], "Two": [3, -2]}, stacked=True)
 line = LineChart({"f(x)": [(0, 0), (1, 1), (2, 4)]})
 scatter = ScatterPlot({"Measured": [(0, 1), (1, 2)]}, sizes=[4, 8])
-histogram = Histogram([0, .2, .7, 1, 2], bins=[0, 1, 2])
-heatmap = Heatmap([[1, .4], [.4, 1]], row_labels=["A", "B"],
-                  column_labels=["A", "B"], color_limits=(-1, 1))
-network = NetworkGraph(["A", "B", "C"], [("A", "B"), ("B", "C")],
-                       weights=[2, 1], directed=True)
-field = VectorField([(0, 0, 1, 0), (1, 1, 0, -1)], vector_scale=.5)
-sankey = SankeyChart(["Income", "Spend", "Save"],
-                     [("Income", "Spend", 70), ("Income", "Save", 30)])
-pie = PieChart(["Equity", "Bonds", "Cash"], [50, 35, 15], hole=.5)
+histogram = Histogram([0, 0.2, 0.7, 1, 2], bins=[0, 1, 2])
+heatmap = Heatmap([[1, 0.4], [0.4, 1]], row_labels=["A", "B"], column_labels=["A", "B"], color_limits=(-1, 1))
+network = NetworkGraph(["A", "B", "C"], [("A", "B"), ("B", "C")], weights=[2, 1], directed=True)
+field = VectorField([(0, 0, 1, 0), (1, 1, 0, -1)], vector_scale=0.5)
+sankey = SankeyChart(["Income", "Spend", "Save"], [("Income", "Spend", 70), ("Income", "Save", 30)])
+pie = PieChart(["Equity", "Bonds", "Cash"], [50, 35, 15], hole=0.5)
 ```
 
 - **BarChart(categories, series, stacked=False):** series is an insertion-ordered
@@ -122,9 +129,14 @@ from faceless_champ import Axis, ChartStyle, ColorScheme, LineChart
 chart = LineChart(
     {"Growth": [(1, 10), (2, 100), (3, 1000)]},
     y_axis=Axis(scale="log", limits=(1, 10000), label="Value"),
-    style=ChartStyle(scheme=ColorScheme.named("paper"),
-                     colors=("#145a9c", "#8d580a"),
-                     font_size=18, title_size=28, grid=True, legend=True),
+    style=ChartStyle(
+        scheme=ColorScheme.named("paper"),
+        colors=("#145a9c", "#8d580a"),
+        font_size=18,
+        title_size=28,
+        grid=True,
+        legend=True,
+    ),
 )
 ```
 
@@ -142,8 +154,14 @@ chart, vector, and scatter mark stroke/radius defaults in design pixels (default
 
 ```python
 style = ChartStyle(
-    scheme=ColorScheme.named("paper"), font="my-serif.ttf", font_weight=400,
-    font_size=28, title_size=40, line_width=2.4, grid=False, legend=False,
+    scheme=ColorScheme.named("paper"),
+    font="my-serif.ttf",
+    font_weight=400,
+    font_size=28,
+    title_size=40,
+    line_width=2.4,
+    grid=False,
+    legend=False,
 )
 ```
 
@@ -194,8 +212,7 @@ chart = RankedBarChart(
 year = Number(2010, format_spec=".0f", width=180, font_size=50, color="#14202e", position=(960, 100))
 scene = Scene(Canvas(1280, 720, "#f2f0eb"))
 scene.add(chart, year)
-scene.play(chart.animate.data_to({"Alpha": 12, "Beta": 18, "New entrant": 6}),
-           year.animate.value_to(2011), run_time=2)
+scene.play(chart.animate.data_to({"Alpha": 12, "Beta": 18, "New entrant": 6}), year.animate.value_to(2011), run_time=2)
 ```
 
 The [`company-growth` training project](../training%20project/company-growth/README.md)

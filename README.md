@@ -23,6 +23,7 @@ Save this as `hello.py`:
 ```python
 from faceless_champ import Scene, Text, Circle, Typewriter, FadeIn
 
+
 class Hello(Scene):
     def construct(self):
         title = Text("Hello, world!", font_size=100, position=(960, 400))
@@ -145,8 +146,7 @@ dot = Circle(40, fill="#48e0cb", stroke=None)
 label = Text("Input", font_size=32).next_to(dot, direction="down", gap=20)
 diagram = Group(dot, label).move_to(960, 540)
 self.play(FadeIn(diagram))
-self.play(diagram.animate.scale_to(1.2).rotate_to(10),
-          dot.animate.opacity_to(0.6))
+self.play(diagram.animate.scale_to(1.2).rotate_to(10), dot.animate.opacity_to(0.6))
 ```
 
 Use `Group(...).arrange(direction="right", gap=40)` for consistent edge spacing,
@@ -243,3 +243,12 @@ and animations. No optional extra is required. See the [API reference](docs/api.
 ```bash
 uv run faceless-champ render examples/flags.py FlagsShowcase -o output/flags.mp4 -q ql
 ```
+
+### Motion graphics
+
+Animate shape colors and geometry, text colors, and independent X/Y scales.
+Compose finite `Stagger`, `Succession`, and `Repeat` schedules; clip components or
+complete groups with local masks and directional `Wipe` reveals. Six reusable
+indicators include progress bars/rings, gauges, countdowns, loading dots and checkmarks.
+See the [API and timing guide](docs/motion-graphics.md) and
+[self-contained showcase](examples/motion_graphics/render.py).

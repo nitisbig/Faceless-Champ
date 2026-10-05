@@ -47,6 +47,9 @@ class Component:
         position: tuple[float, float] = (0, 0),
         anchor: str = "center",
         scale: float = 1.0,
+        scale_x: float = 1.0,
+        scale_y: float = 1.0,
+        mask=None,
         rotation: float = 0.0,
         opacity: float = 1.0,
         z_index: float = 0,
@@ -58,6 +61,13 @@ class Component:
         if len(self.position) != 2:
             raise ValueError("position needs x and y")
         self.scale = finite(scale, "scale", 0.001)
+        self.scale_x = finite(scale_x, "scale_x", 0.001)
+        self.scale_y = finite(scale_y, "scale_y", 0.001)
+        from .masks import Mask
+
+        if mask is not None and not isinstance(mask, Mask):
+            raise TypeError("mask must be a Mask")
+        self.mask = mask
         self.rotation = finite(rotation, "rotation")
         self.opacity = finite(opacity, "opacity", 0)
         if self.opacity > 1:
@@ -102,7 +112,12 @@ class Component:
         return AnimationBuilder(self)
 
     def state(self) -> dict:
+        from .motion import visual_state
+
         return {
+            **visual_state(self),
+            "scale_x": self.scale_x,
+            "scale_y": self.scale_y,
             "position": self.position,
             "scale": self.scale,
             "rotation": self.rotation,

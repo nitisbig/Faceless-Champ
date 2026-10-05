@@ -92,3 +92,12 @@ flag_path(code) returns the absolute PNG path; supported_flags() lists all 254 c
 Flags preserve colors/aspect ratio by default and accept Image options and animations.
 Assets ship with the package, work offline from any cwd, and require no extra dependency.
 The renderable example is examples/flags.py; see docs/api.md#country-flags.
+
+Motion graphics: docs/motion-graphics.md and examples/motion_graphics/render.py.
+Animate fill_to/stroke_to/color_to, width_to/height_to, stroke_width_to,
+corner_radius_to, scale_xy_to; scale_x/y multiply uniform scale. Query evaluated
+geometry with Scene.bounds_at. Stagger/Succession/Repeat are finite nested animation
+schedules, distinct from scene Sequence. Repeat cycles counts traversals, including
+backward ping-pong traversals. Local RectangleMask/CircleMask/ShapeMask apply to
+complete targets; Wipe shares their alpha compositor. ProgressBar/ProgressRing/
+Gauge/LoadingDots/Checkmark use progress_to([0,1]); Countdown uses value_to(0).

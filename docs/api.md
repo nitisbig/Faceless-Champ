@@ -100,9 +100,12 @@ geometry. Colors can include alpha.
 
 ```python
 scheme = ColorScheme.named("midnight")
-formula = Equation(r"a^2+b^2=c^2", color=scheme.text,
-                   color_map={"a": scheme.primary, "b": scheme.secondary,
-                              "c": scheme.tertiary}, position=(960, 540))
+formula = Equation(
+    r"a^2+b^2=c^2",
+    color=scheme.text,
+    color_map={"a": scheme.primary, "b": scheme.secondary, "c": scheme.tertiary},
+    position=(960, 540),
+)
 self.play(Write(formula))
 ```
 
@@ -171,8 +174,7 @@ dot = Circle(40, fill="#48e0cb", stroke=None)
 label = Text("Input", font_size=32).next_to(dot, direction="down", gap=20)
 diagram = Group(dot, label).move_to(960, 540)
 self.play(FadeIn(diagram), run_time=0.5)
-self.play(diagram.animate.scale_to(1.2).rotate_to(10),
-          dot.animate.opacity_to(0.6), run_time=1)
+self.play(diagram.animate.scale_to(1.2).rotate_to(10), dot.animate.opacity_to(0.6), run_time=1)
 ```
 
 See [examples/groups.py](../examples/groups.py) for a nested connected diagram.
@@ -226,7 +228,7 @@ multiplies any existing alpha, with opacity in `[0, 1]`.
 ```python
 scheme = ColorScheme.named("paper")
 curve = Polyline(points, stroke=scheme.primary, stroke_width=4, line_cap="round")
-area = Polyline(area_points, closed=True, fill=with_alpha(scheme.primary, .18), stroke=None)
+area = Polyline(area_points, closed=True, fill=with_alpha(scheme.primary, 0.18), stroke=None)
 ```
 
 ## Scenes and animation
@@ -323,10 +325,15 @@ earlier movements or scaling. Invalid keyframes reject the whole play call befor
 components or tracks are added.
 
 ```python
-self.play(Animation(
-    icon, {"scale": 1}, relative=("scale",),
-    keyframes={"scale": ((0, 1), (0.5, 1.2), (1, 1))},
-), run_time=0.6)
+self.play(
+    Animation(
+        icon,
+        {"scale": 1},
+        relative=("scale",),
+        keyframes={"scale": ((0, 1), (0.5, 1.2), (1, 1))},
+    ),
+    run_time=0.6,
+)
 ```
 
 ## Composition
@@ -508,3 +515,11 @@ from stitching many separately rasterized segments.
 `OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
 and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
 `animate.rotate()` for geographic animation. See [Maps guide](maps.md) for API details and examples.
+
+## Motion graphics
+
+See [Motion graphics](motion-graphics.md) for animated color and geometry builders,
+`scale_xy_to`, `Scene.bounds_at`, finite nested `Stagger`/`Succession`/`Repeat`,
+local `RectangleMask`/`CircleMask`/`ShapeMask`, `Wipe`, and the six indicators
+(`ProgressBar`, `ProgressRing`, `Gauge`, `Countdown`, `LoadingDots`, `Checkmark`).
+The guide defines interpolation, ranges, coordinate systems and exact loop endpoints.
