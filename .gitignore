@@ -16,3 +16,6 @@ output/
 **/images/
 .pytest_cache/
 .ruff_cache/
+
+# Map showcase previews
+/media/maps/

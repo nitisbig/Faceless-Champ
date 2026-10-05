@@ -30,6 +30,7 @@ from .components import (
     Triangle,
     finite,
 )
+from .maps import Map, draw_map
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
 from .typography import DEFAULT_FONT, load_font
@@ -126,7 +127,9 @@ class PillowRenderer:
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
-                if isinstance(c, Chart):
+                if isinstance(c, Map):
+                    draw_map(c, entry.initial, min(1, 64 / max(c.width, c.height)))
+                elif isinstance(c, Chart):
                     draw_chart(c, entry.initial, 1)
                 elif isinstance(c, Equation):
                     ImageColor.getcolor(c.color, "RGBA")
@@ -271,6 +274,8 @@ class PillowRenderer:
         return result
 
     def _sprite(self, c, state, factor, age):
+        if isinstance(c, Map):
+            return draw_map(c, state, factor)
         if isinstance(c, Chart):
             # The bounded scene-frame cache handles holds; never retain per-frame chart sprites.
             return draw_chart(c, state, factor)

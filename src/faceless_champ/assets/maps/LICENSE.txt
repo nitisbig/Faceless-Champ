@@ -1,0 +1,12 @@
+Country geometry: Natural Earth v5.1.2, public domain.
+https://www.naturalearthdata.com/about/terms-of-use/
+
+Earth texture: NASA Earth Observatory / NASA Visible Earth, Blue Marble Next Generation,
+January 2004, Reto Stoeckli. Credit NASA Earth Observatory.
+https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/
+NASA imagery usage guidance: https://www.nasa.gov/nasa-brand-center/images-and-media/
+No NASA endorsement is implied.
+
+Derived assets: countries rounded to 5 decimals; texture resized to 4096x2048 JPEG.
+Source and derived SHA-256 hashes are in manifest.json.
+Reproduction: scripts/prepare_maps.py and docs/maps.md in the source distribution.

@@ -184,13 +184,18 @@ class Scene(Renderable):
                 raise ValueError("Animation starts must refer to animated properties")
             if set(animation.keyframes or {}) - set(animation.targets):
                 raise ValueError("Keyframes must refer to animated properties")
-            if set(animation.relative) - (set(animation.targets) & {"position", "scale", "rotation"}):
-                raise ValueError("Relative properties must be animated position, scale, or rotation")
+            if set(animation.relative) - (
+                set(animation.targets) & {"position", "scale", "rotation", "longitude", "latitude", "map_rotation"}
+            ):
+                raise ValueError("Unsupported relative animation property")
             for properties in (animation.targets, animation.starts or {}):
                 for key, value in properties.items():
                     if key not in animation.component.state():
                         raise ValueError(f"Unsupported animation property: {key}")
-                    _validate_animated_value(key, value)
+                    if key == "latitude" and key in animation.relative:
+                        finite(value, key)
+                    else:
+                        _validate_animated_value(key, value)
                     if key == "data":
                         animation.component.validate_data(value)
             entry = self._objects.get(animation.component)
@@ -217,6 +222,8 @@ class Scene(Renderable):
                         relative_value(key, base, animation.starts[key]) if key in (animation.starts or {}) else base
                     )
                     target = relative_value(key, base, target)
+                if key == "longitude" and getattr(animation, "map_shortest", False):
+                    target = base + (target - base + 180) % 360 - 180
                 frames = None
                 if key in (animation.keyframes or {}):
                     points = animation.keyframes[key]
@@ -288,13 +295,23 @@ def _validate_animated_value(key: str, value) -> None:
             raise ValueError("Animated data must be a nonempty numeric tuple")
         for item in value:
             finite(item, "data")
+    elif key == "latitude":
+        finite(value, key)
+        if not -90 <= value <= 90:
+            raise ValueError("latitude must be between -90 and 90")
+    elif key == "zoom":
+        finite(value, key, 0.001)
     elif key == "position":
         if not isinstance(value, tuple) or len(value) != 2:
             raise ValueError("Animated position must be an (x, y) tuple")
         for coordinate in value:
             finite(coordinate, "position")
     else:
-        finite(value, key, 0.001 if key == "scale" else (None if key in {"rotation", "value"} else 0))
+        finite(
+            value,
+            key,
+            0.001 if key == "scale" else (None if key in {"rotation", "value", "longitude", "map_rotation"} else 0),
+        )
         if key in {"opacity", "reveal", "draw"} and value > 1:
             raise ValueError(f"{key} must be <= 1")
 

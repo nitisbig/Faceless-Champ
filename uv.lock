@@ -112,6 +112,9 @@ dependencies = [
 equations = [
     { name = "matplotlib" },
 ]
+maps = [
+    { name = "numpy" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -122,9 +125,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "matplotlib", marker = "extra == 'equations'", specifier = ">=3.9,<4" },
+    { name = "numpy", marker = "extra == 'maps'", specifier = ">=1.26,<3" },
     { name = "pillow", specifier = ">=10.4,<13" },
 ]
-provides-extras = ["equations"]
+provides-extras = ["maps", "equations"]
 
 [package.metadata.requires-dev]
 dev = [

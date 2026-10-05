@@ -190,3 +190,20 @@ Run `python3 'training project/country-economy/render.py' --image placeholder`
 for the opening, or add `--storyboard`, `--scene deficit`, or `--range 120 127`.
 Artifacts and detailed checks are in the project's `output/`, including
 `timeline.json`, `media-verification.json`, and `scene-verification.json`.
+
+## Maps (2026-10-05)
+
+- Added offline country outlines, satellite maps, and a textured orthographic Earth sphere.
+- Full suite: **207 passed**; Ruff checks and `git diff --check` passed.
+- Map tests cover lookup, asset hashes and size, animation endpoints, full rotations,
+  shortest longitude travel, polygon holes, date-line wrapping, poles, texture orientation,
+  alpha masks, viewport-sized zoom rendering, and missing optional NumPy errors.
+- Built wheel and source distribution. All four map asset files are included; the asset
+  directory is approximately **1.2 MB**. Rendered all three map types from an installed
+  wheel with network access blocked. Fresh package import and ordinary shape rendering
+  also work with NumPy imports blocked.
+- Exported `media/maps/maps.mp4`: **18 seconds, 640×360, 12 FPS, 216 frames**, fully decoded
+  without FFmpeg errors. Inspected world/country outlines, satellite country zoom, and
+  globe start, rotation midpoint, country zoom, and final ocean view.
+- HD/4K export performance is unverified. Close-up imagery is limited by the bundled
+  4096×2048 texture. Country coverage is the 177 bundled Natural Earth records.

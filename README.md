@@ -189,3 +189,9 @@ uv run python 'training project/ai-comapny-graph/render.py' --frames
 
 This 30-second example uses five supplied logos and explicitly fictional user
 counts. Scene code lives under `scene/`; reusable behavior lives in the main library.
+
+## Maps
+
+`OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
+and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
+`animate.rotate()` for geographic animation. See [docs/maps.md](docs/maps.md) for API details and examples.

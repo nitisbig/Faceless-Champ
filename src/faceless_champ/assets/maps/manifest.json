@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_110m_admin_0_countries.geojson": "6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f",
+    "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/january/world.200401.3x5400x2700.jpg": "99f5faad74efe985fbf1714c8be7296ca9999759a1215b65f99b7f1df278dde5"
+  },
+  "outputs": {
+    "countries.json": "921fe7106ffe281f45e0b13b926f53fd52b546c892ad3521cc64ca32a5576977",
+    "earth.jpg": "a657c12eb0450f485419ca0c47d48e4c010e91070443dc0d6376b5c26f28941d"
+  }
+}

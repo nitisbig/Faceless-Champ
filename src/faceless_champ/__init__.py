@@ -60,6 +60,7 @@ from .components import (
     Triangle,
 )
 from .export import ExportSettings, render
+from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
 from .timeline import Grid, Layer, Scene, Sequence
@@ -80,6 +81,7 @@ __all__ = [
     "ColorScheme",
     "Component",
     "Draw",
+    "EarthMap",
     "Ellipse",
     "Equation",
     "ExportSettings",
@@ -96,6 +98,7 @@ __all__ = [
     "LineChart",
     "NetworkGraph",
     "Number",
+    "OutlineMap",
     "PieChart",
     "PillowRenderer",
     "Polyline",
@@ -106,6 +109,7 @@ __all__ = [
     "Rectangle",
     "Renderer",
     "SankeyChart",
+    "SatelliteMap",
     "ScatterPlot",
     "Scene",
     "Sequence",
@@ -129,6 +133,7 @@ __all__ = [
     "linear",
     "render",
     "smooth",
+    "supported_countries",
     "with_alpha",
 ]
 __version__ = "0.1.0"

@@ -70,3 +70,9 @@ reuse between words. Both cache budgets accept zero to disable retention.
 training project/country-economy/render.py defaults to a 960x540, 15 fps opening
 preview, with --image placeholder, --scene, --range, --frame, and --storyboard modes.
 Its 14 scenes match the supplied narration; financial figures are illustrative.
+
+## Maps
+
+`OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
+and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
+`animate.rotate()` for geographic animation. See docs/maps.md for API details and examples.

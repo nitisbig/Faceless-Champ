@@ -399,3 +399,9 @@ than path length. It requires an open path with strictly increasing x coordinate
 Combine with `rate_func=linear` for a time graph. The default `draw_by="length"`
 retains the existing behavior. This renders one continuous path without seams
 from stitching many separately rasterized segments.
+
+## Maps
+
+`OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
+and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
+`animate.rotate()` for geographic animation. See [Maps guide](maps.md) for API details and examples.
