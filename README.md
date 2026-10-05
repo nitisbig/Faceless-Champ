@@ -195,3 +195,25 @@ counts. Scene code lives under `scene/`; reusable behavior lives in the main lib
 `OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
 and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
 `animate.rotate()` for geographic animation. See [docs/maps.md](docs/maps.md) for API details and examples.
+
+## Country flags
+
+The 254 PNGs supplied in `assets/flags` are bundled with the library. Look up flags
+by country code, including codes such as `gb-eng`; uppercase and lowercase both work.
+`Flag` preserves the original colors and aspect ratio inside its image box.
+
+```python
+from faceless_champ import FadeIn, Flag, Image, flag_path, supported_flags
+
+flag = Flag("NP", width=180, height=120, position=(960, 540))
+self.play(FadeIn(flag))  # In a Scene.construct() method.
+image = Image(flag_path("us"))  # Obtain a PNG path for other image uses.
+codes = supported_flags()  # Sorted tuple of all available lowercase codes.
+```
+
+Flags work offline from any working directory and use ordinary image transforms
+and animations. No optional extra is required. See the [API reference](docs/api.md#country-flags).
+
+```bash
+uv run faceless-champ render examples/flags.py FlagsShowcase -o output/flags.mp4 -q ql
+```

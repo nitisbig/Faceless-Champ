@@ -76,3 +76,10 @@ Its 14 scenes match the supplied narration; financial figures are illustrative.
 `OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
 and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
 `animate.rotate()` for geographic animation. See docs/maps.md for API details and examples.
+
+Flag(country_code, width=120, height=80, ...) loads a bundled full-color flag by
+case-insensitive code (np, US, gb-eng). Use country codes rather than country names.
+flag_path(code) returns the absolute PNG path; supported_flags() lists all 254 codes.
+Flags preserve colors/aspect ratio by default and accept Image options and animations.
+Assets ship with the package, work offline from any cwd, and require no extra dependency.
+The renderable example is examples/flags.py; see docs/api.md#country-flags.

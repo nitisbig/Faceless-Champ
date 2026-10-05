@@ -207,3 +207,20 @@ Artifacts and detailed checks are in the project's `output/`, including
   globe start, rotation midpoint, country zoom, and final ocean view.
 - HD/4K export performance is unverified. Close-up imagery is limited by the bundled
   4096×2048 texture. Country coverage is the 177 bundled Natural Earth records.
+
+## Country flags (2026-10-05)
+
+- Added public `Flag`, `flag_path`, and `supported_flags` APIs using country codes.
+  All 254 supplied PNGs are bundled unchanged; the original `assets/flags` remains available.
+- Full suite: **228 passed**. The 21 flag tests cover uppercase/whitespace lookup,
+  territory and subdivision codes, invalid codes and path traversal, non-string inputs,
+  every bundled PNG, original colors/transparency, contain/cover fitting, fades, and transforms.
+  Flag tests also passed after removing a deprecated Pillow call from the test itself.
+- Ruff lint/format checks and `git diff --check` passed.
+- Built wheel and source distribution; both contain all 254 flag PNGs. SHA-256 hashes
+  match the supplied files and the installed wheel for every flag. Installed-package
+  lookup and rendering passed from `/tmp` with network, NumPy, and Matplotlib blocked.
+- Rendered `output/flags/flags.mp4`: **2.25 seconds, 1280×720, 12 FPS, 27 H.264 frames**.
+  FFmpeg decoded the entire video without errors. Inspected the final gallery frame,
+  including Nepal's transparent outline, rectangular flags, and Switzerland's square flag.
+  Reproduce with `uv run faceless-champ render examples/flags.py FlagsShowcase -o output/flags/flags.mp4 -q ql --fps 12`.

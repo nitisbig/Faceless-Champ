@@ -33,6 +33,7 @@ Use animation builders for changes over time.
 | `Image(path, ...)` | `width=400`, `height=300`, `fit="contain"` or `"cover"`, `trim=False`, `tint=None`; also `Image.from_source(source, ...)` |
 | `ImageSlot(path, ...)` | Image options plus `mode="auto"`, `label=None`, and placeholder styling; reserves an image box without requiring the asset |
 | `Icon(path, ...)` | `size=120`, `color="white"`; square image box, tinted alpha mask |
+| `Flag(country_code, ...)` | `width=120`, `height=80`; bundled full-color PNG by code; all Image and component options apply |
 | `Rectangle(...)` | `width=200`, `height=200`, `corner_radius=0`; radius must fit inside the rectangle |
 | `Square(side=200, ...)` | Equal width and height |
 | `Circle(radius=100, ...)` | Diameter is twice the radius |
@@ -104,6 +105,37 @@ formula = Equation(r"a^2+b^2=c^2", color=scheme.text,
                               "c": scheme.tertiary}, position=(960, 540))
 self.play(Write(formula))
 ```
+
+## Country flags
+
+`Flag(country_code, width=120, height=80, ...)` loads one of the 254 bundled PNGs
+from the supplied `assets/flags` collection. Country codes are case-insensitive
+and surrounding whitespace is ignored: `"np"`, `"NP"`, `"us"`, and `"gb-eng"`.
+Use codes rather than country names. Unknown codes raise `ValueError` with lookup
+guidance; non-string codes raise `TypeError`.
+
+Flags retain their source colors and transparency, and default to `fit="contain"`
+to preserve the entire flag and its aspect ratio. Configure `width`, `height`,
+`fit`, `trim`, or `tint` as for `Image`; placement, fades, pop effects, and transform
+builders work normally. `flag.country_code` contains the normalized lowercase code.
+
+`flag_path(country_code)` returns an absolute `pathlib.Path` to the bundled PNG,
+usable with `Image` or Pillow. `supported_flags()` returns the sorted tuple of
+available lowercase codes, including the supplied territory and subdivision flags.
+Assets ship in both the wheel and source distribution, require no optional extra,
+and resolve independently of the working directory without network access.
+
+```python
+from faceless_champ import FadeIn, Flag, flag_path, supported_flags
+
+flag = Flag("NP", width=180, height=120, position=(960, 540))
+self.play(FadeIn(flag), run_time=0.5)
+self.play(flag.animate.move_to(1200, 540).scale_to(1.2), run_time=1)
+path = flag_path("US")
+codes = supported_flags()
+```
+
+Render [examples/flags.py](../examples/flags.py) with the ordinary render CLI.
 
 ## Color schemes
 

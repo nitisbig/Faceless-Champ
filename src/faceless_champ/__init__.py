@@ -60,6 +60,7 @@ from .components import (
     Triangle,
 )
 from .export import ExportSettings, render
+from .flags import Flag, flag_path, supported_flags
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
@@ -87,6 +88,7 @@ __all__ = [
     "ExportSettings",
     "FadeIn",
     "FadeOut",
+    "Flag",
     "Grid",
     "Heatmap",
     "Histogram",
@@ -130,10 +132,12 @@ __all__ = [
     "ZoomOut",
     "ease_in",
     "ease_out",
+    "flag_path",
     "linear",
     "render",
     "smooth",
     "supported_countries",
+    "supported_flags",
     "with_alpha",
 ]
 __version__ = "0.1.0"
