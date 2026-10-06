@@ -1,0 +1,496 @@
+1
+00:00:00,070 --> 00:00:02,530
+Imagine waking up one morning and hearing this
+
+2
+00:00:02,530 --> 00:00:04,700
+on the news. The government is running out
+
+3
+00:00:04,700 --> 00:00:07,480
+of money, banks are nervous, investors are selling
+
+4
+00:00:07,480 --> 00:00:10,630
+the country's bonds, the currency is falling, and
+
+5
+00:00:10,630 --> 00:00:13,340
+suddenly everyone is asking the same question. What
+
+6
+00:00:13,340 --> 00:00:15,530
+does it actually mean for an entire country
+
+7
+00:00:15,530 --> 00:00:17,690
+to run out of money? Because a country
+
+8
+00:00:17,690 --> 00:00:19,460
+is not like a person. If you run
+
+9
+00:00:19,460 --> 00:00:22,201
+out of money, your bank balance reaches zero.
+
+10
+00:00:22,200 --> 00:00:25,570
+But governments can collect taxes, borrow money, sell
+
+11
+00:00:25,570 --> 00:00:27,910
+assets, and in some cases even create their
+
+12
+00:00:27,910 --> 00:00:30,340
+own currency. So when people say a country
+
+13
+00:00:30,340 --> 00:00:32,280
+has run out of money, what they usually
+
+14
+00:00:32,280 --> 00:00:35,490
+mean is something more complicated. The government can
+
+15
+00:00:35,490 --> 00:00:37,870
+no longer easily pay for everything it has
+
+16
+00:00:37,870 --> 00:00:40,500
+promised. And that's where the real problems begin.
+
+17
+00:00:40,500 --> 00:00:43,260
+Let's start with the simple government. Every year,
+
+18
+00:00:43,260 --> 00:00:47,010
+it collects money through taxes, income tax, business
+
+19
+00:00:47,010 --> 00:00:50,680
+tax, sales tax, import duties. Then it spends
+
+20
+00:00:50,680 --> 00:00:54,220
+that money on roads, hospitals, schools, public workers,
+
+21
+00:00:54,220 --> 00:00:57,420
+pensions, the military, and many other things. If
+
+22
+00:00:57,420 --> 00:01:00,980
+the government collects $100 billion but spends $110
+
+23
+00:01:00,980 --> 00:01:04,240
+billion, it has a $10 billion deficit. That
+
+24
+00:01:04,240 --> 00:01:07,580
+doesn't automatically mean disaster. The government can simply
+
+25
+00:01:07,580 --> 00:01:09,860
+borrow the extra money. Usually it does this
+
+26
+00:01:09,860 --> 00:01:13,050
+by selling government bonds. A bond is basically
+
+27
+00:01:13,050 --> 00:01:16,070
+an IOU. Investors give the government money today,
+
+28
+00:01:16,070 --> 00:01:18,200
+and the government promises to repay them later,
+
+29
+00:01:18,200 --> 00:01:22,100
+with interest. This happens constantly. Almost every major
+
+30
+00:01:22,100 --> 00:01:25,160
+economy carries government debt. The problem starts when
+
+31
+00:01:25,160 --> 00:01:27,470
+investors begin to doubt that they'll get their
+
+32
+00:01:27,470 --> 00:01:30,220
+money back. Imagine our country keeps borrowing every
+
+33
+00:01:30,220 --> 00:01:33,990
+year. Debt grows from $100 billion to $200
+
+34
+00:01:33,990 --> 00:01:37,270
+billion, then $300 billion. At first, investors may
+
+35
+00:01:37,270 --> 00:01:39,230
+not care. As long as the economy is
+
+36
+00:01:39,230 --> 00:01:41,900
+growing and the government can continue making payments,
+
+37
+00:01:41,900 --> 00:01:45,420
+everything looks manageable. But then something changes. Maybe
+
+38
+00:01:45,420 --> 00:01:48,700
+the economy enters a recession. Tax revenue falls.
+
+39
+00:01:48,700 --> 00:01:51,280
+Maybe there is a war, a banking crisis,
+
+40
+00:01:51,280 --> 00:01:54,550
+a natural disaster. While the government simply borrowed
+
+41
+00:01:54,550 --> 00:01:57,800
+to aggressively for years, now investors become nervous.
+
+42
+00:01:57,800 --> 00:02:01,090
+They start demanding higher interest rates. Previously, the
+
+43
+00:02:01,090 --> 00:02:03,870
+country could borrow at 3%. Now lenders want
+
+44
+00:02:03,870 --> 00:02:07,530
+6%, then 10%, then maybe 20%. And this
+
+45
+00:02:07,530 --> 00:02:10,170
+creates a dangerous cycle. More interest means the
+
+46
+00:02:10,170 --> 00:02:12,630
+government needs even more money, just to service
+
+47
+00:02:12,630 --> 00:02:14,910
+its old debt, so it borrows more. But
+
+48
+00:02:14,910 --> 00:02:18,140
+borrowing more makes investors even more worried, so
+
+49
+00:02:18,140 --> 00:02:21,070
+they demand even higher interest rates. At some
+
+50
+00:02:21,070 --> 00:02:23,661
+point, the government may struggle to borrow at
+
+51
+00:02:23,660 --> 00:02:26,100
+all. This is when the phrase "running out
+
+52
+00:02:26,100 --> 00:02:28,710
+of money" becomes much more real. But there's
+
+53
+00:02:28,710 --> 00:02:31,840
+another important distinction. Does the country owe money
+
+54
+00:02:31,840 --> 00:02:34,400
+in its own currency or in someone else's?
+
+55
+00:02:34,400 --> 00:02:37,100
+Suppose the United States owes dollars. The US
+
+56
+00:02:37,100 --> 00:02:40,170
+government ultimately operates in a system where dollars
+
+57
+00:02:40,170 --> 00:02:42,230
+can be created by its central bank. That
+
+58
+00:02:42,230 --> 00:02:44,660
+doesn't mean it can print unlimited money without
+
+59
+00:02:44,660 --> 00:02:48,190
+consequences. Printing too much can cause inflation, weaken
+
+60
+00:02:48,190 --> 00:02:51,630
+the currency, and destroy confidence. But technically, a
+
+61
+00:02:51,630 --> 00:02:54,030
+country that controls its own currency has more
+
+62
+00:02:54,030 --> 00:02:57,490
+options. Now imagine a developing country owes billions
+
+63
+00:02:57,490 --> 00:03:00,200
+of US dollars. This is much more dangerous.
+
+64
+00:03:00,200 --> 00:03:03,070
+Its government cannot simply create dollars. To repay
+
+65
+00:03:03,070 --> 00:03:06,210
+foreign debt, it needs foreign currency. And countries
+
+66
+00:03:06,210 --> 00:03:09,390
+usually get foreign currency by exporting goods, attracting
+
+67
+00:03:09,390 --> 00:03:13,630
+investment, borrowing internationally, or holding reserves. These reserves
+
+68
+00:03:13,630 --> 00:03:16,920
+are often dollars, euros, gold, or other internationally
+
+69
+00:03:16,920 --> 00:03:20,600
+accepted assets. If foreign currency reserves start disappearing,
+
+70
+00:03:20,600 --> 00:03:23,080
+the country can face a serious crisis. The
+
+71
+00:03:23,080 --> 00:03:25,140
+central bank may try to protect the local
+
+72
+00:03:25,140 --> 00:03:27,790
+currency by selling its dollar reserves. But those
+
+73
+00:03:27,790 --> 00:03:31,510
+reserves are limited. Eventually, businesses struggle to import
+
+74
+00:03:31,510 --> 00:03:35,000
+fuel. Factories cannot buy foreign machinery. Hospitals may
+
+75
+00:03:35,000 --> 00:03:38,180
+have trouble importing medicine. Food imports become more
+
+76
+00:03:38,180 --> 00:03:40,900
+expensive. And the local currency can fall even
+
+77
+00:03:40,900 --> 00:03:44,410
+faster, a weaker currency creates another problem. Imagine
+
+78
+00:03:44,410 --> 00:03:47,130
+the government owes $10 billion US dollars. If
+
+79
+00:03:47,130 --> 00:03:49,510
+its currency loses half its value, the cost
+
+80
+00:03:49,510 --> 00:03:52,330
+of paying that debt in local currency effectively
+
+81
+00:03:52,330 --> 00:03:55,240
+doubles. Now the country is trapped. Its currency
+
+82
+00:03:55,240 --> 00:03:58,600
+is falling, because investors are afraid, and investors
+
+83
+00:03:58,600 --> 00:04:01,150
+are afraid because the currency is falling. So
+
+84
+00:04:01,150 --> 00:04:04,800
+what happens next? Governments usually have several options.
+
+85
+00:04:04,860 --> 00:04:08,780
+The first is austerity, cut spending, reduced subsidies,
+
+86
+00:04:08,780 --> 00:04:12,260
+freeze public wages, raise taxes. The goal is
+
+87
+00:04:12,260 --> 00:04:15,070
+simple, spend less, and convince lenders that the
+
+88
+00:04:15,070 --> 00:04:18,030
+government can repay its debts. But economically and
+
+89
+00:04:18,030 --> 00:04:20,890
+politically, this can be painful. Higher taxes and
+
+90
+00:04:20,890 --> 00:04:23,720
+lower government spending can weaken the economy even
+
+91
+00:04:23,720 --> 00:04:25,920
+further. The second option is to ask for
+
+92
+00:04:25,920 --> 00:04:28,800
+help. This is where organizations like the International
+
+93
+00:04:28,800 --> 00:04:31,160
+Monetary Fund can enter. The IMF may provide
+
+94
+00:04:31,160 --> 00:04:34,520
+emergency loans, usually in exchange for economic reforms
+
+95
+00:04:34,520 --> 00:04:38,040
+designed to stabilize government finances. The third option
+
+96
+00:04:38,040 --> 00:04:41,060
+is restructuring the debt. Instead of paying everything
+
+97
+00:04:41,060 --> 00:04:44,300
+exactly as promised, the government negotiates with creditors.
+
+98
+00:04:44,300 --> 00:04:47,400
+Maybe the country pays later. Maybe interest rates
+
+99
+00:04:47,400 --> 00:04:50,080
+are reduced, or maybe creditors agree to receive
+
+100
+00:04:50,080 --> 00:04:52,090
+only part of what they are owed. And
+
+101
+00:04:52,090 --> 00:04:54,900
+then there is the most dramatic option, default.
+
+102
+00:04:54,900 --> 00:04:57,440
+A sovereign default happens when a government fails
+
+103
+00:04:57,440 --> 00:04:59,670
+to make its debt payments. But even default
+
+104
+00:04:59,670 --> 00:05:02,730
+doesn't mean the country disappears. The government still
+
+105
+00:05:02,730 --> 00:05:05,470
+exists, people still go to work, businesses still
+
+106
+00:05:05,470 --> 00:05:09,200
+operate. The country still produces food, energy, services,
+
+107
+00:05:09,200 --> 00:05:12,520
+and goods. What changes is trust? Investors become
+
+108
+00:05:12,520 --> 00:05:15,440
+less willing to lend. Interest rates may rise,
+
+109
+00:05:15,440 --> 00:05:18,400
+banks can suffer losses, the currency may fall,
+
+110
+00:05:18,400 --> 00:05:21,700
+inflation can accelerate. An ordinary people often feel
+
+111
+00:05:21,700 --> 00:05:25,980
+the consequences through higher prices, unemployment, shortages, and
+
+112
+00:05:25,980 --> 00:05:28,500
+falling purchasing power. So a country does not
+
+113
+00:05:28,500 --> 00:05:30,420
+really run out of money in the same
+
+114
+00:05:30,420 --> 00:05:32,540
+way a household does. What it can run
+
+115
+00:05:32,540 --> 00:05:36,120
+out of is borrowing capacity, foreign currency, investor
+
+116
+00:05:36,120 --> 00:05:39,550
+confidence, and sometimes political room to make difficult
+
+117
+00:05:39,550 --> 00:05:42,470
+decisions. And that's the strange thing about national
+
+118
+00:05:42,470 --> 00:05:45,230
+debt. A government can survive with enormous debt
+
+119
+00:05:45,230 --> 00:05:47,280
+for decades, as long as people believe it
+
+120
+00:05:47,280 --> 00:05:50,200
+can keep paying. But once that belief disappears,
+
+121
+00:05:50,200 --> 00:05:52,570
+the numbers on a spreadsheet can suddenly turn
+
+122
+00:05:52,570 --> 00:05:54,990
+into a very real economic crisis. Because in
+
+123
+00:05:54,990 --> 00:05:56,970
+the end, money is not the only thing
+
+124
+00:05:56,970 --> 00:06:00,400
+keeping a financial system alive. Confidence is...
+

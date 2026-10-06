@@ -30,8 +30,6 @@ wheels/
 *.mpeg
 *.mpg
 *.wmv
-*.srt
-*.vtt
 media/
 # Keep reusable sound effects shipped with the library/examples.
 !assets/sfx/**/*.wav
