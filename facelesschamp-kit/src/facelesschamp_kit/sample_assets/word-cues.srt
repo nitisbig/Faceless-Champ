@@ -1,0 +1,11 @@
+1
+00:00:00,000 --> 00:00:09,000
+Build once. Reuse everywhere. A video component brings content, layout, and motion together in one reusable definition.
+
+2
+00:00:10,000 --> 00:00:19,000
+Repeated setup makes every project harder to maintain. Shared building blocks give your videos consistent structure and style.
+
+3
+00:00:20,000 --> 00:00:29,000
+Compose your scenes. Preview the important moments. Then export the complete video. Keep the original narration timing throughout.

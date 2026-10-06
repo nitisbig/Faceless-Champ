@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "facelesschamp-kit"
+version = "0.1.0rc1"
+description = "Structured video authoring with reusable Faceless Champ components"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["faceless-champ>=0.1.0,<0.2.0"]
+
+[project.optional-dependencies]
+maps = ["faceless-champ[maps]>=0.1.0,<0.2.0"]
+equations = ["faceless-champ[equations]>=0.1.0,<0.2.0"]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
+
+[project.scripts]
+fc-kit = "facelesschamp_kit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.setuptools.package-data]
+facelesschamp_kit = ["sample_assets/*"]

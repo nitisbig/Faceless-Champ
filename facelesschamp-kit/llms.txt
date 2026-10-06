@@ -1,0 +1,8 @@
+# facelesschamp-kit
+Python 3.12+ framework over faceless-champ. Start with README.md and docs/api.md.
+Use build(ctx) returning Video or a core composition. Keep content in reusable frozen blocks.
+Compose fresh primitives in compose(ctx, bounds); finish layout before compilation.
+Use segment-local times for play; narration markers reference original SRT cue numbers.
+Preview uses the source clock. Validate and inspect before exporting; never infer full-export success from a frame.
+Use provided CLI and Project services rather than copying render loops.
+Read docs/catalog.md for block props and examples/custom_block.py for extension patterns.

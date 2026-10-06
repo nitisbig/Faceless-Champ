@@ -1,0 +1,5 @@
+Project code licensing has not been selected. This file does not grant a license.
+Do not treat this local release candidate as publicly licensed or publish it until the owner selects a license.
+The core engine's bundled third-party assets retain their own license notices.
+The kit's bundled sample uses an original demonstration script and locally synthesized speech;
+its synthetic provenance is recorded in sample_assets/README.txt.

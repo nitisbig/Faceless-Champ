@@ -1,10 +1,16 @@
 # facelesschamp-kit: architecture and implementation plan
 
-Status: proposed design, ready to turn into implementation tasks.
+Status: v0.1.0rc1 implemented as an independent local repository at
+`/home/kingnit/Desktop/facelesschamp-kit`.
 Date: 2026-10-06.
 
-The API examples, commands, versions, and directory layouts below are proposals.
-`facelesschamp-kit` has not been implemented by this planning change.
+This document preserves the original design proposal. The implemented API,
+installation instructions, and verification evidence are maintained in the
+[kit README](../../facelesschamp-kit/README.md),
+[API reference](../../facelesschamp-kit/docs/api.md), and
+[verification report](../../facelesschamp-kit/docs/verification.md).
+Some proposed examples below differ from the shipped API; use those references
+for runnable code. Public publication and project licensing remain pending.
 
 ## 1. Recommended direction
 

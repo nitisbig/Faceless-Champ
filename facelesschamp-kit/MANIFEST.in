@@ -1,0 +1,7 @@
+include LICENSE.pending
+include llms.txt
+recursive-include docs *.md
+recursive-include examples *.py
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include src/facelesschamp_kit/sample_assets *
