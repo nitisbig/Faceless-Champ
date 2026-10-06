@@ -63,6 +63,8 @@ from .export import ExportSettings, render
 from .flags import Flag, flag_path, supported_flags
 from .layout import Bounds, Group
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
+from .narration import CueScene
+from .preview import StoryboardSample, render_storyboard, save_frame
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
 from .timeline import Grid, Layer, Scene, Sequence
@@ -83,6 +85,7 @@ __all__ = [
     "Circle",
     "ColorScheme",
     "Component",
+    "CueScene",
     "Draw",
     "EarthMap",
     "Ellipse",
@@ -123,6 +126,7 @@ __all__ = [
     "SlideOut",
     "SpinIn",
     "Square",
+    "StoryboardSample",
     "SubtitleCue",
     "SubtitleTrack",
     "Text",
@@ -138,6 +142,8 @@ __all__ = [
     "flag_path",
     "linear",
     "render",
+    "render_storyboard",
+    "save_frame",
     "smooth",
     "supported_countries",
     "supported_flags",

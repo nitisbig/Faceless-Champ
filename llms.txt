@@ -8,6 +8,15 @@
 - [Renderer and timeline architecture](docs/architecture.md)
 - [Runnable examples](examples/showcase.py)
 - [Authoring skill](skills/faceless-champ/SKILL.md)
+- [Cue chapters and still/storyboard previews](docs/narration.md)
+
+CueScene maps original SubtitleTrack cue indices to a local chapter clock via
+cue_time()/at_cue(). finish() holds exactly to the source interval and rejects
+content overflow. Use cut-only Sequence chapters and continuous audio on Layer.
+save_frame exports a source-time PNG; render_storyboard accepts float times or
+StoryboardSample(time, label), preserves portrait aspect ratios, and protects
+existing outputs. The stock-analysis example defaults to a 7.280s, 540x810/12fps
+opening preview with --image placeholder, --scene, --range, --frame, --storyboard.
 
 Import from faceless_champ. Subclass Scene and override construct(). Use add(),
 play(), wait(), and add_audio(). Coordinates are design pixels, top-left origin,

@@ -1,5 +1,11 @@
 # Authoring guide
 
+Use [cue chapters and preview helpers](narration.md) for narrated examples:
+`CueScene.at_cue()` maps unchanged word cues to a chapter clock; `finish()` guards
+chapter boundaries. `save_frame()` and `render_storyboard()` inspect key moments
+with shared library behavior. Start with a short source-time clip and inspect
+frames before attempting a complete export.
+
 ## Narrated previews and image reservations
 
 Keep a continuous narration/caption overlay at zero when composing multiple

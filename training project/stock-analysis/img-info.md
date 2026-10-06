@@ -1,0 +1,51 @@
+# Stock-analysis artwork
+
+Save these exact PNG names in the project's **image/** folder. Default
+`python3 render.py` loads existing files and uses named boxes for missing ones.
+`--image placeholder` always forces boxes; `--image required` requires all three.
+No images have been generated or downloaded for this preview.
+
+Use sRGB PNG. Slots use `fit="cover"`; allow cropping around the subject.
+Keep quiet editorial imagery with white #FFFFFF, cream #F4F3EE, stone #B1ADA1,
+and small terracotta #C15F3C accents. Avoid text, logos, watermarks, numerical
+claims and green brand colors. Charts and labels are drawn separately in code.
+
+| File | Scene / source seconds | Slot: left, top, width, height | Suggested source size |
+| --- | --- | --- | --- |
+| 1.png | opening, 0–7.280 | 100, 940, 880, 280 | 1760×560 |
+| 2.png | growth, 18.150–24.430 | 80, 423, 920, 530 | 1840×1060 |
+| 3.png | verdict, 47.280–59.150 | 95, 430, 890, 210 | 1780×420 |
+
+## 1.png — Compute, up close
+
+Prompt: Wide editorial macro illustration of an advanced AI processor on an
+off-white surface, fine etched circuit lines, pale stone casing, one subtle
+terracotta copper accent, soft daylight, restrained tactile materials. Center
+the chip in a wide 22:7 composition with generous negative space. No text,
+logos, labels, numbers or charts. Quiet supporting artwork for an animated chart.
+
+Stock alternative: licensed macro photo of an unbranded chip or circuit board
+with neutral lighting. Crop to the central chip and keep the background quiet.
+
+## 2.png — Infrastructure demand
+
+Prompt: Calm architectural view down a modern data-center aisle, cream and pale
+stone server racks with fine terracotta cable accents, diffuse daylight, clean
+geometry, restrained editorial realism. Landscape 92:53 composition with the
+aisle centered and racks away from the edges. No neon, logos, people, readable
+display text, statistics or identifiable brand-specific hardware.
+
+Stock alternative: licensed still of a server aisle or data-center buildout.
+Use a neutral color grade. For stock footage, extract a licensed still: ImageSlot
+currently imports images/GIFs, rather than video files.
+
+## 3.png — Growth meets a hurdle
+
+Prompt: Minimal physical sculpture of layered stone compute tiles on an
+off-white studio surface, one tile accented in terracotta, soft side lighting,
+refined editorial art direction. Very wide 89:21 banner, centered sculpture,
+low visual density and generous negative space. No text, arrows, charts, logos,
+or investment promises; the comparison diagram is drawn separately in code.
+
+Stock alternative: licensed still-life of semiconductor components, neutral
+architectural steps, or stacked stone blocks. Keep contrast below the headline.

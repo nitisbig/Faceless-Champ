@@ -1,0 +1,27 @@
+{
+  "visual_thesis": "NVIDIA's growth is impressive, but the stock's next test is whether that growth can exceed the expectations already priced in.",
+  "canvas": {"width": 1080, "height": 1620},
+  "palette": {"background": "#FFFFFF", "accent": "#C15F3C", "muted": "#B1ADA1", "surface": "#F4F3EE", "ink": "#292724"},
+  "preview": {"width": 540, "height": 810, "fps": 12},
+  "chapters": [
+    {"id": "opening", "title": "After the run", "cue": 1},
+    {"id": "growth", "title": "The engine is growth", "cue": 20},
+    {"id": "expectations", "title": "The bar is already high", "cue": 65},
+    {"id": "risks", "title": "Three pressures", "cue": 96},
+    {"id": "verdict", "title": "Growth versus expectations", "cue": 119},
+    {"id": "closing", "title": "Analysis, not financial advice", "cue": 155}
+  ],
+  "storyboard_times": [2.9, 6.5, 10.5, 14.8, 16.8, 23.6, 32.5, 37.8, 39.8, 43.2, 46.3, 54.8, 57.8, 61.5],
+  "revenue": {
+    "categories": ["Q2 FY26", "Q2 FY27"], "billions_usd": [46.7, 96.2], "yoy_percent": 106,
+    "source_date": "2026-08-26",
+    "source": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/"
+  },
+  "images": ["1.png", "2.png", "3.png"],
+  "source_notes": [
+    "Original audio and both SRT files are preserved.",
+    "Audio includes spoken asterisk artifacts and mistranscribed NVIDIA tokens.",
+    "The spoken valuation is ambiguous and undated; no numeric market cap is drawn.",
+    "Price paths and expectation diagrams are conceptual, not market history or forecasts."
+  ]
+}

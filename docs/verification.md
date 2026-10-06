@@ -297,3 +297,54 @@ raster/gradient masks; repeats expand finite timeline tracks; affine mask layers
 cost CPU and memory proportional to canvas area and nesting depth. Group opacity
 continues multiplying member opacity, and layout bounds remain conservative,
 unclipped boxes. These choices are documented in `docs/motion-graphics.md`.
+
+## Stock-analysis narration and preview helpers
+
+Verified on 2026-10-06:
+
+- **308 pytest cases passed**, including 12 new cases for CueScene source/local
+  timing, original cue indices, offsets/end edges, rejected events and overflow,
+  preserved audio tails, portrait storyboards, frame parity and overwrite protection.
+- Ruff checks passed for source, tests and stock-analysis scripts. Changed Python
+  files pass formatting checks; the authoring skill passes quick_validate.py.
+- Built the wheel and source distribution offline. Installed the wheel into an
+  isolated target outside the checkout and imported it with Python isolation.
+  CueScene, save_frame, render_storyboard, bundled-font rendering and a short MP4
+  export passed there; the wheel MP4 also passed FFmpeg decoding.
+- Composed all six stock-analysis scenes on the exact original 160-cue clock.
+  The cut-only sequence boundaries are 0, 7.280, 24.430, 38.540, 47.280, 59.150s.
+  One continuous audio layer extends the composition to 62.088s, preserving the
+  tail after the last subtitle cue at 61.840s.
+- Verified five selected clips at **540×810 / 12 fps**, with H.264 video and stereo
+  AAC audio. Source ranges: 0–7.280, 12.9–18.8, 34.6–41.2, 43.7–47.6,
+  55.3–59.5s. Counts: 88, 71, 80, 47, 51 frames. Every clip passed full decoding,
+  zero stream-start and frame-count/duration checks. Audio correlation against
+  corresponding original source windows ranged from **0.999589 to 0.999861**.
+  These are timing/signal checks rather than a subjective listening review.
+- Inspected the 14-sample source storyboard and eight decoded animation frames.
+  Moved the valuation sentence below bar labels and the expectation label away
+  from the tall bar. Audited 87 visible text instances against the safe area with
+  no out-of-bounds results. Inspected the last hold at source time 62.040s.
+- CLI checks from an unrelated working directory passed for scene listing and
+  expected rejection of unknown scenes, NaN ranges, endpoint frame requests,
+  required missing images, and existing outputs without overwrite.
+
+The initial draft smoke command selected its unfinished full duration and was
+interrupted before completion. It was replaced with a short opening clip and its
+temporary encoder files were removed. **No full narration or production export
+was completed.** Verification covers selected low-quality clips and frames only.
+Images remain named placeholders; input narration/SRT artifacts remain intact.
+Revenue uses a dated NVIDIA source; price/hurdle diagrams remain conceptual.
+
+Reproduce from the repository root:
+
+```bash
+python3 'training project/stock-analysis/render.py' --image placeholder --overwrite
+python3 'training project/stock-analysis/render.py' --storyboard --image placeholder --overwrite
+python3 'training project/stock-analysis/render.py' --range 55.3 59.5 --image placeholder --overwrite
+```
+
+Generated inspection artifacts are under the ignored project output directory:
+`storyboard/storyboard.png`, `decoded/decoded-contact-sheet.png`, `timeline.json`,
+and `verification.json`. The example's scene plan, image prompts, config and
+commands are in `training project/stock-analysis/`.

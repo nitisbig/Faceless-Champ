@@ -131,6 +131,7 @@ bounded caption caching with reusable phrase layouts.
 - [API reference](docs/api.md): components, scenes, animation, composition, and exports.
 - [Authoring guide](docs/guide.md): timing, grids, audio, fonts, and troubleshooting.
 - [Architecture](docs/architecture.md): extension points and renderer contracts.
+- [facelesschamp-kit proposal](docs/facelesschamp-kit-plan.md): framework architecture and phased implementation plan.
 - [Agent entry point](llms.txt) and [authoring skill](skills/faceless-champ/SKILL.md).
 - [Verification record](docs/verification.md): test and sample-render results.
 
@@ -252,3 +253,18 @@ complete groups with local masks and directional `Wipe` reveals. Six reusable
 indicators include progress bars/rings, gauges, countdowns, loading dots and checkmarks.
 See the [API and timing guide](docs/motion-graphics.md) and
 [self-contained showcase](examples/motion_graphics/render.py).
+
+### Stock-analysis narration
+
+The [stock-analysis example](training%20project/stock-analysis/README.md) has six
+cue-synchronized finance scenes on a white 2:3 canvas, image placeholders, a dated
+revenue comparison, and a preview-first root `render.py`.
+
+```bash
+python3 'training project/stock-analysis/render.py' --image placeholder
+python3 'training project/stock-analysis/render.py' --storyboard --image placeholder
+```
+
+The default renders only the opening at 540×810 / 12 fps. New public `CueScene`
+chapter timing, `save_frame`, `StoryboardSample`, and `render_storyboard` APIs live
+in the main package. See [narration and preview contracts](docs/narration.md).

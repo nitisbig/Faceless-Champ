@@ -2,6 +2,20 @@
 
 All names below are available from `faceless_champ` unless stated otherwise.
 
+## Narration chapters and preview helpers
+
+`CueScene(track, canvas=None, *, start_time=0, end_time=None)` subclasses Scene.
+`cue_time(index, edge="start", offset=0)` maps original SRT cues to local seconds;
+`at_cue(...)` schedules a block there. `finish()` holds to the exact source interval
+and rejects content overflow. Audio remains explicit; combine cut-only chapters
+with continuous narration on a Layer.
+
+`save_frame(node, time, output, *, size=None, renderer=None, overwrite=False)` saves
+a source-time PNG. `render_storyboard(node, samples, directory, *, size=None,
+columns=3, renderer=None, overwrite=False)` saves numbered PNGs and a contact sheet.
+Samples are times or `StoryboardSample(time, label="")`. Helpers protect existing
+outputs and preserve canvas aspect ratio. See [contracts and examples](narration.md).
+
 ## Canvas and components
 
 `Canvas(width=1920, height=1080, bg="black")` defines design dimensions.
