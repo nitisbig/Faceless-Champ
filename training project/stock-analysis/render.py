@@ -23,6 +23,12 @@ def main():
     parser.add_argument("--image", choices=("auto", "placeholder", "required"), default="auto")
     parser.add_argument("--fps", type=fps_value, default=CONFIG["preview"]["fps"])
     parser.add_argument("--resolution", choices=("preview", "design"), default="preview")
+    parser.add_argument(
+        "--antialias",
+        type=int,
+        choices=(1, 2, 3, 4),
+        help="Raster supersampling; default 2 for full design, 1 for previews",
+    )
     parser.add_argument("-o", "--output", type=Path)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--list-scenes", action="store_true")
@@ -46,7 +52,8 @@ def main():
             if args.resolution == "preview"
             else (CANVAS.width, CANVAS.height)
         )
-        renderer = PillowRenderer(2 if args.full and args.resolution == "design" else 1)
+        antialias = args.antialias or (2 if args.full and args.resolution == "design" else 1)
+        renderer = PillowRenderer(antialias)
         directory = PROJECT / "output"
         if args.storyboard:
             samples = [
@@ -108,7 +115,14 @@ def main():
                 progress=progress,
             )
             plan["last_render_range"] = [start, end]
-            plan["last_export_settings"] = {"width": size[0], "height": size[1], "fps": args.fps}
+            plan["last_export_settings"] = {
+                "width": size[0],
+                "height": size[1],
+                "fps": args.fps,
+                "antialias": antialias,
+                "crf": settings.crf,
+                "preset": settings.preset,
+            }
         directory.mkdir(parents=True, exist_ok=True)
         (directory / "timeline.json").write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
         print(result)

@@ -10,6 +10,32 @@ wheels/
 .venv
 
 # Generated media and tool caches
+# Audio, video, and generated subtitles (at any directory depth)
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.flac
+*.ogg
+*.opus
+*.aiff
+*.aif
+*.wma
+*.mp4
+*.m4v
+*.mov
+*.mkv
+*.webm
+*.avi
+*.mpeg
+*.mpg
+*.wmv
+*.srt
+*.vtt
+media/
+# Keep reusable sound effects shipped with the library/examples.
+!assets/sfx/**/*.wav
+
 output/
 **/output/
 **/image/

@@ -1,48 +1,47 @@
-# Stock analysis: visual plan
+# Stock-analysis redesign
 
-Core visual thesis: NVIDIA's growth is impressive, but the stock's next test is whether that growth can exceed the expectations already priced in.
+Thesis: impressive growth is only half the question; the next test is whether
+NVIDIA can keep beating the expectations already priced into the stock.
 
-## Canvas and design
+The canvas remains 1080×1620 (2:3), white, with cream panels, terracotta emphasis,
+stone comparisons, and dark ink typography. Cormorant Garamond headlines pair
+with DM Sans numeric displays. Original artwork appears in scenes 1, 2, and 5.
 
-1080 × 1620 (2:3), 30 fps design; testing at 540 × 810, 12 fps.
-White #FFFFFF background, terracotta #C15F3C emphasis, stone #B1ADA1
-rules and secondary elements, cream #F4F3EE panels. Dark #292724 typography
-keeps small explanatory labels legible. Editorial Cormorant Garamond headlines,
-DM Sans labels, licensed Material Symbols for chip, power, and rates.
-72 px side margins; heading at y=200–330, visual at y=500–1100,
-conclusion at y=1240–1390, quiet source label near y=1510.
-Reveal each comparison progressively; avoid a six-panel grid that shrinks labels.
-Scenes cut on exact cue boundaries, with short component fades/slide entrances.
-No overlapping chapter crossfades or retimed audio. No full narration captions.
+## Information and motion
 
-## Six scenes
+1. **0–7.280s / question.** The conceptual price path draws with a dot tracking
+   its exact geometry. The original chip image enters. A record-high highlight,
+   business-versus-stock chip, and investment question progressively reframe the run.
+2. **7.280–17.900s / revenue.** A large dollar counter and zero-baseline comparison
+   build the previous and current quarter. +106%, +$49.5B and 2.06× reveal different
+   readings of the same verified figures. Bar heights match the dollar scale.
+   **18.150–24.430s / infrastructure.** All revenue-chart elements clear. Original
+   image 2 enters; the $89.0B counter and 92.5% share ring show the growth engine.
+   Data Center +117% YoY supports a three-node demand/buildout/NVIDIA flow.
+3. **24.430–38.540s / expectations.** Premium valuation enters as a condition.
+   Growth → price → hurdle explains the mechanism. That diagram clears; the
+   expectation line reveals. Ordinary growth stops short; exceptional growth
+   rises through the hurdle. No artificial numerical valuation is displayed.
+4. **38.540–47.280s / risks.** Three editorial rows provide context, then reveal
+   their mechanisms at the narrated risk cues. A spending branch illustrates
+   custom-chip competition; a stopped pipeline illustrates power limitations;
+   opposed arrows illustrate higher rates and valuation pressure.
+5. **47.280–59.150s / verdict.** Original image 3 supports two independent cards:
+   business quality and high expectations. The growth curve and attached tracker
+   pass the priced-in benchmark. The final question lands before the closing cut.
+6. **59.150–62.088s / closing.** Two large watchpoints, the narrated analysis
+   label and financial-advice disclaimer; hold through the unmodified audio tail.
 
-| Scene | Source seconds / first cue | What it proves | Visual and cue anchors |
-| --- | --- | --- | --- |
-| opening | 0–7.280 / 1 | A rising stock creates a valuation question. | NVDA wordmark; conceptual line draws at cue 6 (1.360); high marker at cue 8 (2.160); question at cue 16 (4.880). Image 1: chip detail. |
-| growth | 7.280–24.430 / 20 | Revenue growth is supported by AI infrastructure demand. | Chart appears with growth at cue 25 (8.890); previous-year bar first; new-quarter bar and $96.2B at cue 36 (13.140); +106% YoY at cue 39 (14.400); data-center image 2 and AI-to-NVIDIA flow at cues 48, 55, 61 (17.900, 21.420, 22.900). |
-| expectations | 24.430–38.540 / 65 | A high valuation sets a high performance hurdle. | Price/expectation conceptual diagram; valuation label at cue 77 (28.710); expectation hurdle at cue 80 (30.770); ordinary growth at cue 89 (34.830); exceptional growth at cue 92 (36.280). No numeric market capitalization. |
-| risks | 38.540–47.280 / 96 | Competition, power, and interest rates can obstruct the thesis. | Three stacked illustrated rows; chip competition at cue 96 (38.540), power bottleneck at cue 103 (40.830), rates pressure at cue 111 (44.000). Icon and directional arrow explain each effect. |
-| verdict | 47.280–59.150 / 119 | Company quality and investment expectations are separate questions. | Strong business card at cue 126 (49.040); expectation card at cue 134 (51.900); future-growth line at cue 147 (55.770) passes expectation hurdle at cue 151 (56.840); final question at cue 154 (58.080). Image 3: abstract compute sculpture. |
-| closing | 59.150–62.088 / 155 | This is an analytical comparison. | Calm closing statement, 'Analysis / Not financial advice', at cues 157 and 159; hold through the original audio tail. |
+Animations use the existing 160-word SRT and source clock. The scene is visually
+fast paced; audio is not sped up. Headlines establish each chapter. Within the
+chapter, meaningful changes recur approximately every second; simultaneous
+animations explain one relation. The progress rail is excluded from pacing QA
+so it cannot disguise an otherwise static composition.
 
-Timing comes from the original 160 word cues. SRT ends at 61.840s;
-audio metadata is 62.088s. Preserve the tail. The transcript misrecognizes NVIDIA
-as 'and video' / 'video', and speaks 'asterisk' several times; preserve both inputs.
+## Verification
 
-## Data and image policy
-
-Revenue comparison: NVIDIA Q2 FY2026 $46.7B versus Q2 FY2027 $96.2B,
-+106% YoY, rounded from the company's dated earnings release:
-https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/
-Display fiscal-quarter/source labels. All price and expectation lines are conceptual,
-persistently labeled; no invented stock prices or forecasts. The spoken valuation
-('five, $8 trillion') is ambiguous and undated; use a qualitative valuation label.
-Image slots use image/1.png, 2.png, 3.png; prompts and placement in img-info.md.
-
-## Verification order
-
-First render the opening as a small working clip; then compose all scenes,
-inspect a storyboard, and render short key-animation ranges around revenue,
-valuation, risks, and the verdict. Decode clips and inspect timing/audio metadata.
-Do not render the entire narration during implementation.
+Check preserved asset hashes, original cue boundaries, event containment, and
+maximum intervals without meaningful animation. Render and inspect a 17-frame
+storyboard plus full-size key frames. Export the full redesign to a distinct
+filename, inspect its audio/video streams, and decode the resulting MP4. Record
+what actually passed in `output/redesign-verification.json`.

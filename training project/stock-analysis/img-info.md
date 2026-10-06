@@ -1,9 +1,9 @@
-# Stock-analysis artwork
+# Stock-analysis artwork — originals preserved
 
 Save these exact PNG names in the project's **image/** folder. Default
 `python3 render.py` loads existing files and uses named boxes for missing ones.
 `--image placeholder` always forces boxes; `--image required` requires all three.
-No images have been generated or downloaded for this preview.
+The redesign uses the existing three PNGs unchanged. The prompts below are archival; no replacement artwork is requested.
 
 Use sRGB PNG. Slots use `fit="cover"`; allow cropping around the subject.
 Keep quiet editorial imagery with white #FFFFFF, cream #F4F3EE, stone #B1ADA1,
@@ -12,9 +12,9 @@ claims and green brand colors. Charts and labels are drawn separately in code.
 
 | File | Scene / source seconds | Slot: left, top, width, height | Suggested source size |
 | --- | --- | --- | --- |
-| 1.png | opening, 0–7.280 | 100, 940, 880, 280 | 1760×560 |
-| 2.png | growth, 18.150–24.430 | 80, 423, 920, 530 | 1840×1060 |
-| 3.png | verdict, 47.280–59.150 | 95, 430, 890, 210 | 1780×420 |
+| 1.png | opening, 0.550–7.280 | 72, 1089, 936, 282 | 1872×564 |
+| 2.png | growth, 18.150–24.430 | 72, 427, 936, 448 | 1872×896 |
+| 3.png | verdict, 47.620–59.150 | 72, 417, 936, 222 | 1872×444 |
 
 ## 1.png — Compute, up close
 

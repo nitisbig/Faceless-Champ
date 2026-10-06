@@ -1,27 +1,124 @@
 {
   "visual_thesis": "NVIDIA's growth is impressive, but the stock's next test is whether that growth can exceed the expectations already priced in.",
-  "canvas": {"width": 1080, "height": 1620},
-  "palette": {"background": "#FFFFFF", "accent": "#C15F3C", "muted": "#B1ADA1", "surface": "#F4F3EE", "ink": "#292724"},
-  "preview": {"width": 540, "height": 810, "fps": 12},
+  "canvas": {
+    "width": 1080,
+    "height": 1620
+  },
+  "palette": {
+    "background": "#FFFFFF",
+    "accent": "#C15F3C",
+    "muted": "#B1ADA1",
+    "surface": "#F4F3EE",
+    "ink": "#292724"
+  },
+  "preview": {
+    "width": 540,
+    "height": 810,
+    "fps": 24
+  },
   "chapters": [
-    {"id": "opening", "title": "After the run", "cue": 1},
-    {"id": "growth", "title": "The engine is growth", "cue": 20},
-    {"id": "expectations", "title": "The bar is already high", "cue": 65},
-    {"id": "risks", "title": "Three pressures", "cue": 96},
-    {"id": "verdict", "title": "Growth versus expectations", "cue": 119},
-    {"id": "closing", "title": "Analysis, not financial advice", "cue": 155}
+    {
+      "id": "opening",
+      "title": "After the run",
+      "cue": 1
+    },
+    {
+      "id": "growth",
+      "title": "The engine is growth",
+      "cue": 20
+    },
+    {
+      "id": "expectations",
+      "title": "The bar is already high",
+      "cue": 65
+    },
+    {
+      "id": "risks",
+      "title": "Three pressures",
+      "cue": 96
+    },
+    {
+      "id": "verdict",
+      "title": "Growth versus expectations",
+      "cue": 119
+    },
+    {
+      "id": "closing",
+      "title": "Analysis, not financial advice",
+      "cue": 155
+    }
   ],
-  "storyboard_times": [2.9, 6.5, 10.5, 14.8, 16.8, 23.6, 32.5, 37.8, 39.8, 43.2, 46.3, 54.8, 57.8, 61.5],
+  "storyboard_times": [
+    2.8,
+    6.7,
+    10.9,
+    14.9,
+    17.4,
+    20.8,
+    23.7,
+    28.9,
+    34.9,
+    37.8,
+    40.7,
+    43.7,
+    46.8,
+    50.5,
+    54.9,
+    58.6,
+    61.8
+  ],
   "revenue": {
-    "categories": ["Q2 FY26", "Q2 FY27"], "billions_usd": [46.7, 96.2], "yoy_percent": 106,
+    "categories": [
+      "Q2 FY26",
+      "Q2 FY27"
+    ],
+    "billions_usd": [
+      46.743,
+      96.221
+    ],
+    "yoy_percent": 106,
     "source_date": "2026-08-26",
     "source": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/"
   },
-  "images": ["1.png", "2.png", "3.png"],
+  "images": [
+    "1.png",
+    "2.png",
+    "3.png"
+  ],
   "source_notes": [
     "Original audio and both SRT files are preserved.",
     "Audio includes spoken asterisk artifacts and mistranscribed NVIDIA tokens.",
     "The spoken valuation is ambiguous and undated; no numeric market cap is drawn.",
     "Price paths and expectation diagrams are conceptual, not market history or forecasts."
-  ]
+  ],
+  "visual_design": {
+    "version": 2,
+    "pacing": "Fast visual storytelling; original audio speed and source clock",
+    "beat_target_seconds": 1.0,
+    "type": "Editorial financial dashboard",
+    "quality_fps": 30
+  },
+  "earnings": {
+    "revenue_millions_usd": {
+      "Q2 FY26": 46743,
+      "Q1 FY27": 81615,
+      "Q2 FY27": 96221
+    },
+    "added_revenue_billions": 49.478,
+    "revenue_multiple": 2.0585,
+    "data_center_billions": 89.0,
+    "data_center_yoy_percent": 117,
+    "data_center_share_percent": 92.5,
+    "share_method": "89.0B divided by 96.221B; rounded to one decimal",
+    "source": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/",
+    "source_date": "2026-08-26"
+  },
+  "preserved_asset_sha256": {
+    "image/1.png": "797c80cdd9edf54984ff123444837884ddbfbb24cff7f3d003866a9c6e4f6b4e",
+    "image/2.png": "c37c7ff53c94db5423918c4ddbcc58c5b0c94044a37b9d74e555b01884a1aa81",
+    "image/3.png": "6512fecf7994f145f9dff50ea3a5e23afac0aebb89d5aaf608acf51540019bc7",
+    "audio.mp3": "135c797b5f90c2bc6d841f396887794cb0c68822445b641a1d48f76afe594cdd",
+    "cue-per-word.srt": "d5f42cbf770fd69355586d530b1fba14d38e4ed2cee775b6ab307b8893264066",
+    "normal-subtitle.srt": "2f72ae4d2e970991ce23cb1ae7d3d6a79afa43b66f41b0d71311ee8614062107"
+  }
 }

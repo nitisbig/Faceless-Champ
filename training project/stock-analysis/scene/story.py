@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from faceless_champ import Canvas, CueScene, Layer, Scene, Sequence, SubtitleTrack
+from faceless_champ import Canvas, CueScene, Layer, Scene, Sequence, SubtitleTrack, linear
 
 from .chapters import AUTHORS
 from .design import CANVAS, CONFIG, PROJECT
@@ -22,6 +22,10 @@ def stock_analysis_video(image_mode="auto"):
     for (identifier, title, cue), start, end, author in zip(chapters, starts, ends, AUTHORS, strict=True):
         board = CueScene(track, CANVAS, start_time=start, end_time=end)
         author(board, image_mode)
+        with board.at(0.38):
+            board.play(
+                board.visual_progress.animate.progress_to(1), run_time=board.segment_duration - 0.38, rate_func=linear
+            )
         board.finish()
         boards.append(board)
         events = [
@@ -36,7 +40,17 @@ def stock_analysis_video(image_mode="auto"):
             }
             for entry in board.entries
         ]
-        plan.append({"id": identifier, "title": title, "cue": cue, "start": start, "end": end, "events": events})
+        plan.append(
+            {
+                "id": identifier,
+                "title": title,
+                "cue": cue,
+                "start": start,
+                "end": end,
+                "events": events,
+                "visual_beats": board.visual_beats,
+            }
+        )
     video = Layer(Sequence(*boards, canvas=CANVAS), narration, canvas=CANVAS)
     video.story_plan = {
         "duration": video.duration,
@@ -50,6 +64,8 @@ def stock_analysis_video(image_mode="auto"):
         "palette": CONFIG["palette"],
         "source_notes": CONFIG["source_notes"],
         "revenue": CONFIG["revenue"],
+        "earnings": CONFIG["earnings"],
+        "visual_design": CONFIG["visual_design"],
         "storyboard_times": CONFIG["storyboard_times"],
     }
     return video
