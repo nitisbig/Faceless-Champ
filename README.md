@@ -128,6 +128,7 @@ bounded caption caching with reusable phrase layouts.
 
 ## Documentation
 
+- [Guide website](website/README.md): 21 chapters from Hello World through the framework and motion graphics, with copyable examples and rendered previews. Serve it with `python3 -m http.server 8765 --directory website/dist`.
 - [API reference](docs/api.md): components, scenes, animation, composition, and exports.
 - [Authoring guide](docs/guide.md): timing, grids, audio, fonts, and troubleshooting.
 - [Architecture](docs/architecture.md): extension points and renderer contracts.

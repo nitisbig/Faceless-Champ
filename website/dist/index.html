@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fafbf9">
+  <meta name="description" content="Learn Faceless Champ: a practical Python video guide, from Hello World to reusable framework blocks and motion graphics. Copy runnable examples and inspect rendered previews.">
+  <title>Faceless Champ — Developer Guide</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="header">
+    <a class="brand" href="#hello-world" aria-label="Faceless Champ home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>faceless<span class="brand-light">champ</span><span class="brand-dot">.</span></span></a>
+    <span class="header-divider"></span><span class="guide-label">Developer guide</span>
+    <div class="header-actions"><a class="github-link" href="https://github.com/nitisbig/Faceless-Champ" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button id="theme-toggle" class="icon-button" aria-label="Switch to dark theme" title="Switch theme">◐</button><button id="menu-toggle" class="icon-button menu-toggle" aria-label="Open chapters" aria-expanded="false" aria-controls="sidebar">☰</button></div>
+  </header>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar" aria-label="Guide chapters">
+      <button class="search-button" id="open-search"><span aria-hidden="true">⌕</span> Search the guide <kbd>⌘ K</kbd></button>
+      <div class="sidebar-intro">THE GUIDE <span id="chapter-count">21 chapters</span></div>
+      <nav id="chapter-nav"></nav>
+      <div class="sidebar-bottom"><span class="status-dot"></span> Core v0.1.0 <span>Kit v0.1.0rc1</span><p>Python in. Video out.</p></div>
+    </aside>
+    <main id="main" tabindex="-1"><article id="article"><p class="loading">Loading the guide…</p></article></main>
+    <aside class="page-toc" aria-label="On this page"><div class="toc-label">ON THIS PAGE</div><nav id="toc"></nav><div class="toc-note"><span aria-hidden="true">↳</span><p>Learn by making.<br>Every chapter builds<br>on the last.</p></div></aside>
+  </div>
+  <div id="mobile-backdrop" hidden></div>
+  <dialog id="search-dialog" aria-labelledby="search-label">
+    <form method="dialog" class="search-head"><label id="search-label" for="search-input">Search the guide</label><button class="icon-button" aria-label="Close search">×</button></form>
+    <div class="search-input-wrap"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Try “stagger”, “audio”, or “blocks”…" autocomplete="off"></div>
+    <div id="search-results" role="list"></div><div class="search-footer">Search titles, explanations, and example code <kbd>ESC</kbd> to close</div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="no-script">This guide needs JavaScript for chapter navigation. You can also read the Markdown documentation in <a href="https://github.com/nitisbig/Faceless-Champ/tree/master/docs">the repository</a>.</p></noscript>
+</body>
+</html>

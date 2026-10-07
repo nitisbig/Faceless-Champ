@@ -1,0 +1,172 @@
+{
+  "chapters": 21,
+  "python_snippets": 25,
+  "examples": [
+    {
+      "file": "hello.py",
+      "duration": 3.0,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      }
+    },
+    {
+      "file": "portrait.py",
+      "duration": 2.0,
+      "sampled_frames": 3
+    },
+    {
+      "file": "text_shapes.py",
+      "duration": 2.0,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "2.000000"
+        }
+      }
+    },
+    {
+      "file": "timing.py",
+      "duration": 4.0,
+      "sampled_frames": 3
+    },
+    {
+      "file": "groups.py",
+      "duration": 2.0,
+      "sampled_frames": 3
+    },
+    {
+      "file": "images.py",
+      "duration": 2.0,
+      "sampled_frames": 3
+    },
+    {
+      "file": "charts.py",
+      "duration": 3.0,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      }
+    },
+    {
+      "file": "composition.py",
+      "duration": 5.4,
+      "sampled_frames": 3
+    },
+    {
+      "file": "kit_main.py",
+      "duration": 10.0,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 360,
+            "height": 640
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      }
+    },
+    {
+      "file": "kit_blocks.py",
+      "duration": 4.0,
+      "sampled_frames": 3
+    },
+    {
+      "file": "kit_custom.py",
+      "duration": 6.0,
+      "sampled_frames": 3
+    },
+    {
+      "file": "properties.py",
+      "duration": 2.5,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "2.533333"
+        }
+      }
+    },
+    {
+      "file": "schedules.py",
+      "duration": 3.6500000000000004,
+      "sampled_frames": 3
+    },
+    {
+      "file": "masks.py",
+      "duration": 2.5,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "2.533333"
+        }
+      }
+    },
+    {
+      "file": "indicators.py",
+      "duration": 4.5,
+      "sampled_frames": 3,
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "4.533333"
+        }
+      }
+    }
+  ]
+}

@@ -47,3 +47,7 @@ training project/stock-analysis/image/*
 
 # Map showcase previews
 /media/maps/
+
+# Track the guide site and its verified preview assets.
+!website/dist/
+!website/dist/**
