@@ -27,7 +27,40 @@ The speech fixture is synthetic and persistently labeled. Its three cues are sen
 
 Artifacts are under `output/verification/` and `output/catalog/`. JSON reports preserve the original temporary verification paths and tool environment as historical build evidence; copied artifacts remain available in this repository. Reproduce with `python scripts/verify_media.py --output output/new-verification --profile final`. Use a fresh output directory for an untouched scaffold. `scripts/catalog.py` regenerates the visual catalog.
 
-## Limits
+## Whiteboard addition — 2026-10-07
+
+The `whiteboard_basic` addition was checked against core source baseline
+`96d990e833f5c2f2dcc9e826f82640190d124e09`, with no core source changes.
+
+- All 62 existing kit cases passed, alongside 50 whiteboard cases (112 total). These cover sequential visibility,
+  linear progress and holds, scene clearing, fresh builds, immutable recipes, geometry errors, both canvas formats,
+  label/caption reservation, original nonsequential cue indices, audio tails, and CLI registration/scaffolding.
+- Ruff lint, formatting, and Git whitespace checks passed. Kit wheel/sdist and a fresh core wheel/sdist were built.
+- Core and kit wheels were installed offline into an isolated environment. Pillow was copied from the existing local
+  runtime. CLI media checks ran from `/tmp`, without `PYTHONPATH` or editable package imports.
+- The installed CLI initialized the starter, validated it, produced a frame and storyboard, previewed it, and exported
+  its complete ten-second video. The first export process was terminated; a separate retry completed successfully.
+
+| Artifact | Output | Verification |
+| --- | --- | --- |
+| Whiteboard preview | 10 seconds, 960×540, 15 fps, silent | ffprobe and complete decode |
+| Whiteboard final | 10 seconds, 1920×1080, 30 fps, silent; default final profile | ffprobe, complete decode, eight decoded frames inspected |
+| Narrated excerpt | Source 1.25–3.75 seconds, 960×540, 15 fps | Complete decode, source audio/frame comparison, three decoded frames inspected |
+
+The excerpt uses a clearly labeled synthetic test tone and SRT indices 7, 19, and 55. Audio correlation with the original
+source range was **0.9988811054**. Maximum decoded-frame mean absolute RGB error was **0.803/255** for the final video and
+**0.100/255** for the excerpt. Inspected frames showed the intended partial strokes, completed holds, and clean scene reset.
+
+Artifacts and machine-readable results are under `output/whiteboard-verification/`. Reproduce from an installed environment:
+
+```bash
+python scripts/verify_whiteboard.py --output output/new-whiteboard-verification
+```
+
+Use a fresh directory, or `--resume` to reuse generated outputs and repeat the media checks. Portrait geometry and label
+layout were tested; this addition does not claim a full portrait, 4K, or long-form export verification.
+
+## General limits
 
 This verifies short full exports at 1080p portrait, catalog rendering in landscape, and source-clock excerpts. It does not establish full 4K, sustained long-form rendering, alternate operating systems, or optional maps/equations extras. Core capabilities remain available, but kit domain sections are deferred.
 

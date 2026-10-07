@@ -61,10 +61,16 @@ with video.segment("comparison", window=voice.between("comparison", "recap")) as
 
 ## Reuse and configuration
 
-The built-ins support portrait `shorts` and `landscape` design canvases, with `midnight` and `light` themes. Export profiles scale the selected canvas; switching format rebuilds layout. Text wraps, then shrinks, and fails if it cannot fit at the theme minimum.
+The built-ins support portrait `shorts` and `landscape` design canvases, with `midnight`, `light`, and `whiteboard` themes. Export profiles scale the selected canvas; switching format rebuilds layout. Text wraps, then shrinks, and fails if it cannot fit at the theme minimum.
+
+Create a whiteboard video with `fc-kit init my-board --template whiteboard-basic`, or import
+`whiteboard_basic` and `WhiteboardScene` from `facelesschamp_kit.templates`. Ordered paths, lines, arrows, rectangles,
+and circles draw sequentially, hold, then clear between scenes. Recipes support explicit durations and original narration
+cue windows. The returned `Video` remains editable. See the [whiteboard guide](docs/whiteboard.md) for examples and timing.
 
 - [API and project configuration](docs/api.md)
 - [Block catalog and visual examples](docs/catalog.md)
+- [Whiteboard template and drawing recipes](docs/whiteboard.md)
 - [Architecture and extension contract](docs/architecture.md)
 - [Verification and known limits](docs/verification.md)
 - [Custom block example](examples/custom_block.py)

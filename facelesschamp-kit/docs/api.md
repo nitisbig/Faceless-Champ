@@ -12,7 +12,7 @@ caption_space = 220
 [videos.main]
 factory = "videos.main:build"
 format = "shorts" # or landscape
- theme = "midnight" # or light
+theme = "midnight" # or light, whiteboard
 captions = false
 [profiles.preview]
 fps = 15
@@ -57,6 +57,13 @@ Implement `compose(context, bounds) -> BlockBuild(root, children={}, bounds=None
 Block content props are defensively copied when added. Prefer frozen dataclasses and tuples. Store core components only inside `compose`, never on the reusable block definition. Do not mutate the context while composing a block. Failed compilations publish no result and can be retried with fresh components.
 
 Themes are frozen dataclasses in `facelesschamp_kit.themes`. Assign a custom Theme to `ctx.theme` in the factory before constructing Video; update `ctx.canvas` with a matching background if desired. Heading, TextPanel, and MetricCard support default/accent/muted variants and explicit color overrides. Precedence is theme defaults → chosen theme → variant → explicit color. Stack and Split are composable blocks; Split uses rows in portrait and columns in landscape.
+
+`whiteboard_basic(ctx, *, scenes, audio=None, subtitles=None, markers=None, captions=None, theme=None,
+draw_fraction=0.7)` and immutable `WhiteboardScene` recipes are available from `facelesschamp_kit.templates`.
+`WhiteboardDrawing` and its five geometry specifications are exported from `facelesschamp_kit.blocks`.
+See the [whiteboard API and examples](whiteboard.md). The factory applies `WHITEBOARD` or its explicit theme to the context
+and canvas; pass `theme=ctx.theme` to use project configuration. `fc-kit init ... --template whiteboard-basic` generates
+an editable two-scene landscape starter.
 
 ## Assets
 

@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import tempfile
+from importlib.resources import files
 from pathlib import Path
 
 from .diagnostics import KitError
@@ -72,8 +73,8 @@ def build(ctx):
 
 
 def init_project(destination, template="silent"):
-    if template not in {"silent", "explainer-short", "narrated-short"}:
-        raise KitError("TEMPLATE", "Choose silent, explainer-short, or narrated-short")
+    if template not in {"silent", "explainer-short", "narrated-short", "whiteboard-basic"}:
+        raise KitError("TEMPLATE", "Choose silent, explainer-short, narrated-short, or whiteboard-basic")
     destination = Path(destination).resolve()
     if destination.exists():
         raise KitError("DESTINATION", "Destination already exists; choose a new directory")
@@ -84,9 +85,22 @@ def init_project(destination, template="silent"):
             (staging / directory).mkdir(parents=True)
         (staging / "videos/__init__.py").write_text("")
         (staging / "components/__init__.py").write_text("")
-        (staging / "facelesschamp.toml").write_text(CONFIG)
+        whiteboard = template == "whiteboard-basic"
+        config = (
+            CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
+                'theme = "midnight"', 'theme = "whiteboard"'
+            )
+            if whiteboard
+            else CONFIG
+        )
+        (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
-        (staging / "videos/main.py").write_text(NARRATED if narrated else SILENT)
+        source = (
+            files("facelesschamp_kit").joinpath("sample_assets/whiteboard.py").read_text()
+            if whiteboard
+            else (NARRATED if narrated else SILENT)
+        )
+        (staging / "videos/main.py").write_text(source)
         manifest = (
             {
                 "voiceover": {
@@ -120,12 +134,21 @@ def init_project(destination, template="silent"):
             if narrated
             else ""
         )
+        if whiteboard:
+            instructions = (
+                "Edit the two WhiteboardScene recipes in videos/main.py. Drawings use source coordinates in each "
+                "viewbox and fit both landscape and shorts formats without stretching. Each board draws, holds, "
+                "and clears before the next scene. All geometry is local; no media downloads are required.\n\n"
+                "For narration, register audio/subtitle assets in assets/manifest.json, pass their IDs and a "
+                "marker mapping to whiteboard_basic, and replace scene durations with cues=(start_marker, end_marker). "
+                "Use None for the last end marker to hold through the audio end. Captions are optional.\n\n"
+            )
         (staging / "README.md").write_text(
             "# Your video\n\n"
             + instructions
             + "Run `fc-kit validate main`, `fc-kit preview main -o output/preview.mp4`, and "
             "`fc-kit render main -o output/main.mp4`. Preview defaults to the first ten seconds.\n\n"
-            "Change format to `landscape` or theme to `light` in facelesschamp.toml. "
+            "Choose format `shorts` or `landscape`, and theme `midnight`, `light`, or `whiteboard` in facelesschamp.toml. "
             "Enable captions explicitly with `captions = true`.\n"
         )
         # Reserve the destination before moving content; never merge with an existing project.

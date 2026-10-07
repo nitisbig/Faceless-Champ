@@ -41,4 +41,14 @@ LIGHT = replace(
     muted="#52625E",
     accent="#097B67",
 )
-THEMES = MappingProxyType({"midnight": MIDNIGHT, "light": LIGHT})
+WHITEBOARD = replace(
+    LIGHT,
+    name="whiteboard",
+    background="#FFFFFF",
+    surface="#FFFFFF",
+    foreground="#1E293B",
+    muted="#64748B",
+    accent="#2563EB",
+    radius=0,
+)
+THEMES = MappingProxyType({"midnight": MIDNIGHT, "light": LIGHT, "whiteboard": WHITEBOARD})

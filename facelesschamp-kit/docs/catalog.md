@@ -33,3 +33,9 @@ Run `python scripts/catalog.py --output output/catalog`. This creates 24 thumbna
 The corresponding `-light-portrait`, `-midnight-landscape`, and `-light-landscape` PNGs demonstrate theme/format variants. The ImageCard example deliberately demonstrates labeled missing media. Contract tests include long-text wrapping, minimum-size failures, strict missing media, real image loading, and captions within their reserved area.
 
 Callable templates in facelesschamp_kit.templates: silent(ctx, value=42, label="Reusable components") and narrated(ctx, audio="voiceover", subtitles="word_cues", markers=None). These return Video definitions. CLI init generates editable starter files; upgrades never rewrite user projects. `explainer-short` is an alias for the silent scaffold. The narrated scaffold references a bundled, clearly labeled synthetic sample; replacing its manifest entries removes the sample-only label.
+
+`whiteboard_basic(ctx, scenes=...)` adds ordered drawing recipes with explicit or narrated timing. `WhiteboardDrawing`
+composes `WhiteboardPath`, `WhiteboardLine`, `WhiteboardArrow`, `WhiteboardRectangle`, and `WhiteboardCircle` specifications.
+Its named children are `stroke-0`, `stroke-1`, etc. It displays the complete drawing when used as a standalone block;
+the template controls sequential reveals. The `whiteboard-basic` CLI starter and `whiteboard` theme are registered.
+See the [whiteboard guide](whiteboard.md) for geometry, styling, and narration examples.

@@ -98,7 +98,8 @@ class Project:
                 raise KitError("CONFIG", "format must be shorts or landscape", video=name)
             if settings.get("theme", "midnight") not in THEMES:
                 raise KitError(
-                    "CONFIG", "Config theme must be midnight or light; custom themes can be assigned in build(ctx)"
+                    "CONFIG",
+                    f"Config theme must be one of {', '.join(THEMES)}; custom themes can be assigned in build(ctx)",
                 )
             if not isinstance(settings.get("captions", False), bool):
                 raise KitError("CONFIG", "captions must be a boolean")

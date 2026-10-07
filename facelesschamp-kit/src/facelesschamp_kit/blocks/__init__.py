@@ -1,4 +1,4 @@
-"""Six composition-only blocks. All drawing belongs to faceless-champ."""
+"""Composition-only blocks. All rendering belongs to faceless-champ."""
 
 from dataclasses import dataclass
 
@@ -6,6 +6,14 @@ from faceless_champ import Bounds, Image, Number, Rectangle
 
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
+from .whiteboard import (
+    WhiteboardArrow,
+    WhiteboardCircle,
+    WhiteboardDrawing,
+    WhiteboardLine,
+    WhiteboardPath,
+    WhiteboardRectangle,
+)
 
 
 def palette(ctx, variant, color):
@@ -155,4 +163,19 @@ class StepList:
         )
 
 
-__all__ = ["Block", "BlockBuild", "Comparison", "Heading", "ImageCard", "MetricCard", "StepList", "TextPanel"]
+__all__ = [
+    "Block",
+    "BlockBuild",
+    "Comparison",
+    "Heading",
+    "ImageCard",
+    "MetricCard",
+    "StepList",
+    "TextPanel",
+    "WhiteboardArrow",
+    "WhiteboardCircle",
+    "WhiteboardDrawing",
+    "WhiteboardLine",
+    "WhiteboardPath",
+    "WhiteboardRectangle",
+]
