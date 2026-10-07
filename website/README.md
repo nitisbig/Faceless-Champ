@@ -1,28 +1,44 @@
-# Faceless Champ guide website
+# Faceless Champ developer guides
 
-A buildless guide for the core library and facelesschamp-kit, with 21 sidebar chapters,
-copyable highlighted code, 15 downloadable Python examples, chapter search, deep links,
-light/dark themes, and responsive navigation. Seven real Python-rendered preview clips
-are bundled with their poster frames. The framework clip covers its three-second hook;
-the complete framework example is ten seconds.
+Two static pages share the same design, assets, and JavaScript:
+
+- **Core library:** `dist/index.html` — 16 chapters about scenes, components,
+  timelines, narration, composition, motion graphics, and rendering.
+- **Kit framework:** `dist/kit.html` — 10 chapters about structured projects,
+  blocks, themes, narration, templates, and the kit workflow.
+
+The Core / Kit switch stays visible on mobile. Each guide has its own sidebar,
+chapter numbering, search results, installation instructions, and export help.
+Existing core hashes still work. Old framework hashes on `index.html` redirect to
+`kit.html` with their chapter and section intact.
+
+The kit guide covers all four starters: `silent`, its `explainer-short` alias,
+`narrated-short`, and `whiteboard-basic`. It explains editable scaffolds and
+callable templates, whiteboard geometry and timing, format/theme changes, and
+source-time narration. The kit is documented from the bundled local 0.1.0rc1
+release candidate; the guide does not claim published package availability.
 
 ## Preview
 
 From the repository root:
 
 ```bash
-python3 -m http.server 8765 --directory website/dist
+python3 -m http.server 8765 --bind 127.0.0.1 --directory website/dist
 ```
 
-Open http://localhost:8765. HTTP serving is required because chapters load from JSON.
-`website/dist/` can be served by any static host. No JavaScript dependencies or build
-step are required. Fonts use optional Google Fonts with local fallback fonts.
+Open [the core guide](http://127.0.0.1:8765/index.html) or
+[the kit guide](http://127.0.0.1:8765/kit.html).
+HTTP serving is required because chapters load from JSON. `website/dist/` works
+on any static host without URL rewrite rules or JavaScript dependencies.
+Fonts use optional Google Fonts with local fallbacks.
 
 ## Edit and regenerate
 
-Chapter text and Python examples have one source: `scripts/build_content.py`.
-The site layout and interactions live in `dist/index.html`, `dist/styles.css`, and
-`dist/app.js`. After editing content, run:
+Chapter text, guide metadata, and the 18 downloadable Python examples come from
+`scripts/build_content.py`. Every chapter has a `guide` assignment. The shared
+renderer selects the active guide using the HTML body's `data-guide` attribute.
+The two HTML shells, `dist/styles.css`, and `dist/app.js` control presentation.
+Content supports code, tables, notes, and local guide links.
 
 ```bash
 .venv/bin/python website/scripts/build_content.py
@@ -30,17 +46,37 @@ The site layout and interactions live in `dist/index.html`, `dist/styles.css`, a
 node --check website/dist/app.js
 ```
 
-The verifier parses all 25 Python snippets, builds all 15 complete examples,
-validates all three kit projects, and samples three frames per example. Asset-dependent
-narration/audio recipes are syntax-checked; they require the reader's own media.
-With `--render`, it also exports seven preview videos, checks metadata with ffprobe,
-and completely decodes them with FFmpeg. Results live in `verification.json`.
+The verifier checks both page entrypoints and content links, parses all 30 Python
+snippets, builds all 18 downloadable examples, and validates all four template
+starters. Kit examples declare the scaffold they need, including the narrated
+sample assets and the whiteboard theme/format. Preview dimensions follow the
+composition's canvas. The whiteboard example is also validated and sampled in
+portrait, including drawing, holding, and clearing moments.
 
-Browser QA covers copying the exact Python code, search results and navigation,
-chapter navigation, and the mobile menu at a 390-pixel viewport. The two packages'
-current source APIs ground the guide; it does not claim published availability for
-the kit's local 0.1.0rc1 release candidate.
+With `--render`, the verifier exports eight previews, checks their metadata and
+duration with ffprobe, and completely decodes them with FFmpeg. The framework
+quickstart clip shows its three-second hook; the whiteboard clip includes both
+five-second scenes. The remaining narrated whiteboard recipe requires the
+reader's own media; it is syntax-checked rather than claimed as a rendered film.
+Results are written to `verification.json`. Without `--render`, the report covers
+build/frame checks only and does not claim fresh media verification.
 
-`.openai/hosting.json` retains the private Sites identity for publication. Deployment
-source synchronization uses a separate checkout, keeping the library repository's Git
-history independent. Do not commit credentials or temporary deployment archives.
+## Browser QA
+
+Check both pages at desktop and mobile widths (1440 × 900 and 390 × 844):
+
+- Core / Kit switching, scoped chapter counts, sidebar and previous/next links.
+- Search isolation, Ctrl/Cmd+K, Escape, and keyboard-operable result links.
+- Exact code and command copying, and downloadable Python source parity.
+- Light/dark theme persistence across pages, mobile menu closing, and overflow.
+- Old framework chapter/section links redirecting to the matching kit page.
+- Preview posters and controls, section links, and browser console errors.
+
+Inspect encoded preview frames in addition to browser screenshots. Manual browser
+and visual inspection results may be recorded separately under `browser_checks`
+and `visual_review` in `verification.json`; rerunning the verifier replaces that
+report, so repeat those inspections before recording them again.
+
+`.openai/hosting.json` retains the existing private Sites identity. Publication
+is a separate step; these local changes do not deploy the site. Do not commit
+credentials or temporary deployment archives.

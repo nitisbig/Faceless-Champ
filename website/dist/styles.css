@@ -5,3 +5,29 @@
 @media(min-width:1550px){main{padding-left:76px;padding-right:76px}}@media(max-width:1190px){:root{--side:250px}.shell{grid-template-columns:var(--side) minmax(0,1fr)}.page-toc{display:none}main{padding:40px 46px}.sidebar{padding-left:22px}.header{padding:0 24px}}@media(max-width:760px){:root{--header:60px}.header{padding:0 20px;gap:15px}.brand{font-size:21px}.brand-mark{transform:scale(.9) skew(-9deg);margin-right:-2px}.guide-label,.header-divider{display:none}.header-actions{gap:12px}.github-link{font-size:11px}.menu-toggle{display:grid}.shell{display:block}.sidebar{position:fixed;top:var(--header);bottom:0;left:0;z-index:35;width:280px;height:calc(100dvh - var(--header));background:var(--bg);transform:translateX(-100%);transition:transform .2s}.sidebar.open{transform:translateX(0)}#mobile-backdrop:not([hidden]){display:block;position:fixed;inset:var(--header) 0 0;background:#0005;z-index:30}main{padding:28px 23px 35px}.breadcrumb{margin-bottom:25px}h1{font-size:39px;letter-spacing:-1.5px}.description{font-size:15px}.lesson-meta{font-size:9px;gap:10px}.lesson-meta span+span:before{margin-right:10px}.section{margin-top:29px}.section h2{font-size:20px}.code-block pre{font-size:11px;padding:16px;line-height:1.9}.preview-box video{max-height:none}.pagination{gap:10px}.page-link{padding:13px}.article-footer{flex-wrap:wrap}.search-input-wrap input{font-size:16px}.preview-header{font-size:9px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
 @media(max-width:760px){.sidebar{visibility:hidden}.sidebar.open{visibility:visible}.github-link{white-space:nowrap}.brand{gap:8px}.header{gap:10px}}@media(max-width:420px){.github-link{display:none}}
 .example-run{border-top:1px solid #ffffff15;padding:11px 15px 13px;background:#ffffff03}.run-label{font-size:10px;color:#92aa9b;margin-bottom:5px}.run-command{display:flex;align-items:flex-start;gap:12px}.run-command code{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#bcd9c5;line-height:1.9;overflow-x:auto;white-space:nowrap;padding-bottom:3px}.run-command .copy-button{flex-shrink:0}
+
+/* Both guides share the same shell and retain a visible switch on small screens. */
+.guide-switch{display:flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-shrink:0}
+.guide-switch a{padding:3px 15px;border-radius:5px;font-size:12px;color:var(--muted);line-height:1.8}
+.guide-switch a:hover,.guide-switch a[aria-current=page]{background:var(--pale);color:var(--green)}
+.guide-switch a[aria-current=page]{font-weight:650}
+.guide-intro{border-left:3px solid var(--green);padding:2px 0 2px 16px;margin:0 0 29px}
+.guide-intro strong{font-size:12px;color:var(--green)}
+.guide-intro p{font-size:13px;color:var(--muted);margin:4px 0;line-height:1.7;max-width:560px}
+.guide-link{display:inline-block;color:var(--green);font-size:13px;border-bottom:1px solid var(--line);margin:0 0 10px}
+.guide-link:hover{border-color:var(--green)}
+.sidebar-intro #guide-name{margin-left:0;letter-spacing:1.3px;font-weight:600}
+.sidebar-bottom #guide-version{float:none;font-size:10px}
+.preview-box{margin-left:0;margin-right:0}
+.preview-box video{object-fit:contain}
+@media(max-width:760px){
+  :root{--header:104px}
+  .header{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:56px 40px;gap:0 10px;padding:0 20px 8px}
+  .brand{font-size:21px;white-space:nowrap}
+  .header-actions{grid-column:2;grid-row:1;gap:10px}
+  .guide-switch{grid-column:1 / -1;grid-row:2;justify-self:start}
+  .guide-switch a{padding:2px 21px}
+  .section h2{scroll-margin-top:125px}
+  html{scroll-padding-top:125px}
+}
+@media(max-width:360px){.brand{font-size:18px}.brand-mark{display:none}.header{padding-left:16px;padding-right:16px}}

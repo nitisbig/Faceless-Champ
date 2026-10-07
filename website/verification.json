@@ -1,11 +1,31 @@
 {
-  "chapters": 21,
-  "python_snippets": 25,
+  "guides": {
+    "core": {
+      "page": "index.html",
+      "chapters": 16
+    },
+    "kit": {
+      "page": "kit.html",
+      "chapters": 10
+    }
+  },
+  "chapters": 26,
+  "python_snippets": 30,
   "examples": [
     {
       "file": "hello.py",
+      "guide": "core",
       "duration": 3.0,
       "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        2.95
+      ],
+      "size": [
+        640,
+        360
+      ],
       "media": {
         "programs": [],
         "streams": [
@@ -18,17 +38,38 @@
         "format": {
           "duration": "3.000000"
         }
-      }
+      },
+      "fully_decoded": true
     },
     {
       "file": "portrait.py",
+      "guide": "core",
       "duration": 2.0,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.0,
+        1.95
+      ],
+      "size": [
+        360,
+        640
+      ]
     },
     {
       "file": "text_shapes.py",
+      "guide": "core",
       "duration": 2.0,
       "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.0,
+        1.95
+      ],
+      "size": [
+        640,
+        360
+      ],
       "media": {
         "programs": [],
         "streams": [
@@ -41,27 +82,68 @@
         "format": {
           "duration": "2.000000"
         }
-      }
+      },
+      "fully_decoded": true
     },
     {
       "file": "timing.py",
+      "guide": "core",
       "duration": 4.0,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        3.95
+      ],
+      "size": [
+        640,
+        360
+      ]
     },
     {
       "file": "groups.py",
+      "guide": "core",
       "duration": 2.0,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.0,
+        1.95
+      ],
+      "size": [
+        640,
+        360
+      ]
     },
     {
       "file": "images.py",
+      "guide": "core",
       "duration": 2.0,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.0,
+        1.95
+      ],
+      "size": [
+        640,
+        360
+      ]
     },
     {
       "file": "charts.py",
+      "guide": "core",
       "duration": 3.0,
       "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        2.95
+      ],
+      "size": [
+        640,
+        360
+      ],
       "media": {
         "programs": [],
         "streams": [
@@ -74,45 +156,38 @@
         "format": {
           "duration": "3.000000"
         }
-      }
+      },
+      "fully_decoded": true
     },
     {
       "file": "composition.py",
+      "guide": "core",
       "duration": 5.4,
-      "sampled_frames": 3
-    },
-    {
-      "file": "kit_main.py",
-      "duration": 10.0,
       "sampled_frames": 3,
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 360,
-            "height": 640
-          }
-        ],
-        "format": {
-          "duration": "3.000000"
-        }
-      }
-    },
-    {
-      "file": "kit_blocks.py",
-      "duration": 4.0,
-      "sampled_frames": 3
-    },
-    {
-      "file": "kit_custom.py",
-      "duration": 6.0,
-      "sampled_frames": 3
+      "sample_times": [
+        0,
+        1.5,
+        5.3500000000000005
+      ],
+      "size": [
+        640,
+        360
+      ]
     },
     {
       "file": "properties.py",
+      "guide": "core",
       "duration": 2.5,
       "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.25,
+        2.45
+      ],
+      "size": [
+        640,
+        360
+      ],
       "media": {
         "programs": [],
         "streams": [
@@ -125,17 +200,38 @@
         "format": {
           "duration": "2.533333"
         }
-      }
+      },
+      "fully_decoded": true
     },
     {
       "file": "schedules.py",
+      "guide": "core",
       "duration": 3.6500000000000004,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        3.6000000000000005
+      ],
+      "size": [
+        640,
+        360
+      ]
     },
     {
       "file": "masks.py",
+      "guide": "core",
       "duration": 2.5,
       "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.25,
+        2.45
+      ],
+      "size": [
+        640,
+        360
+      ],
       "media": {
         "programs": [],
         "streams": [
@@ -148,12 +244,23 @@
         "format": {
           "duration": "2.533333"
         }
-      }
+      },
+      "fully_decoded": true
     },
     {
       "file": "indicators.py",
+      "guide": "core",
       "duration": 4.5,
       "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        4.45
+      ],
+      "size": [
+        640,
+        360
+      ],
       "media": {
         "programs": [],
         "streams": [
@@ -166,7 +273,236 @@
         "format": {
           "duration": "4.533333"
         }
-      }
+      },
+      "fully_decoded": true
+    },
+    {
+      "file": "kit_main.py",
+      "guide": "kit",
+      "duration": 10.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        9.95
+      ],
+      "size": [
+        360,
+        640
+      ],
+      "template": "silent",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 360,
+            "height": 640
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      },
+      "fully_decoded": true
+    },
+    {
+      "file": "kit_blocks.py",
+      "guide": "kit",
+      "duration": 4.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        3.95
+      ],
+      "size": [
+        360,
+        640
+      ],
+      "template": "silent"
+    },
+    {
+      "file": "kit_custom.py",
+      "guide": "kit",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        360,
+        640
+      ],
+      "template": "silent"
+    },
+    {
+      "file": "kit_silent.py",
+      "guide": "kit",
+      "duration": 10.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        9.95
+      ],
+      "size": [
+        360,
+        640
+      ],
+      "template": "silent"
+    },
+    {
+      "file": "kit_narrated.py",
+      "guide": "kit",
+      "duration": 30.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        29.95
+      ],
+      "size": [
+        360,
+        640
+      ],
+      "template": "narrated-short"
+    },
+    {
+      "file": "kit_whiteboard.py",
+      "guide": "kit",
+      "duration": 10.0,
+      "sampled_frames": 7,
+      "sample_times": [
+        0,
+        0.6,
+        2.5,
+        4,
+        5,
+        6.2,
+        9.5
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "template": "whiteboard-basic",
+      "portrait_size": [
+        360,
+        640
+      ],
+      "formats_checked": [
+        "landscape",
+        "shorts"
+      ],
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "format": {
+          "duration": "10.000000"
+        }
+      },
+      "fully_decoded": true
     }
-  ]
+  ],
+  "starters": [
+    {
+      "template": "silent",
+      "duration": 10.0,
+      "size": [
+        360,
+        640
+      ],
+      "validated": true,
+      "sampled_frames": 3
+    },
+    {
+      "template": "explainer-short",
+      "duration": 10.0,
+      "size": [
+        360,
+        640
+      ],
+      "validated": true,
+      "sampled_frames": 3
+    },
+    {
+      "template": "narrated-short",
+      "duration": 30.0,
+      "size": [
+        360,
+        640
+      ],
+      "validated": true,
+      "sampled_frames": 3
+    },
+    {
+      "template": "whiteboard-basic",
+      "duration": 10.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3
+    }
+  ],
+  "links_checked": 25,
+  "python_snippets_compiled": 30,
+  "legacy_links": {
+    "chapter_ids_preserved": 21,
+    "section_ids_preserved": 64
+  },
+  "browser_checks": {
+    "date": "2026-10-07",
+    "browser": "Codex in-app browser",
+    "viewports": {
+      "desktop": [
+        1440,
+        900
+      ],
+      "mobile": [
+        390,
+        844
+      ]
+    },
+    "chapter_routes_checked": 26,
+    "mobile_horizontal_overflow_failures": 0,
+    "passed": [
+      "Core and Kit page switch, scoped sidebars and chapter numbering",
+      "Core whiteboard search returns no results; kit whiteboard search finds its chapters",
+      "Ctrl+K opens search; result links navigate; Escape dismisses search",
+      "Exact source copying for hello.py and kit_whiteboard.py",
+      "Exact whiteboard render-command copying",
+      "Downloaded kit_whiteboard.py matches the generated source byte for byte",
+      "Previous and next chapter navigation stays inside the active guide",
+      "Theme selection persists when switching guides",
+      "Both mobile menus open and close when a chapter is selected",
+      "All five legacy framework chapters redirect with section fragments intact",
+      "Whiteboard section deep link scrolls below the sticky header",
+      "Preview posters and native video controls display on desktop and mobile"
+    ],
+    "console_errors": 0
+  },
+  "visual_review": {
+    "whiteboard_encoded_frames_seconds": [
+      0,
+      0.6,
+      2.466666666666667,
+      4,
+      5,
+      6.2,
+      9.466666666666667
+    ],
+    "whiteboard_preview_duration_seconds": 10,
+    "findings": "Sequential stroke reveals, complete-board holds, and scene-boundary clearing inspected in decoded MP4 frames. Both guide layouts inspected on desktop and mobile."
+  }
 }

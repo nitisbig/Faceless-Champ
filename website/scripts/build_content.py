@@ -9,7 +9,7 @@ EXAMPLES = DIST / 'examples'
 EXAMPLES.mkdir(parents=True, exist_ok=True)
 lessons = []
 
-def code(source, language='python', filename=None, target=None, kind='core'):
+def code(source, language='python', filename=None, target=None, kind='core', template='silent'):
     source = textwrap.dedent(source).strip() + '\n'
     result = dict(type='code', language=language, code=source)
     if filename:
@@ -18,7 +18,8 @@ def code(source, language='python', filename=None, target=None, kind='core'):
         result['command'] = (f'faceless-champ render {filename} {target} -o output/{Path(filename).stem}.mp4 -q ql'
                              if kind == 'core' else 'fc-kit preview main -o output/preview.mp4')
         if kind == 'kit':
-            result['placement'] = 'Save as videos/main.py in a scaffolded fc-kit project.'
+            result['template'] = template
+            result['placement'] = f'Save as videos/main.py in a project created with --template {template}.'
     return result
 
 def section(title, text, *blocks):
@@ -27,8 +28,12 @@ def section(title, text, *blocks):
 def note(text):
     return dict(type='note', text=text)
 
-def lesson(id, title, group, description, sections, preview=None):
-    lessons.append(dict(id=id, title=title, group=group, description=description, sections=sections, preview=preview))
+def link(text, href):
+    return dict(type='link', text=text, href=href)
+
+def lesson(id, title, group, description, sections, preview=None, *, guide='core', portrait=False):
+    lessons.append(dict(id=id, title=title, group=group, description=description, sections=sections,
+                        preview=preview, guide=guide, portrait=portrait))
 
 hello = code('''
 from faceless_champ import Scene, Text, Circle, Typewriter, FadeIn
@@ -49,22 +54,22 @@ section('Render it', 'Run this in the directory containing hello.py after comple
 section('Read the timeline', 'The text and circle enter together over 1.5 seconds. The next play() moves the circle for one second. wait(0.5) holds the final frame. Total duration: three seconds.', note('Multiple animations in one play() run together. Separate play() calls run one after another.')),
 section('Try a change', 'Change the message, the circle color, or run_time. Use --overwrite to replace an existing export.', code('faceless-champ render hello.py Hello -o output/hello.mp4 -q ql --overwrite', 'bash')),
 ], 'hello')
-lesson('installation', 'Installation', 'Start here', 'Set up the video engine and the optional framework in a Python 3.12+ environment.', [
-section('Get the repository', 'The guide uses the current repository APIs. Install from source; the kit is a local 0.1.0rc1 release candidate.', code('''
+lesson('installation', 'Installation', 'Start here', 'Set up the core Python video engine, its command line, and FFmpeg.', [
+section('Get the repository', 'Install the current core library from source in a Python 3.12+ environment.', code('''
 git clone https://github.com/nitisbig/Faceless-Champ.git
 cd Faceless-Champ
 python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -e . -e ./facelesschamp-kit
+python -m pip install -e .
 ''', 'bash')),
 section('Install FFmpeg', 'On Ubuntu, install FFmpeg for MP4 encoding and ffprobe for inspecting exports. The FFmpeg build must include the libx264 encoder.', code('''
 sudo apt install ffmpeg
 ffmpeg -version
 ffprobe -version
-fc-kit doctor
+faceless-champ --help
 ''', 'bash')),
 section('Optional capabilities', 'Charts, shapes, text, and motion graphics use the core Pillow dependency. Equations need Matplotlib; maps need NumPy. Install only the extras you use.', code('python -m pip install -e ".[equations,maps]"', 'bash')),
-section('Two packages, two jobs', 'faceless_champ provides components, animation, timelines, and rendering. facelesschamp_kit adds project structure, segments, reusable blocks, themes, asset resolution, and workflow commands.', dict(type='table', headers=['Layer', 'Import', 'CLI'], rows=[['Library / engine','faceless_champ','faceless-champ'],['Framework / kit','facelesschamp_kit','fc-kit']]))
+section('Two packages, two jobs', 'This guide covers faceless_champ: components, animation, timelines, and rendering. For structured projects, reusable blocks, and templates, use the framework guide.', link('Open the facelesschamp-kit guide →', 'kit.html'))
 ])
 canvas = code('''
 from faceless_champ import Canvas, Circle, Scene, Text, FadeIn
@@ -263,7 +268,7 @@ fc-kit storyboard main -o output/storyboard
 fc-kit preview main --segment hook -o output/hook.mp4
 fc-kit render main -o output/main.mp4
 ''','bash'),note('facelesschamp-kit 0.1.0rc1 is a local release candidate. The guide uses the implementation in this repository.'))
-], 'kit')
+], 'kit', guide='kit', portrait=True)
 lesson('project-configuration', 'Project configuration', 'The framework', 'Keep format, themes, assets, and export settings in a predictable project layout.', [
 section('Know the project layout', 'The scaffold separates authoring code from local assets and workflow outputs.', code('''
 my-video/
@@ -309,7 +314,7 @@ section('Register local assets', 'Asset paths resolve from the project root. Use
   }
 }
 ''','json'),note('CLI output paths resolve from the invoking directory. Use fc-kit --project /absolute/path for projects elsewhere. Final exports reject placeholders unless explicitly allowed.'))
-])
+], guide='kit')
 blocks = code('''
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import Heading, MetricCard
@@ -327,9 +332,9 @@ def build(ctx):
 ''',filename='kit_blocks.py',kind='kit')
 lesson('blocks-and-themes', 'Blocks & themes', 'The framework', 'Reusable content definitions compose fresh core components into measured layouts.', [
 section('Compose a block layout', 'Stack allocates vertical cells. Split stacks in portrait and uses columns in landscape. Text wraps, then shrinks to the theme minimum; content that still cannot fit fails with a useful error.',blocks),
-section('Choose the right block', 'Built-in blocks expose named children for targeted motion. Pass variant="accent" or variant="muted" to Heading, TextPanel, or MetricCard.',dict(type='table',headers=['Block','Content','Named children'],rows=[['Heading','Text','text'],['TextPanel','Text + optional title','background, text, title'],['MetricCard','Value + label','background, value, label'],['ImageCard','Asset + label','background, image, label'],['Comparison','Left + right text','0, 1'],['StepList','Tuple of steps','0, 1, …']])),
-section('Keep styling consistent', 'Set theme="midnight" or theme="light" in facelesschamp.toml. Theme values flow into every built-in block. Explicit colors override variants; variants override theme defaults.')
-])
+section('Choose the right block', 'Built-in blocks expose named children for targeted motion. Pass variant="accent" or variant="muted" to Heading, TextPanel, or MetricCard.',dict(type='table',headers=['Block','Content','Named children'],rows=[['Heading','Text','text'],['TextPanel','Text + optional title','background, text, title'],['MetricCard','Value + label','background, value, label'],['ImageCard','Asset + label','background, image, label'],['Comparison','Left + right text','0, 1'],['StepList','Tuple of steps','0, 1, …'],['WhiteboardDrawing','Path and shape specifications','stroke-0, stroke-1, …']])),
+section('Keep styling consistent', 'Set theme="midnight", theme="light", or theme="whiteboard" in facelesschamp.toml. Theme values flow into every built-in block. Explicit colors override variants; variants override theme defaults.')
+], guide='kit')
 custom = code('''
 from dataclasses import dataclass
 from faceless_champ import Circle, Group, Text
@@ -362,7 +367,7 @@ lesson('custom-blocks', 'Your own blocks', 'The framework', 'Turn a repeated vis
 section('Implement compose()', 'A block defines content, not live component state. compose(context, bounds) creates fresh core components every time the block is placed.',custom),
 section('Respect the block contract', 'Return BlockBuild(root, children). Named children must belong to the root hierarchy. Finish grouping and layout before returning; the measured root must fit the supplied bounds. Keep reusable props immutable.',note('Do not store core components on the block definition. Each placement needs independent components and animation tracks.')),
 section('Use the engine directly', 'For an advanced visual, segment.add_core(lambda ctx, bounds: component) accepts a factory that returns a fresh Component or BlockBuild. Place the result inside the supplied bounds.')
-])
+], guide='kit')
 lesson('framework-narration', 'Narrated projects', 'The framework', 'Use narration windows to determine segment lengths and preserve the source clock.', [
 section('Start with the narrated template', 'The template includes runnable synthetic demonstration speech and sentence-level SRT cues. It visibly labels the sample. Replace its manifest entries and markers with your own narration.',code('''
 fc-kit init narrated-video --template narrated-short
@@ -389,7 +394,7 @@ def build(ctx):
     return video
 '''),note('Entrance durations must fit each cue window. The final segment holds through an audio tail; the build report identifies that extension.')),
 section('Enable captions intentionally', 'Use captions=true in project configuration when you want the kit’s caption overlay. Layout reserves the configured caption space before placing blocks. The bundled template has sentence cues; use your own word-aligned SRT for word highlighting.')
-])
+], guide='kit')
 properties = code('''
 from faceless_champ import Canvas, Rectangle, Scene, Text
 
@@ -493,18 +498,235 @@ scene.render("output/final.mp4", width=1920, height=1080,
              fps=30, antialias=2, crf=18,
              preset="medium", overwrite=True)
 ''')),
-section('Use the kit workflow', 'The kit validates every export profile and writes reports under .fc-kit/reports/. Default preview covers the first ten seconds; render exports the full video.',code('''
-fc-kit validate main
-fc-kit inspect main --json
-fc-kit preview main --start 0 --end 3 -o output/preview.mp4
-fc-kit render main -o output/final.mp4
-''','bash'),note('A successful still or short preview verifies that sample. Inspect and decode the completed video before considering the full export verified.'))
+section('Use the kit workflow', 'Structured kit projects have their own validation and export commands in the framework guide.', link('Kit preview and export →', 'kit.html#kit-preview-and-export'))
 ])
 lesson('troubleshooting', 'Troubleshooting', 'Ship your video', 'Resolve common authoring and export errors with small, specific checks.', [
-section('Common fixes', 'Most issues become clear in a small preview or a validation report.',dict(type='table',headers=['Symptom','Fix'],rows=[['FFmpeg / ffprobe missing','Install FFmpeg and check PATH.'],['Unknown encoder libx264','Use a build with the H.264 encoder.'],['Output already exists','Choose another path or use --overwrite.'],['Audio starts late','Use add_audio(..., start=0).'],['Animation overlap','Separate writes to the same property.'],['Invalid dimensions','Supply both even dimensions; preserve aspect ratio.'],['TEXT_FIT / layout overflow','Shorten content, increase its bounds, or split it.'],['Missing asset in final profile','Supply the real asset; placeholders require explicit opt-in.'],['Final state is absent','Add wait() after the last animation.'],['Crossfade is too long','Shorten the fade or lengthen its children.']])),
+section('Common fixes', 'Most issues become clear in a small preview or a validation report.',dict(type='table',headers=['Symptom','Fix'],rows=[['FFmpeg / ffprobe missing','Install FFmpeg and check PATH.'],['Unknown encoder libx264','Use a build with the H.264 encoder.'],['Output already exists','Choose another path or use --overwrite.'],['Audio starts late','Use add_audio(..., start=0).'],['Animation overlap','Separate writes to the same property.'],['Invalid dimensions','Supply both even dimensions; preserve aspect ratio.'],['Final state is absent','Add wait() after the last animation.'],['Crossfade is too long','Shorten the fade or lengthen its children.']])),
 section('Bound the work', 'Use ql or a 960 × 540 excerpt at 15 fps with antialias=1. Rendering uses a CPU Pillow renderer and streams frames to FFmpeg. Higher resolution, frame rate, antialiasing, and deep masks increase rendering cost.'),
-section('Keep the current scope clear', 'The core currently exports MP4. GPU rendering, camera animation, video import, and graphical editing are future work. The framework is a local release candidate; its runtime neither downloads media nor generates speech.')
+section('Keep the current scope clear', 'The core currently exports MP4. GPU rendering, camera animation, video import, and graphical editing are future work.')
 ])
 
-(DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, coreVersion='0.1.0', kitVersion='0.1.0rc1'), indent=2) + '\n')
-print(f'Generated {len(lessons)} chapters and {len(list(EXAMPLES.glob("*.py")))} downloadable examples.')
+lesson('kit-installation', 'Installation', 'Start here', 'Install the framework and its core engine, then check your local video tools.', [
+section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc1 is a local release candidate; these instructions do not assume a published release.', code('''
+git clone https://github.com/nitisbig/Faceless-Champ.git
+cd Faceless-Champ
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e . -e ./facelesschamp-kit
+''', 'bash')),
+section('Check FFmpeg and the engine', 'Install FFmpeg and ffprobe with the libx264 encoder. doctor checks Python, encoding tools, output access, and optional dependencies.', code('''
+sudo apt install ffmpeg
+fc-kit doctor
+fc-kit list templates
+''', 'bash')),
+section('Add optional capabilities', 'The core handles rendering; the kit handles projects, blocks, assets, and templates. Geometry-only whiteboards need no extra dependencies. For equations or maps, install the matching extras from the repository root.', code('python -m pip install -e ".[equations,maps]" -e "./facelesschamp-kit[equations,maps]"', 'bash'), link('Learn the core components and animations →', 'index.html')),
+], guide='kit')
+
+silent_template = code('''
+from facelesschamp_kit.templates import silent
+
+
+def build(ctx):
+    return silent(ctx, value=3, label="Steps from idea to video")
+''', filename='kit_silent.py', kind='kit')
+narrated_template = code('''
+from facelesschamp_kit.templates import narrated
+
+
+def build(ctx):
+    return narrated(
+        ctx,
+        audio="voiceover",
+        subtitles="word_cues",
+        markers={"hook": 1, "comparison": 2, "finish": 3},
+    )
+''', filename='kit_narrated.py', kind='kit', template='narrated-short')
+lesson('templates', 'Template catalog', 'Templates', 'Choose a runnable starter, edit its Python factory, and turn it into your own video.', [
+section('Choose a starter', 'List the installed templates, then pick a fresh destination directory. init refuses to merge into an existing directory.', code('fc-kit list templates', 'bash'), dict(type='table', headers=['Template', 'Starting point', 'Defaults'], rows=[
+    ['silent', 'Ten-second metric, comparison, and steps', 'Shorts · midnight · no audio'],
+    ['explainer-short', 'Alias of the silent scaffold', 'Same files and defaults as silent'],
+    ['narrated-short', 'Thirty-second synthetic narration demo', 'Shorts · midnight · sentence SRT cues'],
+    ['whiteboard-basic', 'Two five-second drawing scenes', 'Landscape · whiteboard · no captions'],
+])),
+section('Create an editable project', 'Choose one command below. Each creates videos/main.py, facelesschamp.toml, an asset manifest, and local component/data folders. Generated files belong to you; upgrading the package does not rewrite them.', code('''
+fc-kit init silent-video --template silent
+fc-kit init explainer-video --template explainer-short
+fc-kit init narrated-video --template narrated-short
+fc-kit init board-video --template whiteboard-basic
+''', 'bash')),
+section('Call a template from Python', 'A callable template returns an ordinary editable Video. Save this factory in a silent project; adjust its content or append segments before returning it.', silent_template),
+section('Use the narrated factory', 'Save this in a narrated-short project, which supplies the voiceover and word_cues manifest entries. The bundled sample is labeled SYNTHETIC DEMO AUDIO and uses sentence cues, not word-aligned subtitles.', narrated_template),
+section('Replace the demonstration media', 'Replace the package resource entries in assets/manifest.json with paths to your own audio and SRT, remove the synthetic source metadata, and update the original cue indices in your factory. The narrated callable expects hook, comparison, and finish marker names. The runtime does not generate speech or download media.', link('Narration windows and captions →', '#framework-narration')),
+section('Choose drawing recipes', 'whiteboard_basic(ctx, scenes=...) returns a Video with sequential stroke reveals. Use the next chapter for geometry, themes, timing, and narrated drawing scenes.', link('Build a whiteboard video →', '#whiteboard-videos')),
+], guide='kit')
+
+whiteboard = code('''
+from facelesschamp_kit.blocks import (
+    WhiteboardArrow, WhiteboardCircle, WhiteboardDrawing,
+    WhiteboardLine, WhiteboardPath, WhiteboardRectangle,
+)
+from facelesschamp_kit.templates import WhiteboardScene, whiteboard_basic
+
+
+def build(ctx):
+    return whiteboard_basic(
+        ctx,
+        theme=ctx.theme,
+        draw_fraction=0.7,
+        scenes=[
+            WhiteboardScene(
+                name="connect",
+                duration=5,
+                drawing=WhiteboardDrawing(
+                    viewbox=(1400, 700),
+                    drawings=(
+                        WhiteboardCircle(center=(350, 350), radius=140, stroke_width=8),
+                        WhiteboardArrow(start=(540, 350), end=(860, 350),
+                                        color="#2563EB", stroke_width=8),
+                        WhiteboardCircle(center=(1050, 350), radius=140, stroke_width=8),
+                    ),
+                ),
+            ),
+            WhiteboardScene(
+                name="progress",
+                duration=5,
+                drawing=WhiteboardDrawing(
+                    viewbox=(1400, 700),
+                    drawings=(
+                        WhiteboardRectangle(x=200, y=120, width=1000, height=460,
+                                            stroke_width=8),
+                        WhiteboardLine(start=(300, 480), end=(1100, 480),
+                                       color="#64748B", stroke_width=6),
+                        WhiteboardPath(points=((300, 440), (500, 400), (700, 320),
+                                               (900, 300), (1100, 200)),
+                                       color="#2563EB", stroke_width=10),
+                    ),
+                ),
+            ),
+        ],
+    )
+''', filename='kit_whiteboard.py', kind='kit', template='whiteboard-basic')
+lesson('whiteboard-videos', 'Whiteboard videos', 'Templates', 'Draw an idea stroke by stroke, hold the finished diagram, then clear the board for the next scene.', [
+section('Start a whiteboard project', 'This starter selects landscape, the whiteboard theme, and no captions. Replace videos/main.py with the downloadable factory below. The preview above shows the complete ten-second example.', code('''
+fc-kit init my-board --template whiteboard-basic
+cd my-board
+fc-kit validate main
+fc-kit frame main --time 4 -o output/frame.png
+fc-kit storyboard main -o output/storyboard
+fc-kit preview main -o output/preview.mp4
+''', 'bash')),
+section('Build two drawing scenes', 'WhiteboardScene is an immutable recipe. Each scene has a unique name, a drawing, and either a positive duration or a narration cue window. This example uses no labels so the geometry carries the explanation.', whiteboard),
+section('Choose paths and shapes', 'Import these immutable specifications from facelesschamp_kit.blocks. Each accepts color=None and stroke_width=5. Shapes are outlines without fills; open lines and paths have rounded ends.', dict(type='table', headers=['Specification', 'Geometry'], rows=[
+    ['WhiteboardPath(points, closed=False)', 'At least two distinct points; three for a closed outline'],
+    ['WhiteboardLine(start, end)', 'A straight stroke'],
+    ['WhiteboardArrow(start, end, tip_size=18)', 'A stroke and arrowhead'],
+    ['WhiteboardRectangle(x, y, width, height)', 'Top-left corner and dimensions'],
+    ['WhiteboardCircle(center, radius)', 'Center and radius'],
+])),
+section('Fit the drawing to the canvas', 'WhiteboardDrawing(drawings, viewbox=(1000, 1000)) uses source coordinates from the top-left, with x right and y down. Keep all geometry inside the viewbox, including full circle outlines. Coordinates and dimensions must be finite, strokes positive, and arrowheads no longer than their line. The complete viewbox fits uniformly inside the safe area; changing formats preserves proportions and whitespace without rearranging the geometry.', code('''
+# Edit these existing entries in facelesschamp.toml:
+[videos.main]
+factory = "videos.main:build"
+format = "shorts"  # Use "landscape" for 16:9.
+theme = "whiteboard"
+captions = false
+''', 'toml')),
+section('Draw, hold, and clear', 'The default draw_fraction=0.7 divides the first 70% of each scene equally among its strokes, in order. Later strokes remain hidden until their start; the remaining 30% holds the completed board. Each new scene clears the previous drawing. Choose 0 < draw_fraction < 1. Omitted starts append scenes; explicit starts may leave blank gaps. Scenes must be chronological and cannot overlap.', note('WhiteboardDrawing used directly with segment.add() shows the completed drawing. The whiteboard_basic template schedules the reveals; its named children are stroke-0, stroke-1, and so on.')),
+section('Add labels and style', 'An optional WhiteboardScene label fades in at the start and reserves the top 15% of the safe area. Labels wrap and shrink; unfit text produces TEXT_FIT. Captions reserve a separate bottom area. The factory defaults to WHITEBOARD and updates the context theme and canvas; pass theme=ctx.theme, as the example does, to honor project configuration.', code('''
+from dataclasses import replace
+from facelesschamp_kit.themes import WHITEBOARD
+
+custom_theme = replace(WHITEBOARD, foreground="#17324D", accent="#F97316")
+# In build(ctx), pass theme=custom_theme to whiteboard_basic.
+# Add label="Connect ideas" to a WhiteboardScene to enable its label.
+''')),
+section('Attach your narration', 'Register your own audio and subtitle paths in assets/manifest.json. Supply audio, subtitles, and a nonempty marker mapping together. The marker values are original SRT cue indices, which need not be consecutive.', code('''
+{
+  "voice": {"type": "audio", "path": "assets/audio/voice.wav"},
+  "words": {"type": "subtitle", "path": "assets/words.srt"}
+}
+''', 'json'), code('''
+from facelesschamp_kit.blocks import WhiteboardCircle, WhiteboardDrawing
+from facelesschamp_kit.templates import WhiteboardScene, whiteboard_basic
+
+
+def build(ctx):
+    first_drawing = WhiteboardDrawing(
+        drawings=(WhiteboardCircle(center=(500, 500), radius=200),))
+    second_drawing = WhiteboardDrawing(
+        drawings=(WhiteboardCircle(center=(300, 500), radius=150),
+                  WhiteboardCircle(center=(700, 500), radius=150)))
+    return whiteboard_basic(
+        ctx,
+        theme=ctx.theme,
+        audio="voice",
+        subtitles="words",
+        markers={"opening": 7, "explanation": 19},
+        captions=False,
+        scenes=[
+            WhiteboardScene("opening", first_drawing,
+                            cues=("opening", "explanation")),
+            WhiteboardScene("explanation", second_drawing,
+                            cues=("explanation", None)),
+        ],
+    )
+'''), note('This factory requires your own media and valid cue indices; replace its simple circles with your own drawings. Audio starts at master time zero, preserving leading silence. A gap before the first cue shows an empty board; None ends the last window at the audio duration. Do not combine cues with start or duration in one scene. The last board holds through an attached audio tail. captions=None inherits project configuration.')),
+section('Extend the returned video', 'The returned Video supports normal segments and overlays. Add a closing segment or target drawing children with core animations. The implemented template supports geometry outlines. Hand overlays, image tracing, handwriting fonts, media generation, and boards that persist across recipe scenes are future capabilities.', link('Create your own reusable blocks →', '#custom-blocks')),
+], 'whiteboard', guide='kit')
+
+lesson('kit-preview-and-export', 'Preview & export', 'Ship your video', 'Validate the project, inspect its layout, and export using the configured profiles.', [
+section('Validate before rendering', 'Validation checks every export profile and writes reports under .fc-kit/reports/. inspect summarizes the built timeline and assets.', code('''
+fc-kit validate main
+fc-kit inspect main --json
+''', 'bash')),
+section('Inspect frames and scenes', 'Frame times must lie inside the video duration. The storyboard samples the project; use a segment ID from inspect to focus a preview.', code('''
+fc-kit frame main --time 1 -o output/frame.png
+fc-kit storyboard main -o output/storyboard
+fc-kit preview main --start 0 --end 3 -o output/excerpt.mp4
+''', 'bash')),
+section('Preview and export', 'preview defaults to the first ten seconds; render exports the complete video with the final profile. Output paths resolve from the invoking directory. Add --overwrite to deliberately replace an existing export.', code('''
+fc-kit preview main -o output/preview.mp4
+fc-kit render main -o output/final.mp4
+''', 'bash'), note('A successful still or short preview verifies that sample. Inspect representative frames and completely decode the final export before treating the full video as verified.')),
+], guide='kit')
+lesson('kit-troubleshooting', 'Troubleshooting', 'Ship your video', 'Use diagnostics and short previews to resolve project, template, and export errors.', [
+section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Errors include the relevant project or segment context.', dict(type='table', headers=['Symptom', 'Fix'], rows=[
+    ['FFmpeg / ffprobe / libx264 missing', 'Install FFmpeg and check PATH with fc-kit doctor.'],
+    ['Destination already exists', 'Use a new directory; init does not merge projects.'],
+    ['TEXT_FIT / layout overflow', 'Shorten labels, enlarge bounds, or split the scene.'],
+    ['Missing asset / final placeholder', 'Provide the actual manifest asset; final exports reject placeholders by default.'],
+    ['Unknown narration marker', 'Use an existing original SRT cue index and the correct marker name.'],
+    ['WHITEBOARD_TIMING', 'Keep scenes chronological and nonoverlapping, with 0 < draw_fraction < 1.'],
+    ['Invalid whiteboard geometry', 'Keep shapes inside the viewbox with finite dimensions and positive strokes.'],
+    ['Whiteboard appears immediately', 'Use whiteboard_basic for animation; the standalone block displays the completed drawing.'],
+    ['Wrong whiteboard colors', 'Select theme="whiteboard" in the project when passing theme=ctx.theme.'],
+    ['Output already exists', 'Choose another path or explicitly add --overwrite.'],
+])),
+section('Bound the work', 'Use a frame, a storyboard, and a short preview before raising resolution or frame rate. The kit uses the core CPU Pillow renderer and FFmpeg encoder.'),
+section('Keep the current scope clear', 'The framework is a local 0.1.0rc1 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
+], guide='kit')
+
+core_lessons = [item for item in lessons if item['guide'] == 'core']
+kit_lessons = {item['id']: item for item in lessons if item['guide'] == 'kit'}
+for item in lessons:
+    if item['id'] in ('framework-quickstart', 'project-configuration'):
+        item['group'] = 'Start here'
+    elif item['id'] in ('blocks-and-themes', 'custom-blocks', 'framework-narration'):
+        item['group'] = 'Framework fundamentals'
+# Keep chapter groups contiguous in the sidebar and reading order.
+kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration',
+             'blocks-and-themes', 'custom-blocks', 'framework-narration', 'templates',
+             'whiteboard-videos', 'kit-preview-and-export', 'kit-troubleshooting']
+assert set(kit_order) == set(kit_lessons)
+lessons = core_lessons + [kit_lessons[key] for key in kit_order]
+guides = {
+    'core': dict(title='Faceless Champ Core Guide', label='Core library', file='index.html',
+                 version='0.1.0', kind='PYTHON LIBRARY', home='hello-world',
+                 introduction='Create animated videos with Python scenes, components, and a precise timeline.'),
+    'kit': dict(title='facelesschamp-kit Guide', label='Kit framework', file='kit.html',
+                version='0.1.0rc1', kind='FRAMEWORK', home='framework-quickstart',
+                introduction='Build structured video projects with reusable blocks, editable templates, and narration cues.'),
+}
+(DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, guides=guides), indent=2) + '\n')
+print(f'Generated {len(core_lessons)} core and {len(kit_lessons)} kit chapters, '
+      f'with {len(list(EXAMPLES.glob("*.py")))} downloadable examples.')
