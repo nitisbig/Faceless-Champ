@@ -5,6 +5,22 @@ description: Author and render Python videos with Faceless Champ scenes, animati
 
 # Faceless Champ authoring
 
+- Use public fit_text(text, Bounds(...), font_size=..., min_font_size=..., color=...)
+  for measured wrapping/shrinking; it returns an unowned centered Text. Use ordinary
+  Text for exact whitespace such as code indentation. Impossible fits are errors.
+- In kit projects, use Segment.cue_time(original_index, edge="start", offset=0)
+  and add/add_core(at=..., duration=...) for individual word-triggered visuals.
+  Entrances and motions must remain inside placement lifetimes; narration is attached
+  once at master zero. Keep defaults compatible and preserve original cue indices.
+- Use kit FlowDiagram(steps, direction="horizontal" or "vertical") for measured
+  workflows. Named node-N, label-N, edge-N children support independent animation.
+  ImageCard uses ImageSlot boxes labeled with the manifest filename. Compact
+  TextPanel grids fit both title and body using measured allocations.
+- The programming-value example supplies six chapters, four images/ slots and
+  an outline written before scene code. Its render.py defaults to 0–12 seconds at
+  960×540/15 fps. Use --storyboard, --range, --scene and --frame for feedback;
+  --full is an explicit later action, not part of preview validation.
+
 Read [the API](../../docs/api.md) for supported constructors and
 [the examples](../../examples/showcase.py) for complete scenes. Use
 [the guide](../../docs/guide.md) when working with timing, sound, or nested layouts.

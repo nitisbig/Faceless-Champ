@@ -1,11 +1,13 @@
 """Composition-only blocks. All rendering belongs to faceless-champ."""
 
 from dataclasses import dataclass
+from pathlib import Path
 
-from faceless_champ import Bounds, Image, Number, Rectangle
+from faceless_champ import Bounds, ImageSlot, Number, Rectangle
 
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
+from .flow import FlowDiagram
 from .whiteboard import (
     WhiteboardArrow,
     WhiteboardCircle,
@@ -60,18 +62,19 @@ class TextPanel:
 
     def compose(self, ctx, bounds):
         box = centered(bounds, 600)
-        p = ctx.theme.spacing
+        p = min(ctx.theme.spacing, max(8, box.height / 12))
         children = {"background": panel(ctx, box)}
         top = box.top + p
         if self.title:
+            title_height = min(120, (box.height - 3 * p) * 0.38)
             children["title"] = fit_text(
                 self.title,
                 ctx,
-                Bounds(box.left + p, top, box.right - p, top + 120),
-                size=ctx.theme.heading_size,
+                Bounds(box.left + p, top, box.right - p, top + title_height),
+                size=min(ctx.theme.heading_size, ctx.theme.body_size * 1.4),
                 color=ctx.theme.accent,
             )
-            top += 150
+            top += title_height + p
         children["text"] = fit_text(
             self.text,
             ctx,
@@ -124,10 +127,21 @@ class ImageCard:
         children = {"background": panel(ctx, box)}
         image_box = Bounds(box.left + p, box.top + p, box.right - p, box.bottom - (120 if self.label else p))
         path = ctx.assets.image(self.asset, self.mode)
-        if path:
-            children["image"] = Image(path, width=image_box.width, height=image_box.height, position=image_box.center)
-        else:
-            children["image"] = fit_text(f"PLACEHOLDER\n{self.asset}", ctx, image_box, color=ctx.theme.muted)
+        entry = ctx.assets.entries.get(self.asset, {})
+        label = Path(entry.get("path", self.asset)).name
+        children["image"] = ImageSlot(
+            path or ctx.root / label,
+            mode=self.mode if path else "placeholder",
+            label=label,
+            width=image_box.width,
+            height=image_box.height,
+            position=image_box.center,
+            placeholder_fill=ctx.theme.surface,
+            placeholder_stroke=ctx.theme.muted,
+            placeholder_color=ctx.theme.foreground,
+            placeholder_font=ctx.theme.font,
+            placeholder_font_size=ctx.theme.body_size,
+        )
         if self.label:
             children["label"] = fit_text(
                 self.label, ctx, Bounds(box.left + p, image_box.bottom, box.right - p, box.bottom - p)
@@ -167,6 +181,7 @@ __all__ = [
     "Block",
     "BlockBuild",
     "Comparison",
+    "FlowDiagram",
     "Heading",
     "ImageCard",
     "MetricCard",

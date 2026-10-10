@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
 
-from faceless_champ import Bounds, Component, Group, Text
+from faceless_champ import Bounds, Component, Group
+from faceless_champ import fit_text as core_fit_text
 
 from ..diagnostics import KitError
 
@@ -32,35 +33,18 @@ def fit_text(text, ctx, box, *, size=None, color=None, align="center"):
     minimum = theme.minimum_font_size
     if size < minimum:
         raise KitError("TEXT_FIT", "Requested font size is below theme minimum")
-    for font_size in range(int(size), int(minimum) - 1, -2):
-
-        def make(value, font_size=font_size):
-            return Text(
-                value,
-                font=theme.font,
-                font_size=font_size,
-                color=color or theme.foreground,
-                align=align,
-                spacing=8,
-                position=box.center,
-            )
-
-        lines = []
-        for paragraph in text.split("\n"):
-            line = ""
-            for word in paragraph.split():
-                candidate = f"{line} {word}".strip()
-                if line and make(candidate).bounds.width > box.width:
-                    lines.append(line)
-                    line = word
-                else:
-                    line = candidate
-            lines.append(line)
-        result = make("\n".join(lines))
-        measured = result.bounds
-        if measured.width <= box.width and measured.height <= box.height:
-            return result
-    raise KitError("TEXT_FIT", "Text cannot fit at the minimum size; shorten it or allocate more space")
+    try:
+        return core_fit_text(
+            text,
+            box,
+            font_size=size,
+            min_font_size=minimum,
+            font=theme.font,
+            color=color or theme.foreground,
+            align=align,
+        )
+    except ValueError as exc:
+        raise KitError("TEXT_FIT", str(exc)) from exc
 
 
 def centered(box, height, width=None):

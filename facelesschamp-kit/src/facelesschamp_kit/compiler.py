@@ -56,6 +56,10 @@ def compile_video(video):
         for placement in segment.placements:
             scope = {"segment": segment.name, "placement": placement.handle.placement}
             try:
+                placement_start = segment.start + placement.at
+                placement_end = placement_start + placement.duration if placement.duration is not None else end
+                if placement.at >= segment.duration or placement_end > end + 1e-9:
+                    raise KitError("PLACEMENT_WINDOW", "Placement exceeds segment")
                 bounds = placement.bounds or ctx.bounds
                 built = placement.block(ctx, bounds) if placement.core else placement.block.compose(ctx, bounds)
                 if not isinstance(built, BlockBuild):
@@ -79,20 +83,25 @@ def compile_video(video):
                     raise KitError("LAYOUT", "Block exceeds allocated bounds; resize content or change its layout")
                 built.root.z_index = placement.z_index
                 builds[placement.handle.placement] = built
-                events.append((segment.start, 1, "add", built.root, None, scope))
-                events.append((end, 0, "remove", built.root, None, scope))
+                events.append((placement_start, 1, "add", built.root, None, scope))
+                events.append((placement_end, 0, "remove", built.root, None, scope))
                 segment_reports[-1]["placements"].append(
                     {
                         "id": placement.handle.placement,
                         "bounds": {k: getattr(b, k) for k in ("left", "top", "right", "bottom")},
                         "children": list(built.children),
                         "z_index": placement.z_index,
+                        "start": placement_start,
+                        "end": placement_end,
                     }
                 )
                 if placement.enter:
                     run = placement.enter_duration or ctx.theme.motion_duration
-                    if run > segment.duration:
-                        raise KitError("MOTION_WINDOW", "Entry recipe exceeds segment; shorten enter_duration")
+                    authored_lifetime = (
+                        placement.duration if placement.duration is not None else segment.duration - placement.at
+                    )
+                    if run > authored_lifetime:
+                        raise KitError("MOTION_WINDOW", "Entry recipe exceeds placement; shorten enter_duration")
                     targets = (
                         list(built.root.children)
                         if placement.enter == "stagger" and isinstance(built.root, Group)
@@ -104,7 +113,7 @@ def compile_video(video):
                         recipe = PopIn if placement.enter == "pop" else FadeIn
                         animation = recipe(target)
                         hidden.add(target)
-                        events.append((segment.start + i * step, 2, "play", animation, leaf_duration, scope))
+                        events.append((placement_start + i * step, 2, "play", animation, leaf_duration, scope))
             except KitError as exc:
                 raise KitError(exc.code, exc.message, **(exc.scope | scope)) from exc
             except (ValueError, TypeError, OSError) as exc:
@@ -113,6 +122,10 @@ def compile_video(video):
             scope = {"segment": segment.name, "placement": target.placement}
             built = builds[target.placement]
             try:
+                placement = next(p for p in segment.placements if p.handle.placement == target.placement)
+                motion_end = placement.at + placement.duration if placement.duration is not None else segment.duration
+                if local < placement.at or local + run > motion_end + 1e-9:
+                    raise KitError("MOTION_WINDOW", "Animation exceeds placement lifetime", **scope)
                 component = built.children[target.child] if target.child is not None else built.root
                 animation = factory(component)
                 if not isinstance(animation, Animation) or animation.component is not component:

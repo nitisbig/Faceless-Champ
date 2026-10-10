@@ -61,8 +61,14 @@ Shapes accept `fill=None`, `stroke="white"`, `stroke_width=4`.
 padding so strokes are not cut off. Top-left anchors refer to that raster box.
 
 Text accepts an explicit TTF/OTF font file; `None` uses the bundled DejaVu Sans.
+`fit_text(text, bounds, *, font_size=64, min_font_size=24, font=None,
+font_weight=None, color="white", align="center", spacing=8)` returns an unowned
+Text centered inside positive `Bounds`. It wraps words, preserves explicit newline
+breaks, then shrinks in two-pixel steps (always trying the minimum) until measured
+geometry fits. Unbreakable words are shrunk rather than split; impossible fits
+raise `ValueError`. Use ordinary Text when exact whitespace/indentation is needed.
 Newlines are supported; `align` is left, center, or right alignment within multiline
-text. There is no automatic wrapping, rich text, font-family lookup, or guaranteed
+text. Text itself does not wrap. There is no rich text, font-family lookup, or guaranteed
 fallback for characters absent from the selected font.
 `font_weight` sets the Weight axis of an explicit variable font. Values must fit
 that font's axis range; static fonts reject this option. `None` preserves the font's

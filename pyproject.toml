@@ -1,6 +1,6 @@
 [project]
 name = "faceless-champ"
-version = "0.1.0"
+version = "0.1.1"
 description = "Programmatic animated video editing for developers and AI agents"
 readme = "README.md"
 authors = [

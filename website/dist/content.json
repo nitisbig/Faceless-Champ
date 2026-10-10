@@ -193,6 +193,17 @@
           ]
         },
         {
+          "title": "Fit text into a box",
+          "text": "Use fit_text when a label should wrap and shrink inside measured Bounds. The minimum size is always tried; impossible fits raise an error. Plain Text preserves exact whitespace such as code indentation.",
+          "blocks": [
+            {
+              "type": "code",
+              "language": "python",
+              "code": "from faceless_champ import Bounds, fit_text\n\nlabel = fit_text(\"Understand the system.\\nChoose a useful problem.\",\n                 Bounds(240, 280, 1680, 800), font_size=100,\n                 min_font_size=40, color=\"#292724\")\n"
+            }
+          ]
+        },
+        {
           "title": "Style before scheduling",
           "text": "Set fill, stroke, opacity, scale, and rotation before adding a component. Once it is on the timeline, use its animation builder for a timed change.",
           "blocks": [
@@ -849,7 +860,7 @@
             },
             {
               "type": "note",
-              "text": "facelesschamp-kit 0.1.0rc1 is a local release candidate. The guide uses the implementation in this repository."
+              "text": "facelesschamp-kit 0.1.0rc2 is a local release candidate. The guide uses the implementation in this repository."
             }
           ]
         }
@@ -866,7 +877,7 @@
       "sections": [
         {
           "title": "Install from this repository",
-          "text": "Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc1 is a local release candidate; these instructions do not assume a published release.",
+          "text": "Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc2 is a local release candidate; these instructions do not assume a published release.",
           "blocks": [
             {
               "type": "code",
@@ -977,6 +988,28 @@
               "placement": "Save as videos/main.py in a project created with --template silent."
             }
           ]
+        },
+        {
+          "title": "Build a workflow",
+          "text": "FlowDiagram fits an ordered chain into its allocation. Choose horizontal for wide canvases and vertical for tall ones. Nodes, labels, and connectors are named children; delayed placements enter at their local at time and disappear after their explicit duration.",
+          "blocks": [
+            {
+              "type": "code",
+              "language": "python",
+              "code": "from faceless_champ import Draw\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import FlowDiagram\n\ndef build(ctx):\n    video = Video(ctx)\n    segment = video.segment(\"workflow\", duration=5)\n    direction = \"horizontal\" if ctx.canvas.width > ctx.canvas.height else \"vertical\"\n    flow = segment.add(FlowDiagram((\"Input\", \"Transform\", \"Useful output\"), direction),\n                       at=0.5, duration=4, enter=\"fade\", enter_duration=0.4)\n    segment.play(flow[\"edge-0\"], Draw, at=1, duration=0.6)\n    segment.play(flow[\"node-1\"], lambda c: c.animate.scale_to(0.94), at=2, duration=0.5)\n    segment.play(flow[\"label-2\"], lambda c: c.animate.color_to(ctx.theme.accent), at=3, duration=0.5)\n    segment.play(flow, lambda c: c.animate.opacity_to(0), at=4, duration=0.5)\n    return video\n",
+              "filename": "kit_workflow.py",
+              "target": null,
+              "kind": "kit",
+              "command": "fc-kit preview main -o output/preview.mp4",
+              "template": "silent",
+              "placement": "Save as videos/main.py in a project created with --template silent."
+            }
+          ]
+        },
+        {
+          "title": "Reserve missing artwork",
+          "text": "ImageCard uses a labeled ImageSlot box matching the real image dimensions. Auto loads present files, placeholder always forces a box, and required rejects missing assets. Existing corrupt files fail in auto and required modes. TextPanel shares measured core fitting and allocates title/body space for compact cards.",
+          "blocks": []
         },
         {
           "title": "Choose the right block",
@@ -1111,6 +1144,17 @@
             {
               "type": "note",
               "text": "Entrance durations must fit each cue window. The final segment holds through an audio tail; the build report identifies that extension."
+            }
+          ]
+        },
+        {
+          "title": "Time a beat inside a segment",
+          "text": "Attach narration and use original SRT indices with segment.cue_time. Cue edges become local seconds without retiming the source. Add delayed placements with finite lifetimes; entrances and motions must fit their placement.",
+          "blocks": [
+            {
+              "type": "code",
+              "language": "python",
+              "code": "# With narration attached and cue 19 inside this segment:\nat = segment.cue_time(19)\ncard = segment.add(Heading(\"The important idea\"), at=at, duration=2, enter=\"fade\")\nsegment.play(card, lambda c: c.animate.opacity_to(0), at=at + 1.7, duration=0.3)\n"
             }
           ]
         },
@@ -1496,7 +1540,7 @@
         },
         {
           "title": "Keep the current scope clear",
-          "text": "The framework is a local 0.1.0rc1 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.",
+          "text": "The framework is a local 0.1.0rc2 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.",
           "blocks": [
             {
               "type": "link",
@@ -1516,7 +1560,7 @@
       "title": "Faceless Champ Core Guide",
       "label": "Core library",
       "file": "index.html",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "kind": "PYTHON LIBRARY",
       "home": "hello-world",
       "introduction": "Create animated videos with Python scenes, components, and a precise timeline."
@@ -1525,7 +1569,7 @@
       "title": "facelesschamp-kit Guide",
       "label": "Kit framework",
       "file": "kit.html",
-      "version": "0.1.0rc1",
+      "version": "0.1.0rc2",
       "kind": "FRAMEWORK",
       "home": "framework-quickstart",
       "introduction": "Build structured video projects with reusable blocks, editable templates, and narration cues."

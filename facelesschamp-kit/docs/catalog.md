@@ -10,8 +10,13 @@ Each block constructs ordinary core components. Both 9:16 and 16:9 and both them
 | ImageCard | asset, label="", mode="required" | theme surface | background, image, label when present |
 | Comparison | left, right | theme surface/accent | 0, 1 (the two panel roots) |
 | StepList | steps (copied to tuple) | theme accent | 0, 1, … (step roots) |
+| FlowDiagram | steps (copied to tuple), direction="horizontal" or "vertical" | theme surface/accent | node-0, label-0, edge-0, … |
 
 Heading, TextPanel, and MetricCard variants: default, accent, muted. Explicit color overrides the variant. Text wraps then shrinks to a 24-pixel theme minimum; an unbreakable word or excessive text that still cannot fit fails with TEXT_FIT. MetricCard displays whole numbers using the core Number default; animate its value child with value_to. ImageCard uses contain fitting and never crops the source image. Required media cannot be silently replaced; auto/placeholder substitutions visibly identify themselves.
+
+TextPanel allocates title and body space from its available height, so compact grid cards retain a readable body. All fitted block text uses the public core `fit_text` helper. ImageCard uses core `ImageSlot`: missing artwork reserves the same image geometry as real files and displays the manifest filename (or asset ID without a path). Auto loads a present file, placeholder always forces a box, and required fails on missing files. Existing corrupt files still fail in auto/required modes.
+
+FlowDiagram measures an ordered chain of rounded cards and connectors inside its allocation. It does not run an implicit clock. Use `handle["node-1"]` for card transforms, `handle["label-1"]` for text emphasis, and `handle["edge-0"]` with core Draw for connector reveals. Choose vertical direction for tall allocations; an allocation too small for its steps fails with LAYOUT. The new self-contained example is `examples/workflow.py`.
 
 Stack(*blocks, gap=28) allocates vertical cells. Split(*blocks, gap=28) stacks in portrait and uses columns in landscape. Nested layouts remain ordinary reusable blocks. Each child must fit its measured allocation. For explicit placement, pass core Bounds to segment.add.
 

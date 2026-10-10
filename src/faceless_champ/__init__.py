@@ -68,6 +68,7 @@ from .preview import StoryboardSample, render_storyboard, save_frame
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
 from .timeline import Grid, Layer, Scene, Sequence
+from .typography import fit_text
 
 __all__ = [
     "COLOR_SCHEMES",
@@ -139,6 +140,7 @@ __all__ = [
     "ZoomOut",
     "ease_in",
     "ease_out",
+    "fit_text",
     "flag_path",
     "linear",
     "render",
@@ -149,7 +151,7 @@ __all__ = [
     "supported_flags",
     "with_alpha",
 ]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
 from .masks import CircleMask, RectangleMask, ShapeMask, Wipe

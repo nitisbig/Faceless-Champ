@@ -1,5 +1,12 @@
 # Faceless Champ
 
+The [Programming Value example](training%20project/programming-value/README.md)
+uses both packages to compose six chapters against 1,379 original word cues.
+Start with `python3 'training project/programming-value/render.py' --image placeholder`:
+it renders only a 12-second 960×540 preview. Artwork prompts and a storyboard mode
+support feedback before full export. Public additions include `fit_text`, kit
+`FlowDiagram`, cue-timed placement lifetimes, and consistent image reservations.
+
 A Python library for creating animated videos from text, shapes, images, and audio.
 Inspired by Manim's scene authoring model, built for general video components.
 

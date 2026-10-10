@@ -13,7 +13,16 @@ from .project import Project, package_version
 from .scaffold import init_project
 
 CATALOG = {
-    "blocks": ["Heading", "TextPanel", "MetricCard", "ImageCard", "Comparison", "StepList", "WhiteboardDrawing"],
+    "blocks": [
+        "Heading",
+        "TextPanel",
+        "MetricCard",
+        "ImageCard",
+        "Comparison",
+        "StepList",
+        "FlowDiagram",
+        "WhiteboardDrawing",
+    ],
     "themes": ["midnight", "light", "whiteboard"],
     "templates": ["silent", "explainer-short", "narrated-short", "whiteboard-basic"],
 }

@@ -38,6 +38,8 @@ class Placement:
     enter_duration: float
     z_index: float
     core: bool = False
+    at: float = 0
+    duration: float | None = None
 
 
 @dataclass
@@ -48,6 +50,7 @@ class Segment:
     cues: tuple = ()
     placements: list = field(default_factory=list)
     motions: list = field(default_factory=list)
+    _track: object = field(default=None, repr=False)
 
     @property
     def end(self):
@@ -59,7 +62,38 @@ class Segment:
     def __exit__(self, *exc):
         return False
 
-    def add(self, block, *, id=None, bounds=None, anchor="center", enter=None, enter_duration=None, z_index=0):
+    def cue_time(self, index, *, edge="start", offset=0):
+        """Translate an original narration cue edge to segment-local seconds."""
+        if self._track is None:
+            raise KitError("NARRATION", "Attach narration before using cue_time", segment=self.name)
+        if not isinstance(index, int) or isinstance(index, bool) or index < 1:
+            raise KitError("CUE_INDEX", "Cue index must be a positive integer", segment=self.name)
+        if edge not in {"start", "end"}:
+            raise KitError("CUE_EDGE", "edge must be start or end", segment=self.name)
+        try:
+            cue = self._track.cue(index)
+        except KeyError:
+            raise KitError("CUE_INDEX", "Original cue does not exist", segment=self.name, cue=index) from None
+        if not self.start <= cue.start < self.end:
+            raise KitError("CUE_WINDOW", "Cue starts outside segment", segment=self.name, cue=index)
+        source = getattr(cue, edge) + number(offset, "offset", minimum=-float("inf"))
+        if not self.start <= source <= self.end:
+            raise KitError("CUE_WINDOW", "Cue event lies outside segment", segment=self.name, cue=index)
+        return source - self.start
+
+    def add(
+        self,
+        block,
+        *,
+        id=None,
+        bounds=None,
+        anchor="center",
+        enter=None,
+        enter_duration=None,
+        z_index=0,
+        at=0,
+        duration=None,
+    ):
         if anchor != "center":
             raise KitError("LAYOUT", "Use anchor='center' or explicit bounds for placement")
         if enter not in {None, "fade", "pop", "stagger"}:
@@ -70,10 +104,23 @@ class Segment:
         handle = Handle(f"{self.name}/{name}")
         if any(p.handle == handle for p in self.placements):
             raise KitError("PLACEMENT_ID", "Duplicate placement ID", placement=handle.placement)
-        duration = number(enter_duration, "enter_duration", positive=True) if enter_duration is not None else None
+        at = number(at, "at")
+        life = number(duration, "duration", positive=True) if duration is not None else None
+        run = number(enter_duration, "enter_duration", positive=True) if enter_duration is not None else None
+        if at >= self.duration or (life is not None and at + life > self.duration + 1e-9):
+            raise KitError("PLACEMENT_WINDOW", "Placement exceeds its segment", segment=self.name)
+        if enter and run is not None and run > (life if life is not None else self.duration - at):
+            raise KitError("MOTION_WINDOW", "Entrance exceeds placement lifetime", segment=self.name)
         self.placements.append(
             Placement(
-                handle, deepcopy(block), bounds, enter, duration, number(z_index, "z_index", minimum=-float("inf"))
+                handle,
+                deepcopy(block),
+                bounds,
+                enter,
+                run,
+                number(z_index, "z_index", minimum=-float("inf")),
+                at=at,
+                duration=life,
             )
         )
         return handle
@@ -94,6 +141,10 @@ class Segment:
         duration = number(duration, "duration", positive=True)
         if at + duration > self.duration + 1e-9:
             raise KitError("MOTION_WINDOW", "Animation exceeds its segment", segment=self.name)
+        placement = next(p for p in self.placements if p.handle.placement == target.placement)
+        end = placement.at + placement.duration if placement.duration is not None else self.duration
+        if at < placement.at or at + duration > end + 1e-9:
+            raise KitError("MOTION_WINDOW", "Animation exceeds placement lifetime", segment=self.name)
         self.motions.append((target, animation, at, duration))
         return self
 
@@ -146,12 +197,15 @@ class Video:
             name, number(start, "start"), number(duration, "duration", positive=True), window.cues if window else ()
         )
         self.segments.append(segment)
+        segment._track = self.voice.track if self.voice else None
         return segment
 
     def narration(self, *, audio, subtitles, markers, captions=None, overlap_tolerance=0):
         if self.voice is not None:
             raise KitError("NARRATION", "A video supports one master narration track")
         self.voice = Narration(self.context.root / audio, self.context.root / subtitles, markers, overlap_tolerance)
+        for segment in self.segments:
+            segment._track = self.voice.track
         if captions is not None:
             self.context.captions = bool(captions)
         return self.voice

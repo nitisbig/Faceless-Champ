@@ -3,6 +3,13 @@ Python 3.12+ framework over faceless-champ. Start with README.md and docs/api.md
 Use build(ctx) returning Video or a core composition. Keep content in reusable frozen blocks.
 Compose fresh primitives in compose(ctx, bounds); finish layout before compilation.
 Use segment-local times for play; narration markers reference original SRT cue numbers.
+Use Segment.cue_time(original_index, edge="start", offset=0) for local cue times.
+Segment.add/add_core accept at=0 and duration=None for delayed/finite lifetimes;
+motions and entrances must fit their placement. Reports include source start/end.
+FlowDiagram(steps, direction="horizontal"|"vertical") exposes node-N, label-N,
+and edge-N children for transforms, color changes and Draw reveals.
+ImageCard uses core ImageSlot for named boxes with matching image geometry.
+TextPanel scales title/body allocation for compact grids; core fit_text does wrapping.
 Preview uses the source clock. Validate and inspect before exporting; never infer full-export success from a frame.
 Use provided CLI and Project services rather than copying render loops.
 Read docs/catalog.md for block props and examples/custom_block.py for extension patterns.

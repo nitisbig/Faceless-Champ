@@ -122,7 +122,7 @@ def init_project(destination, template="silent"):
         (staging / "assets/manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         (staging / "pyproject.toml").write_text(
             '[project]\nname = "my-video"\nversion = "0.1.0"\n'
-            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc1"]\n'
+            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc2"]\n'
         )
         (staging / ".gitignore").write_text("output/\n.fc-kit/\n.venv/\n__pycache__/\n")
         instructions = (

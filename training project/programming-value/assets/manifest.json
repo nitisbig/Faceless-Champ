@@ -1,0 +1,6 @@
+{
+  "art-1": {"type": "image", "path": "images/1.png", "source": "User-supplied editorial AI illustration", "license": "User supplied"},
+  "art-2": {"type": "image", "path": "images/2.png", "source": "User-supplied small-business workspace", "license": "User supplied"},
+  "art-3": {"type": "image", "path": "images/3.png", "source": "User-supplied professional applications montage", "license": "User supplied"},
+  "art-4": {"type": "image", "path": "images/4.png", "source": "User-supplied human context illustration", "license": "User supplied"}
+}

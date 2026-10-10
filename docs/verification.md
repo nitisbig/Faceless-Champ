@@ -1,5 +1,45 @@
 # v0.1 verification
 
+## Programming Value and shared authoring APIs — 2026-10-10
+
+Core source version 0.1.1 and kit 0.1.0rc2 add public measured text fitting,
+cue-local scheduling, delayed/finite placement lifetimes, responsive text panels,
+workflow blocks, and consistent labeled image cards. The kit requires core >=0.1.1.
+
+- Combined core/kit suite: **441 tests passed**; Ruff and diff whitespace checks passed.
+- Core wheel/sdist and kit wheel/sdist built locally. Both wheels installed into a
+  clean /tmp environment with Pillow 12.3.0, no source-tree imports; dependency
+  checks and workflow frames in both landscape and portrait passed.
+- Both guide sites: **26 chapters, 33 Python snippets, 19 downloadable examples,
+  four starters** verified; the eight existing guide previews rendered and decoded.
+- Programming Value: six source-clock chapters cover the probed **493.152 s**
+  narration; all **1,379 cues and six 1 ms overlaps** remain unchanged. Audio is
+  attached once at zero. There are 179 placements and 115 distinct entrance times.
+- Inspected the 24-frame storyboard, dense seven-question layout, conceptual
+  cost/value curves, opening code race, and decoded frames from each chapter.
+  Reduced project card overshoot to preserve its 72-pixel safe margins.
+- **1,638 animated root-bound samples**, including descendant animation endpoints
+  and keyframe extrema, found no safe-area overflow. Nine cached/uncached frame
+  comparisons were pixel-identical.
+- Seven low-quality excerpts: **1,123 encoded frames**, 960×540 / 15 fps, completely
+  decoded. Durations match the selected ranges within one preview frame. Their
+  audio correlations against corresponding source MP3 intervals were
+  **0.99958–0.99988**, without shifting the reference audio.
+- Workflow frame benchmark: 117 frames at 960×540/antialias 1 in approximately
+  **0.72 s** (163 frames/s) on this machine, excluding compilation/encoding.
+  No renderer performance patch was warranted by the sampled workload.
+- Native kit Project validation and CLI invocation from /tmp passed. Missing
+  required artwork, NaN ranges, endpoint frames, unknown scenes, incorrect aspect
+  ratios and overwrite protection produced expected errors.
+
+Only selected previews and frames were rendered. **Full-length, production-quality,
+and 4K exports remain unverified.** All four user artwork slots remain placeholders.
+Project evidence is in its ignored output/verification.json, output/storyboard/, and
+output/decoded/. The outline, prompts and source-only composition are in
+training project/programming-value.
+
+## Earlier verification
+
 Verified on Linux on 2026-10-03 with Python 3.12.3, Pillow 12.3.0, and FFmpeg 6.1.1.
 
 - **28 pytest cases passed**, covering deterministic animation, snapshots, conflicts,

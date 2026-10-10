@@ -108,6 +108,13 @@ from faceless_champ import Text
 label = Text("One idea.\\nTwo lines.", font_size=64,
              color="#48e0cb", position=(960, 540))
 ''')),
+section('Fit text into a box', 'Use fit_text when a label should wrap and shrink inside measured Bounds. The minimum size is always tried; impossible fits raise an error. Plain Text preserves exact whitespace such as code indentation.', code('''
+from faceless_champ import Bounds, fit_text
+
+label = fit_text("Understand the system.\\nChoose a useful problem.",
+                 Bounds(240, 280, 1680, 800), font_size=100,
+                 min_font_size=40, color="#292724")
+''')),
 section('Style before scheduling', 'Set fill, stroke, opacity, scale, and rotation before adding a component. Once it is on the timeline, use its animation builder for a timed change.', note('Finish Group membership and initial layout before adding the group to a scene.'))
 ], 'text-shapes')
 timing = code('''
@@ -267,7 +274,7 @@ fc-kit frame main --time 1.5 -o output/frame.png
 fc-kit storyboard main -o output/storyboard
 fc-kit preview main --segment hook -o output/hook.mp4
 fc-kit render main -o output/main.mp4
-''','bash'),note('facelesschamp-kit 0.1.0rc1 is a local release candidate. The guide uses the implementation in this repository.'))
+''','bash'),note('facelesschamp-kit 0.1.0rc2 is a local release candidate. The guide uses the implementation in this repository.'))
 ], 'kit', guide='kit', portrait=True)
 lesson('project-configuration', 'Project configuration', 'The framework', 'Keep format, themes, assets, and export settings in a predictable project layout.', [
 section('Know the project layout', 'The scaffold separates authoring code from local assets and workflow outputs.', code('''
@@ -332,6 +339,24 @@ def build(ctx):
 ''',filename='kit_blocks.py',kind='kit')
 lesson('blocks-and-themes', 'Blocks & themes', 'The framework', 'Reusable content definitions compose fresh core components into measured layouts.', [
 section('Compose a block layout', 'Stack allocates vertical cells. Split stacks in portrait and uses columns in landscape. Text wraps, then shrinks to the theme minimum; content that still cannot fit fails with a useful error.',blocks),
+section('Build a workflow', 'FlowDiagram fits an ordered chain into its allocation. Choose horizontal for wide canvases and vertical for tall ones. Nodes, labels, and connectors are named children; delayed placements enter at their local at time and disappear after their explicit duration.', code('''
+from faceless_champ import Draw
+from facelesschamp_kit import Video
+from facelesschamp_kit.blocks import FlowDiagram
+
+def build(ctx):
+    video = Video(ctx)
+    segment = video.segment("workflow", duration=5)
+    direction = "horizontal" if ctx.canvas.width > ctx.canvas.height else "vertical"
+    flow = segment.add(FlowDiagram(("Input", "Transform", "Useful output"), direction),
+                       at=0.5, duration=4, enter="fade", enter_duration=0.4)
+    segment.play(flow["edge-0"], Draw, at=1, duration=0.6)
+    segment.play(flow["node-1"], lambda c: c.animate.scale_to(0.94), at=2, duration=0.5)
+    segment.play(flow["label-2"], lambda c: c.animate.color_to(ctx.theme.accent), at=3, duration=0.5)
+    segment.play(flow, lambda c: c.animate.opacity_to(0), at=4, duration=0.5)
+    return video
+''', filename='kit_workflow.py', kind='kit')),
+section('Reserve missing artwork', 'ImageCard uses a labeled ImageSlot box matching the real image dimensions. Auto loads present files, placeholder always forces a box, and required rejects missing assets. Existing corrupt files fail in auto and required modes. TextPanel shares measured core fitting and allocates title/body space for compact cards.'),
 section('Choose the right block', 'Built-in blocks expose named children for targeted motion. Pass variant="accent" or variant="muted" to Heading, TextPanel, or MetricCard.',dict(type='table',headers=['Block','Content','Named children'],rows=[['Heading','Text','text'],['TextPanel','Text + optional title','background, text, title'],['MetricCard','Value + label','background, value, label'],['ImageCard','Asset + label','background, image, label'],['Comparison','Left + right text','0, 1'],['StepList','Tuple of steps','0, 1, …'],['WhiteboardDrawing','Path and shape specifications','stroke-0, stroke-1, …']])),
 section('Keep styling consistent', 'Set theme="midnight", theme="light", or theme="whiteboard" in facelesschamp.toml. Theme values flow into every built-in block. Explicit colors override variants; variants override theme defaults.')
 ], guide='kit')
@@ -393,6 +418,12 @@ def build(ctx):
         segment.add(Comparison("Before", "After"), enter="fade")
     return video
 '''),note('Entrance durations must fit each cue window. The final segment holds through an audio tail; the build report identifies that extension.')),
+section('Time a beat inside a segment', 'Attach narration and use original SRT indices with segment.cue_time. Cue edges become local seconds without retiming the source. Add delayed placements with finite lifetimes; entrances and motions must fit their placement.', code('''
+# With narration attached and cue 19 inside this segment:
+at = segment.cue_time(19)
+card = segment.add(Heading("The important idea"), at=at, duration=2, enter="fade")
+segment.play(card, lambda c: c.animate.opacity_to(0), at=at + 1.7, duration=0.3)
+''')),
 section('Enable captions intentionally', 'Use captions=true in project configuration when you want the kit’s caption overlay. Layout reserves the configured caption space before placing blocks. The bundled template has sentence cues; use your own word-aligned SRT for word highlighting.')
 ], guide='kit')
 properties = code('''
@@ -507,7 +538,7 @@ section('Keep the current scope clear', 'The core currently exports MP4. GPU ren
 ])
 
 lesson('kit-installation', 'Installation', 'Start here', 'Install the framework and its core engine, then check your local video tools.', [
-section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc1 is a local release candidate; these instructions do not assume a published release.', code('''
+section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc2 is a local release candidate; these instructions do not assume a published release.', code('''
 git clone https://github.com/nitisbig/Faceless-Champ.git
 cd Faceless-Champ
 python3.12 -m venv .venv
@@ -703,7 +734,7 @@ section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Erro
     ['Output already exists', 'Choose another path or explicitly add --overwrite.'],
 ])),
 section('Bound the work', 'Use a frame, a storyboard, and a short preview before raising resolution or frame rate. The kit uses the core CPU Pillow renderer and FFmpeg encoder.'),
-section('Keep the current scope clear', 'The framework is a local 0.1.0rc1 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
+section('Keep the current scope clear', 'The framework is a local 0.1.0rc2 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
 ], guide='kit')
 
 core_lessons = [item for item in lessons if item['guide'] == 'core']
@@ -721,10 +752,10 @@ assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]
 guides = {
     'core': dict(title='Faceless Champ Core Guide', label='Core library', file='index.html',
-                 version='0.1.0', kind='PYTHON LIBRARY', home='hello-world',
+                 version='0.1.1', kind='PYTHON LIBRARY', home='hello-world',
                  introduction='Create animated videos with Python scenes, components, and a precise timeline.'),
     'kit': dict(title='facelesschamp-kit Guide', label='Kit framework', file='kit.html',
-                version='0.1.0rc1', kind='FRAMEWORK', home='framework-quickstart',
+                version='0.1.0rc2', kind='FRAMEWORK', home='framework-quickstart',
                 introduction='Build structured video projects with reusable blocks, editable templates, and narration cues.'),
 }
 (DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, guides=guides), indent=2) + '\n')

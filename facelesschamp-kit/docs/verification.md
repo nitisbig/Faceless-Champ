@@ -1,5 +1,29 @@
 # Local release-candidate verification
 
+## 2026-10-10: Programming Value authoring additions
+
+Kit 0.1.0rc2 requires core 0.1.1 or later in the current minor line. The combined
+suite passes 441 tests. The new contracts cover original cue indices and overlaps,
+delayed placement lifetimes, entrances/motions inside authored windows, final
+audio-tail holds, independent builds, measured workflow geometry, compact title/body
+allocations, and real/placeholder/corrupt image behavior. Audio tails extend holds,
+not entrance or motion windows.
+
+Both installed wheels were checked outside source trees with compatible dependencies;
+the workflow example was sampled in landscape and portrait. The guide verified
+26 chapters, 33 snippets, 19 runnable examples and four starters. The Programming
+Value project also builds through Project with its custom white/terracotta theme.
+
+Its six chapters span 493.152 seconds and preserve 1,379 original cues and six 1 ms
+overlaps. Seven 540p/15fps excerpts (1,123 frames) completely decode and have source
+audio correlations above 0.99958. A 24-frame storyboard, 1,638 animated root-bound
+samples and nine cached/uncached pixel comparisons passed. Four numbered artwork
+reservations remain ready for user-supplied files. Full-length and 4K exports were
+not rendered. See the core [verification record](../../docs/verification.md) for
+the selected ranges, benchmark interpretation and evidence location.
+
+## Earlier verification
+
 Verified 2026-10-06 on Linux x86_64, Python 3.12.3, Pillow 12.3.0, FFmpeg/ffprobe 6.1.1. Core source baseline: `e95c89399da1fb3a6e62f5f690a1625d8685bde4`, distribution version 0.1.0. Kit version: 0.1.0rc1. No core source changes were needed.
 
 ## Automated and packaging checks

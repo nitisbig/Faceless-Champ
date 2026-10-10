@@ -10,6 +10,12 @@
 - [Authoring skill](skills/faceless-champ/SKILL.md)
 - [Cue chapters and still/storyboard previews](docs/narration.md)
 
+fit_text(text, Bounds(...), font_size=64, min_font_size=24, color="white")
+wraps and shrinks into measured bounds, preserves explicit newlines, returns an
+unowned centered Text, and rejects impossible fits. Plain Text preserves code indentation.
+The programming-value example uses core plus kit, original word-cue timing,
+four images/1.png–4.png reservations, and a 12-second 540p default preview.
+
 CueScene maps original SubtitleTrack cue indices to a local chapter clock via
 cue_time()/at_cue(). finish() holds exactly to the source interval and rejects
 content overflow. Use cut-only Sequence chapters and continuous audio on Layer.

@@ -10,7 +10,7 @@
     }
   },
   "chapters": 26,
-  "python_snippets": 30,
+  "python_snippets": 33,
   "examples": [
     {
       "file": "hello.py",
@@ -323,6 +323,22 @@
       "template": "silent"
     },
     {
+      "file": "kit_workflow.py",
+      "guide": "kit",
+      "duration": 5.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        4.95
+      ],
+      "size": [
+        360,
+        640
+      ],
+      "template": "silent"
+    },
+    {
       "file": "kit_custom.py",
       "guide": "kit",
       "duration": 6.0,
@@ -455,54 +471,5 @@
       "sampled_frames": 3
     }
   ],
-  "links_checked": 25,
-  "python_snippets_compiled": 30,
-  "legacy_links": {
-    "chapter_ids_preserved": 21,
-    "section_ids_preserved": 64
-  },
-  "browser_checks": {
-    "date": "2026-10-07",
-    "browser": "Codex in-app browser",
-    "viewports": {
-      "desktop": [
-        1440,
-        900
-      ],
-      "mobile": [
-        390,
-        844
-      ]
-    },
-    "chapter_routes_checked": 26,
-    "mobile_horizontal_overflow_failures": 0,
-    "passed": [
-      "Core and Kit page switch, scoped sidebars and chapter numbering",
-      "Core whiteboard search returns no results; kit whiteboard search finds its chapters",
-      "Ctrl+K opens search; result links navigate; Escape dismisses search",
-      "Exact source copying for hello.py and kit_whiteboard.py",
-      "Exact whiteboard render-command copying",
-      "Downloaded kit_whiteboard.py matches the generated source byte for byte",
-      "Previous and next chapter navigation stays inside the active guide",
-      "Theme selection persists when switching guides",
-      "Both mobile menus open and close when a chapter is selected",
-      "All five legacy framework chapters redirect with section fragments intact",
-      "Whiteboard section deep link scrolls below the sticky header",
-      "Preview posters and native video controls display on desktop and mobile"
-    ],
-    "console_errors": 0
-  },
-  "visual_review": {
-    "whiteboard_encoded_frames_seconds": [
-      0,
-      0.6,
-      2.466666666666667,
-      4,
-      5,
-      6.2,
-      9.466666666666667
-    ],
-    "whiteboard_preview_duration_seconds": 10,
-    "findings": "Sequential stroke reveals, complete-board holds, and scene-boundary clearing inspected in decoded MP4 frames. Both guide layouts inspected on desktop and mobile."
-  }
+  "links_checked": 26
 }

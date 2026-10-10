@@ -44,9 +44,17 @@ Programmatic output paths, like CLI output paths, are relative to the calling wo
 
 `Video(ctx).segment(name, duration=N)` appends. Supply `start=T` for an absolute window, or `window=voice.between(...)` for a cue window. Names must be unique. Segments are context managers but can also be populated directly. Empty segments represent intentional holds/gaps.
 
-`segment.add(block, id=None, bounds=None, anchor="center", enter=None, enter_duration=None, z_index=0)` returns a placement handle. `bounds` overrides the context safe area, including for deliberate overlays. Entry recipes are `fade`, `pop`, and `stagger`; their default duration comes from the theme (0.6 seconds). They must fit the segment. Stagger enters immediate children in order.
+`segment.add(block, id=None, bounds=None, anchor="center", enter=None, enter_duration=None, z_index=0, at=0, duration=None)` returns a placement handle. `bounds` overrides the context safe area, including for deliberate overlays. `at` is segment-local seconds; `duration` gives an explicit positive lifetime. Omitting duration holds to the segment end (including a final audio-tail hold). Entry recipes are `fade`, `pop`, and `stagger`; their default duration comes from the theme (0.6 seconds). Entrances must fit the placement lifetime. Stagger enters immediate children in order. Build reports include absolute placement start/end times.
 
-`segment.play(handle_or_child, callback, at=0, duration=1)` schedules a core Animation. Local `at` becomes global time once. Use `handle["value"]` for named children. Overlapping writes to the same property are rejected by the engine; different properties and distinct placements may overlap. A placement disappears exactly at its segment end, after all its animations complete.
+`segment.play(handle_or_child, callback, at=0, duration=1)` schedules a core Animation within the placement's authored lifetime. Local `at` becomes global time once. Use `handle["value"]` for named children. Overlapping writes to the same property are rejected by the engine; different properties and distinct placements may overlap. A finite placement disappears at its own end; an open placement disappears at the segment end.
+
+`segment.cue_time(original_index, edge="start", offset=0)` translates a master narration cue to local seconds. Attach narration first; existing segments also become cue-aware when narration is attached later. Cue starts must lie in the segment's half-open source interval; a resulting event may reach its end boundary. Offsets may be signed but may not move the event outside the segment. Source cue times/indices are never changed.
+
+```python
+at = segment.cue_time(19)  # choose an original cue in this segment
+card = segment.add(Heading("The important idea"), at=at, duration=2, enter="fade")
+segment.play(card, lambda c: c.animate.opacity_to(0), at=at + 1.7, duration=0.3)
+```
 
 `segment.add_core(lambda ctx, bounds: component, ...)` supports advanced authoring. Return a fresh Component or BlockBuild every invocation. Direct components must already fit the supplied bounds. A complete core Scene/Sequence/Grid/Layer can also be returned by a project factory; segment metadata is unavailable for those entries.
 
