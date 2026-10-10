@@ -4,15 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "facelesschamp-kit"
-version = "0.1.0rc2"
+version = "0.1.0rc3"
 description = "Structured video authoring with reusable Faceless Champ components"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["faceless-champ>=0.1.1,<0.2.0"]
+dependencies = ["faceless-champ>=0.1.2,<0.2.0"]
 
 [project.optional-dependencies]
-maps = ["faceless-champ[maps]>=0.1.1,<0.2.0"]
-equations = ["faceless-champ[equations]>=0.1.1,<0.2.0"]
+web = ["faceless-champ[web]>=0.1.2,<0.2.0"]
+maps = ["faceless-champ[maps]>=0.1.2,<0.2.0"]
+equations = ["faceless-champ[equations]>=0.1.2,<0.2.0"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
 
 [project.scripts]

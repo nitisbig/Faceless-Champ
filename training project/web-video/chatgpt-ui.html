@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="A single-file, interactive ChatGPT-inspired interface demo.">
+  <title>ChatGPT UI — Single File Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --canvas: #ffffff; --side: #f9f9f9; --surface: #ffffff; --surface-soft: #f6f6f6;
+      --text: #0d0d0d; --muted: #6e6e6e; --line: #e7e7e7; --hover: #ededed;
+      --user: #f4f4f4; --icon: #4d4d4d; --shadow: 0 7px 36px rgba(0,0,0,.075);
+      --popup: #ffffff; --outline: #9b9b9b;
+      --sidebar-width: 264px;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --canvas: #212121; --side: #171717; --surface: #303030; --surface-soft: #2b2b2b;
+      --text: #f4f4f4; --muted: #aaa; --line: #414141; --hover: #2b2b2b;
+      --user: #303030; --icon: #cecece; --shadow: 0 10px 40px rgba(0,0,0,.36);
+      --popup: #303030; --outline: #777;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html,body { margin:0; height:100%; background:var(--canvas); color:var(--text); font: 14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif; }
+    button,textarea,input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible,textarea:focus-visible,input:focus-visible {outline: 2px solid var(--outline); outline-offset:2px;}
+    svg { display:block; flex:none; }
+    .icon {width:19px;height:19px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+    .icon.sm {width:16px;height:16px} .icon.lg {width:23px;height:23px}
+    #app {height:100dvh;min-height:450px;display:flex;overflow:hidden;}
+    .sidebar {width:var(--sidebar-width);flex:0 0 var(--sidebar-width);background:var(--side);display:flex;flex-direction:column;transition:margin-left .22s ease;z-index:20;overflow:hidden;}
+    .sidebar.closed {margin-left:calc(-1 * var(--sidebar-width));}
+    .sidebar-header {display:flex;align-items:center;justify-content:space-between;padding:19px 14px 12px;}
+    .sidebar-actions {padding:8px 12px 12px;display:grid;gap:3px;}
+    .icon-btn {height:35px;width:35px;background:transparent;border:0;border-radius:10px;color:var(--icon);display:grid;place-items:center;}
+    .icon-btn:hover,.nav-item:hover,.chat-link:hover,.chat-link.active,.profile-btn:hover {background:var(--hover);}
+    .icon-btn.tight {width:29px;height:29px;border-radius:8px;}
+    .brand-mark {width:29px;height:29px;display:grid;place-items:center;color:var(--text);}
+    .brand-mark svg {width:27px;height:27px;fill:currentColor;}
+    .nav-item {display:flex;align-items:center;gap:11px;width:100%;height:38px;padding:0 10px;color:var(--text);font-weight:560;text-align:left;border:0;border-radius:10px;background:transparent;}
+    .nav-item .icon {width:19px;height:19px;}
+    .nav-label {flex:1;white-space:nowrap;}
+    .shortcut {font-size:11px;color:var(--muted);font-weight:400;opacity:0;transition:opacity .15s}
+    .nav-item:hover .shortcut {opacity:1;}
+    .history {flex:1;overflow:auto;padding:12px 12px 24px;scrollbar-width:thin;scrollbar-color:transparent transparent;}
+    .history:hover {scrollbar-color:var(--line) transparent;}
+    .history-heading {font-size:12px;color:var(--muted);font-weight:650;padding:12px 10px 8px;}
+    .chat-link {display:flex;align-items:center;width:100%;height:36px;border-radius:9px;min-width:0;position:relative;}
+    .chat-open {padding:0 10px;min-width:0;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:left;color:var(--text);background:none;border:0;font-size:13px;}
+    .chat-menu-trigger {flex:none;width:28px;height:28px;display:grid;place-items:center;margin-right:3px;opacity:0;border:0;background:none;color:var(--muted);border-radius:7px;}
+    .chat-link:hover .chat-menu-trigger,.chat-link.active .chat-menu-trigger,.chat-menu-trigger:focus-visible {opacity:1;}
+    .chat-menu-trigger:hover {background:var(--surface);}
+    .empty-history {color:var(--muted);font-size:12px;padding:10px;line-height:1.7;}
+    .profile-area {padding:8px 12px 15px;border-top:1px solid transparent;}
+    .profile-btn {display:flex;align-items:center;gap:10px;width:100%;padding:7px 9px;border:0;border-radius:10px;background:transparent;color:var(--text);text-align:left;}
+    .avatar {width:30px;height:30px;background:#d8d1f1;color:#45368a;border-radius:50%;display:grid;place-items:center;font-weight:650;font-size:12px;}
+    :root[data-theme="dark"] .avatar {background:#594b7b;color:#faf8ff;}
+    .profile-text {display:flex;flex:1;min-width:0;flex-direction:column;line-height:1.3;}
+    .profile-text strong {font-size:12.5px;} .profile-text small {font-size:11px;color:var(--muted);margin-top:2px;}
+    .main {min-width:0;flex:1;position:relative;display:flex;flex-direction:column;background:var(--canvas);}
+    .topbar {height:67px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 19px;gap:8px;}
+    .top-left,.top-right {display:flex;align-items:center;gap:6px;}
+    .model-picker {padding:7px 11px;display:flex;gap:6px;align-items:center;border:0;border-radius:10px;color:var(--text);font-weight:600;font-size:17px;letter-spacing:-.45px;background:transparent;}
+    .model-picker:hover {background:var(--surface-soft)}
+    .model-picker .chevron {width:15px;height:15px;color:var(--muted)}
+    .top-right .share {display:none;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:none;font-weight:570;}
+    .top-right .share:hover {background:var(--surface-soft)}
+    .top-right .share.visible {display:flex;}
+    .head-avatar {background:#e2e5ec;color:#444b60;width:30px;height:30px;margin-left:5px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:12px;}
+    :root[data-theme="dark"] .head-avatar {background:#525765;color:white;}
+    .workspace {flex:1;min-height:0;display:flex;flex-direction:column;}
+    .welcome {flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 22px;}
+    .welcome-title {font-size:31px;letter-spacing:-1.15px;font-weight:600;margin:0 0 29px;text-align:center;line-height:1.3;}
+    .welcome-compose {width:min(100%,768px);}
+    .welcome-spacer {height:clamp(60px,18vh,170px);flex:none;}
+    .composer-wrap {width:min(calc(100% - 44px),768px);margin:0 auto;flex:none;}
+    .composer {border:1px solid var(--line);border-radius:25px;background:var(--surface);box-shadow:0 3px 18px rgba(0,0,0,.035);position:relative;padding:10px 12px 10px;}
+    :root[data-theme="dark"] .composer {border-color:#474747;box-shadow:none;}
+    .composer:focus-within {border-color:#d4d4d4;}
+    :root[data-theme="dark"] .composer:focus-within {border-color:#666;}
+    .composer textarea {width:100%;min-height:38px;max-height:195px;resize:none;padding:5px 7px 7px;background:none;border:0;outline:none;color:var(--text);font-size:15.5px;line-height:1.55;display:block;scrollbar-width:thin;}
+    .composer textarea::placeholder {color:#919191;}
+    .compose-controls {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:3px;}
+    .control-set {display:flex;align-items:center;gap:5px;min-width:0;}
+    .round-tool {width:34px;height:34px;border-radius:50%;background:transparent;border:0;display:grid;place-items:center;color:var(--icon);}
+    .round-tool:hover {background:var(--hover)}
+    .tool-label {display:flex;align-items:center;gap:7px;border:none;border-radius:18px;padding:7px 10px;background:transparent;color:var(--icon);font-size:12.5px;white-space:nowrap;}
+    .tool-label:hover {background:var(--hover)}
+    .send-btn {width:34px;height:34px;border-radius:50%;border:0;background:#e7e7e7;color:#999;display:grid;place-items:center;transition:background .16s,color .16s;}
+    .send-btn.ready {background:#101010;color:white;}
+    :root[data-theme="dark"] .send-btn {background:#474747;color:#777;}
+    :root[data-theme="dark"] .send-btn.ready {background:#fafafa;color:#171717;}
+    .send-btn.ready:hover {opacity:.82;}
+    .fineprint {padding:12px 0 13px;font-size:11.5px;color:var(--muted);text-align:center;}
+    .quick-actions {display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:19px;}
+    .quick-action {border:1px solid var(--line);background:transparent;border-radius:23px;padding:9px 13px;display:flex;align-items:center;gap:8px;color:var(--icon);font-size:12.5px;white-space:nowrap;}
+    .quick-action:hover {background:var(--surface-soft)}
+    .qa-orange {color:#d9814f} .qa-green {color:#4e9b70} .qa-blue {color:#6490d3} .qa-purple {color:#9b79c6}
+    .thread-scroller {overflow-y:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:thin;}
+    .thread {max-width:768px;margin:0 auto;padding:28px 0 16px;min-height:100%;display:flex;flex-direction:column;gap:25px;}
+    .message {line-height:1.75;font-size:14.5px;position:relative;padding:0 0;min-width:0;}
+    .message.user {align-self:flex-end;max-width:min(85%,560px);}
+    .user-bubble {background:var(--user);border-radius:20px;padding:11px 16px;white-space:pre-wrap;overflow-wrap:anywhere;}
+    .message.assistant {width:100%;padding-right:16px;}
+    .assistant-tag {display:none;}
+    .message p {margin:0 0 13px;}
+    .message p:last-child {margin-bottom:0;}
+    .message h2,.message h3 {font-size:16px;line-height:1.4;margin:17px 0 7px;}
+    .message h2:first-child,.message h3:first-child {margin-top:0;}
+    .message ul,.message ol {margin:4px 0 14px;padding-left:22px;}
+    .message li {padding-left:2px;margin:3px 0;}
+    .message pre {position:relative;padding:18px;overflow:auto;background:#f5f5f5;border-radius:11px;font-size:12.5px;line-height:1.65;border:1px solid var(--line);}
+    :root[data-theme="dark"] .message pre {background:#161616;}
+    .message code {font-family:ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;font-size:.9em;background:var(--surface-soft);padding:2px 4px;border-radius:4px;}
+    .message pre code {padding:0;background:none;}
+    .message-actions {display:flex;gap:2px;margin-top:8px;opacity:0;transition:opacity .15s;}
+    .message:hover .message-actions,.message:focus-within .message-actions {opacity:1;}
+    .message.assistant .message-actions {opacity:1;}
+    .mini-icon {border:0;background:none;color:var(--muted);padding:6px;border-radius:8px;display:grid;place-items:center;}
+    .mini-icon:hover {background:var(--surface-soft);color:var(--text);}
+    .attachment-chip {display:inline-flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface-soft);border:1px solid var(--line);border-radius:11px;margin:0 4px 8px 0;font-size:12px;max-width:100%;}
+    .attachment-chip span {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+    .attachment-chip button {border:0;background:none;display:grid;place-items:center;color:var(--muted);padding:1px;}
+    .message .attachment-chip {margin-bottom:7px;}
+    #attachment-preview {display:none;padding:4px 4px 8px;}
+    #attachment-preview:not(:empty) {display:block;}
+    .typing {display:inline-flex;align-items:center;gap:4px;padding:10px 0;}
+    .typing span {width:7px;height:7px;background:var(--muted);border-radius:50%;animation:bounce 1s infinite;}
+    .typing span:nth-child(2) {animation-delay:.13s}.typing span:nth-child(3) {animation-delay:.26s}
+    @keyframes bounce {0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+    .bottom-area {flex:none;background:var(--canvas);padding-top:8px;}
+    .thread-space {display:none;}
+    .overlay {position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;display:none;align-items:flex-start;justify-content:center;padding:14vh 14px 22px;}
+    .overlay.open {display:flex;}
+    .dialog {width:min(100%,540px);background:var(--popup);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line);}
+    .dialog-top {display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;}
+    .dialog-title {font-weight:650;font-size:16px;}
+    .dialog-body {padding:0 18px 18px;}
+    .search-input {width:100%;border:1px solid var(--line);border-radius:11px;background:var(--canvas);color:var(--text);padding:12px 13px;outline:none;}
+    .search-results {max-height:min(48vh,400px);overflow:auto;margin-top:12px;}
+    .search-result {width:100%;padding:11px 12px;background:none;border:0;text-align:left;display:flex;gap:11px;align-items:center;border-radius:10px;color:var(--text);}
+    .search-result:hover {background:var(--surface-soft)}
+    .search-result .result-text {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+    .search-empty {padding:25px 8px;color:var(--muted);text-align:center;}
+    .menu-pop {position:fixed;z-index:50;min-width:176px;border:1px solid var(--line);background:var(--popup);box-shadow:var(--shadow);border-radius:12px;padding:5px;display:none;}
+    .menu-pop.open {display:block;}
+    .menu-option {display:flex;width:100%;align-items:center;gap:10px;padding:9px 10px;border:0;background:none;border-radius:8px;text-align:left;color:var(--text);font-size:13px;}
+    .menu-option:hover {background:var(--surface-soft)} .menu-option.danger {color:#d64b4b;}
+    .settings-row {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);}
+    .settings-row:last-child {border:0;}
+    .settings-row b {font-size:13.5px;font-weight:600;}.settings-row small{display:block;color:var(--muted);margin-top:3px;}
+    .select {background:var(--surface-soft);color:var(--text);border:1px solid var(--line);padding:8px 10px;border-radius:9px;}
+    .modal-button {border:0;border-radius:9px;padding:9px 12px;background:var(--text);color:var(--canvas);font-weight:600;}
+    .toast {position:fixed;z-index:100;bottom:27px;left:50%;transform:translate(-50%,15px);background:#252525;color:#fff;border-radius:11px;padding:10px 16px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:var(--shadow);font-size:13px;white-space:nowrap;}
+    .toast.visible {opacity:1;transform:translate(-50%,0);}
+    .mobile-scrim {position:fixed;inset:0;background:#0006;z-index:15;display:none;}
+    #mobile-menu {display:none;}
+    .show-when-closed {display:none;}
+    #app:has(.sidebar.closed) .show-when-closed {display:grid;}
+    .search-hint {font-size:12px;color:var(--muted);margin:6px 0 0;}
+    @media (max-width:850px) {
+      .sidebar {position:absolute;top:0;bottom:0;left:0;box-shadow:8px 0 24px #00000010;}
+      .sidebar.closed {margin-left:calc(-1 * var(--sidebar-width));box-shadow:none;}
+      .mobile-scrim.visible {display:block;}
+      #mobile-menu {display:grid;}
+      .desktop-panel {display:none!important;}
+      #desktop-open {display:none!important;}
+      .topbar {padding:0 14px;}
+      .model-picker {font-size:17px;}
+      .thread {padding:22px 20px 12px;}
+      .thread-scroller {min-height:0;}
+      .message.assistant {padding-right:0;}
+    }
+    @media (min-width:851px) {
+      #desktop-open {display:none;}
+      #app:has(.sidebar.closed) #desktop-open {display:grid;}
+    }
+    @media (max-width:560px) {
+      .welcome-title {font-size:25px;letter-spacing:-.7px;margin-bottom:23px;}
+      .welcome {padding:0 13px;}
+      .composer-wrap {width:calc(100% - 22px)}
+      .welcome-compose {width:100%;}
+      .quick-action {padding:7px 10px;font-size:11.5px;}
+      .quick-actions {gap:7px;}
+      .fineprint {font-size:10px;padding-bottom:10px;}
+      .head-avatar {display:none;}
+      .top-right .share {font-size:12px;padding:7px;}
+      .message.user {max-width:90%;}
+    }
+    @media (prefers-reduced-motion: reduce) {*,*::before,*::after {animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+  </style>
+</head>
+<body>
+<!-- Inline symbols keep the website self-contained and offline-friendly. -->
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18"/></symbol>
+  <symbol id="i-compose" viewBox="0 0 24 24"><path d="M12 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10"/><path d="m13 15 7.5-7.5a2.12 2.12 0 0 0-3-3L10 12l-1 4z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 5 5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m12 19 0-14m-6 6 6-6 6 6"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="m21 11.5-8.8 8.8a6 6 0 0 1-8.5-8.5l9.7-9.7a4 4 0 0 1 5.6 5.6l-9.7 9.7a2 2 0 0 1-2.8-2.8l8.9-8.8"/></symbol>
+  <symbol id="i-wave" viewBox="0 0 24 24"><path d="M4 10v4m4-7v10m4-14v18m4-14v10m4-7v4"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 4.5 6 4.5 9s-1.5 6-4.5 9c-3-3-4.5-6-4.5-9S9 6 12 3"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m-2-19a7 7 0 0 0-4 13c1 .8 1 1.7 1 2h6c0-.3 0-1.2 1-2A7 7 0 0 0 12 2"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h16m-14-4 10-10 3 3-10 10-4 1zM15 7l3 3"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4m8-8 4 4-4 4m-3-12-3 16"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 1M4 17l2 1a7 7 0 0 0 12.5-3"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3m-5 5 5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18m-2 0-1 15H6L5 6m4 0V3h6v3m-5 4v7m4-7v7"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20H4v-8L15 1a3 3 0 0 1 4 4L8 16l-4 1"/><path d="M13 4l5 5"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15.7A8.5 8.5 0 0 1 8.3 4 8.5 8.5 0 1 0 20 15.7Z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M13 3H5v18h14V9zM13 3v6h6"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.5 1.2-1.7 3-1.8-.7a9 9 0 0 1-2.6 1.4l-.3 2H9.4l-.3-2a9 9 0 0 1-2.6-1.4l-1.8.7-1.7-3L4.5 15a9 9 0 0 1 0-3l-1.5-1.2 1.7-3 1.8.7a9 9 0 0 1 2.6-1.4l.3-2h5.2l.3 2a9 9 0 0 1 2.6 1.4l1.8-.7 1.7 3-1.5 1.2a9 9 0 0 1-.1 3Z" transform="translate(0 -1.5) scale(1 .96)"/></symbol>
+</svg>
+<div id="app">
+  <div class="mobile-scrim" id="mobile-scrim"></div>
+  <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+    <div class="sidebar-header">
+      <div class="brand-mark" aria-label="ChatGPT logo">
+        <!-- An abstract conversation rosette, drawn inline (no external assets). -->
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2.5c3.6 0 6.3 1.6 7.7 4.3 3.2.1 5.9 2.8 5.9 6.2 0 2.1-.9 3.9-2.4 5.1.7 3.2-.5 6-3.4 7.6-1.9 1.1-3.8 1.3-5.6.8-2.4 2.2-5.7 2.9-8.7 1.2-1.9-1.1-3.1-2.7-3.6-4.5-3.1-.9-5.3-3.7-5.3-7 0-2.2 1-4.1 2.5-5.3-.6-3.3.7-6.1 3.6-7.7C9 2 11 1.9 12.8 2.4c1-.1 2.1.1 3.2.1zm0 3c-2.1 0-3.7.8-4.5 2.5L10 11.5l5.5-3.1 1.5 2.6-9.9 5.7v3.1c0 2.5 2 4.4 4.4 4.4.9 0 1.7-.2 2.5-.7l6.1-3.5v-5l3 .1v5.5c2.3-1.1 3.4-3.7 2.2-6-.4-.8-1.1-1.5-1.9-2l-6-3.6-4.4 2.5-1.5-2.6 4.8-2.8c-.4-.4-.7-.6-1.3-.6zm-7.6 4c-2.2-.3-4.1 1.1-4.5 3.1-.4 1.9.3 3.6 2 4.5v-4.2l3-1.8zm11.2-1.6 4 2.4c1.6-.5 2.5-1.6 2.5-3.1-1.2-1.1-2.6-1.4-4.1-.9zm-13 12.4c.5 2.3 2.7 3.6 5 3.4l-3.9-2.3zm10.4 4.3c2 .6 4.2-.2 5.3-2.1l-3.8 2.2z"/></svg>
+      </div>
+      <button class="icon-btn" id="close-sidebar" aria-label="Close sidebar" title="Close sidebar"><svg class="icon lg"><use href="#i-panel"/></svg></button>
+    </div>
+    <nav class="sidebar-actions" aria-label="Main">
+      <button class="nav-item" id="new-chat"><svg class="icon"><use href="#i-compose"/></svg><span class="nav-label">New chat</span><span class="shortcut">Ctrl K</span></button>
+      <button class="nav-item" id="search-chats"><svg class="icon"><use href="#i-search"/></svg><span class="nav-label">Search chats</span><span class="shortcut">Ctrl Shift K</span></button>
+      <button class="nav-item" id="explore"><svg class="icon"><use href="#i-grid"/></svg><span class="nav-label">Explore GPTs</span></button>
+    </nav>
+    <div class="history" id="history" aria-label="Chat history"></div>
+    <div class="profile-area"><button class="profile-btn" id="profile"><span class="avatar">D</span><span class="profile-text"><strong>Demo user</strong><small>Local UI preview</small></span><svg class="icon sm"><use href="#i-more"/></svg></button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="icon-btn" id="mobile-menu" aria-label="Open sidebar" title="Open sidebar"><svg class="icon lg"><use href="#i-menu"/></svg></button>
+        <button class="icon-btn" id="desktop-open" aria-label="Open sidebar" title="Open sidebar"><svg class="icon lg"><use href="#i-panel"/></svg></button>
+        <button class="icon-btn show-when-closed" id="quick-new" aria-label="New chat" title="New chat"><svg class="icon lg"><use href="#i-compose"/></svg></button>
+        <button class="model-picker" id="model-picker" aria-label="Model menu">ChatGPT <svg class="icon chevron"><use href="#i-chevron"/></svg></button>
+      </div>
+      <div class="top-right">
+        <button class="share" id="share-chat"><svg class="icon sm"><use href="#i-share"/></svg> Share</button>
+        <span class="head-avatar" title="Demo user">D</span>
+      </div>
+    </header>
+    <div class="workspace" id="workspace">
+      <section class="welcome" id="welcome">
+        <h1 class="welcome-title">What can I help with?</h1>
+        <div class="welcome-compose" id="welcome-compose"></div>
+        <div class="quick-actions" id="quick-actions">
+          <button class="quick-action" data-prompt="Help me brainstorm an interesting creative project"><svg class="icon sm qa-orange"><use href="#i-bulb"/></svg> Brainstorm ideas</button>
+          <button class="quick-action" data-prompt="Help me write a professional email"><svg class="icon sm qa-green"><use href="#i-pen"/></svg> Write something</button>
+          <button class="quick-action" data-prompt="Explain JavaScript promises with an example"><svg class="icon sm qa-blue"><use href="#i-code"/></svg> Write code</button>
+          <button class="quick-action" data-prompt="Explain a surprising science fact"><svg class="icon sm qa-purple"><use href="#i-globe"/></svg> Surprise me</button>
+        </div>
+        <div class="welcome-spacer"></div>
+      </section>
+      <div class="thread-scroller" id="thread-scroller" hidden><div class="thread" id="thread" aria-live="polite"></div></div>
+      <div class="bottom-area" id="bottom-area" hidden><div class="composer-wrap" id="thread-compose"></div><div class="fineprint">UI demo only. Replies are simulated, not generated by an AI model.</div></div>
+    </div>
+  </main>
+</div>
+
+<template id="composer-template">
+  <div class="composer">
+    <div id="attachment-preview"></div>
+    <textarea id="prompt-input" rows="1" aria-label="Message ChatGPT" placeholder="Ask anything"></textarea>
+    <div class="compose-controls"><div class="control-set">
+      <button class="round-tool" id="attach-button" aria-label="Attach file" title="Attach file"><svg class="icon lg"><use href="#i-plus"/></svg></button>
+      <button class="tool-label" id="tools-button" title="Choose a tool"><svg class="icon sm"><use href="#i-grid"/></svg> Tools</button>
+    </div><div class="control-set">
+      <button class="round-tool" id="dictate" aria-label="Dictate message" title="Voice dictation (if supported)"><svg class="icon"><use href="#i-wave"/></svg></button>
+      <button class="send-btn" id="send" aria-label="Send message" disabled><svg class="icon"><use href="#i-arrow"/></svg></button>
+    </div></div>
+  </div>
+</template>
+<input type="file" id="file-input" hidden accept=".txt,.md,.csv,.json,.js,.ts,.py,.html,.css,.pdf,image/*" multiple>
+<div class="overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Search chats"><div class="dialog">
+  <div class="dialog-top"><span class="dialog-title">Search chats</span><button class="icon-btn tight" data-close="search-overlay" aria-label="Close"><svg class="icon sm"><use href="#i-x"/></svg></button></div>
+  <div class="dialog-body"><input class="search-input" id="search-input" placeholder="Search by title or message..." autocomplete="off"><div class="search-results" id="search-results"></div><p class="search-hint">Find conversations saved locally in this browser.</p></div>
+</div></div>
+<div class="overlay" id="settings-overlay" role="dialog" aria-modal="true" aria-label="Settings"><div class="dialog">
+  <div class="dialog-top"><span class="dialog-title">Settings</span><button class="icon-btn tight" data-close="settings-overlay" aria-label="Close"><svg class="icon sm"><use href="#i-x"/></svg></button></div>
+  <div class="dialog-body">
+    <div class="settings-row"><div><b>Appearance</b><small>Change the interface theme</small></div><select id="theme-choice" class="select" aria-label="Appearance"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+    <div class="settings-row"><div><b>Export chats</b><small>Download your local conversations as JSON</small></div><button class="modal-button" id="export-all">Export</button></div>
+    <div class="settings-row"><div><b>Clear conversations</b><small>Remove all saved chats from this browser</small></div><button class="modal-button" id="clear-all">Clear all</button></div>
+    <div class="settings-row"><div><b>About</b><small>Single HTML file · no API or backend · localStorage</small></div><span style="color:var(--muted);font-size:12px">Demo 1.0</span></div>
+  </div>
+</div></div>
+<div class="menu-pop" id="context-menu" role="menu"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  'use strict';
+  const STORAGE = 'onefile-chatgpt-demo-v1';
+  const THEME_STORAGE = 'onefile-chatgpt-demo-theme';
+  const $ = (selector, root=document) => root.querySelector(selector);
+  const $$ = (selector, root=document) => Array.from(root.querySelectorAll(selector));
+  const icon = (name, cls='') => `<svg class="icon ${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+  const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const storageGet = key => {try{return localStorage.getItem(key);}catch(_){return null;}};
+  const storageSet = (key,value) => {try{localStorage.setItem(key,value);return true;}catch(_){return false;}};
+  const makeId = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+  let chats = [], currentId = null, pendingFiles = [], isTyping = false, abortReply = null;
+  let toastTimeout, menuOpen = false, sidebarManuallyClosed = false;
+  const prefersDark = matchMedia('(prefers-color-scheme: dark)');
+
+  try {
+    const saved = JSON.parse(storageGet(STORAGE)||'[]');
+    if (Array.isArray(saved)) chats = saved.filter(c=>c && typeof c.id==='string' && Array.isArray(c.messages) && typeof c.title==='string');
+  } catch (_) {}
+  function save() { try {storageSet(STORAGE, JSON.stringify(chats));} catch (_) {toast('Storage is full. Export your chats to keep them safe.');} }
+  function active() {return chats.find(c=>c.id===currentId);}
+  function showToast(text) {
+    const box=$('#toast'); box.textContent=text; box.classList.add('visible');clearTimeout(toastTimeout);
+    toastTimeout=setTimeout(()=>box.classList.remove('visible'),2500);
+  }
+  const toast = showToast;
+  function dateGroup(ts) {
+    const d = new Date(ts), now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const diff=Math.floor((today-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/86400000);
+    if(diff<=0) return 'Today'; if(diff===1) return 'Yesterday'; if(diff<7) return 'Previous 7 days'; if(diff<30) return 'Previous 30 days';
+    return d.toLocaleString(undefined,{month:'long',year:'numeric'});
+  }
+  function renderHistory() {
+    const host=$('#history'); host.replaceChildren();
+    if(!chats.length) {host.innerHTML='<div class="history-heading">Your chats</div><p class="empty-history">Your conversations will appear here. Start a chat to see it in your history.</p>';return;}
+    let group='';
+    [...chats].sort((a,b)=>b.updated-a.updated).forEach(c=>{
+      const g=dateGroup(c.updated);
+      if(g!==group){group=g;const label=document.createElement('div');label.className='history-heading';label.textContent=g;host.append(label);}
+      const row=document.createElement('div');row.className='chat-link'+(c.id===currentId?' active':'');
+      row.innerHTML=`<button class="chat-open" title="${escapeHTML(c.title)}"></button><button class="chat-menu-trigger" aria-label="More options" title="More options">${icon('more','sm')}</button>`;
+      $('.chat-open',row).textContent=c.title;
+      $('.chat-open',row).onclick=()=>openChat(c.id);
+      $('.chat-menu-trigger',row).onclick=e=>{e.stopPropagation();openMenu(e.currentTarget,[
+        {label:'Rename',glyph:'edit',action:()=>renameChat(c.id)},
+        {label:'Export chat',glyph:'download',action:()=>exportChat(c.id)},
+        {label:'Delete',glyph:'trash',danger:true,action:()=>deleteChat(c.id)}
+      ]);};
+      host.append(row);
+    });
+  }
+  function mountComposer(target) {
+    const tpl=$('#composer-template'); target.replaceChildren(tpl.content.cloneNode(true));
+    const prompt=$('#prompt-input',target);
+    prompt.addEventListener('input',()=>{resizePrompt();updateSend();});
+    prompt.addEventListener('keydown',e=>{
+      if(e.key==='Enter' && !e.shiftKey && !e.isComposing){e.preventDefault();sendMessage();}
+    });
+    $('#send',target).onclick=sendMessage;
+    $('#attach-button',target).onclick=()=>$('#file-input').click();
+    $('#tools-button',target).onclick=e=>openMenu(e.currentTarget,[
+      {label:'Brainstorm',glyph:'bulb',action:()=>insertPrompt('Help me brainstorm ideas for ')},
+      {label:'Write or edit',glyph:'pen',action:()=>insertPrompt('Help me write ')},
+      {label:'Help with code',glyph:'code',action:()=>insertPrompt('Explain this code: ')},
+      {label:'Explore a topic',glyph:'globe',action:()=>insertPrompt('Explain in simple terms: ')}
+    ]);
+    $('#dictate',target).onclick=startDictation;
+    renderAttachments();
+  }
+  function input() {return $('#prompt-input');}
+  function insertPrompt(str) {input().value=str;resizePrompt();updateSend();input().focus();}
+  function resizePrompt(){ const el=input();if(!el)return;el.style.height='auto';el.style.height=Math.min(el.scrollHeight,195)+'px'; }
+  function updateSend(){ const btn=$('#send');if(!btn)return;const ok=!!(input()?.value.trim()||pendingFiles.length);btn.disabled=!ok||isTyping;btn.classList.toggle('ready',ok&&!isTyping); }
+  function renderAttachments() {
+    const el=$('#attachment-preview');if(!el)return;el.replaceChildren();
+    pendingFiles.forEach((f,i)=>{
+      const chip=document.createElement('div');chip.className='attachment-chip';
+      chip.innerHTML=icon('file','sm')+`<span></span><button aria-label="Remove attachment">${icon('x','sm')}</button>`;
+      $('span',chip).textContent=f.name;
+      $('button',chip).onclick=()=>{pendingFiles.splice(i,1);renderAttachments();updateSend();};
+      el.append(chip);
+    });
+  }
+  function cancelPendingReply() {
+    if(abortReply){clearTimeout(abortReply);abortReply=null;}
+    isTyping=false;
+  }
+  function newChat() {
+    cancelPendingReply();currentId=null;pendingFiles=[];renderHistory();renderMain();closeMobile();input()?.focus();
+    try {history.replaceState(null,'',location.pathname);} catch(_){}
+  }
+  function openChat(id) {
+    if(!chats.some(c=>c.id===id))return;
+    cancelPendingReply();currentId=id;pendingFiles=[];renderHistory();renderMain();closeMobile();
+  }
+  function renderMain() {
+    const chat=active(),hasMessages=!!chat?.messages?.length;
+    $('#welcome').hidden=hasMessages;$('#thread-scroller').hidden=!hasMessages;$('#bottom-area').hidden=!hasMessages;
+    $('#share-chat').classList.toggle('visible',hasMessages);
+    mountComposer(hasMessages?$('#thread-compose'):$('#welcome-compose'));
+    if(hasMessages){renderMessages();scrollBottom();}
+  }
+  function scrollBottom(){const el=$('#thread-scroller');requestAnimationFrame(()=>el.scrollTop=el.scrollHeight);}
+  // Small safe Markdown renderer for the simulated assistant's static demo messages.
+  function markdown(text) {
+    const parts=String(text).split(/(```[^\n]*\n[\s\S]*?```)/g);
+    return parts.map(part=>{
+      if(part.startsWith('```') && part.endsWith('```')){
+        const content=part.replace(/^```[^\n]*\n/,'').slice(0,-3).trimEnd();
+        return `<pre><code>${escapeHTML(content)}</code></pre>`;
+      }
+      const inline=s=>escapeHTML(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+      const lines=part.split('\n'),out=[];let paragraph=[],list=[];
+      function flushParagraph(){if(paragraph.length){out.push('<p>'+paragraph.map(inline).join('<br>')+'</p>');paragraph=[];}}
+      function flushList(){if(list.length){out.push('<ul>'+list.map(item=>'<li>'+inline(item)+'</li>').join('')+'</ul>');list=[];}}
+      for(const line of lines){
+        if(/^\s*[-*] /.test(line)){flushParagraph();list.push(line.replace(/^\s*[-*] /,''));}
+        else if(/^#{1,3} /.test(line)){flushParagraph();flushList();const level=line.match(/^#+/)[0].length;out.push(`<h${Math.max(level,2)}>${inline(line.replace(/^#+ /,''))}</h${Math.max(level,2)}>`);}
+        else if(!line.trim()){flushParagraph();flushList();}
+        else {flushList();paragraph.push(line);}
+      }
+      flushParagraph();flushList();return out.join('');
+    }).join('');
+  }
+  function renderMessages() {
+    const host=$('#thread');host.replaceChildren();const chat=active();if(!chat)return;
+    chat.messages.forEach((m,index)=>{
+      const elem=document.createElement('article');elem.className='message '+m.role;
+      if(m.role==='user') {
+        if(m.files?.length){m.files.forEach(f=>{const chip=document.createElement('div');chip.className='attachment-chip';chip.innerHTML=icon('file','sm')+'<span></span>';$('span',chip).textContent=f;elem.append(chip);});}
+        const bubble=document.createElement('div');bubble.className='user-bubble';bubble.textContent=m.text;elem.append(bubble);
+        const actions=document.createElement('div');actions.className='message-actions';
+        actions.innerHTML=`<button class="mini-icon" title="Copy" aria-label="Copy user message">${icon('copy','sm')}</button><button class="mini-icon" title="Edit and resend" aria-label="Edit and resend">${icon('edit','sm')}</button>`;
+        actions.children[0].onclick=()=>copyText(m.text);
+        actions.children[1].onclick=()=>{insertPrompt(m.text);input().focus();};elem.append(actions);
+      }else{
+        const body=document.createElement('div');body.className='assistant-body';body.innerHTML=markdown(m.text);elem.append(body);
+        const actions=document.createElement('div');actions.className='message-actions';
+        actions.innerHTML=`<button class="mini-icon" title="Copy" aria-label="Copy response">${icon('copy','sm')}</button><button class="mini-icon" title="Regenerate" aria-label="Regenerate response">${icon('refresh','sm')}</button>`;
+        actions.children[0].onclick=()=>copyText(m.text);
+        actions.children[1].onclick=()=>regenerate(index);
+        elem.append(actions);
+      }
+      host.append(elem);
+    });
+    if(isTyping){const typing=document.createElement('div');typing.className='message assistant';typing.innerHTML='<div class="typing" aria-label="Responding"><span></span><span></span><span></span></div>';host.append(typing);}
+  }
+  function sendMessage(){
+    if(isTyping)return;
+    const raw=input()?.value.trim()||'';
+    if(!raw&&!pendingFiles.length)return;
+    const files=pendingFiles.map(f=>f.name);
+    pendingFiles=[];
+    let chat=active();
+    if(!chat){chat={id:makeId(),title:raw?raw.slice(0,48)+(raw.length>48?'…':''):'Attached file',messages:[],created:Date.now(),updated:Date.now()};chats.unshift(chat);currentId=chat.id;}
+    chat.messages.push({role:'user',text:raw,files});chat.updated=Date.now();save();isTyping=true;renderHistory();renderMain();
+    const capturedId=chat.id;
+    abortReply=setTimeout(()=>{
+      abortReply=null;
+      const target=chats.find(c=>c.id===capturedId);if(!target)return;
+      target.messages.push({role:'assistant',text:demoResponse(raw,files)});target.updated=Date.now();isTyping=false;save();renderHistory();if(currentId===capturedId){renderMessages();updateSend();scrollBottom();}
+    },650+Math.min(raw.length*3,850));
+  }
+  function regenerate(index){
+    const chat=active();if(!chat||isTyping)return;
+    let userMessage='';for(let i=index-1;i>=0;i--){if(chat.messages[i].role==='user'){userMessage=chat.messages[i].text;break;}}
+    if(!userMessage)return;
+    chat.messages[index].text=demoResponse(userMessage,[],'again');save();renderMessages();toast('Demo response regenerated');
+  }
+  function demoResponse(message,files=[],variation='') {
+    const s=message.toLowerCase().trim();
+    const notice='*This is a local interface demo. Connect a secure backend to receive real AI answers.*';
+    // All content below is generated locally from canned templates; never sent to a server.
+    if(files.length&&!s)return `I can see you've attached **${files.join(', ')}**.\n\nThis demo shows how file attachments appear in the interface, but it does not read or analyze them.\n\n${notice}`;
+    if(/^(hi|hello|hey|good morning|good evening|yo)\b/.test(s))return `Hello! 👋\n\nThis ChatGPT-inspired interface is running entirely in your browser. You can create chats, search your history, toggle dark mode, attach file names, and try out the chat interactions.\n\n${notice}`;
+    if(/(code|javascript|python|program|function|promise|html|css|react|typescript|debug)/.test(s))return `## Let's break it down\n\nHere's a small JavaScript example demonstrating the idea of an asynchronous operation:\n\n\`\`\`javascript\nasync function fetchExample() {\n  try {\n    const result = await Promise.resolve({ success: true });\n    console.log(result);\n  } catch (error) {\n    console.error(error);\n  }\n}\n\nfetchExample();\n\`\`\`\n\n**Key ideas:**\n- Keep each function focused on a clear purpose.\n- Handle failures explicitly.\n- Test with realistic input and edge cases.\n\n${notice}`;
+    if(/(write|email|message|letter|post|caption|draft)/.test(s))return `## A starting draft\n\n**Subject: A quick note**\n\nHi there,\n\nI wanted to reach out and share a few thoughts. I believe we have an opportunity to make progress by keeping our goals clear and focusing on the next practical step.\n\nI'd love to hear your perspective when you have a moment.\n\nBest regards,\n[Your name]\n\n**Tip:** A strong draft is specific about its audience, purpose, and desired action.\n\n${notice}`;
+    if(/(brainstorm|idea|project|creative|startup)/.test(s))return `## A few directions to explore\n\n- **A tiny useful tool:** Solve one annoying everyday problem exceptionally well.\n- **An interactive explainer:** Turn a difficult concept into a small visual experience.\n- **A creative automation:** Connect repetitive steps into a reusable personal workflow.\n- **A learning game:** Make knowledge feel like something the user can experiment with.\n\n**Next step:** Pick one direction, define your target user, and build the smallest version that proves the concept.\n\n${notice}`;
+    if(/(science|surprise|fact|space|physics)/.test(s))return `Here's a fascinating idea: **time doesn't pass at exactly the same rate everywhere.**\n\nAccording to general relativity, clocks in different gravitational fields tick at slightly different rates. GPS satellites must account for relativistic effects to help maintain accurate positioning.\n\nIt is a striking example of abstract physics shaping everyday technology.\n\n${notice}`;
+    if(/(summar|explain|understand|learn|what is|how does|why )/.test(s))return `## A simple way to understand it\n\nStart by identifying the **core idea**, then connect it to a concrete example. A useful explanation often follows three steps:\n\n- **Intuition:** What problem are we trying to solve?\n- **Mechanism:** What happens, step by step?\n- **Application:** When is this useful in the real world?\n\nYour question was: “${message.slice(0,180).replace(/\n/g,' ')}${message.length>180?'…':''}”\n\n${notice}`;
+    return `${variation?'Here is another take.\n\n':''}You asked: “${message.slice(0,220).replace(/\n/g,' ')}${message.length>220?'…':''}”\n\nThis interface is a **working front-end prototype**: it includes a responsive layout, multiple conversations, persistent local history, search, file-name attachments, a settings panel, and a polished message composer.\n\nFor real responses to arbitrary questions, the next step is to connect it to an AI API through your own server.\n\n${notice}`;
+  }
+  function renameChat(id){const c=chats.find(x=>x.id===id);if(!c)return;const name=prompt('Rename chat',c.title);if(name!==null&&name.trim()){c.title=name.trim().slice(0,100);save();renderHistory();}}
+  function deleteChat(id){const c=chats.find(x=>x.id===id);if(!c)return;if(!confirm(`Delete “${c.title}”?`))return;chats=chats.filter(x=>x.id!==id);if(currentId===id){currentId=null;cancelPendingReply();renderMain();}save();renderHistory();toast('Chat deleted');}
+  function download(name,data,mime){const blob=new Blob([data],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  function exportChat(id){const c=chats.find(x=>x.id===id);if(!c)return;download('chat-'+id.slice(0,8)+'.json',JSON.stringify(c,null,2),'application/json');toast('Chat exported');}
+  function copyText(value){if(navigator.clipboard?.writeText)navigator.clipboard.writeText(value).then(()=>toast('Copied to clipboard')).catch(()=>fallbackCopy(value));else fallbackCopy(value);}
+  function fallbackCopy(text){const el=document.createElement('textarea');el.value=text;el.style.position='fixed';el.style.opacity='0';document.body.append(el);el.select();try{document.execCommand('copy');toast('Copied to clipboard');}catch(_){toast('Copy is not supported in this browser');}el.remove();}
+  function openOverlay(id){closeMenu();$('#'+id).classList.add('open');if(id==='search-overlay'){renderSearch();setTimeout(()=>$('#search-input').focus(),30);}if(id==='settings-overlay')$('#theme-choice').value=storageGet(THEME_STORAGE)||'system';}
+  function closeOverlays(){$$('.overlay.open').forEach(el=>el.classList.remove('open'));}
+  function renderSearch(){const q=$('#search-input').value.trim().toLowerCase(),results=$('#search-results');results.replaceChildren();const matches=[...chats].sort((a,b)=>b.updated-a.updated).filter(c=>c.title.toLowerCase().includes(q)||c.messages.some(m=>m.text.toLowerCase().includes(q)));
+    if(!matches.length){results.innerHTML='<div class="search-empty">No conversations found</div>';return;}
+    matches.forEach(c=>{const btn=document.createElement('button');btn.className='search-result';btn.innerHTML=icon('search','sm')+'<span class="result-text"></span>';$('span',btn).textContent=c.title;btn.onclick=()=>{closeOverlays();openChat(c.id);};results.append(btn);});
+  }
+  function openMenu(target,items){const pop=$('#context-menu');if(menuOpen){closeMenu();}
+    pop.replaceChildren();items.forEach(item=>{const b=document.createElement('button');b.className='menu-option'+(item.danger?' danger':'');b.innerHTML=icon(item.glyph,'sm')+`<span>${escapeHTML(item.label)}</span>`;b.onclick=()=>{closeMenu();item.action();};pop.append(b);});
+    pop.classList.add('open');menuOpen=true;
+    const rect=target.getBoundingClientRect(),w=190,h=items.length*40+10;
+    let left=Math.min(rect.left,window.innerWidth-w-9),top=rect.bottom+5;
+    if(top+h>innerHeight-10)top=rect.top-h-5;
+    pop.style.left=Math.max(9,left)+'px';pop.style.top=Math.max(9,top)+'px';
+  }
+  function closeMenu(){$('#context-menu').classList.remove('open');menuOpen=false;}
+  function applyTheme(value){const dark=value==='dark'||(value==='system'&&prefersDark.matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').content=dark?'#212121':'#ffffff';}
+  function toggleSidebar(force){const sidebar=$('#sidebar');const close=typeof force==='boolean'?force:!sidebar.classList.contains('closed');sidebar.classList.toggle('closed',close);$('#mobile-scrim').classList.toggle('visible',!close&&innerWidth<=850);sidebarManuallyClosed=close;}
+  function closeMobile(){if(innerWidth<=850)toggleSidebar(true);}
+  function startDictation(){
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){toast('Voice dictation is not available in this browser');return;}
+    const rec=new SR();rec.lang=navigator.language||'en-US';rec.interimResults=false;
+    rec.onresult=e=>{input().value+=(input().value?' ':'')+e.results[0][0].transcript;resizePrompt();updateSend();};
+    rec.onerror=()=>toast('Could not capture your voice');rec.start();toast('Listening…');
+  }
+  $('#file-input').addEventListener('change',e=>{
+    for(const f of e.target.files){if(f.size>20*1024*1024){toast('Please choose files under 20 MB');continue;}if(pendingFiles.length<5)pendingFiles.push({name:f.name});}
+    e.target.value='';renderAttachments();updateSend();input().focus();
+  });
+  $('#new-chat').onclick=newChat;$('#quick-new').onclick=newChat;$('#search-chats').onclick=()=>openOverlay('search-overlay');
+  $('#close-sidebar').onclick=()=>toggleSidebar(true);$('#desktop-open').onclick=()=>toggleSidebar(false);$('#mobile-menu').onclick=()=>toggleSidebar(false);
+  $('#mobile-scrim').onclick=closeMobile;
+  $('#explore').onclick=()=>toast('Explore GPTs is a visual placeholder in this demo');
+  $('#model-picker').onclick=e=>openMenu(e.currentTarget,[{label:'ChatGPT · Demo mode',glyph:'check',action:()=>toast('This is a local-only demo')}]);
+  $('#profile').onclick=()=>openOverlay('settings-overlay');
+  $('#share-chat').onclick=()=>{const c=active();if(!c)return;const body=c.messages.map(m=>`${m.role==='user'?'You':'Assistant'}:\n${m.text}`).join('\n\n');copyText(body);};
+  $$('#quick-actions button').forEach(b=>b.onclick=()=>insertPrompt(b.dataset.prompt));
+  $$('.overlay').forEach(overlay=>overlay.addEventListener('mousedown',e=>{if(e.target===overlay)closeOverlays();}));
+  $$('[data-close]').forEach(b=>b.onclick=()=>closeOverlays());
+  $('#search-input').addEventListener('input',renderSearch);
+  $('#theme-choice').onchange=e=>{storageSet(THEME_STORAGE,e.target.value);applyTheme(e.target.value);};
+  $('#export-all').onclick=()=>{download('chatgpt-ui-demo-chats.json',JSON.stringify(chats,null,2),'application/json');toast('Conversations exported');};
+  $('#clear-all').onclick=()=>{if(!chats.length){toast('No conversations to clear');return;}if(confirm('Permanently delete all local conversations?')){chats=[];currentId=null;save();cancelPendingReply();renderHistory();renderMain();closeOverlays();toast('All chats cleared');}};
+  document.addEventListener('pointerdown',e=>{if(menuOpen&&!$('#context-menu').contains(e.target)&&!e.target.closest('.chat-menu-trigger,#tools-button,#model-picker'))closeMenu();});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){closeMenu();closeOverlays();}
+    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){
+      e.preventDefault();if(e.shiftKey)openOverlay('search-overlay');else newChat();
+    }
+  });
+  prefersDark.addEventListener?.('change',()=>{if((storageGet(THEME_STORAGE)||'system')==='system')applyTheme('system');});
+  window.addEventListener('resize',()=>{if(innerWidth<=850&& !$('#sidebar').classList.contains('closed')){$('#mobile-scrim').classList.add('visible');}else $('#mobile-scrim').classList.remove('visible');});
+  applyTheme(storageGet(THEME_STORAGE)||'system');
+  if(innerWidth<=850)toggleSidebar(true);
+  renderHistory();renderMain();
+})();
+</script>
+</body>
+</html>

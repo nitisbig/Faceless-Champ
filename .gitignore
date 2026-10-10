@@ -51,3 +51,6 @@ training project/stock-analysis/image/*
 # Track the guide site and its verified preview assets.
 !website/dist/
 !website/dist/**
+
+# Prepared browser frame caches
+.web-cache/

@@ -55,8 +55,9 @@ def _size(component, renderer):
     from .charts import Chart
     from .maps import Map
     from .subtitles import Captions
+    from .web.clip import HtmlClip
 
-    if isinstance(component, (Image, Chart, Map)):
+    if isinstance(component, (Image, Chart, Map, HtmlClip)):
         return max(1, round(component.width)), max(1, round(component.height))
     if isinstance(component, Captions):
         sizes = [renderer._caption_sprite(component, 1, phrase[0].start).size for phrase in component.phrases]

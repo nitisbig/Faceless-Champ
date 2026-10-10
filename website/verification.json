@@ -2,15 +2,15 @@
   "guides": {
     "core": {
       "page": "index.html",
-      "chapters": 16
+      "chapters": 17
     },
     "kit": {
       "page": "kit.html",
-      "chapters": 10
+      "chapters": 11
     }
   },
-  "chapters": 26,
-  "python_snippets": 33,
+  "chapters": 28,
+  "python_snippets": 36,
   "examples": [
     {
       "file": "hello.py",
@@ -25,21 +25,7 @@
       "size": [
         640,
         360
-      ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "3.000000"
-        }
-      },
-      "fully_decoded": true
+      ]
     },
     {
       "file": "portrait.py",
@@ -69,21 +55,7 @@
       "size": [
         640,
         360
-      ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "2.000000"
-        }
-      },
-      "fully_decoded": true
+      ]
     },
     {
       "file": "timing.py",
@@ -143,21 +115,7 @@
       "size": [
         640,
         360
-      ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "3.000000"
-        }
-      },
-      "fully_decoded": true
+      ]
     },
     {
       "file": "composition.py",
@@ -187,21 +145,7 @@
       "size": [
         640,
         360
-      ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "2.533333"
-        }
-      },
-      "fully_decoded": true
+      ]
     },
     {
       "file": "schedules.py",
@@ -231,21 +175,7 @@
       "size": [
         640,
         360
-      ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "2.533333"
-        }
-      },
-      "fully_decoded": true
+      ]
     },
     {
       "file": "indicators.py",
@@ -260,21 +190,22 @@
       "size": [
         640,
         360
+      ]
+    },
+    {
+      "file": "html_video.py",
+      "guide": "core",
+      "duration": 1.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        0.5,
+        0.95
       ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "4.533333"
-        }
-      },
-      "fully_decoded": true
+      "size": [
+        640,
+        360
+      ]
     },
     {
       "file": "kit_main.py",
@@ -290,21 +221,7 @@
         360,
         640
       ],
-      "template": "silent",
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 360,
-            "height": 640
-          }
-        ],
-        "format": {
-          "duration": "3.000000"
-        }
-      },
-      "fully_decoded": true
+      "template": "silent"
     },
     {
       "file": "kit_blocks.py",
@@ -412,21 +329,23 @@
       "formats_checked": [
         "landscape",
         "shorts"
+      ]
+    },
+    {
+      "file": "kit_web.py",
+      "guide": "kit",
+      "duration": 1.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        0.5,
+        0.95
       ],
-      "media": {
-        "programs": [],
-        "streams": [
-          {
-            "codec_name": "h264",
-            "width": 640,
-            "height": 360
-          }
-        ],
-        "format": {
-          "duration": "10.000000"
-        }
-      },
-      "fully_decoded": true
+      "size": [
+        640,
+        360
+      ],
+      "template": "silent"
     }
   ],
   "starters": [
@@ -471,5 +390,5 @@
       "sampled_frames": 3
     }
   ],
-  "links_checked": 26
+  "links_checked": 30
 }

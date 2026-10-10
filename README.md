@@ -276,3 +276,10 @@ python3 'training project/stock-analysis/render.py' --storyboard --image placeho
 The default renders only the opening at 540×810 / 12 fps. New public `CueScene`
 chapter timing, `save_frame`, `StoryboardSample`, and `render_storyboard` APIs live
 in the main package. See [narration and preview contracts](docs/narration.md).
+
+## HTML to video
+
+Turn local HTML into timed scenes with the optional `web` extra. Script interactions,
+prepare frames, and compose `HtmlClip` alongside other components.
+See [the HTML-to-video guide](docs/html-to-video.md) and
+[the example tour](training%20project/web-video/README.md).

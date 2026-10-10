@@ -15,3 +15,5 @@ Use provided CLI and Project services rather than copying render loops.
 Read docs/catalog.md for block props and examples/custom_block.py for extension patterns.
 For whiteboard videos, use templates.whiteboard_basic with immutable WhiteboardScene recipes and blocks.WhiteboardDrawing.
 Start with `fc-kit init my-board --template whiteboard-basic`; read docs/whiteboard.md for geometry and cue timing.
+
+HTML-to-video: see docs/html-to-video.md. Core faceless_champ.web owns HtmlPage, WebScript, capture_html, WebCapture, HtmlClip and timed visual controls. Kit WebWalkthrough/WebElement consume prepared captures. Browser installation is explicit; never perform a full export when only previews are requested.

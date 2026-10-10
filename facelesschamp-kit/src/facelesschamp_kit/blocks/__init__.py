@@ -8,6 +8,7 @@ from faceless_champ import Bounds, ImageSlot, Number, Rectangle
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
 from .flow import FlowDiagram
+from .web import WebElement, WebWalkthrough
 from .whiteboard import (
     WhiteboardArrow,
     WhiteboardCircle,
@@ -187,6 +188,8 @@ __all__ = [
     "MetricCard",
     "StepList",
     "TextPanel",
+    "WebElement",
+    "WebWalkthrough",
     "WhiteboardArrow",
     "WhiteboardCircle",
     "WhiteboardDrawing",

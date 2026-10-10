@@ -2,9 +2,9 @@
 
 Two static pages share the same design, assets, and JavaScript:
 
-- **Core library:** `dist/index.html` — 16 chapters about scenes, components,
+- **Core library:** `dist/index.html` — 17 chapters about scenes, components,
   timelines, narration, composition, motion graphics, and rendering.
-- **Kit framework:** `dist/kit.html` — 10 chapters about structured projects,
+- **Kit framework:** `dist/kit.html` — 11 chapters about structured projects,
   blocks, themes, narration, templates, and the kit workflow.
 
 The Core / Kit switch stays visible on mobile. Each guide has its own sidebar,
@@ -80,3 +80,7 @@ report, so repeat those inspections before recording them again.
 `.openai/hosting.json` retains the existing private Sites identity. Publication
 is a separate step; these local changes do not deploy the site. Do not commit
 credentials or temporary deployment archives.
+
+The HTML chapters include `html_video.py` and `kit_web.py` factories for prepared captures.
+The verifier uses a synthetic capture to validate their browser-free composition; browser
+interaction tests live in the core test suite and are enabled with `FC_WEB_BROWSER_TESTS=1`.

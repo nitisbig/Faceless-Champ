@@ -274,7 +274,7 @@ fc-kit frame main --time 1.5 -o output/frame.png
 fc-kit storyboard main -o output/storyboard
 fc-kit preview main --segment hook -o output/hook.mp4
 fc-kit render main -o output/main.mp4
-''','bash'),note('facelesschamp-kit 0.1.0rc2 is a local release candidate. The guide uses the implementation in this repository.'))
+''','bash'),note('facelesschamp-kit 0.1.0rc3 is a local release candidate. The guide uses the implementation in this repository.'))
 ], 'kit', guide='kit', portrait=True)
 lesson('project-configuration', 'Project configuration', 'The framework', 'Keep format, themes, assets, and export settings in a predictable project layout.', [
 section('Know the project layout', 'The scaffold separates authoring code from local assets and workflow outputs.', code('''
@@ -538,7 +538,7 @@ section('Keep the current scope clear', 'The core currently exports MP4. GPU ren
 ])
 
 lesson('kit-installation', 'Installation', 'Start here', 'Install the framework and its core engine, then check your local video tools.', [
-section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc2 is a local release candidate; these instructions do not assume a published release.', code('''
+section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc3 is a local release candidate; these instructions do not assume a published release.', code('''
 git clone https://github.com/nitisbig/Faceless-Champ.git
 cd Faceless-Champ
 python3.12 -m venv .venv
@@ -734,7 +734,58 @@ section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Erro
     ['Output already exists', 'Choose another path or explicitly add --overwrite.'],
 ])),
 section('Bound the work', 'Use a frame, a storyboard, and a short preview before raising resolution or frame rate. The kit uses the core CPU Pillow renderer and FFmpeg encoder.'),
-section('Keep the current scope clear', 'The framework is a local 0.1.0rc2 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
+section('Keep the current scope clear', 'The framework is a local 0.1.0rc3 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
+], guide='kit')
+
+# Browser examples deliberately reopen prepared assets; no browser runs on import.
+web_core = code("""
+from faceless_champ import Canvas, Scene
+from faceless_champ.web import HtmlClip, WebCapture
+
+def build_scene(capture_directory):
+    capture = WebCapture(capture_directory)
+    scene = Scene(Canvas(1920, 1080, '#101827'))
+    scene.add(HtmlClip(capture, width=1440, height=900, position=(960, 540)))
+    scene.wait(capture.duration)
+    return scene
+""", filename='html_video.py', target='build_scene')
+web_core['command'] = 'Prepare a capture first, then call build_scene(capture.directory).'
+lesson('html-to-video', 'HTML to video', 'Media and composition',
+       'Prepare real browser interactions, then compose the frames into ordinary scenes.', [
+    section('Install browser preparation', 'Browser installation is explicit; normal scene playback stays browser-free.',
+            code('uv pip install -e ".[web]"\npython -m playwright install chromium', 'bash')),
+    section('Author a local walkthrough', 'Times are source seconds. Track selectors before using element crops or focus.',
+            code("""from faceless_champ.web import HtmlPage, WebScript, capture_html
+page = HtmlPage('ui.html', viewport=(1440, 900))
+script = WebScript(8).type('#prompt-input', 'Hello', at=1, duration=2)
+script.click('#send', at=3.5).track('.composer')
+capture = capture_html(page, script, fps=30, cache_dir='.web-cache')""")),
+    section('Compose a prepared asset', 'Use the supplied factory from your runner after explicit preparation.', web_core),
+    section('Prepare only what you need', 'Use start_time/end_time for ranges or sample_times for stills. Earlier interactions replay without saving unused frames. Cache files are lossless and disk-backed.'),
+    section('Know the boundaries', 'Local HTML and assets only. Captures preserve real page pixels; selector crops keep backgrounds. Match capture and export FPS. Identical pixels across different browser/font environments are not promised.',
+            link('Kit walkthrough blocks →', 'kit.html#html-walkthroughs')),
+])
+web_kit = code("""
+from faceless_champ.web import WebCapture, WebCallout
+from facelesschamp_kit.blocks import WebWalkthrough, WebElement
+
+def walkthrough(capture_directory):
+    capture = WebCapture(capture_directory)
+    return WebWalkthrough(capture, title='Product tour',
+                          callouts=(WebCallout('Explore your app', 0, 3),))
+
+def element(capture_directory, selector):
+    return WebElement(WebCapture(capture_directory), selector)
+""", filename='kit_web.py', kind='kit')
+web_kit['command'] = 'Call walkthrough(capture.directory) and add the block to a segment.'
+web_kit['placement'] = 'Use these helpers from your project after explicit core capture preparation.'
+lesson('html-walkthroughs', 'HTML walkthroughs', 'Framework fundamentals',
+       'Present prepared browser frames with reusable blocks.', [
+    section('Prepare with core, present with kit', 'Install the web extra on both matching packages. Run capture_html explicitly before composing blocks; kit build and render never start a browser.',
+            link('Core capture guide →', 'index.html#html-to-video')),
+    section('Reusable blocks', 'WebWalkthrough adds optional browser chrome, cursor and click effects. WebElement reuses a tracked selector crop in any layout.', web_kit),
+    section('Focus and explain', 'Pass WebFocus, WebHighlight and WebCallout records to the block. All annotation times use the original capture clock. Cursor and highlights follow focus transforms. Each compose creates fresh components.'),
+    section('Try the supplied tour', 'training project/web-video/render.py supports prepare, frame, storyboard, preview and render. Start with a sparse storyboard or short preview; full export is a separate explicit command.'),
 ], guide='kit')
 
 core_lessons = [item for item in lessons if item['guide'] == 'core']
@@ -747,15 +798,15 @@ for item in lessons:
 # Keep chapter groups contiguous in the sidebar and reading order.
 kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration',
              'blocks-and-themes', 'custom-blocks', 'framework-narration', 'templates',
-             'whiteboard-videos', 'kit-preview-and-export', 'kit-troubleshooting']
+             'whiteboard-videos', 'html-walkthroughs', 'kit-preview-and-export', 'kit-troubleshooting']
 assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]
 guides = {
     'core': dict(title='Faceless Champ Core Guide', label='Core library', file='index.html',
-                 version='0.1.1', kind='PYTHON LIBRARY', home='hello-world',
+                 version='0.1.2', kind='PYTHON LIBRARY', home='hello-world',
                  introduction='Create animated videos with Python scenes, components, and a precise timeline.'),
     'kit': dict(title='facelesschamp-kit Guide', label='Kit framework', file='kit.html',
-                version='0.1.0rc2', kind='FRAMEWORK', home='framework-quickstart',
+                version='0.1.0rc3', kind='FRAMEWORK', home='framework-quickstart',
                 introduction='Build structured video projects with reusable blocks, editable templates, and narration cues.'),
 }
 (DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, guides=guides), indent=2) + '\n')

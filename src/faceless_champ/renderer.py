@@ -36,6 +36,7 @@ from .maps import Map, draw_map
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
 from .typography import DEFAULT_FONT, load_font
+from .web.clip import HtmlClip
 
 
 class Renderer(Protocol):
@@ -150,6 +151,8 @@ class PillowRenderer:
                         ImageColor.getcolor(c.future_color, "RGBA")
                         for phrase in c.phrases:
                             self._caption_sprite(c, 1, phrase[0].start)
+                elif isinstance(c, HtmlClip):
+                    pass  # Prepared ranges are checked at requested frame time.
                 elif isinstance(c, Image):
                     self._image(c)
                     if c.tint is not None:
@@ -242,7 +245,10 @@ class PillowRenderer:
                     tuple((origin, tuple(parent.items())) for origin, parent in parents),
                     self._caption_state(c, age)
                     if isinstance(c, Captions)
-                    else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None),
+                    else (
+                        c.frame_key(age) if isinstance(c, HtmlClip)
+                        else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None)
+                    ),
                 )
                 for c, state, age, parents in visible
             ),
@@ -409,6 +415,8 @@ class PillowRenderer:
     def _sprite(self, c, state, factor, age):
         from .indicators import ProgressBar, draw_indicator
 
+        if isinstance(c, HtmlClip):
+            return c.frame_image(age, factor)
         if isinstance(c, ProgressBar):
             return draw_indicator(c, state, factor, self)
         # A temporary style view avoids mutating snapshots and retaining intermediate sprites.

@@ -116,3 +116,5 @@ schedules, distinct from scene Sequence. Repeat cycles counts traversals, includ
 backward ping-pong traversals. Local RectangleMask/CircleMask/ShapeMask apply to
 complete targets; Wipe shares their alpha compositor. ProgressBar/ProgressRing/
 Gauge/LoadingDots/Checkmark use progress_to([0,1]); Countdown uses value_to(0).
+
+HTML-to-video: see docs/html-to-video.md. Core faceless_champ.web owns HtmlPage, WebScript, capture_html, WebCapture, HtmlClip and timed visual controls. Kit WebWalkthrough/WebElement consume prepared captures. Browser installation is explicit; never perform a full export when only previews are requested.

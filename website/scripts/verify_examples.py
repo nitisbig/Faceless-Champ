@@ -97,7 +97,25 @@ for lesson in content['lessons']:
             assert path.read_text() == block['code'], filename
             check_link(f'examples/{filename}', lesson['guide'])
             with tempfile.TemporaryDirectory(prefix='fc-guide-check-') as temporary:
-                if block['kind'] == 'kit':
+                if filename in {'html_video.py', 'kit_web.py'}:
+                    from PIL import Image
+                    from faceless_champ import Canvas, Scene
+                    from facelesschamp_kit.context import BuildContext
+                    asset = Path(temporary) / 'capture'
+                    asset.mkdir()
+                    Image.new('RGB', (144, 90), '#345678').save(asset / '00000000.png')
+                    (asset / 'manifest.json').write_text(json.dumps({
+                        'schema': 1, 'fps': 1, 'duration': 1, 'viewport': [144, 90],
+                        'frames': {'0': {'geometry': {}, 'cursor': [0, 0], 'clicks': []}}}))
+                    namespace = runpy.run_path(str(path))
+                    if filename == 'html_video.py':
+                        node = namespace['build_scene'](asset)
+                    else:
+                        ctx = BuildContext(Path(temporary), canvas=Canvas(1920, 1080))
+                        node = Scene(ctx.canvas)
+                        node.add(namespace['walkthrough'](asset).compose(ctx, ctx.bounds).root)
+                        node.wait(1)
+                elif block['kind'] == 'kit':
                     project_path = Path(temporary) / 'video'
                     init_project(project_path, block['template'])
                     (project_path / 'videos/main.py').write_text(block['code'])

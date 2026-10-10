@@ -96,3 +96,9 @@ python scripts/verify_media.py --output output/verification
 The build script uses the active interpreter's setuptools/wheel. `scripts/prepare_sample.py` is an optional developer-only fixture generator requiring espeak-ng; it is not used by rendering or scaffolding.
 
 No public repository or package publication is performed by this implementation. Licensing for project code remains undecided; `LICENSE.pending` records that status rather than granting a license. Core asset licenses remain in the core distribution.
+
+## HTML walkthroughs
+
+`WebWalkthrough` and `WebElement` compose prepared core HTML captures into kit videos.
+See [the walkthrough guide](docs/html-to-video.md). Install the optional `web` extra
+for browser preparation; playback and block composition do not need Playwright.
