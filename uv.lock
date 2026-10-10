@@ -109,6 +109,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+coding = [
+    { name = "pygments" },
+]
 equations = [
     { name = "matplotlib" },
 ]
@@ -131,8 +134,9 @@ requires-dist = [
     { name = "numpy", marker = "extra == 'maps'", specifier = ">=1.26,<3" },
     { name = "pillow", specifier = ">=10.4,<13" },
     { name = "playwright", marker = "extra == 'web'", specifier = ">=1.58,<2" },
+    { name = "pygments", marker = "extra == 'coding'", specifier = ">=2.18,<3" },
 ]
-provides-extras = ["web", "maps", "equations"]
+provides-extras = ["coding", "web", "maps", "equations"]
 
 [package.metadata.requires-dev]
 dev = [

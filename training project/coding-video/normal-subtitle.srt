@@ -1,0 +1,224 @@
+1
+00:00:00,060 --> 00:00:02,690
+Imagine you're building a video game. You have
+
+2
+00:00:02,690 --> 00:00:04,900
+two players. Each player has a name, a
+
+3
+00:00:04,900 --> 00:00:07,830
+health level, and actions like taking damage or
+
+4
+00:00:07,830 --> 00:00:11,100
+healing. Now imagine managing a hundred players using
+
+5
+00:00:11,100 --> 00:00:13,840
+separate variables and functions that would get messy
+
+6
+00:00:13,840 --> 00:00:16,800
+pretty quickly, and this is exactly where Python
+
+7
+00:00:16,800 --> 00:00:19,490
+classes become useful. A class is simply a
+
+8
+00:00:19,490 --> 00:00:22,680
+blueprint for creating objects. Think of a blueprint
+
+9
+00:00:22,680 --> 00:00:24,930
+for a house. The blueprint isn't a house
+
+10
+00:00:24,930 --> 00:00:27,260
+itself, but you can build many houses from
+
+11
+00:00:27,260 --> 00:00:30,030
+it. In Python, the idea is similar. Let's
+
+12
+00:00:30,030 --> 00:00:32,600
+create a class called player. We start with
+
+13
+00:00:32,600 --> 00:00:35,830
+the keyword class, followed by its name. Inside
+
+14
+00:00:35,830 --> 00:00:38,250
+this class, we define something called the init
+
+15
+00:00:38,250 --> 00:00:41,160
+method. Don't worry about the strange double underscore.
+
+16
+00:00:41,160 --> 00:00:43,700
+This method runs automatically whenever we create a
+
+17
+00:00:43,700 --> 00:00:45,300
+new player. It helps us set up the
+
+18
+00:00:45,300 --> 00:00:48,650
+player's initial information. Here, we give every player
+
+19
+00:00:48,650 --> 00:00:50,700
+a name and a starting health of one
+
+20
+00:00:50,700 --> 00:00:54,310
+hundred. But what exactly is self? Self refers
+
+21
+00:00:54,310 --> 00:00:56,700
+to the specific object we're working with. If
+
+22
+00:00:56,700 --> 00:00:59,100
+we create two players, each one gets its
+
+23
+00:00:59,100 --> 00:01:01,640
+own name and health. So changing one player's
+
+24
+00:01:01,640 --> 00:01:04,160
+health won't change the others. Now let's make
+
+25
+00:01:04,160 --> 00:01:07,260
+our players actually do something. Inside the class,
+
+26
+00:01:07,260 --> 00:01:09,390
+we create a method called take damage. A
+
+27
+00:01:09,390 --> 00:01:12,030
+method is simply a function defined inside a
+
+28
+00:01:12,030 --> 00:01:14,470
+class. This method takes an amount of damage
+
+29
+00:01:14,470 --> 00:01:16,650
+and subtracts it from the player's health. We
+
+30
+00:01:16,650 --> 00:01:19,120
+can also create a heal method that increases
+
+31
+00:01:19,120 --> 00:01:21,980
+health. And finally, a show status method to
+
+32
+00:01:21,980 --> 00:01:25,840
+display the player's current information. Notice something interesting.
+
+33
+00:01:25,900 --> 00:01:27,950
+We've grouped the player's data and the actions
+
+34
+00:01:27,950 --> 00:01:30,200
+that operate on that data in one place.
+
+35
+00:01:30,200 --> 00:01:32,590
+That's the power of a class. Now comes
+
+36
+00:01:32,590 --> 00:01:35,400
+the fun part. Let's create our first object.
+
+37
+00:01:35,400 --> 00:01:37,660
+We write player, pass in the name Alex,
+
+38
+00:01:37,660 --> 00:01:40,040
+and store the result in a variable. Just
+
+39
+00:01:40,040 --> 00:01:42,100
+like that, we've created a player with a
+
+40
+00:01:42,100 --> 00:01:45,250
+name and 100 health points. Let's create another
+
+41
+00:01:45,250 --> 00:01:47,790
+player named Sam. Both objects come from the
+
+42
+00:01:47,790 --> 00:01:51,150
+same class, but they're completely independent. Now Alex
+
+43
+00:01:51,150 --> 00:01:54,480
+takes 30 damage. His health drops to 70.
+
+44
+00:01:54,540 --> 00:01:56,800
+When we heal him by 15, his health
+
+45
+00:01:56,800 --> 00:02:00,580
+becomes 85. Meanwhile, Sam takes 10 damage, leaving
+
+46
+00:02:00,580 --> 00:02:03,200
+him with 90. When we display their status,
+
+47
+00:02:03,200 --> 00:02:05,680
+we get two different results. And that's the
+
+48
+00:02:05,680 --> 00:02:08,230
+key idea. The class defines what a player
+
+49
+00:02:08,230 --> 00:02:10,110
+is and what a player can do. An
+
+50
+00:02:10,110 --> 00:02:13,040
+object is an actual instance created from that
+
+51
+00:02:13,040 --> 00:02:16,610
+class. Attributes hold the object's information, methods define
+
+52
+00:02:16,610 --> 00:02:19,640
+its behavior, and self-connects those methods to the
+
+53
+00:02:19,640 --> 00:02:23,100
+correct object. Once you understand this, classes stop
+
+54
+00:02:23,100 --> 00:02:25,900
+looking like complicated syntax. They become a way
+
+55
+00:02:25,900 --> 00:02:29,280
+to organize code into reusable, understandable pieces, and
+
+56
+00:02:29,280 --> 00:02:31,280
+that's your introduction to classes in Python.
+

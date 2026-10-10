@@ -283,3 +283,11 @@ Turn local HTML into timed scenes with the optional `web` extra. Script interact
 prepare frames, and compose `HtmlClip` alongside other components.
 See [the HTML-to-video guide](docs/html-to-video.md) and
 [the example tour](training%20project/web-video/README.md).
+
+### CodingChamp
+
+Render themed code editors with syntax highlighting and character, word, or block
+reveals using `CodingChamp`, `CodeTheme`, and `CodeReveal`. Install the optional
+`coding` extra for Pygments languages; plain text needs no extra dependency.
+See [the CodingChamp guide](docs/coding.md), [the staged example](examples/coding/showcase.py),
+and the cue-synchronized `training project/coding-video` tutorial.

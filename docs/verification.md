@@ -388,3 +388,14 @@ Generated inspection artifacts are under the ignored project output directory:
 `storyboard/storyboard.png`, `decoded/decoded-contact-sheet.png`, `timeline.json`,
 and `verification.json`. The example's scene plan, image prompts, config and
 commands are in `training project/stock-analysis/`.
+
+## CodingChamp — 2026-10-10
+
+Added core CodingChamp/CodeTheme/CodeReveal editor rendering, an optional coding extra,
+and the bundled licensed DejaVu Sans Mono font. Core + kit suites: 479 passed, 1 skipped;
+28 CodingChamp checks also passed against an externally installed wheel. Offline sdist/wheel
+builds, lockfile consistency, Ruff and diff checks passed. The coding-video training project
+adds six acceptance tests and five decoded, source-audio-aligned excerpts (894 frames), including
+20/30/60 FPS and a short 4K sample. See
+[the project verification record](../training%20project/coding-video/VERIFICATION.md).
+The complete tutorial was not rendered: `full_export_verified: false`.

@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = ["Pillow>=10.4,<13"]
 
 [project.optional-dependencies]
+coding = ["Pygments>=2.18,<3"]
 web = ["playwright>=1.58,<2"]
 maps = ["numpy>=1.26,<3"]
 equations = ["matplotlib>=3.9,<4"]

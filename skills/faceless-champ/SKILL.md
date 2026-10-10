@@ -134,3 +134,12 @@ Use --overwrite only when replacing the chosen output is intended.
   LoadingDots has identical endpoints for finite Repeat loops. These components
   never start implicit clocks. See docs/motion-graphics.md and the self-contained
   examples/motion_graphics/render.py for timing and validation examples.
+
+- Use CodingChamp for source-preserving syntax-highlighted editor panels; install the
+  optional coding extra for language aliases, or choose language="text" for plain text.
+  CodeReveal(panel, start=0, end=1) uses the panel's typewriter, word, or block reveal_mode.
+  block_ends are increasing inclusive local line numbers including the last line.
+  Keep code readable by selecting excerpts; overflow raises instead of wrapping code.
+  CodeTheme.named supplies midnight/ocean/paper. See docs/coding.md. The coding-video
+  training wrapper exports the full tutorial by default as explicitly requested;
+  use --range when validating excerpts and never infer full-export QA from them.

@@ -118,3 +118,9 @@ complete targets; Wipe shares their alpha compositor. ProgressBar/ProgressRing/
 Gauge/LoadingDots/Checkmark use progress_to([0,1]); Countdown uses value_to(0).
 
 HTML-to-video: see docs/html-to-video.md. Core faceless_champ.web owns HtmlPage, WebScript, capture_html, WebCapture, HtmlClip and timed visual controls. Kit WebWalkthrough/WebElement consume prepared captures. Browser installation is explicit; never perform a full export when only previews are requested.
+
+CodingChamp: use CodingChamp(code, language="python", theme="midnight", ...) and
+CodeReveal(panel, start=0, end=1) for fixed-layout editor animations. Set reveal_mode
+to typewriter, word, or block; block_ends uses increasing inclusive local line numbers.
+Syntax highlighting needs the coding extra; language="text" works without it.
+CodeTheme.named supports midnight/ocean/paper. See docs/coding.md and examples/coding/showcase.py.

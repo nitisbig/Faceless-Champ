@@ -543,3 +543,10 @@ See [Motion graphics](motion-graphics.md) for animated color and geometry builde
 local `RectangleMask`/`CircleMask`/`ShapeMask`, `Wipe`, and the six indicators
 (`ProgressBar`, `ProgressRing`, `Gauge`, `Countdown`, `LoadingDots`, `Checkmark`).
 The guide defines interpolation, ranges, coordinate systems and exact loop endpoints.
+
+## CodingChamp code editors
+
+`CodingChamp`, `CodeTheme`, and `CodeReveal` are public core APIs for syntax-colored
+editor surfaces and source-preserving character/word/block reveals. See the
+[complete CodingChamp API and examples](coding.md) for constructor options, themes,
+staged animation, optional language support, layout limits, and cache controls.

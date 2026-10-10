@@ -172,3 +172,7 @@ __all__ += [
     "Succession",
     "Wipe",
 ]
+
+from .coding import CodeReveal, CodeTheme, CodingChamp
+
+__all__ += ["CodeReveal", "CodeTheme", "CodingChamp"]

@@ -45,10 +45,15 @@ class Renderer(Protocol):
 
 
 class PillowRenderer:
-    def __init__(self, antialias: int = 2, *, frame_cache_mb: float = 64, caption_cache_mb: float = 32):
+    def __init__(
+        self, antialias: int = 2, *, frame_cache_mb: float = 64, caption_cache_mb: float = 32, code_cache_mb: float = 32
+    ):
         if antialias not in (1, 2, 3, 4):
             raise ValueError("antialias must be 1, 2, 3, or 4")
         self.antialias = antialias
+        self._code_sprites = OrderedDict()
+        self._code_cache_limit = round(finite(code_cache_mb, "code_cache_mb", 0) * 1024 * 1024)
+        self._code_cache_bytes = 0
         self._images = {}
         self._fonts = {}
         self._sprites = {}
@@ -130,8 +135,11 @@ class PillowRenderer:
         if isinstance(node, Scene):
             for entry in node.entries:
                 c = entry.component
+                from .coding import CodingChamp
                 from .indicators import ProgressBar
 
+                if isinstance(c, CodingChamp):
+                    continue
                 if isinstance(c, ProgressBar):
                     continue
                 if isinstance(c, Group):
@@ -246,7 +254,8 @@ class PillowRenderer:
                     self._caption_state(c, age)
                     if isinstance(c, Captions)
                     else (
-                        c.frame_key(age) if isinstance(c, HtmlClip)
+                        c.frame_key(age)
+                        if isinstance(c, HtmlClip)
                         else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None)
                     ),
                 )
@@ -413,7 +422,11 @@ class PillowRenderer:
         return result
 
     def _sprite(self, c, state, factor, age):
+        from .coding import CodingChamp, draw_code
         from .indicators import ProgressBar, draw_indicator
+
+        if isinstance(c, CodingChamp):
+            return draw_code(c, state, factor, self)
 
         if isinstance(c, HtmlClip):
             return c.frame_image(age, factor)
