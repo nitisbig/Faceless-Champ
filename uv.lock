@@ -108,7 +108,7 @@ wheels = [
 
 [[package]]
 name = "faceless-champ"
-version = "0.1.3"
+version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "pillow" },
@@ -127,6 +127,10 @@ equations = [
 maps = [
     { name = "numpy" },
 ]
+playground = [
+    { name = "playwright" },
+    { name = "pygments" },
+]
 web = [
     { name = "playwright" },
 ]
@@ -143,10 +147,12 @@ requires-dist = [
     { name = "matplotlib", marker = "extra == 'equations'", specifier = ">=3.9,<4" },
     { name = "numpy", marker = "extra == 'maps'", specifier = ">=1.26,<3" },
     { name = "pillow", specifier = ">=10.4,<13" },
+    { name = "playwright", marker = "extra == 'playground'", specifier = ">=1.58,<2" },
     { name = "playwright", marker = "extra == 'web'", specifier = ">=1.58,<2" },
     { name = "pygments", marker = "extra == 'coding'", specifier = ">=2.18,<3" },
+    { name = "pygments", marker = "extra == 'playground'", specifier = ">=2.18,<3" },
 ]
-provides-extras = ["chess", "coding", "web", "maps", "equations"]
+provides-extras = ["chess", "coding", "playground", "web", "maps", "equations"]
 
 [package.metadata.requires-dev]
 dev = [

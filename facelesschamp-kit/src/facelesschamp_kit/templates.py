@@ -199,3 +199,46 @@ def chesschamp(ctx, data="data.json"):
     with video.segment("chesschamp", duration=script.duration) as segment:
         segment.add(ChessBoard(script))
     return video
+
+
+def coding_playground(
+    ctx,
+    script,
+    *,
+    start=0,
+    audio=None,
+    subtitles=None,
+    markers=None,
+    cues=None,
+    layout="side",
+    code_ratio=0.5,
+    font_size=24,
+    output=True,
+    fps=15,
+    timeout=10,
+    output_limit=1_000_000,
+):
+    """Compose a prepared programming lesson; checkpoint times are relative to its segment."""
+    from .blocks import CodingPlayground
+
+    prepared = ctx.playground(script, fps=fps, timeout=timeout, output_limit=output_limit)
+    video = Video(ctx)
+    if audio is not None:
+        video.narration(
+            audio=ctx.assets.audio(audio),
+            subtitles=ctx.assets.subtitle(subtitles) if subtitles else None,
+            markers=markers,
+        )
+    if cues is not None:
+        if video.voice is None or start != 0:
+            raise KitError("PLAYGROUND_TIMING", "Cue timing needs narration and cannot also specify start")
+        segment = video.segment("coding", window=video.voice.between(*cues))
+        if segment.duration < script.duration:
+            raise KitError("PLAYGROUND_TIMING", "Playground exceeds its narration window")
+    else:
+        segment = video.segment("coding", start=start, duration=script.duration)
+    segment.add(
+        CodingPlayground(prepared, layout=layout, code_ratio=code_ratio, font_size=font_size, output=output),
+        id="playground",
+    )
+    return video

@@ -3,7 +3,8 @@
 CodingChamp renders source code inside an editor surface using the ordinary Pillow renderer.
 Install syntax highlighting with `pip install 'faceless-champ[coding]'` (or `uv sync --extra coding`).
 `language="text"` is the dependency-free default. Set a Pygments language alias such as `python`,
-`javascript`, or `typescript` to color syntax. Source is displayed, never executed.
+`javascript`, or `typescript` to color syntax. This editor displays source without executing it. For explicit checkpoint execution and side canvases,
+see [CodingChamp playgrounds](coding-playgrounds.md).
 
 ```python
 from faceless_champ import Canvas, Scene, CodingChamp, CodeReveal

@@ -73,8 +73,21 @@ def build(ctx):
 
 
 def init_project(destination, template="silent"):
-    if template not in {"silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui", "chesschamp"}:
-        raise KitError("TEMPLATE", "Choose silent, explainer-short, narrated-short, whiteboard-basic, os-ui, or chesschamp")
+    if template not in {
+        "silent",
+        "explainer-short",
+        "narrated-short",
+        "whiteboard-basic",
+        "os-ui",
+        "chesschamp",
+        "coding-web",
+        "coding-concept",
+        "coding-backend",
+    }:
+        raise KitError(
+            "TEMPLATE",
+            "Choose silent, explainer-short, narrated-short, whiteboard-basic, os-ui, chesschamp, coding-web, coding-concept, or coding-backend",
+        )
     destination = Path(destination).resolve()
     if destination.exists():
         raise KitError("DESTINATION", "Destination already exists; choose a new directory")
@@ -88,14 +101,15 @@ def init_project(destination, template="silent"):
         whiteboard = template == "whiteboard-basic"
         os_ui = template == "os-ui"
         chess = template == "chesschamp"
+        coding = template.startswith("coding-")
         config = (
             CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
                 'theme = "midnight"', 'theme = "whiteboard"'
             )
-            if whiteboard or os_ui or chess
+            if whiteboard or os_ui or chess or coding
             else CONFIG
         )
-        if os_ui or chess:
+        if os_ui or chess or coding:
             config = config.replace('theme = "whiteboard"', 'theme = "midnight"')
         (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
@@ -107,9 +121,15 @@ def init_project(destination, template="silent"):
             else (NARRATED if narrated else SILENT)
         )
         if chess:
-            source = 'from facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    return chesschamp(ctx)\n'
+            source = (
+                "from facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    return chesschamp(ctx)\n"
+            )
             (staging / "data.json").write_text(
                 files("facelesschamp_kit").joinpath("sample_assets/chesschamp.json").read_text()
+            )
+        if coding:
+            source = (
+                files("facelesschamp_kit").joinpath("sample_assets/" + template.replace("-", "_") + ".py").read_text()
             )
         (staging / "videos/main.py").write_text(source)
         manifest = (
@@ -133,11 +153,18 @@ def init_project(destination, template="silent"):
         (staging / "assets/manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         (staging / "pyproject.toml").write_text(
             '[project]\nname = "my-video"\nversion = "0.1.0"\n'
-            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc4"]\n'
+            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc5"]\n'
         )
         if chess:
             project_file = staging / "pyproject.toml"
-            project_file.write_text(project_file.read_text().replace("facelesschamp-kit==", "facelesschamp-kit[chess]=="))
+            project_file.write_text(
+                project_file.read_text().replace("facelesschamp-kit==", "facelesschamp-kit[chess]==")
+            )
+        if coding:
+            project_file = staging / "pyproject.toml"
+            project_file.write_text(
+                project_file.read_text().replace("facelesschamp-kit==", "facelesschamp-kit[playground]==")
+            )
         (staging / ".gitignore").write_text("output/\n.fc-kit/\n.venv/\n__pycache__/\n")
         instructions = (
             (
@@ -163,6 +190,14 @@ def init_project(destination, template="silent"):
                 "For narration, register audio/subtitle assets in assets/manifest.json, pass their IDs and a "
                 "marker mapping to whiteboard_basic, and replace scene durations with cues=(start_marker, end_marker). "
                 "Use None for the last end marker to hold through the audio end. Captions are optional.\n\n"
+            )
+        if coding:
+            instructions = (
+                "Edit the complete source revisions and explicit bindings in videos/main.py. "
+                "Install facelesschamp-kit[playground]; for web also install Chromium explicitly. "
+                "Run `fc-kit prepare main` before validate, preview, or render. "
+                "Preparation executes trusted local source; it is not a security sandbox. "
+                "Use `fc-kit prepare main --refresh` to execute again.\n\n"
             )
         (staging / "README.md").write_text(
             "# Your video\n\n"

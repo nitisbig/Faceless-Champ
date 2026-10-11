@@ -300,3 +300,8 @@ See [OS UI rendering](docs/os-ui.md) and `examples/os_ui/render.py`.
 ### ChessChamp
 
 Render legal two-player chess tutorials from timed `data.json` with `ChessChamp`, `ChessScript`, and `ChessTheme`. Install `faceless-champ[chess]`; see [ChessChamp](docs/chesschamp.md) and [the runnable example](examples/chesschamp/showcase.py).
+
+## Coding playgrounds
+
+Animate source edits beside real web output, car/object illustrations, or backend/AI data.
+Prepare checkpoints explicitly, then render without executing code. See the [CodingChamp playground guide](docs/coding-playgrounds.md).

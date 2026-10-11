@@ -106,7 +106,7 @@ class Project:
         for name, settings in self.config.get("profiles", {}).items():
             fields(settings, {"width", "height", "fps", "crf", "preset", "antialias", "quality"}, f"profiles.{name}")
 
-    def build(self, video_id="main", *, strict_assets=False):
+    def build(self, video_id="main", *, strict_assets=False, _preparing=False, _refresh=False):
         try:
             settings = self.config["videos"][video_id]
         except KeyError:
@@ -122,6 +122,8 @@ class Project:
             safe_margin=opts.get("safe_margin", 64),
             caption_space=opts.get("caption_space", 220),
             captions=settings.get("captions", False),
+            preparing=_preparing,
+            refresh_prepared=_refresh,
         )
         with project_imports(self.root):
             try:
@@ -157,6 +159,7 @@ class Project:
                 "theme": asdict(ctx.theme),
                 "seed": ctx.seed,
                 "assets": list(ctx.assets.resolved.values()),
+                "prepared_assets": ctx.prepared_assets,
                 "versions": {
                     "kit": package_version("facelesschamp-kit"),
                     "core": package_version("faceless-champ"),
@@ -181,6 +184,10 @@ class Project:
         if result.duration <= 0:
             raise KitError("EMPTY_VIDEO", "Video duration must be positive", video=video_id)
         return result
+
+    def prepare(self, video_id="main", *, refresh=False):
+        """Execute explicitly declared preparation dependencies, then validate composition."""
+        return self.build(video_id, _preparing=True, _refresh=refresh).report
 
     def settings(self, compiled, profile):
         if profile not in {"preview", "final"} and profile not in self.config.get("profiles", {}):

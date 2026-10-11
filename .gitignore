@@ -54,3 +54,7 @@ training project/stock-analysis/image/*
 
 # Prepared browser frame caches
 .web-cache/
+
+# Prepared CodingChamp assets
+.playground-cache/
+.fc-kit/

@@ -92,12 +92,18 @@ def capture_html(
     sample_times=None,
     timeout=10,
     progress=None,
+    allow_errors=False,
+    output_limit=1_000_000,
 ):
     """Prepare a full capture, source-time range, or sparse storyboard samples.
 
     Replay starts at zero even for a range. Only requested frames are persisted.
     Browser installation is explicit: ``python -m playwright install chromium``.
     """
+    if type(allow_errors) is not bool:
+        raise WebError("allow_errors must be boolean")
+    if type(output_limit) is not int or output_limit < 1:
+        raise WebError("output_limit must be a positive integer")
     fps = finite(fps, "fps", 0.001)
     timeout = finite(timeout, "timeout", 0.001)
     start = finite(start_time, "start_time", 0)
@@ -127,7 +133,9 @@ def capture_html(
         try:
             identity = {
                 "schema": 1,
-                "driver": 1,
+                "driver": 2,
+                "allow_errors": allow_errors,
+                "output_limit": output_limit,
                 "source": source_hash,
                 "path": str(page.path.relative_to(page.asset_root)),
                 "viewport": page.viewport,
@@ -157,7 +165,20 @@ def capture_html(
                         service_workers="block",
                     )
                     try:
-                        _prepare(context, origin, page, script, fps, indices, temporary, identity, timeout, progress)
+                        _prepare(
+                            context,
+                            origin,
+                            page,
+                            script,
+                            fps,
+                            indices,
+                            temporary,
+                            identity,
+                            timeout,
+                            progress,
+                            allow_errors,
+                            output_limit,
+                        )
                     finally:
                         context.close()
                 # Rename a complete directory; no reader sees a half-written manifest.
@@ -172,21 +193,42 @@ def capture_html(
             browser.close()
 
 
-def _prepare(context, origin, source, script, fps, indices, directory, identity, timeout, progress):
-    errors = []
+def _prepare(
+    context,
+    origin,
+    source,
+    script,
+    fps,
+    indices,
+    directory,
+    identity,
+    timeout,
+    progress,
+    allow_errors=False,
+    output_limit=1_000_000,
+):
+    errors, console = [], []
+    output_size = 0
+
+    def record(target, message):
+        nonlocal output_size
+        text = str(message)
+        output_size += len(text.encode())
+        if output_size <= output_limit:
+            target.append(text)
 
     def route(request_route):
         url = request_route.request.url
         if url.startswith(origin + "/") or urlsplit(url).scheme in {"data", "blob", "about"}:
             request_route.continue_()
         else:
-            errors.append(f"External request blocked: {url}")
+            record(errors, f"External request blocked: {url}")
             request_route.abort()
 
     context.route("**/*", route)
 
     def block_socket(socket):
-        errors.append(f"WebSocket unavailable in offline capture: {socket.url}")
+        record(errors, f"WebSocket unavailable in offline capture: {socket.url}")
         socket.close()
 
     context.route_web_socket("**/*", block_socket)
@@ -199,10 +241,11 @@ def _prepare(context, origin, source, script, fps, indices, directory, identity,
     )
     page = context.new_page()
     page.set_default_timeout(timeout * 1000)
-    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.on("pageerror", lambda error: record(errors, error))
+    page.on("console", lambda message: record(errors if message.type == "error" else console, message.text))
     page.on(
         "response",
-        lambda response: errors.append(f"HTTP {response.status}: {response.url}") if response.status >= 400 else None,
+        lambda response: record(errors, f"HTTP {response.status}: {response.url}") if response.status >= 400 else None,
     )
     page.clock.install(time=1704067200000)
     page.clock.pause_at(1704067200000)
@@ -292,7 +335,9 @@ def _prepare(context, origin, source, script, fps, indices, directory, identity,
         advance(time)
         interpolate(time)
         page.evaluate(ANIMATION_DRIVER, milliseconds)
-        if errors:
+        if output_size > output_limit:
+            raise WebError("Browser output limit exceeded")
+        if errors and not allow_errors:
             raise WebError("Browser preparation failed: " + "; ".join(errors))
         if index not in indices:
             continue
@@ -315,6 +360,8 @@ def _prepare(context, origin, source, script, fps, indices, directory, identity,
                     }""")
         page.screenshot(path=str(directory / f"{index:08d}.png"), animations="allow", caret="hide")
         frames[str(index)] = {
+            "console_count": len(console),
+            "error_count": len(errors),
             "geometry": geometry,
             "cursor": cursor[:],
             "clicks": [c for c in clicks if 0 <= time - c["at"] <= 0.6],
@@ -323,6 +370,8 @@ def _prepare(context, origin, source, script, fps, indices, directory, identity,
             progress(len(frames), len(indices))
     manifest = {
         "schema": 1,
+        "console": console,
+        "errors": errors,
         "identity": identity,
         "fps": fps,
         "duration": script.duration,

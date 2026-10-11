@@ -52,7 +52,7 @@ def test_scaffold_os_ui(tmp_path):
     root = tmp_path / "demo"
     init_project(root, template="os-ui")
     assert "landscape" in (root / "facelesschamp.toml").read_text()
-    assert "0.1.0rc4" in (root / "pyproject.toml").read_text()
+    assert "0.1.0rc5" in (root / "pyproject.toml").read_text()
     project = Project(root)
     compiled = project.build("main")
     assert compiled.duration == 35

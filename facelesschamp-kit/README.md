@@ -111,3 +111,8 @@ Use `OSWalkthrough`, `FinderWindow`, and `SettingsWindow`, or start with
 ### ChessChamp
 
 Start with `fc-kit init my-chess --template chesschamp` after installing `facelesschamp-kit[chess]`. Edit required `data.json` for legal White/Black moves, commentary, arrows, highlights, and optional existing audio. See [ChessChamp](docs/chesschamp.md).
+
+## Coding playgrounds
+
+Animate source edits beside real web output, car/object illustrations, or backend/AI data.
+Prepare checkpoints explicitly, then render without executing code. See the [CodingChamp playground guide](docs/coding-playgrounds.md).

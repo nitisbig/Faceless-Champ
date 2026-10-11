@@ -130,6 +130,10 @@ def compile_video(video):
             except KitError as exc:
                 raise KitError(exc.code, exc.message, **(exc.scope | scope)) from exc
             except (ValueError, TypeError, OSError) as exc:
+                from faceless_champ import PlaygroundError
+
+                if isinstance(exc, PlaygroundError):
+                    raise KitError(exc.code, str(exc), **(exc.scope | scope)) from exc
                 raise KitError("BLOCK_BUILD", str(exc), **scope) from exc
         for target, factory, local, run in segment.motions:
             scope = {"segment": segment.name, "placement": target.placement}

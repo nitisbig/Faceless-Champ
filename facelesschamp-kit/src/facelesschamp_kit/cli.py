@@ -15,6 +15,10 @@ from .scaffold import init_project
 CATALOG = {
     "blocks": [
         "ChessBoard",
+        "CodeEditor",
+        "CodingPlayground",
+        "WebWalkthrough",
+        "WebElement",
         "Heading",
         "TextPanel",
         "MetricCard",
@@ -28,7 +32,17 @@ CATALOG = {
         "SettingsWindow",
     ],
     "themes": ["midnight", "light", "whiteboard"],
-    "templates": ["silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui", "chesschamp"],
+    "templates": [
+        "silent",
+        "explainer-short",
+        "narrated-short",
+        "whiteboard-basic",
+        "os-ui",
+        "chesschamp",
+        "coding-web",
+        "coding-concept",
+        "coding-backend",
+    ],
 }
 
 
@@ -54,7 +68,12 @@ def doctor(root="."):
 
     optional = {
         name: importlib.util.find_spec(module) is not None
-        for name, module in (("maps", "numpy"), ("equations", "matplotlib"))
+        for name, module in (
+            ("maps", "numpy"),
+            ("equations", "matplotlib"),
+            ("coding", "pygments"),
+            ("web", "playwright"),
+        )
     }
     return {
         "ok": all(checks.values()),
@@ -75,11 +94,13 @@ def main(argv=None):
     sub.add_parser("doctor")
     listing = sub.add_parser("list")
     listing.add_argument("kind", choices=["videos", *CATALOG])
-    for name in ("validate", "inspect", "frame", "storyboard", "preview", "render"):
+    for name in ("prepare", "validate", "inspect", "frame", "storyboard", "preview", "render"):
         command = sub.add_parser(name)
         command.add_argument("video", nargs="?", default="main")
         command.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
-        if name in {"validate", "inspect"}:
+        if name == "prepare":
+            command.add_argument("--refresh", action="store_true")
+        elif name in {"validate", "inspect"}:
             command.add_argument("--strict-assets", action="store_true")
         else:
             command.add_argument("-o", "--output", type=Path, required=True)
@@ -105,6 +126,8 @@ def main(argv=None):
             project = Project(args.project)
             if args.command == "list":
                 result = list(project.config["videos"])
+            elif args.command == "prepare":
+                result = project.prepare(args.video, refresh=args.refresh)
             elif args.command in {"validate", "inspect"}:
                 result = project.validate(args.video, strict_assets=args.strict_assets)
             elif args.command == "frame":

@@ -151,7 +151,7 @@ __all__ = [
     "supported_flags",
     "with_alpha",
 ]
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
 from .masks import CircleMask, RectangleMask, ShapeMask, Wipe
@@ -180,3 +180,33 @@ __all__ += ["CodeReveal", "CodeTheme", "CodingChamp"]
 from .chess import ChessAssets, ChessChamp, ChessScript, ChessTheme
 
 __all__ += ["ChessAssets", "ChessChamp", "ChessScript", "ChessTheme"]
+
+from .playground import (
+    CanvasItem,
+    CodeCheckpoint,
+    CodeEditor,
+    EditTimeline,
+    EventBinding,
+    PlaygroundCanvas,
+    PlaygroundError,
+    PlaygroundOutput,
+    PlaygroundScript,
+    PreparedPlayground,
+    ValueBinding,
+    prepare_playground,
+)
+
+__all__ += [
+    "CanvasItem",
+    "CodeCheckpoint",
+    "CodeEditor",
+    "EditTimeline",
+    "EventBinding",
+    "PlaygroundCanvas",
+    "PlaygroundError",
+    "PlaygroundOutput",
+    "PlaygroundScript",
+    "PreparedPlayground",
+    "ValueBinding",
+    "prepare_playground",
+]

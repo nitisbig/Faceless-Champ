@@ -21,6 +21,9 @@ class BuildContext:
     caption_space: float = 220
     captions: bool = False
     assets: AssetRegistry | None = None
+    preparing: bool = False
+    refresh_prepared: bool = False
+    prepared_assets: list = field(default_factory=list)
 
     def __post_init__(self):
         self.root = Path(self.root).resolve()
@@ -47,3 +50,50 @@ class BuildContext:
     def load_csv(self, path):
         with (self.root / path).open(newline="") as stream:
             return list(csv.DictReader(stream))
+
+    def playground(self, script, *, timeout=10, output_limit=1_000_000, fps=15):
+        """Declare a prepared dependency. Only Project.prepare executes checkpoints."""
+        import hashlib
+        import os
+        import tempfile
+
+        from faceless_champ import PlaygroundError, PreparedPlayground, prepare_playground
+
+        settings = {"timeout": timeout, "output_limit": output_limit, "fps": fps}
+        key = hashlib.sha256(json.dumps({"script": script.record(), **settings}, sort_keys=True).encode()).hexdigest()
+        directory = self.root / ".fc-kit/playgrounds"
+        reference = directory / (key + ".json")
+        try:
+            if self.preparing:
+                prepared = prepare_playground(script, cache_dir=directory, refresh=self.refresh_prepared, **settings)
+                fd, temporary = tempfile.mkstemp(prefix=".reference-", dir=directory)
+                try:
+                    with os.fdopen(fd, "w") as stream:
+                        json.dump({"asset": prepared.directory.name}, stream)
+                    os.replace(temporary, reference)
+                finally:
+                    Path(temporary).unlink(missing_ok=True)
+            else:
+                if not reference.is_file():
+                    raise KitError("PLAYGROUND_UNPREPARED", "Run fc-kit prepare before validate/frame/preview/render")
+                asset = (directory / json.loads(reference.read_text())["asset"]).resolve()
+                if not asset.is_relative_to(directory.resolve()):
+                    raise KitError("PLAYGROUND_ASSET", "Prepared reference escapes its cache")
+                prepared = PreparedPlayground(asset)
+                if prepared.script.record() != script.record():
+                    raise KitError("PLAYGROUND_STALE", "Source changed; run fc-kit prepare")
+            self.prepared_assets.append(
+                {
+                    "kind": "coding-playground",
+                    "status": "prepared",
+                    "fingerprint": prepared.fingerprint,
+                    "path": str(prepared.directory),
+                }
+            )
+            return prepared
+        except KitError:
+            raise
+        except PlaygroundError as exc:
+            raise KitError(exc.code, str(exc), **exc.scope) from exc
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            raise KitError("PLAYGROUND_ASSET", str(exc)) from exc

@@ -23,3 +23,5 @@ OS UI: docs/os-ui.md; OSWalkthrough, FinderWindow, SettingsWindow; fc-kit init -
 ChessChamp: docs/chesschamp.md; blocks.ChessBoard(script, theme=None, source_start=0), named child board; templates.chesschamp(ctx, data="data.json"); fc-kit init --template chesschamp. Install kit[chess]. JSON times are absolute within the script. Optional narration.audio is an asset ID. Audio-only Video.narration does not support cues/captions without subtitles.
 
 Chess artwork defaults to bundled downloaded PNGs. ChessBoard assets= accepts core ChessAssets; data.json assets.directory resolves from the JSON directory. Core from_pgn/to_dict converts SAN game notation to timed data.json.
+
+- Coding playgrounds: docs/coding-playgrounds.md; coding-web, coding-concept, coding-backend templates; prepare explicitly before playback.
