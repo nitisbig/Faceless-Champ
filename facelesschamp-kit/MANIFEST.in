@@ -5,3 +5,5 @@ recursive-include examples *.py
 recursive-include scripts *.py
 recursive-include tests *.py
 recursive-include src/facelesschamp_kit/sample_assets *
+
+global-exclude *.py[cod]

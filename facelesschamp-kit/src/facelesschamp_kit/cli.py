@@ -22,9 +22,12 @@ CATALOG = {
         "StepList",
         "FlowDiagram",
         "WhiteboardDrawing",
+        "OSWalkthrough",
+        "FinderWindow",
+        "SettingsWindow",
     ],
     "themes": ["midnight", "light", "whiteboard"],
-    "templates": ["silent", "explainer-short", "narrated-short", "whiteboard-basic"],
+    "templates": ["silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui"],
 }
 
 

@@ -17,3 +17,5 @@ For whiteboard videos, use templates.whiteboard_basic with immutable WhiteboardS
 Start with `fc-kit init my-board --template whiteboard-basic`; read docs/whiteboard.md for geometry and cue timing.
 
 HTML-to-video: see docs/html-to-video.md. Core faceless_champ.web owns HtmlPage, WebScript, capture_html, WebCapture, HtmlClip and timed visual controls. Kit WebWalkthrough/WebElement consume prepared captures. Browser installation is explicit; never perform a full export when only previews are requested.
+
+OS UI: docs/os-ui.md; OSWalkthrough, FinderWindow, SettingsWindow; fc-kit init --template os-ui.

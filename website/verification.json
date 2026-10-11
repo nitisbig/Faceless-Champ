@@ -2,15 +2,15 @@
   "guides": {
     "core": {
       "page": "index.html",
-      "chapters": 17
+      "chapters": 18
     },
     "kit": {
       "page": "kit.html",
-      "chapters": 11
+      "chapters": 12
     }
   },
-  "chapters": 28,
-  "python_snippets": 36,
+  "chapters": 30,
+  "python_snippets": 38,
   "examples": [
     {
       "file": "hello.py",
@@ -208,6 +208,21 @@
       ]
     },
     {
+      "file": "os_ui.py",
+      "guide": "core",
+      "duration": 13.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        12.95
+      ],
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
       "file": "kit_main.py",
       "guide": "kit",
       "duration": 10.0,
@@ -346,6 +361,22 @@
         360
       ],
       "template": "silent"
+    },
+    {
+      "file": "kit_os_ui.py",
+      "guide": "kit",
+      "duration": 4.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        3.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "template": "os-ui"
     }
   ],
   "starters": [
@@ -388,7 +419,17 @@
       ],
       "validated": true,
       "sampled_frames": 3
+    },
+    {
+      "template": "os-ui",
+      "duration": 35.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3
     }
   ],
-  "links_checked": 30
+  "links_checked": 34
 }

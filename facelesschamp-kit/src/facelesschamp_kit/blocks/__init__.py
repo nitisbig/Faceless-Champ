@@ -8,6 +8,7 @@ from faceless_champ import Bounds, ImageSlot, Number, Rectangle
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
 from .flow import FlowDiagram
+from .os_ui import FinderWindow, OSWalkthrough, SettingsWindow
 from .web import WebElement, WebWalkthrough
 from .whiteboard import (
     WhiteboardArrow,
@@ -182,10 +183,13 @@ __all__ = [
     "Block",
     "BlockBuild",
     "Comparison",
+    "FinderWindow",
     "FlowDiagram",
     "Heading",
     "ImageCard",
     "MetricCard",
+    "OSWalkthrough",
+    "SettingsWindow",
     "StepList",
     "TextPanel",
     "WebElement",

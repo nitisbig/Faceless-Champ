@@ -44,3 +44,8 @@ composes `WhiteboardPath`, `WhiteboardLine`, `WhiteboardArrow`, `WhiteboardRecta
 Its named children are `stroke-0`, `stroke-1`, etc. It displays the complete drawing when used as a standalone block;
 the template controls sequential reveals. The `whiteboard-basic` CLI starter and `whiteboard` theme are registered.
 See the [whiteboard guide](whiteboard.md) for geometry, styling, and narration examples.
+
+## OS UI
+
+`OSWalkthrough`, `FinderWindow`, and `SettingsWindow` fit authored system tutorials
+into any layout. See [OS UI tutorials](os-ui.md); starter template: `os-ui`.

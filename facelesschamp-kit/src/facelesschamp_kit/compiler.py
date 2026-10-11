@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from faceless_champ import Animation, Captions, FadeIn, Group, PopIn, Scene
+from faceless_champ.os_ui import OSClip
 
 from .assets import digest
 from .blocks import BlockBuild
@@ -67,6 +68,12 @@ def compile_video(video):
                 if built is None:
                     raise KitError("BLOCK_CONTRACT", "compose must return BlockBuild")
                 members = set(descendants(built.root))
+                authored_lifetime = (
+                    placement.duration if placement.duration is not None else segment.duration - placement.at
+                )
+                for member in members:
+                    if isinstance(member, OSClip) and member.duration - member.source_start > authored_lifetime + 1e-9:
+                        raise KitError("MOTION_WINDOW", "OS script exceeds authored placement lifetime")
                 if claimed & members or any(m in video._constructed for m in members):
                     raise KitError("OWNERSHIP", "Block/factory must return fresh component instances")
                 if not set(built.children.values()) <= members:

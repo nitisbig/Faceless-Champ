@@ -880,6 +880,58 @@
       "portrait": false
     },
     {
+      "id": "os-ui",
+      "title": "OS UI rendering",
+      "group": "Library fundamentals",
+      "description": "Build offline macOS-style tutorials with virtual files, settings and a cursor.",
+      "sections": [
+        {
+          "title": "Author the filesystem and actions",
+          "text": "Use stable file IDs and semantic actions. The cursor and system changes share one deterministic timeline. No browser or macOS installation is required.",
+          "blocks": [
+            {
+              "type": "code",
+              "language": "python",
+              "code": "\"\"\"Run: faceless-champ render examples/os_ui/render.py Tutorial -o output/os-ui.mp4\"\"\"\n\nfrom faceless_champ import Scene\nfrom faceless_champ.os_ui import File, Folder, OSClip, OSScript, VirtualFileSystem\n\n\nclass Tutorial(Scene):\n    def construct(self):\n        filesystem = VirtualFileSystem(\n            Folder(\n                \"home\",\n                \"Home\",\n                (\n                    Folder(\n                        \"documents\",\n                        \"Documents\",\n                        (\n                            File(\"notes\", \"Notes.txt\", \"Organize an idea.\\nPresent the process.\"),\n                            Folder(\"archive\", \"Archive\"),\n                        ),\n                    ),\n                ),\n            )\n        )\n        script = (\n            OSScript()\n            .wait(1)\n            .open_folder(\"documents\")\n            .rename(\"notes\", \"Launch Notes.txt\")\n            .drag(\"notes\", \"archive\")\n            .open_folder(\"archive\")\n            .preview(\"notes\")\n            .wait(1)\n            .window(\"preview\", \"close\")\n            .open_settings()\n            .set_value(\"appearance:theme\", \"dark\")\n            .open_settings(\"sound\")\n            .set_value(\"sound:volume\", 40)\n            .wait(1)\n        )\n        self.add(OSClip(filesystem, script, position=(960, 540)))\n        self.wait(script.duration)\n",
+              "filename": "os_ui.py",
+              "target": "Tutorial",
+              "kind": "core",
+              "command": "faceless-champ render os_ui.py Tutorial -o output/os_ui.mp4 -q ql"
+            }
+          ]
+        },
+        {
+          "title": "Embed or isolate",
+          "text": "OSClip supports desktop, finder and settings modes. Isolated windows have transparent surroundings. Use ordinary scene position, scale, opacity, masks and groups.",
+          "blocks": []
+        },
+        {
+          "title": "Timing and targets",
+          "text": "Actions default to one second and accept at and duration. Scripts are chronological and cannot overlap. Hidden targets fail before export. source_start supports excerpts, and the final state holds.",
+          "blocks": []
+        },
+        {
+          "title": "Customize",
+          "text": "MacOSPreset controls light/dark appearance, colors, bundled typography, authored clock and cursor. SettingsPage and Control define custom toggles, sliders, choices, text fields and buttons.",
+          "blocks": []
+        },
+        {
+          "title": "Framework tutorials",
+          "text": "Use fitted blocks and the os-ui project template.",
+          "blocks": [
+            {
+              "type": "link",
+              "text": "OS UI framework guide \u2192",
+              "href": "kit.html#os-ui-tutorials"
+            }
+          ]
+        }
+      ],
+      "preview": null,
+      "guide": "core",
+      "portrait": false
+    },
+    {
       "id": "framework-quickstart",
       "title": "Framework quickstart",
       "group": "Start here",
@@ -924,7 +976,7 @@
             },
             {
               "type": "note",
-              "text": "facelesschamp-kit 0.1.0rc3 is a local release candidate. The guide uses the implementation in this repository."
+              "text": "facelesschamp-kit 0.1.0rc4 is a local release candidate. The guide uses the implementation in this repository."
             }
           ]
         }
@@ -941,7 +993,7 @@
       "sections": [
         {
           "title": "Install from this repository",
-          "text": "Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc3 is a local release candidate; these instructions do not assume a published release.",
+          "text": "Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc4 is a local release candidate; these instructions do not assume a published release.",
           "blocks": [
             {
               "type": "code",
@@ -1538,6 +1590,61 @@
       "portrait": false
     },
     {
+      "id": "os-ui-tutorials",
+      "title": "OS UI tutorials",
+      "group": "Framework fundamentals",
+      "description": "Place a desktop, Finder window or settings tutorial in any video.",
+      "sections": [
+        {
+          "title": "Start a tutorial",
+          "text": "The os-ui template contains a complete 35-second authored system tutorial.",
+          "blocks": [
+            {
+              "type": "code",
+              "language": "bash",
+              "code": "fc-kit init my-tutorial --template os-ui\n"
+            }
+          ]
+        },
+        {
+          "title": "Reusable blocks",
+          "text": "OSWalkthrough, FinderWindow and SettingsWindow create independent core instances and fit within allocated bounds.",
+          "blocks": [
+            {
+              "type": "code",
+              "language": "python",
+              "code": "from faceless_champ.os_ui import OSScript\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import SettingsWindow\n\n\ndef build(ctx):\n    video = Video(ctx)\n    script = (OSScript().set_value('appearance:theme', 'dark')\n              .open_settings('sound').set_value('sound:volume', 35).wait(1))\n    with video.segment('settings', duration=script.duration) as segment:\n        segment.add(SettingsWindow(script=script))\n    return video\n",
+              "filename": "kit_os_ui.py",
+              "target": null,
+              "kind": "kit",
+              "command": "fc-kit preview main -o output/preview.mp4",
+              "template": "os-ui",
+              "placement": "Save as videos/main.py in a project created with --template os-ui."
+            }
+          ]
+        },
+        {
+          "title": "Narration and excerpts",
+          "text": "Actions use placement-local time. Use segment.cue_time for source-clock alignment, subtract the placement offset, and account for source_start. Scripts must fit the authored placement; audio tail holds do not extend action windows.",
+          "blocks": []
+        },
+        {
+          "title": "Supported interactions",
+          "text": "Navigation, file operations, previews, menus, dialogs, settings controls and window animations use the public core API.",
+          "blocks": [
+            {
+              "type": "link",
+              "text": "Core OS UI guide \u2192",
+              "href": "index.html#os-ui"
+            }
+          ]
+        }
+      ],
+      "preview": null,
+      "guide": "kit",
+      "portrait": false
+    },
+    {
       "id": "kit-preview-and-export",
       "title": "Preview & export",
       "group": "Ship your video",
@@ -1653,7 +1760,7 @@
         },
         {
           "title": "Keep the current scope clear",
-          "text": "The framework is a local 0.1.0rc3 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.",
+          "text": "The framework is a local 0.1.0rc4 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.",
           "blocks": [
             {
               "type": "link",
@@ -1673,7 +1780,7 @@
       "title": "Faceless Champ Core Guide",
       "label": "Core library",
       "file": "index.html",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "kind": "PYTHON LIBRARY",
       "home": "hello-world",
       "introduction": "Create animated videos with Python scenes, components, and a precise timeline."
@@ -1682,7 +1789,7 @@
       "title": "facelesschamp-kit Guide",
       "label": "Kit framework",
       "file": "kit.html",
-      "version": "0.1.0rc3",
+      "version": "0.1.0rc4",
       "kind": "FRAMEWORK",
       "home": "framework-quickstart",
       "introduction": "Build structured video projects with reusable blocks, editable templates, and narration cues."

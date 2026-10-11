@@ -151,7 +151,7 @@ __all__ = [
     "supported_flags",
     "with_alpha",
 ]
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
 from .masks import CircleMask, RectangleMask, ShapeMask, Wipe

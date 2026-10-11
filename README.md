@@ -291,3 +291,8 @@ reveals using `CodingChamp`, `CodeTheme`, and `CodeReveal`. Install the optional
 `coding` extra for Pygments languages; plain text needs no extra dependency.
 See [the CodingChamp guide](docs/coding.md), [the staged example](examples/coding/showcase.py),
 and the cue-synchronized `training project/coding-video` tutorial.
+
+### OS UI rendering
+
+Render offline macOS-style desktops, Finder navigation, settings, and cursor actions.
+See [OS UI rendering](docs/os-ui.md) and `examples/os_ui/render.py`.

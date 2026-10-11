@@ -124,3 +124,5 @@ CodeReveal(panel, start=0, end=1) for fixed-layout editor animations. Set reveal
 to typewriter, word, or block; block_ends uses increasing inclusive local line numbers.
 Syntax highlighting needs the coding extra; language="text" works without it.
 CodeTheme.named supports midnight/ocean/paper. See docs/coding.md and examples/coding/showcase.py.
+
+OS UI: docs/os-ui.md; public faceless_champ.os_ui API; offline macOS-style virtual filesystem, settings and semantic actions.

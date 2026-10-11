@@ -550,3 +550,8 @@ The guide defines interpolation, ranges, coordinate systems and exact loop endpo
 editor surfaces and source-preserving character/word/block reveals. See the
 [complete CodingChamp API and examples](coding.md) for constructor options, themes,
 staged animation, optional language support, layout limits, and cache controls.
+
+## OS UI
+
+`faceless_champ.os_ui` exposes `OSClip`, `OSScript`, `MacOSPreset`, `VirtualFileSystem`,
+`File`, `Folder`, `SettingsPage`, `Control`, and `starter_pages`. See [OS UI](os-ui.md).

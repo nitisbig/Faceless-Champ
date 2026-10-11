@@ -33,6 +33,7 @@ from .components import (
 )
 from .layout import Group, transform_point
 from .maps import Map, draw_map
+from .os_ui import OSClip
 from .subtitles import Captions
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
 from .typography import DEFAULT_FONT, load_font
@@ -159,7 +160,7 @@ class PillowRenderer:
                         ImageColor.getcolor(c.future_color, "RGBA")
                         for phrase in c.phrases:
                             self._caption_sprite(c, 1, phrase[0].start)
-                elif isinstance(c, HtmlClip):
+                elif isinstance(c, (HtmlClip, OSClip)):
                     pass  # Prepared ranges are checked at requested frame time.
                 elif isinstance(c, Image):
                     self._image(c)
@@ -255,7 +256,7 @@ class PillowRenderer:
                     if isinstance(c, Captions)
                     else (
                         c.frame_key(age)
-                        if isinstance(c, HtmlClip)
+                        if isinstance(c, (HtmlClip, OSClip))
                         else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None)
                     ),
                 )
@@ -428,7 +429,7 @@ class PillowRenderer:
         if isinstance(c, CodingChamp):
             return draw_code(c, state, factor, self)
 
-        if isinstance(c, HtmlClip):
+        if isinstance(c, (HtmlClip, OSClip)):
             return c.frame_image(age, factor)
         if isinstance(c, ProgressBar):
             return draw_indicator(c, state, factor, self)

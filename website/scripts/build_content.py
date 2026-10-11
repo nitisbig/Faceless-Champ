@@ -274,7 +274,7 @@ fc-kit frame main --time 1.5 -o output/frame.png
 fc-kit storyboard main -o output/storyboard
 fc-kit preview main --segment hook -o output/hook.mp4
 fc-kit render main -o output/main.mp4
-''','bash'),note('facelesschamp-kit 0.1.0rc3 is a local release candidate. The guide uses the implementation in this repository.'))
+''','bash'),note('facelesschamp-kit 0.1.0rc4 is a local release candidate. The guide uses the implementation in this repository.'))
 ], 'kit', guide='kit', portrait=True)
 lesson('project-configuration', 'Project configuration', 'The framework', 'Keep format, themes, assets, and export settings in a predictable project layout.', [
 section('Know the project layout', 'The scaffold separates authoring code from local assets and workflow outputs.', code('''
@@ -538,7 +538,7 @@ section('Keep the current scope clear', 'The core currently exports MP4. GPU ren
 ])
 
 lesson('kit-installation', 'Installation', 'Start here', 'Install the framework and its core engine, then check your local video tools.', [
-section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc3 is a local release candidate; these instructions do not assume a published release.', code('''
+section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc4 is a local release candidate; these instructions do not assume a published release.', code('''
 git clone https://github.com/nitisbig/Faceless-Champ.git
 cd Faceless-Champ
 python3.12 -m venv .venv
@@ -734,7 +734,7 @@ section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Erro
     ['Output already exists', 'Choose another path or explicitly add --overwrite.'],
 ])),
 section('Bound the work', 'Use a frame, a storyboard, and a short preview before raising resolution or frame rate. The kit uses the core CPU Pillow renderer and FFmpeg encoder.'),
-section('Keep the current scope clear', 'The framework is a local 0.1.0rc3 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
+section('Keep the current scope clear', 'The framework is a local 0.1.0rc4 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
 ], guide='kit')
 
 # Browser examples deliberately reopen prepared assets; no browser runs on import.
@@ -788,6 +788,47 @@ lesson('html-walkthroughs', 'HTML walkthroughs', 'Framework fundamentals',
     section('Try the supplied tour', 'training project/web-video/render.py supports prepare, frame, storyboard, preview and render. Start with a sparse storyboard or short preview; full export is a separate explicit command.'),
 ], guide='kit')
 
+os_core = code((ROOT.parent / 'examples/os_ui/render.py').read_text(),
+               filename='os_ui.py', target='Tutorial')
+lesson('os-ui', 'OS UI rendering', 'Library fundamentals',
+       'Build offline macOS-style tutorials with virtual files, settings and a cursor.', [
+    section('Author the filesystem and actions',
+            'Use stable file IDs and semantic actions. The cursor and system changes share one deterministic timeline. No browser or macOS installation is required.', os_core),
+    section('Embed or isolate',
+            'OSClip supports desktop, finder and settings modes. Isolated windows have transparent surroundings. Use ordinary scene position, scale, opacity, masks and groups.'),
+    section('Timing and targets',
+            'Actions default to one second and accept at and duration. Scripts are chronological and cannot overlap. Hidden targets fail before export. source_start supports excerpts, and the final state holds.'),
+    section('Customize',
+            'MacOSPreset controls light/dark appearance, colors, bundled typography, authored clock and cursor. SettingsPage and Control define custom toggles, sliders, choices, text fields and buttons.'),
+    section('Framework tutorials', 'Use fitted blocks and the os-ui project template.',
+            link('OS UI framework guide →', 'kit.html#os-ui-tutorials')),
+])
+os_kit = code("""
+from faceless_champ.os_ui import OSScript
+from facelesschamp_kit import Video
+from facelesschamp_kit.blocks import SettingsWindow
+
+
+def build(ctx):
+    video = Video(ctx)
+    script = (OSScript().set_value('appearance:theme', 'dark')
+              .open_settings('sound').set_value('sound:volume', 35).wait(1))
+    with video.segment('settings', duration=script.duration) as segment:
+        segment.add(SettingsWindow(script=script))
+    return video
+""", filename='kit_os_ui.py', kind='kit', template='os-ui')
+lesson('os-ui-tutorials', 'OS UI tutorials', 'Framework fundamentals',
+       'Place a desktop, Finder window or settings tutorial in any video.', [
+    section('Start a tutorial', 'The os-ui template contains a complete 35-second authored system tutorial.',
+            code('fc-kit init my-tutorial --template os-ui', 'bash')),
+    section('Reusable blocks',
+            'OSWalkthrough, FinderWindow and SettingsWindow create independent core instances and fit within allocated bounds.', os_kit),
+    section('Narration and excerpts',
+            'Actions use placement-local time. Use segment.cue_time for source-clock alignment, subtract the placement offset, and account for source_start. Scripts must fit the authored placement; audio tail holds do not extend action windows.'),
+    section('Supported interactions', 'Navigation, file operations, previews, menus, dialogs, settings controls and window animations use the public core API.',
+            link('Core OS UI guide →', 'index.html#os-ui')),
+], guide='kit')
+
 core_lessons = [item for item in lessons if item['guide'] == 'core']
 kit_lessons = {item['id']: item for item in lessons if item['guide'] == 'kit'}
 for item in lessons:
@@ -798,15 +839,15 @@ for item in lessons:
 # Keep chapter groups contiguous in the sidebar and reading order.
 kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration',
              'blocks-and-themes', 'custom-blocks', 'framework-narration', 'templates',
-             'whiteboard-videos', 'html-walkthroughs', 'kit-preview-and-export', 'kit-troubleshooting']
+             'whiteboard-videos', 'html-walkthroughs', 'os-ui-tutorials', 'kit-preview-and-export', 'kit-troubleshooting']
 assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]
 guides = {
     'core': dict(title='Faceless Champ Core Guide', label='Core library', file='index.html',
-                 version='0.1.2', kind='PYTHON LIBRARY', home='hello-world',
+                 version='0.1.3', kind='PYTHON LIBRARY', home='hello-world',
                  introduction='Create animated videos with Python scenes, components, and a precise timeline.'),
     'kit': dict(title='facelesschamp-kit Guide', label='Kit framework', file='kit.html',
-                version='0.1.0rc3', kind='FRAMEWORK', home='framework-quickstart',
+                version='0.1.0rc4', kind='FRAMEWORK', home='framework-quickstart',
                 introduction='Build structured video projects with reusable blocks, editable templates, and narration cues.'),
 }
 (DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, guides=guides), indent=2) + '\n')

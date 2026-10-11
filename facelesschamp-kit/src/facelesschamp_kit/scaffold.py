@@ -73,8 +73,8 @@ def build(ctx):
 
 
 def init_project(destination, template="silent"):
-    if template not in {"silent", "explainer-short", "narrated-short", "whiteboard-basic"}:
-        raise KitError("TEMPLATE", "Choose silent, explainer-short, narrated-short, or whiteboard-basic")
+    if template not in {"silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui"}:
+        raise KitError("TEMPLATE", "Choose silent, explainer-short, narrated-short, whiteboard-basic, or os-ui")
     destination = Path(destination).resolve()
     if destination.exists():
         raise KitError("DESTINATION", "Destination already exists; choose a new directory")
@@ -86,18 +86,23 @@ def init_project(destination, template="silent"):
         (staging / "videos/__init__.py").write_text("")
         (staging / "components/__init__.py").write_text("")
         whiteboard = template == "whiteboard-basic"
+        os_ui = template == "os-ui"
         config = (
             CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
                 'theme = "midnight"', 'theme = "whiteboard"'
             )
-            if whiteboard
+            if whiteboard or os_ui
             else CONFIG
         )
+        if os_ui:
+            config = config.replace('theme = "whiteboard"', 'theme = "midnight"')
         (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
         source = (
-            files("facelesschamp_kit").joinpath("sample_assets/whiteboard.py").read_text()
-            if whiteboard
+            files("facelesschamp_kit")
+            .joinpath("sample_assets/os_ui.py" if os_ui else "sample_assets/whiteboard.py")
+            .read_text()
+            if whiteboard or os_ui
             else (NARRATED if narrated else SILENT)
         )
         (staging / "videos/main.py").write_text(source)
@@ -122,7 +127,7 @@ def init_project(destination, template="silent"):
         (staging / "assets/manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         (staging / "pyproject.toml").write_text(
             '[project]\nname = "my-video"\nversion = "0.1.0"\n'
-            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc2"]\n'
+            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc4"]\n'
         )
         (staging / ".gitignore").write_text("output/\n.fc-kit/\n.venv/\n__pycache__/\n")
         instructions = (

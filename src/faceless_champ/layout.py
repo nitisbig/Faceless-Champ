@@ -55,10 +55,11 @@ def _size(component, renderer):
     from .charts import Chart
     from .coding import CodingChamp
     from .maps import Map
+    from .os_ui import OSClip
     from .subtitles import Captions
     from .web.clip import HtmlClip
 
-    if isinstance(component, (Image, Chart, Map, HtmlClip, CodingChamp)):
+    if isinstance(component, (Image, Chart, Map, HtmlClip, OSClip, CodingChamp)):
         return max(1, round(component.width)), max(1, round(component.height))
     if isinstance(component, Captions):
         sizes = [renderer._caption_sprite(component, 1, phrase[0].start).size for phrase in component.phrases]
