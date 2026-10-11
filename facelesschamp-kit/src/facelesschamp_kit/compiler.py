@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from faceless_champ import Animation, Captions, FadeIn, Group, PopIn, Scene
+from faceless_champ import Animation, Captions, ChessChamp, FadeIn, Group, PopIn, Scene
 from faceless_champ.os_ui import OSClip
 
 from .assets import digest
@@ -37,6 +37,7 @@ def compile_video(video):
     duration = max(visual_end, video.voice.duration if video.voice else 0)
     final = max(video.segments, key=lambda s: (s.end, s.start))
     diagnostics, segment_reports, events = [], [], []
+    chess_assets = {}
     claimed = set()
     hidden = set()
     if duration > visual_end:
@@ -72,8 +73,13 @@ def compile_video(video):
                     placement.duration if placement.duration is not None else segment.duration - placement.at
                 )
                 for member in members:
-                    if isinstance(member, OSClip) and member.duration - member.source_start > authored_lifetime + 1e-9:
-                        raise KitError("MOTION_WINDOW", "OS script exceeds authored placement lifetime")
+                    if isinstance(member, ChessChamp):
+                        chess_assets[placement.handle.placement] = member.assets.checksums
+                    if (
+                        isinstance(member, (OSClip, ChessChamp))
+                        and member.duration - member.source_start > authored_lifetime + 1e-9
+                    ):
+                        raise KitError("MOTION_WINDOW", "Script exceeds authored placement lifetime")
                 if claimed & members or any(m in video._constructed for m in members):
                     raise KitError("OWNERSHIP", "Block/factory must return fresh component instances")
                 if not set(built.children.values()) <= members:
@@ -163,6 +169,8 @@ def compile_video(video):
             raise KitError("TIMELINE", str(exc), **scope) from exc
     if video.voice:
         scene.add_audio(video.voice.audio, start=0)
+        if ctx.captions and video.voice.track is None:
+            raise KitError("NARRATION", "Captions require subtitles")
         if ctx.captions:
             caption = Captions(
                 video.voice.track,
@@ -193,12 +201,15 @@ def compile_video(video):
         "duration": duration,
         "segments": segment_reports,
         "diagnostics": diagnostics,
+        "chess_assets": chess_assets,
         "narration": {
             "audio_checksum": digest(video.voice.audio),
-            "subtitle_checksum": digest(video.voice.subtitles),
+            "subtitle_checksum": digest(video.voice.subtitles) if video.voice.subtitles is not None else None,
             "duration": video.voice.duration,
             "markers": video.voice.markers,
-            "cues": [{"index": c.index, "start": c.start, "end": c.end} for c in video.voice.track.cues],
+            "cues": [{"index": c.index, "start": c.start, "end": c.end} for c in video.voice.track.cues]
+            if video.voice.track is not None
+            else [],
         }
         if video.voice
         else None,

@@ -1,0 +1,25 @@
+schema_version = 1
+
+[project]
+name = "carlsen-kasparov-chess-ui"
+safe_margin = 40
+
+[videos.main]
+factory = "videos.main:build"
+format = "landscape"
+theme = "midnight"
+captions = false
+
+[profiles.preview]
+width = 1280
+height = 720
+fps = 24
+antialias = 1
+preset = "veryfast"
+
+[profiles.final]
+width = 1920
+height = 1080
+fps = 30
+antialias = 1
+preset = "medium"

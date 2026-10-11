@@ -14,6 +14,7 @@ from .scaffold import init_project
 
 CATALOG = {
     "blocks": [
+        "ChessBoard",
         "Heading",
         "TextPanel",
         "MetricCard",
@@ -27,7 +28,7 @@ CATALOG = {
         "SettingsWindow",
     ],
     "themes": ["midnight", "light", "whiteboard"],
-    "templates": ["silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui"],
+    "templates": ["silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui", "chesschamp"],
 }
 
 

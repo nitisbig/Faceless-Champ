@@ -3,6 +3,12 @@ revision = 3
 requires-python = ">=3.12"
 
 [[package]]
+name = "chess"
+version = "1.11.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/09/7d04d7581ae3bb8b598017941781bceb7959dd1b13e3ebf7b6a2cd843bc9/chess-1.11.2.tar.gz", hash = "sha256:a8b43e5678fdb3000695bdaa573117ad683761e5ca38e591c4826eba6d25bb39", size = 6131385, upload-time = "2025-02-25T19:10:27.328Z" }
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -109,6 +115,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+chess = [
+    { name = "chess" },
+]
 coding = [
     { name = "pygments" },
 ]
@@ -130,13 +139,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "chess", marker = "extra == 'chess'", specifier = ">=1.11.2,<2" },
     { name = "matplotlib", marker = "extra == 'equations'", specifier = ">=3.9,<4" },
     { name = "numpy", marker = "extra == 'maps'", specifier = ">=1.26,<3" },
     { name = "pillow", specifier = ">=10.4,<13" },
     { name = "playwright", marker = "extra == 'web'", specifier = ">=1.58,<2" },
     { name = "pygments", marker = "extra == 'coding'", specifier = ">=2.18,<3" },
 ]
-provides-extras = ["coding", "web", "maps", "equations"]
+provides-extras = ["chess", "coding", "web", "maps", "equations"]
 
 [package.metadata.requires-dev]
 dev = [

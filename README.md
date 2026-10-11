@@ -296,3 +296,7 @@ and the cue-synchronized `training project/coding-video` tutorial.
 
 Render offline macOS-style desktops, Finder navigation, settings, and cursor actions.
 See [OS UI rendering](docs/os-ui.md) and `examples/os_ui/render.py`.
+
+### ChessChamp
+
+Render legal two-player chess tutorials from timed `data.json` with `ChessChamp`, `ChessScript`, and `ChessTheme`. Install `faceless-champ[chess]`; see [ChessChamp](docs/chesschamp.md) and [the runnable example](examples/chesschamp/showcase.py).

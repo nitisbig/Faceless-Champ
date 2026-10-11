@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "duration": 74.85000000000001,
+  "players": {
+    "white": "Magnus Carlsen",
+    "black": "Garry Kasparov"
+  },
+  "orientation": "white",
+  "initial_fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "result": "1/2-1/2",
+  "moves": [
+    {
+      "at": 1.0,
+      "duration": 0.45,
+      "uci": "d2d4"
+    },
+    {
+      "at": 1.7,
+      "duration": 0.45,
+      "uci": "d7d5"
+    },
+    {
+      "at": 2.4,
+      "duration": 0.45,
+      "uci": "c2c4"
+    },
+    {
+      "at": 3.1,
+      "duration": 0.45,
+      "uci": "c7c6"
+    },
+    {
+      "at": 3.8,
+      "duration": 0.45,
+      "uci": "g1f3"
+    },
+    {
+      "at": 4.5,
+      "duration": 0.45,
+      "uci": "g8f6"
+    },
+    {
+      "at": 5.2,
+      "duration": 0.45,
+      "uci": "b1c3"
+    },
+    {
+      "at": 5.9,
+      "duration": 0.45,
+      "uci": "e7e6"
+    },
+    {
+      "at": 6.6,
+      "duration": 0.45,
+      "uci": "c1g5"
+    },
+    {
+      "at": 7.3,
+      "duration": 0.45,
+      "uci": "b8d7"
+    },
+    {
+      "at": 8.0,
+      "duration": 0.45,
+      "uci": "e2e3"
+    },
+    {
+      "at": 8.7,
+      "duration": 0.45,
+      "uci": "d8a5"
+    },
+    {
+      "at": 9.4,
+      "duration": 0.45,
+      "uci": "f3d2"
+    },
+    {
+      "at": 10.1,
+      "duration": 0.45,
+      "uci": "f8b4"
+    },
+    {
+      "at": 10.8,
+      "duration": 0.45,
+      "uci": "d1c2"
+    },
+    {
+      "at": 11.5,
+      "duration": 0.45,
+      "uci": "e8g8"
+    },
+    {
+      "at": 12.2,
+      "duration": 0.45,
+      "uci": "f1e2"
+    },
+    {
+      "at": 12.9,
+      "duration": 0.45,
+      "uci": "e6e5"
+    },
+    {
+      "at": 13.6,
+      "duration": 0.45,
+      "uci": "e1g1"
+    },
+    {
+      "at": 14.3,
+      "duration": 0.45,
+      "uci": "e5d4"
+    },
+    {
+      "at": 15.0,
+      "duration": 0.45,
+      "uci": "d2b3"
+    },
+    {
+      "at": 15.7,
+      "duration": 0.45,
+      "uci": "a5b6"
+    },
+    {
+      "at": 16.4,
+      "duration": 0.45,
+      "uci": "e3d4"
+    },
+    {
+      "at": 17.1,
+      "duration": 0.45,
+      "uci": "d5c4"
+    },
+    {
+      "at": 17.8,
+      "duration": 0.45,
+      "uci": "e2c4"
+    },
+    {
+      "at": 18.5,
+      "duration": 0.45,
+      "uci": "a7a5"
+    },
+    {
+      "at": 19.2,
+      "duration": 0.45,
+      "uci": "a2a4"
+    },
+    {
+      "at": 19.9,
+      "duration": 0.45,
+      "uci": "b6c7"
+    },
+    {
+      "at": 20.6,
+      "duration": 0.45,
+      "uci": "a1e1"
+    },
+    {
+      "at": 21.3,
+      "duration": 0.45,
+      "uci": "h7h6"
+    },
+    {
+      "at": 22.0,
+      "duration": 0.45,
+      "uci": "g5h4"
+    },
+    {
+      "at": 22.7,
+      "duration": 0.45,
+      "uci": "b4d6"
+    },
+    {
+      "at": 23.4,
+      "duration": 0.45,
+      "uci": "h2h3"
+    },
+    {
+      "at": 24.1,
+      "duration": 0.45,
+      "uci": "d7b6"
+    },
+    {
+      "at": 24.8,
+      "duration": 0.45,
+      "uci": "h4f6"
+    },
+    {
+      "at": 25.5,
+      "duration": 0.45,
+      "uci": "b6c4"
+    },
+    {
+      "at": 26.2,
+      "duration": 0.45,
+      "uci": "c3e4"
+    },
+    {
+      "at": 26.9,
+      "duration": 0.45,
+      "uci": "d6h2"
+    },
+    {
+      "at": 27.6,
+      "duration": 0.45,
+      "uci": "g1h1"
+    },
+    {
+      "at": 28.3,
+      "duration": 0.45,
+      "uci": "c4d6"
+    },
+    {
+      "at": 29.0,
+      "duration": 0.45,
+      "uci": "h1h2"
+    },
+    {
+      "at": 29.7,
+      "duration": 0.45,
+      "uci": "d6e4"
+    },
+    {
+      "at": 30.4,
+      "duration": 0.45,
+      "uci": "f6e5"
+    },
+    {
+      "at": 31.1,
+      "duration": 0.45,
+      "uci": "e4d6"
+    },
+    {
+      "at": 31.8,
+      "duration": 0.45,
+      "uci": "c2c5"
+    },
+    {
+      "at": 32.5,
+      "duration": 0.45,
+      "uci": "f8d8"
+    },
+    {
+      "at": 33.2,
+      "duration": 0.45,
+      "uci": "d4d5"
+    },
+    {
+      "at": 33.9,
+      "duration": 0.45,
+      "uci": "c7d7"
+    },
+    {
+      "at": 34.6,
+      "duration": 0.45,
+      "uci": "b3d4"
+    },
+    {
+      "at": 35.3,
+      "duration": 0.45,
+      "uci": "d6f5"
+    },
+    {
+      "at": 36.0,
+      "duration": 0.45,
+      "uci": "d5c6"
+    },
+    {
+      "at": 36.7,
+      "duration": 0.45,
+      "uci": "b7c6"
+    },
+    {
+      "at": 37.4,
+      "duration": 0.45,
+      "uci": "d4c6"
+    },
+    {
+      "at": 38.1,
+      "duration": 0.45,
+      "uci": "d8e8"
+    },
+    {
+      "at": 38.8,
+      "duration": 0.45,
+      "uci": "e1d1"
+    },
+    {
+      "at": 39.5,
+      "duration": 0.45,
+      "uci": "d7e6"
+    },
+    {
+      "at": 40.2,
+      "duration": 0.45,
+      "uci": "f1e1"
+    },
+    {
+      "at": 40.9,
+      "duration": 0.45,
+      "uci": "c8b7"
+    },
+    {
+      "at": 41.6,
+      "duration": 0.45,
+      "uci": "c6d4"
+    },
+    {
+      "at": 42.3,
+      "duration": 0.45,
+      "uci": "f5d4"
+    },
+    {
+      "at": 43.0,
+      "duration": 0.45,
+      "uci": "c5d4"
+    },
+    {
+      "at": 43.7,
+      "duration": 0.45,
+      "uci": "e6g6"
+    },
+    {
+      "at": 44.4,
+      "duration": 0.45,
+      "uci": "d4g4"
+    },
+    {
+      "at": 45.1,
+      "duration": 0.45,
+      "uci": "g6g4"
+    },
+    {
+      "at": 45.8,
+      "duration": 0.45,
+      "uci": "h3g4"
+    },
+    {
+      "at": 46.5,
+      "duration": 0.45,
+      "uci": "b7c6"
+    },
+    {
+      "at": 47.2,
+      "duration": 0.45,
+      "uci": "b2b3"
+    },
+    {
+      "at": 47.9,
+      "duration": 0.45,
+      "uci": "f7f6"
+    },
+    {
+      "at": 48.6,
+      "duration": 0.45,
+      "uci": "e5c3"
+    },
+    {
+      "at": 49.3,
+      "duration": 0.45,
+      "uci": "e8e1"
+    },
+    {
+      "at": 50.0,
+      "duration": 0.45,
+      "uci": "d1e1"
+    },
+    {
+      "at": 50.7,
+      "duration": 0.45,
+      "uci": "c6d5"
+    },
+    {
+      "at": 51.4,
+      "duration": 0.45,
+      "uci": "e1b1"
+    },
+    {
+      "at": 52.1,
+      "duration": 0.45,
+      "uci": "g8f7"
+    },
+    {
+      "at": 52.8,
+      "duration": 0.45,
+      "uci": "h2g3"
+    },
+    {
+      "at": 53.5,
+      "duration": 0.45,
+      "uci": "a8b8"
+    },
+    {
+      "at": 54.2,
+      "duration": 0.45,
+      "uci": "b3b4"
+    },
+    {
+      "at": 54.9,
+      "duration": 0.45,
+      "uci": "a5b4"
+    },
+    {
+      "at": 55.6,
+      "duration": 0.45,
+      "uci": "c3b4"
+    },
+    {
+      "at": 56.3,
+      "duration": 0.45,
+      "uci": "d5c4"
+    },
+    {
+      "at": 57.0,
+      "duration": 0.45,
+      "uci": "a4a5"
+    },
+    {
+      "at": 57.7,
+      "duration": 0.45,
+      "uci": "c4a6"
+    },
+    {
+      "at": 58.4,
+      "duration": 0.45,
+      "uci": "f2f3"
+    },
+    {
+      "at": 59.1,
+      "duration": 0.45,
+      "uci": "f7g6"
+    },
+    {
+      "at": 59.8,
+      "duration": 0.45,
+      "uci": "g3f4"
+    },
+    {
+      "at": 60.5,
+      "duration": 0.45,
+      "uci": "h6h5"
+    },
+    {
+      "at": 61.2,
+      "duration": 0.45,
+      "uci": "g4h5"
+    },
+    {
+      "at": 61.9,
+      "duration": 0.45,
+      "uci": "g6h5"
+    },
+    {
+      "at": 62.6,
+      "duration": 0.45,
+      "uci": "b1h1"
+    },
+    {
+      "at": 63.3,
+      "duration": 0.45,
+      "uci": "h5g6"
+    },
+    {
+      "at": 64.0,
+      "duration": 0.45,
+      "uci": "b4c5"
+    },
+    {
+      "at": 64.7,
+      "duration": 0.45,
+      "uci": "b8b2"
+    },
+    {
+      "at": 65.4,
+      "duration": 0.45,
+      "uci": "f4g3"
+    },
+    {
+      "at": 66.1,
+      "duration": 0.45,
+      "uci": "b2a2"
+    },
+    {
+      "at": 66.8,
+      "duration": 0.45,
+      "uci": "c5b6"
+    },
+    {
+      "at": 67.5,
+      "duration": 0.45,
+      "uci": "g6f7"
+    },
+    {
+      "at": 68.2,
+      "duration": 0.45,
+      "uci": "h1c1"
+    },
+    {
+      "at": 68.9,
+      "duration": 0.45,
+      "uci": "g7g5"
+    },
+    {
+      "at": 69.6,
+      "duration": 0.45,
+      "uci": "c1c7"
+    },
+    {
+      "at": 70.3,
+      "duration": 0.45,
+      "uci": "f7g6"
+    },
+    {
+      "at": 71.0,
+      "duration": 0.45,
+      "uci": "c7c6"
+    },
+    {
+      "at": 71.7,
+      "duration": 0.45,
+      "uci": "a6f1"
+    },
+    {
+      "at": 72.4,
+      "duration": 0.45,
+      "uci": "b6f2"
+    }
+  ],
+  "annotations": []
+}

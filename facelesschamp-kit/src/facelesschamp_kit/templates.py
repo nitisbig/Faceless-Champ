@@ -178,3 +178,24 @@ def narrated(ctx, *, audio="voiceover", subtitles="word_cues", markers=None):
     with video.segment("finish", window=voice.between("finish")) as segment:
         segment.add(StepList(("Compose", "Preview", "Export")), enter="stagger")
     return video
+
+
+def chesschamp(ctx, data="data.json"):
+    """Build a chess video from required project-relative JSON and optional audio."""
+    from faceless_champ import ChessScript
+    from faceless_champ.chess import ChessDataError
+
+    from .blocks import ChessBoard
+
+    try:
+        script = ChessScript.from_json(ctx.root / data)
+    except ChessDataError as exc:
+        raise KitError("CHESS_DATA", str(exc), field=exc.path, move_index=exc.move_index) from exc
+    except ImportError as exc:
+        raise KitError("CHESS_DEPENDENCY", "Install facelesschamp-kit[chess]") from exc
+    video = Video(ctx)
+    if script.audio:
+        video.narration(audio=ctx.assets.audio(script.audio))
+    with video.segment("chesschamp", duration=script.duration) as segment:
+        segment.add(ChessBoard(script))
+    return video

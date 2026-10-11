@@ -73,8 +73,8 @@ def build(ctx):
 
 
 def init_project(destination, template="silent"):
-    if template not in {"silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui"}:
-        raise KitError("TEMPLATE", "Choose silent, explainer-short, narrated-short, whiteboard-basic, or os-ui")
+    if template not in {"silent", "explainer-short", "narrated-short", "whiteboard-basic", "os-ui", "chesschamp"}:
+        raise KitError("TEMPLATE", "Choose silent, explainer-short, narrated-short, whiteboard-basic, os-ui, or chesschamp")
     destination = Path(destination).resolve()
     if destination.exists():
         raise KitError("DESTINATION", "Destination already exists; choose a new directory")
@@ -87,14 +87,15 @@ def init_project(destination, template="silent"):
         (staging / "components/__init__.py").write_text("")
         whiteboard = template == "whiteboard-basic"
         os_ui = template == "os-ui"
+        chess = template == "chesschamp"
         config = (
             CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
                 'theme = "midnight"', 'theme = "whiteboard"'
             )
-            if whiteboard or os_ui
+            if whiteboard or os_ui or chess
             else CONFIG
         )
-        if os_ui:
+        if os_ui or chess:
             config = config.replace('theme = "whiteboard"', 'theme = "midnight"')
         (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
@@ -105,6 +106,11 @@ def init_project(destination, template="silent"):
             if whiteboard or os_ui
             else (NARRATED if narrated else SILENT)
         )
+        if chess:
+            source = 'from facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    return chesschamp(ctx)\n'
+            (staging / "data.json").write_text(
+                files("facelesschamp_kit").joinpath("sample_assets/chesschamp.json").read_text()
+            )
         (staging / "videos/main.py").write_text(source)
         manifest = (
             {
@@ -129,6 +135,9 @@ def init_project(destination, template="silent"):
             '[project]\nname = "my-video"\nversion = "0.1.0"\n'
             'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc4"]\n'
         )
+        if chess:
+            project_file = staging / "pyproject.toml"
+            project_file.write_text(project_file.read_text().replace("facelesschamp-kit==", "facelesschamp-kit[chess]=="))
         (staging / ".gitignore").write_text("output/\n.fc-kit/\n.venv/\n__pycache__/\n")
         instructions = (
             (
@@ -139,6 +148,13 @@ def init_project(destination, template="silent"):
             if narrated
             else ""
         )
+        if chess:
+            instructions = (
+                "Install `facelesschamp-kit[chess]`. Edit the required root data.json to author legal UCI moves, "
+                "absolute timing, player names, and text/arrow/highlight annotations. "
+                "Optional narration.audio names an audio asset in assets/manifest.json; subtitles are not required. "
+                "The chess rules dependency is GPL-3.0-or-later. See the ChessChamp guide for its data contract.\n\n"
+            )
         if whiteboard:
             instructions = (
                 "Edit the two WhiteboardScene recipes in videos/main.py. Drawings use source coordinates in each "

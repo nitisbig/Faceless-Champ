@@ -95,3 +95,7 @@ Fresh builds rehash referenced assets and use fresh renderers. Inputs changed du
 `fc-kit [--project PATH] [--json] COMMAND`. Commands: init, doctor, list videos/blocks/themes/templates, validate, inspect, frame, storyboard, preview, render. `inspect main --json` is also accepted. Preview supports `--segment ID` or paired `--start/--end`.
 
 Library errors are KitError with stable `code`, `message`, and optional scope. CLI exits 1 for build/runtime failures and 2 for argument syntax failures. JSON build failures return an `error` object on stderr; argparse syntax diagnostics remain plain text. Reports in `.fc-kit/reports/` include a versioned schema, original segment/cue timing, asset checksums, source hashes, settings, environment, and output metadata. Fingerprints are audit identities, not promises of byte-identical media across machines. Unregistered external data dependencies are not discovered; declare them through the asset registry. Persistent render-result caching is intentionally absent.
+
+## ChessChamp and audio-only narration
+
+`templates.chesschamp(ctx, data="data.json")` returns a Video; `blocks.ChessBoard(script, theme=None, source_start=0)` exposes `board`. `Video.narration(audio=...)` accepts audio without subtitles; cue methods and captions still require subtitles. See [ChessChamp](chesschamp.md).

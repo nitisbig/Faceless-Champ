@@ -555,3 +555,7 @@ staged animation, optional language support, layout limits, and cache controls.
 
 `faceless_champ.os_ui` exposes `OSClip`, `OSScript`, `MacOSPreset`, `VirtualFileSystem`,
 `File`, `Folder`, `SettingsPage`, `Control`, and `starter_pages`. See [OS UI](os-ui.md).
+
+## ChessChamp
+
+`ChessChamp`, `ChessScript`, and `ChessTheme` render legal, timed chess games and annotations. See [the API and JSON contract](chesschamp.md).

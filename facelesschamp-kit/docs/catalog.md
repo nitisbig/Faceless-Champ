@@ -49,3 +49,7 @@ See the [whiteboard guide](whiteboard.md) for geometry, styling, and narration e
 
 `OSWalkthrough`, `FinderWindow`, and `SettingsWindow` fit authored system tutorials
 into any layout. See [OS UI tutorials](os-ui.md); starter template: `os-ui`.
+
+## ChessChamp
+
+`ChessBoard(script, theme=None, source_start=0)` exposes the named child `board`. The `chesschamp` template and CLI scaffold use required root `data.json`. See [ChessChamp](chesschamp.md).

@@ -11,6 +11,7 @@ requires-python = ">=3.12"
 dependencies = ["faceless-champ>=0.1.3,<0.2.0"]
 
 [project.optional-dependencies]
+chess = ["faceless-champ[chess]>=0.1.3,<0.2.0"]
 web = ["faceless-champ[web]>=0.1.3,<0.2.0"]
 maps = ["faceless-champ[maps]>=0.1.3,<0.2.0"]
 equations = ["faceless-champ[equations]>=0.1.3,<0.2.0"]

@@ -107,3 +107,7 @@ for browser preparation; playback and block composition do not need Playwright.
 
 Use `OSWalkthrough`, `FinderWindow`, and `SettingsWindow`, or start with
 `fc-kit init my-tutorial --template os-ui`. See [OS UI tutorials](docs/os-ui.md).
+
+### ChessChamp
+
+Start with `fc-kit init my-chess --template chesschamp` after installing `facelesschamp-kit[chess]`. Edit required `data.json` for legal White/Black moves, commentary, arrows, highlights, and optional existing audio. See [ChessChamp](docs/chesschamp.md).

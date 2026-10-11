@@ -7,6 +7,7 @@ from faceless_champ import Bounds, ImageSlot, Number, Rectangle
 
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
+from .chess import ChessBoard
 from .flow import FlowDiagram
 from .os_ui import FinderWindow, OSWalkthrough, SettingsWindow
 from .web import WebElement, WebWalkthrough
@@ -182,6 +183,7 @@ class StepList:
 __all__ = [
     "Block",
     "BlockBuild",
+    "ChessBoard",
     "Comparison",
     "FinderWindow",
     "FlowDiagram",

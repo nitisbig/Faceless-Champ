@@ -65,7 +65,7 @@ class Segment:
     def cue_time(self, index, *, edge="start", offset=0):
         """Translate an original narration cue edge to segment-local seconds."""
         if self._track is None:
-            raise KitError("NARRATION", "Attach narration before using cue_time", segment=self.name)
+            raise KitError("NARRATION", "Attach narration with subtitles before using cue_time", segment=self.name)
         if not isinstance(index, int) or isinstance(index, bool) or index < 1:
             raise KitError("CUE_INDEX", "Cue index must be a positive integer", segment=self.name)
         if edge not in {"start", "end"}:
@@ -152,11 +152,15 @@ class Segment:
 class Narration:
     def __init__(self, audio, subtitles, markers, overlap_tolerance=0):
         self.audio = Path(audio)
-        self.subtitles = Path(subtitles)
+        self.subtitles = Path(subtitles) if subtitles is not None else None
         self.duration = AudioClip(self.audio).duration
-        self.track = SubtitleTrack.from_srt(subtitles, overlap_tolerance=overlap_tolerance)
-        self.markers = dict(markers)
-        if self.track.duration > self.duration + 0.001:
+        self.track = (
+            SubtitleTrack.from_srt(subtitles, overlap_tolerance=overlap_tolerance) if subtitles is not None else None
+        )
+        self.markers = dict(markers or {})
+        if self.markers and self.track is None:
+            raise KitError("NARRATION", "Markers require subtitles")
+        if self.track is not None and self.track.duration > self.duration + 0.001:
             raise KitError("CUE_AUDIO", "Subtitles extend beyond audio duration")
         for name, index in self.markers.items():
             if not isinstance(index, int) or isinstance(index, bool) or index < 1:
@@ -167,6 +171,8 @@ class Narration:
                 raise KitError("CUE_INDEX", "SRT cue index does not exist", marker=name, cue=index) from None
 
     def between(self, first, next=None):
+        if self.track is None:
+            raise KitError("NARRATION", "Cue windows require subtitles")
         try:
             start = self.track.cue(self.markers[first]).start
             end = self.track.cue(self.markers[next]).start if next else self.duration
@@ -200,10 +206,17 @@ class Video:
         segment._track = self.voice.track if self.voice else None
         return segment
 
-    def narration(self, *, audio, subtitles, markers, captions=None, overlap_tolerance=0):
+    def narration(self, *, audio, subtitles=None, markers=None, captions=None, overlap_tolerance=0):
         if self.voice is not None:
             raise KitError("NARRATION", "A video supports one master narration track")
-        self.voice = Narration(self.context.root / audio, self.context.root / subtitles, markers, overlap_tolerance)
+        if subtitles is None and (self.context.captions if captions is None else captions):
+            raise KitError("NARRATION", "Captions require subtitles")
+        self.voice = Narration(
+            self.context.root / audio,
+            self.context.root / subtitles if subtitles is not None else None,
+            markers,
+            overlap_tolerance,
+        )
         for segment in self.segments:
             segment._track = self.voice.track
         if captions is not None:
