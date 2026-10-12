@@ -305,3 +305,11 @@ Render legal two-player chess tutorials from timed `data.json` with `ChessChamp`
 
 Animate source edits beside real web output, car/object illustrations, or backend/AI data.
 Prepare checkpoints explicitly, then render without executing code. See the [CodingChamp playground guide](docs/coding-playgrounds.md).
+
+### FlowChamp animated diagrams
+
+Use `FlowChamp`, `FlowGraph`, and `FlowScript` for workflows, system/network diagrams, idea maps, and circuit illustrations with animated wires, signals, highlights, and pencil reveals. Python and JSON authoring work offline. See [FlowChamp](docs/flowchamp.md).
+
+Neutral strokes, bounded label caching, static-state reuse and timed layout diagnostics
+support narrated architecture videos. The [TikTok-like example](training%20project/tiktok-system-design/README.md)
+uses core and kit; its root `python3 render.py` defaults to a short low-quality preview.

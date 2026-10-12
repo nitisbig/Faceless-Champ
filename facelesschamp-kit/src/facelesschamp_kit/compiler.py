@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from faceless_champ import Animation, Captions, ChessChamp, FadeIn, Group, PopIn, Scene
+from faceless_champ.flow import FlowChamp, FlowDataError
 from faceless_champ.os_ui import OSClip
 
 from .assets import digest
@@ -73,10 +74,29 @@ def compile_video(video):
                     placement.duration if placement.duration is not None else segment.duration - placement.at
                 )
                 for member in members:
+                    if isinstance(member, FlowChamp):
+                        diagnostics.extend({**item, **scope} for item in member.diagnostics)
+                        samples = {member.source_start, min(member.duration, member.source_start + authored_lifetime)}
+                        for action in member.script.actions:
+                            for i in range(len(action.targets)):
+                                start = action.at + i * action.options.get("stagger", 0)
+                                for sample in (start, start + action.duration / 2, start + action.duration):
+                                    if member.source_start <= sample <= member.source_start + authored_lifetime:
+                                        samples.add(sample)
+                        for sample in sorted(samples):
+                            for item in member.diagnostics_at(sample):
+                                diagnostics.append(
+                                    {
+                                        **item,
+                                        **scope,
+                                        "script_time": sample,
+                                        "source_time": placement_start + sample - member.source_start,
+                                    }
+                                )
                     if isinstance(member, ChessChamp):
                         chess_assets[placement.handle.placement] = member.assets.checksums
                     if (
-                        isinstance(member, (OSClip, ChessChamp))
+                        isinstance(member, (OSClip, ChessChamp, FlowChamp))
                         and member.duration - member.source_start > authored_lifetime + 1e-9
                     ):
                         raise KitError("MOTION_WINDOW", "Script exceeds authored placement lifetime")
@@ -134,6 +154,8 @@ def compile_video(video):
 
                 if isinstance(exc, PlaygroundError):
                     raise KitError(exc.code, str(exc), **(exc.scope | scope)) from exc
+                if isinstance(exc, FlowDataError):
+                    raise KitError("FLOW_DATA", str(exc), path=exc.path, **scope) from exc
                 raise KitError("BLOCK_BUILD", str(exc), **scope) from exc
         for target, factory, local, run in segment.motions:
             scope = {"segment": segment.name, "placement": target.placement}

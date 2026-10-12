@@ -559,3 +559,12 @@ staged animation, optional language support, layout limits, and cache controls.
 ## ChessChamp
 
 `ChessChamp`, `ChessScript`, and `ChessTheme` render legal, timed chess games and annotations. See [the API and JSON contract](chesschamp.md).
+
+## FlowChamp
+
+`FlowChamp`, `FlowGraph`, `FlowNode`, `FlowPort`, `FlowEdge`, `FlowScript`, `FlowTheme`, and `FlowDataError` are exported from core and `faceless_champ.flow`. See [API and JSON contracts](flowchamp.md).
+
+`FlowTheme.stroke=None` retains accent outlines; set a neutral stroke to separate
+structure from emphasis. `FlowChamp.diagnostics_at(time)` returns visible overflow,
+node-overlap and label-overlap warnings on the original script clock.
+`FlowChamp(..., label_cache_mb=8)` bounds label sprite memory; zero disables caching.

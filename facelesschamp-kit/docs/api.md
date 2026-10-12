@@ -99,3 +99,10 @@ Library errors are KitError with stable `code`, `message`, and optional scope. C
 ## ChessChamp and audio-only narration
 
 `templates.chesschamp(ctx, data="data.json")` returns a Video; `blocks.ChessBoard(script, theme=None, source_start=0)` exposes `board`. `Video.narration(audio=...)` accepts audio without subtitles; cue methods and captions still require subtitles. See [ChessChamp](chesschamp.md).
+
+## FlowCanvas
+
+`FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0)` exposes the whole `"diagram"` handle. See [FlowChamp](flowchamp.md).
+
+Default strokes inherit `Theme.muted`. Compilation includes sampled visible core
+diagnostics with placement/segment scope and script/master source times.

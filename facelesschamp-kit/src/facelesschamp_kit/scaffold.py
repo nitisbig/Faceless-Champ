@@ -78,6 +78,7 @@ def init_project(destination, template="silent"):
         "explainer-short",
         "narrated-short",
         "whiteboard-basic",
+        "flowchamp",
         "os-ui",
         "chesschamp",
         "coding-web",
@@ -86,7 +87,7 @@ def init_project(destination, template="silent"):
     }:
         raise KitError(
             "TEMPLATE",
-            "Choose silent, explainer-short, narrated-short, whiteboard-basic, os-ui, chesschamp, coding-web, coding-concept, or coding-backend",
+            "Choose flowchamp, silent, explainer-short, narrated-short, whiteboard-basic, os-ui, chesschamp, coding-web, coding-concept, or coding-backend",
         )
     destination = Path(destination).resolve()
     if destination.exists():
@@ -106,10 +107,10 @@ def init_project(destination, template="silent"):
             CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
                 'theme = "midnight"', 'theme = "whiteboard"'
             )
-            if whiteboard or os_ui or chess or coding
+            if whiteboard or os_ui or chess or coding or template == "flowchamp"
             else CONFIG
         )
-        if os_ui or chess or coding:
+        if os_ui or chess or coding or template == "flowchamp":
             config = config.replace('theme = "whiteboard"', 'theme = "midnight"')
         (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
@@ -131,6 +132,8 @@ def init_project(destination, template="silent"):
             source = (
                 files("facelesschamp_kit").joinpath("sample_assets/" + template.replace("-", "_") + ".py").read_text()
             )
+        if template == "flowchamp":
+            source = files("facelesschamp_kit").joinpath("sample_assets/flowchamp.py").read_text()
         (staging / "videos/main.py").write_text(source)
         manifest = (
             {

@@ -34,4 +34,4 @@ testpaths = ["tests"]
 line-length = 120
 
 [tool.uv.build-backend]
-source-include = ["docs/**", "examples/**", "tests/**", "skills/**", "llms.txt", "uv.lock", "scripts/prepare_maps.py"]
+source-include = ["docs/**", "examples/**", "tests/**", "skills/**", "llms.txt", "uv.lock", "scripts/prepare_maps.py", "scripts/benchmark_flowchamp.py"]

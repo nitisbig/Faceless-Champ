@@ -32,6 +32,7 @@ from .components import (
     Triangle,
     finite,
 )
+from .flow import FlowChamp
 from .layout import Group, transform_point
 from .maps import Map, draw_map
 from .os_ui import OSClip
@@ -162,7 +163,7 @@ class PillowRenderer:
                         ImageColor.getcolor(c.future_color, "RGBA")
                         for phrase in c.phrases:
                             self._caption_sprite(c, 1, phrase[0].start)
-                elif isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView)):
+                elif isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp)):
                     pass  # Prepared ranges are checked at requested frame time.
                 elif isinstance(c, Image):
                     self._image(c)
@@ -258,7 +259,7 @@ class PillowRenderer:
                     if isinstance(c, Captions)
                     else (
                         c.frame_key(age)
-                        if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView))
+                        if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp))
                         else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None)
                     ),
                 )
@@ -431,7 +432,7 @@ class PillowRenderer:
         if isinstance(c, CodingChamp):
             return draw_code(c, state, factor, self)
 
-        if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView)):
+        if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp)):
             return c.frame_image(age, factor)
         if isinstance(c, ProgressBar):
             return draw_indicator(c, state, factor, self)

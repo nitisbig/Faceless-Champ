@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-10-12",
+  "status": "preview_checked",
+  "full_export_verified": false,
+  "design": {
+    "canvas": [
+      1920,
+      1080
+    ],
+    "background": "#000000",
+    "foreground": "#F4F3EE",
+    "neutral": "#B1ADA1",
+    "accent": "#C15F3C",
+    "captions": false,
+    "headings": false,
+    "drawing_tools": false
+  },
+  "inputs": {
+    "audio.mp3": "8c3dda0d25d52db0a33fe015d7064cafdb09aacf1fb23e9054a5432a4272eade",
+    "cue-per-word.srt": "8bdc389215d1ad44266faafbd6b8215722dd659768006398fc60284bce7334ce",
+    "normal-subtitle.srt": "c7d20c0f368c68794566cf1d66933dd5fa3cfd07cc7ee549a613b50f469c0c80"
+  },
+  "timing": {
+    "cue_count": 399,
+    "cue_end": 150.08,
+    "audio_end": 150.216,
+    "preserved_overlap_seconds": [
+      0.001,
+      0.001
+    ],
+    "audio_tracks": 1,
+    "audio_start": 0,
+    "chapters": 9,
+    "concurrent_signals_at_final_word": 3,
+    "audio_tail_hold": 0.13599999999999568,
+    "neutral_final_hold": true
+  },
+  "structural_audit": {
+    "flow_geometry_samples": 623,
+    "supplement_geometry_samples": 51,
+    "boundary_frames": 26,
+    "blank_boundary_frames": [],
+    "flow_actions": 185,
+    "layout_findings": [],
+    "audio_tracks": 1,
+    "audio_start": 0.0,
+    "duration": 150.216,
+    "cue_count": 399,
+    "cue_end": 150.08,
+    "full_export_verified": false
+  },
+  "tests": {
+    "core": {
+      "passed": 521,
+      "skipped": 2
+    },
+    "kit": {
+      "passed": 158,
+      "skipped": 0
+    },
+    "flow_targeted": {
+      "passed": 64
+    },
+    "ruff": "passed",
+    "diff_whitespace": "passed",
+    "original_raster_parity_cases": 396,
+    "extreme_scale_parity_cases": 15
+  },
+  "packages": {
+    "core": "0.1.4",
+    "kit": "0.1.0rc5",
+    "wheel_and_sdist_builds": "passed",
+    "packaged_schema_docs_skill_and_starter": "passed",
+    "installed_imports_without_checkout": "passed",
+    "installed_training_build_and_frame": "passed",
+    "installed_scaffold": "passed",
+    "pillow": "12.3.0",
+    "artifacts": [
+      {
+        "filename": "faceless_champ-0.1.4-py3-none-any.whl",
+        "sha256": "f10a320d907d8e3885e18880ef525d63092bdcb2ad144ed97a1b463a937b2d12"
+      },
+      {
+        "filename": "faceless_champ-0.1.4.tar.gz",
+        "sha256": "016e9800b70e4746acff58324bad0eaafd5b108bc5597c274b6fefc3eef17b3d"
+      },
+      {
+        "filename": "facelesschamp-kit-0.1.0rc5.tar.gz",
+        "sha256": "0a738aadcf2e7bee0a69bd02a4e3f3ca00106c16825a0e844e9c82ef42fc9de4"
+      },
+      {
+        "filename": "facelesschamp_kit-0.1.0rc5-py3-none-any.whl",
+        "sha256": "7638534a515d57f1ee4dfadf888665edc4b319f65362af4ae71b34af1d99b6e6"
+      }
+    ]
+  },
+  "previews": [
+    {
+      "path": "output/0-12s-preview.mp4",
+      "source_range": [
+        0,
+        12
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 180,
+      "container_duration": 12.0,
+      "decoded": true,
+      "audio_correlation": 0.9998629755180148,
+      "source_pixel_mae": [
+        0.0,
+        0.12514338991769547,
+        0.18926440329218108
+      ]
+    },
+    {
+      "path": "output/upload-preview.mp4",
+      "source_range": [
+        33.7,
+        41.2
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 113,
+      "container_duration": 7.533333,
+      "decoded": true,
+      "audio_correlation": 0.9997737724015237,
+      "source_pixel_mae": [
+        0.08046874999999999,
+        0.12585776748971192,
+        0.16075488683127573
+      ]
+    },
+    {
+      "path": "output/processing-preview.mp4",
+      "source_range": [
+        47,
+        54.3
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 110,
+      "container_duration": 7.333333,
+      "decoded": true,
+      "audio_correlation": 0.9998633469003383,
+      "source_pixel_mae": [
+        0.06752893518518517,
+        0.12422067901234568,
+        0.19919495884773664
+      ]
+    },
+    {
+      "path": "output/delivery-preview.mp4",
+      "source_range": [
+        78,
+        86
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 120,
+      "container_duration": 8.0,
+      "decoded": true,
+      "audio_correlation": 0.9998222733748848,
+      "source_pixel_mae": [
+        0.14474151234567903,
+        0.14922518004115226,
+        0.17791216563786008
+      ]
+    },
+    {
+      "path": "output/recommendations-preview.mp4",
+      "source_range": [
+        96,
+        103
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 105,
+      "container_duration": 7.0,
+      "decoded": true,
+      "audio_correlation": 0.9997404678399432,
+      "source_pixel_mae": [
+        0.047314814814814816,
+        0.1678710133744856,
+        0.17378986625514403
+      ]
+    },
+    {
+      "path": "output/recommendation-intro-preview.mp4",
+      "source_range": [
+        88.7,
+        96
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 110,
+      "container_duration": 7.333333,
+      "decoded": true,
+      "audio_correlation": 0.9998658807348297,
+      "source_pixel_mae": [
+        0.0,
+        0.024915123456790127,
+        0.04673546810699589
+      ]
+    },
+    {
+      "path": "output/together-preview.mp4",
+      "source_range": [
+        145.7,
+        150.216
+      ],
+      "size": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 68,
+      "container_duration": 4.533333,
+      "decoded": true,
+      "audio_correlation": 0.999849402877515,
+      "source_pixel_mae": [
+        0.22229359567901233,
+        0.20615419238683128,
+        0.22231995884773662
+      ]
+    }
+  ],
+  "performance": {
+    "fixture": "45 warmed raster frames per case at 960\u00d7540; same fixtures before and after",
+    "before": {
+      "system": {
+        "frames": 45,
+        "seconds": 4.271671340997273,
+        "python_peak_bytes": 37704,
+        "retained_python_bytes": 18112
+      },
+      "dense": {
+        "frames": 45,
+        "seconds": 11.640005778997875,
+        "python_peak_bytes": 52083,
+        "retained_python_bytes": 35076
+      },
+      "process_peak_rss_kib": 40372,
+      "note": "Linux RSS is whole-process high-water memory; tracemalloc excludes native Pillow buffers."
+    },
+    "after": {
+      "system": {
+        "frames": 45,
+        "seconds": 1.3166876249997586,
+        "python_peak_bytes": 42983,
+        "retained_python_bytes": 12528
+      },
+      "dense": {
+        "frames": 45,
+        "seconds": 5.14660821200232,
+        "python_peak_bytes": 55583,
+        "retained_python_bytes": 35584
+      },
+      "process_peak_rss_kib": 36504,
+      "note": "Linux RSS is whole-process high-water memory; tracemalloc excludes native Pillow buffers."
+    },
+    "dense_seconds_reduction_percent": 55.79,
+    "process_peak_rss_reduction_percent": 9.58,
+    "limitations": "Host-load-sensitive microbenchmarks. Python allocation peaks exclude native Pillow pixels; Linux RSS covers the whole process. No full-film time or memory claim."
+  },
+  "inspection": {
+    "storyboard": "output/storyboard/storyboard.png",
+    "boundaries": "output/boundaries/storyboard.png",
+    "decoded_frames": "output/encoded-frames",
+    "reviewed": true
+  },
+  "limits": [
+    "Layout audit samples authored actions and boundaries, not all frames of a full export.",
+    "No full video or high-quality complete export was rendered."
+  ]
+}

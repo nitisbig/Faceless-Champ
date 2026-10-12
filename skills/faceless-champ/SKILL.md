@@ -143,3 +143,22 @@ Use --overwrite only when replacing the chosen output is intended.
   CodeTheme.named supplies midnight/ocean/paper. See docs/coding.md. The coding-video
   training wrapper exports the full tutorial by default as explicitly requested;
   use --range when validating excerpts and never infer full-export QA from them.
+
+### FlowChamp diagrams
+
+Use public `faceless_champ.flow` graph and script APIs for animated diagrams; use kit `FlowCanvas` for themed placement. Read `docs/flowchamp.md` for contracts. Inspect `FlowDataError.path`, `clip.diagnostics`, `state_at(time)`, and `bounds_for(id,time)` before export. Individual elements use FlowScript IDs; scene/kit handles animate the full viewport. Keep motion inside authored placement windows, including narration tails. Validate short encoded previews before claiming full-export correctness.
+
+- For restrained diagrams, set FlowTheme.stroke to a neutral color and use accent
+  for packets/highlights; kit defaults inherit Theme.muted. `stroke=None` preserves
+  the core's original accent outlines. Use draw(tool="none") to omit drawing tools.
+- Use diagnostics_at(original_script_time) for visible node/label overlaps and
+  overflow. Kit samples action boundaries/midpoints and translates warnings to
+  master source_time. Conservative rectangle warnings require visual inspection;
+  no automatic obstacle routing or continuous collision proof is provided.
+- Exterior technical labels can wrap to two lines. Keep minimum font sizes readable
+  in the output and use node sizes/ports/waypoints that leave space for labels.
+- FlowChamp label sprites have an 8 MiB bounded cache; label_cache_mb=0 verifies
+  uncached parity. Static frame-key reuse preserves transient action boundaries.
+- The TikTok system-design project is content-only composition through Video,
+  FlowCanvas and public core primitives. Its root render.py defaults to a 0–12s,
+  960×540/15fps preview; --full is explicit. Keep reusable improvements in core/kit.

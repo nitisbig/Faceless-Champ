@@ -116,3 +116,12 @@ Start with `fc-kit init my-chess --template chesschamp` after installing `facele
 
 Animate source edits beside real web output, car/object illustrations, or backend/AI data.
 Prepare checkpoints explicitly, then render without executing code. See the [CodingChamp playground guide](docs/coding-playgrounds.md).
+
+### FlowChamp
+
+`FlowCanvas` fits scripted diagrams into kit layouts. Start with `fc-kit init my-flow --template flowchamp`; see [FlowChamp](docs/flowchamp.md).
+
+FlowCanvas inherits neutral strokes from the theme's muted role. Timed layout warnings
+include segment/placement scope and master source times. See the cue-synchronized
+[TikTok-like example](../training%20project/tiktok-system-design/README.md) for a complete
+composition with a short preview as its default export.

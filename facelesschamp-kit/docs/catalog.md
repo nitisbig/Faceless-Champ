@@ -53,3 +53,12 @@ into any layout. See [OS UI tutorials](os-ui.md); starter template: `os-ui`.
 ## ChessChamp
 
 `ChessBoard(script, theme=None, source_start=0)` exposes the named child `board`. The `chesschamp` template and CLI scaffold use required root `data.json`. See [ChessChamp](chesschamp.md).
+
+## FlowChamp
+
+- Block: `FlowCanvas` (whole-component `diagram` handle).
+- Template: `flowchamp`.
+- Recipes: workflow, system, network, idea-map, circuit.
+- Neutral strokes inherit theme muted; packets/highlights inherit accent.
+- Timed diagnostics: overflow, node overlap, label overlap at action samples.
+- [Usage and timing](flowchamp.md).

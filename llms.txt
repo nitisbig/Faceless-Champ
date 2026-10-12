@@ -130,3 +130,6 @@ OS UI: docs/os-ui.md; public faceless_champ.os_ui API; offline macOS-style virtu
 ChessChamp: docs/chesschamp.md. Optional extra chess; exports ChessChamp, ChessScript, ChessTheme. Required data.json uses schema_version=1, duration, timed UCI moves, annotations; default standard start. ChessScript.from_json/from_dict validates all moves before rendering. Kit template chesschamp and block ChessBoard integrate narration and CLI. No interactive play, engine analysis, or TTS. ChessScript.from_pgn imports SAN mainlines; to_dict emits timed JSON. ChessAssets renders the supplied PNG board/pieces with measured board_grid and bounded sprite caches.
 
 - Coding playgrounds: docs/coding-playgrounds.md — explicit checkpoint execution, source edits, prepared web/concept/backend canvases, kit prepare CLI.
+
+FlowChamp: docs/flowchamp.md — Python/JSON graph authoring, FlowScript actions, ports, routes, deterministic playback, and kit FlowCanvas.
+FlowTheme.stroke separates neutral structure from accent highlights/packets; None retains legacy outlines. FlowChamp.diagnostics_at(time) samples visible node/label bounds on the original script clock. Label caches default to 8 MiB per clip; label_cache_mb=0 disables them. Static intervals reuse frame keys. training project/tiktok-system-design/render.py defaults to 0–12s at 960×540/15fps; full export requires --full.

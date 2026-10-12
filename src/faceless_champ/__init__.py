@@ -210,3 +210,7 @@ __all__ += [
     "ValueBinding",
     "prepare_playground",
 ]
+
+from .flow import FlowChamp, FlowDataError, FlowEdge, FlowGraph, FlowNode, FlowPort, FlowScript, FlowTheme
+
+__all__ += ["FlowChamp", "FlowDataError", "FlowEdge", "FlowGraph", "FlowNode", "FlowPort", "FlowScript", "FlowTheme"]

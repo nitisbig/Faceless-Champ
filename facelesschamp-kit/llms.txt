@@ -25,3 +25,6 @@ ChessChamp: docs/chesschamp.md; blocks.ChessBoard(script, theme=None, source_sta
 Chess artwork defaults to bundled downloaded PNGs. ChessBoard assets= accepts core ChessAssets; data.json assets.directory resolves from the JSON directory. Core from_pgn/to_dict converts SAN game notation to timed data.json.
 
 - Coding playgrounds: docs/coding-playgrounds.md; coding-web, coding-concept, coding-backend templates; prepare explicitly before playback.
+
+FlowCanvas / flowchamp template: see docs/flowchamp.md. Use core FlowScript IDs for element motion and the diagram handle for whole-viewport animation.
+FlowCanvas default outlines inherit Theme.muted; accent is reserved for signals/highlights. Compilation samples action boundaries/midpoints and reports FLOW_BOUNDS/FLOW_OVERLAP/FLOW_LABEL_OVERLAP with segment, placement, script_time and master source_time. Use Segment.cue_time(original_index) for narrated graph events.
