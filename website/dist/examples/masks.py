@@ -1,6 +1,6 @@
 from faceless_champ import Canvas, CircleMask, Group, Rectangle, Scene, Text, Wipe
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 card = Rectangle(width=700, height=400, fill="#708fff", stroke=None,
                  position=(960, 540))
 stripe = Rectangle(width=760, height=100, fill="#48e0cb", stroke=None,

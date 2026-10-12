@@ -1,6 +1,6 @@
 from faceless_champ import Canvas, Rectangle, Scene, Text
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 card = Rectangle(width=400, height=220, fill="#48e0cb",
                  stroke="#edf2fc", stroke_width=2, position=(960, 540))
 scene.add(card)

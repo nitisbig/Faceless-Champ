@@ -1,19 +1,33 @@
 # facelesschamp-kit
 
+The current kit requires **faceless-champ>=0.1.4,<0.2.0**. It offers code editors and prepared playgrounds, local HTML walkthroughs, offline OS tutorials, legal chess games, and scripted FlowChamp diagrams alongside the original blocks and whiteboard recipes. See the [complete block and starter catalog](docs/catalog.md) and [agent reference](llms.txt).
+
+For coding projects, preparation is explicit:
+
+```bash
+fc-kit init lesson --template coding-concept
+cd lesson
+fc-kit prepare main
+fc-kit validate main
+fc-kit preview main -o output/preview.mp4
+```
+
+Preparation executes trusted authored code. Ordinary build, validation, inspection, and rendering replay prepared assets. Run `prepare` again after changing sources, bindings, input, timing, or preparation settings; `--refresh` forces re-execution.
+
 Workflow authoring now includes `FlowDiagram`, cue-to-local timing via
 `segment.cue_time()`, and delayed/finite placements via `segment.add(at=..., duration=...)`.
 TextPanel fits compact cards; ImageCard reserves labeled core ImageSlot boxes.
 See [API](docs/api.md), [catalog](docs/catalog.md), and [workflow example](examples/workflow.py).
 
 A structured Python video framework built on the independent **faceless-champ** engine.
-Version **0.1.0rc4** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
+Version **0.1.0rc5** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
 
 ## Install and start
 
 Install the two wheels built from these repositories into your environment:
 
 ```bash
-python -m pip install /path/to/faceless_champ-0.1.3-py3-none-any.whl /path/to/facelesschamp_kit-0.1.0rc4-py3-none-any.whl
+python -m pip install /path/to/faceless_champ-0.1.4-py3-none-any.whl /path/to/facelesschamp_kit-0.1.0rc5-py3-none-any.whl
 fc-kit init my-video --template silent
 cd my-video
 fc-kit doctor
@@ -80,7 +94,7 @@ cue windows. The returned `Video` remains editable. See the [whiteboard guide](d
 - [Verification and known limits](docs/verification.md)
 - [Custom block example](examples/custom_block.py)
 
-Install `facelesschamp-kit[maps]` or `[equations]` to forward the engine extras. Use explicit Python imports for custom blocks and templates. The current minor-line compatibility range is `faceless-champ>=0.1.1,<0.2.0`; only versions actually tested are claimed in verification records.
+Install `facelesschamp-kit[maps]` or `[equations]` to forward the engine extras. Use explicit Python imports for custom blocks and templates. The current minor-line compatibility range is `faceless-champ>=0.1.4,<0.2.0`; only versions actually tested are claimed in verification records.
 
 ## Development
 

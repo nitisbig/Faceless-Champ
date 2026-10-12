@@ -91,3 +91,26 @@ This verifies short full exports at 1080p portrait, catalog rendering in landsca
 Factories are trusted Python. Source modules and declared inputs are fingerprinted conservatively; arbitrary external dependencies and user-provided nondeterministic callbacks cannot be inferred. Do not edit media while exporting. Reports identify core-authored outputs whose block/asset metadata is unavailable. No byte-identical MP4 guarantee across encoder/font/platform versions is made.
 
 Public publication and project-code licensing remain undecided. No remote repository, release, or package publication was created.
+
+## Documentation and website refresh — 2026-10-12
+
+Current docs target kit 0.1.0rc5 and core >=0.1.4,<0.2.0. The block/API references,
+all ten registered starters, preparation workflow, and llms.txt were aligned with
+current public contracts. The website contains 15 kit and 22 core chapters; all
+30 downloads built and sampled, and every starter validated. coding-concept,
+coding-backend, and coding-web explicitly prepared before replay; the web starter
+used actual Chromium. Process launch checks prohibited checkpoint/browser execution
+during ordinary build, validation, sampling, and preview encoding.
+
+Targeted kit feature tests passed (31 tests); targeted core feature tests passed
+(207 tests, two opt-in browser tests skipped). The website verifier separately
+checked real browser preparation. All twelve website previews were regenerated
+with black backgrounds, checked with ffprobe, and fully decoded. Kit quickstart
+and whiteboard preview media were included. Desktop/mobile browser QA verified
+both guides, search isolation, keyboard search, theme persistence, mobile navigation,
+legacy section redirects, and no horizontal overflow. Copy feedback passed; exact
+clipboard readback was unavailable, while generated/downloaded source parity passed.
+
+[Website verification](../../website/verification.json) records precise results.
+This is local documentation/sample verification, not package publication or a
+verified full training-film export. Historical records above remain unchanged.

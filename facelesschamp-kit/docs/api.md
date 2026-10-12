@@ -1,5 +1,21 @@
 # Public API and workflow
 
+Current source: **0.1.0rc5**, requiring core **>=0.1.4,<0.2.0**.
+
+| Capability | Public interface | Guide |
+| --- | --- | --- |
+| Prepared coding lessons | CodeEditor, CodingPlayground, ctx.playground, templates.coding_playground | [Coding playgrounds](coding-playgrounds.md) |
+| HTML walkthroughs | WebWalkthrough, WebElement | [HTML to video](html-to-video.md) |
+| Virtual OS tutorials | OSWalkthrough, FinderWindow, SettingsWindow | [OS UI](os-ui.md) |
+| Legal games | ChessBoard, templates.chesschamp | [ChessChamp](chesschamp.md) |
+| Scripted graphs | FlowCanvas | [FlowChamp](flowchamp.md) |
+
+### Explicit preparation
+
+`Project.prepare(video_id="main", refresh=False)` returns the compiled preparation report. CLI: `fc-kit prepare main [--refresh] [--json]`. `ctx.playground(script, timeout=10, output_limit=1_000_000, fps=15)` declares a prepared dependency. Preparation executes trusted local checkpoints; build, validate, inspect, frame, storyboard, preview, and render replay assets without checkpoint execution or browser launch. Changed sources, inputs, bindings, timing, or settings invalidate preparation. Reports include `prepared_assets` paths, fingerprints, and status; errors retain `PLAYGROUND_*` context.
+
+`coding_playground(ctx, script, ...)` returns a Video with editor, canvas, and optional console. Blocks accept `layout="side"` or `"stacked"`, `code_ratio`, and a readable font size. Use `start` or narration `audio/subtitles/markers/cues`; checkpoint times are local to the authored window. [Full contracts](coding-playgrounds.md).
+
 ## Project configuration
 
 ```toml
@@ -92,7 +108,7 @@ Fresh builds rehash referenced assets and use fresh renderers. Inputs changed du
 
 ## CLI and diagnostics
 
-`fc-kit [--project PATH] [--json] COMMAND`. Commands: init, doctor, list videos/blocks/themes/templates, validate, inspect, frame, storyboard, preview, render. `inspect main --json` is also accepted. Preview supports `--segment ID` or paired `--start/--end`.
+`fc-kit [--project PATH] [--json] COMMAND`. Commands: init, doctor, list videos/blocks/themes/templates, prepare, validate, inspect, frame, storyboard, preview, render. `inspect main --json` is also accepted. Preview supports `--segment ID` or paired `--start/--end`.
 
 Library errors are KitError with stable `code`, `message`, and optional scope. CLI exits 1 for build/runtime failures and 2 for argument syntax failures. JSON build failures return an `error` object on stderr; argparse syntax diagnostics remain plain text. Reports in `.fc-kit/reports/` include a versioned schema, original segment/cue timing, asset checksums, source hashes, settings, environment, and output metadata. Fingerprints are audit identities, not promises of byte-identical media across machines. Unregistered external data dependencies are not discovered; declare them through the asset registry. Persistent render-result caching is intentionally absent.
 

@@ -1,6 +1,39 @@
 # v0.1 block catalog
 
-Each block constructs ordinary core components. Both 9:16 and 16:9 and both themes are tested. Block code licensing is pending; no externally sourced artwork is bundled in these compositions. The engine supplies its licensed default font.
+## Current capability catalog
+
+| Block | Content | Named children | Guide |
+| --- | --- | --- | --- |
+| CodeEditor | Authored source edit timeline | editor | [Coding](coding-playgrounds.md) |
+| CodingPlayground | Prepared code, results, optional output | editor, canvas, output when present | [Coding](coding-playgrounds.md) |
+| WebWalkthrough | Prepared capture with optional chrome/annotations | page, chrome/title when enabled | [Web](html-to-video.md) |
+| WebElement | Tracked selector crop | element | [Web](html-to-video.md) |
+| OSWalkthrough | Authored desktop script | ui | [OS UI](os-ui.md) |
+| FinderWindow | Authored isolated Finder | ui | [OS UI](os-ui.md) |
+| SettingsWindow | Authored isolated settings | ui | [OS UI](os-ui.md) |
+| ChessBoard | Legal timed ChessScript | board | [Chess](chesschamp.md) |
+| FlowCanvas | Graph and timed FlowScript | diagram | [Flow](flowchamp.md) |
+
+Check named children in the feature guide before targeting a handle. OS/window blocks preserve transparent surroundings where applicable. FlowDiagram remains a simple ordered chain; FlowCanvas provides authored graph topology and timed element actions.
+
+## All registered starters
+
+| CLI template | Starting content | Preparation |
+| --- | --- | --- |
+| silent | Metric, comparison, and steps | none |
+| explainer-short | Alias of silent | none |
+| narrated-short | Labeled synthetic narration fixture | none |
+| whiteboard-basic | Two sequential drawing recipes | none |
+| os-ui | Virtual desktop/Finder/settings tutorial | none |
+| chesschamp | Required timed game data.json | chess extra, no checkpoint preparation |
+| flowchamp | Editable graph recipe | none |
+| coding-concept | Independent cars and bound properties | fc-kit prepare |
+| coding-backend | Flows, data, and tensor results | fc-kit prepare |
+| coding-web | Local HTML/CSS/JS with browser interactions | fc-kit prepare and explicit Chromium installation |
+
+Use `fc-kit list templates` and `fc-kit list blocks` for the installed catalog. `init` creates editable files and refuses existing destinations. Only playground preparation executes authored code; normal playback consumes prepared assets.
+
+Each block constructs ordinary core components. The original basic-block gallery below covers portrait/landscape and midnight/light themes. The complete current catalog above also includes specialized code, web, OS, chess, and graph blocks. Block code licensing is pending; chess uses core bundled PNG artwork and other blocks use their declared local assets. The engine supplies its licensed default font and asset notices.
 
 | Block | Content properties | Style properties | Named children |
 | --- | --- | --- | --- |

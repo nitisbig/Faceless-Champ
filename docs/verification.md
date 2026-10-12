@@ -399,3 +399,33 @@ adds six acceptance tests and five decoded, source-audio-aligned excerpts (894 f
 20/30/60 FPS and a short 4K sample. See
 [the project verification record](../training%20project/coding-video/VERIFICATION.md).
 The complete tutorial was not rendered: `full_export_verified: false`.
+
+## Documentation and website refresh — 2026-10-12
+
+Updated current-source documentation for core 0.1.4 and kit 0.1.0rc5, including
+CodingChamp, prepared playgrounds, HTML capture, OS UI, ChessChamp, and FlowChamp.
+The existing website now has 22 core chapters, 15 kit chapters, 45 syntax-checked
+Python snippets, and 30 downloadable examples. All examples built and sampled;
+all ten registered kit starters validated, including actual Chromium preparation
+for coding-web followed by process-blocked replay checks.
+
+Twelve website previews were regenerated on black canvases, with black posters
+and player letterboxing. All twelve passed ffprobe codec/dimension/FPS/duration
+checks and complete FFmpeg decoding. Sixteen representative encoded frames were
+inspected, including early/final states of the four new feature previews. The
+standalone downloaded HTML runner additionally prepared a real local button tour
+and exported a completely decoded four-second 640×360/15 FPS video.
+
+Targeted core tests: 207 passed, two opt-in browser tests skipped. Targeted kit
+tests: 31 passed. The website verifier separately exercised real browser preparation.
+JavaScript syntax, Markdown example syntax/links, generated/downloaded source parity,
+and diff whitespace checks passed. Desktop (1440×900) and mobile (390×844) browser
+QA covered both guides, search, keyboard shortcuts, theme persistence, mobile menus,
+legacy redirects, and overflow. Flow preview playback reached its six-second end.
+Copy UI feedback passed; clipboard content readback was unavailable through the
+in-app browser tool, so exact content parity was verified from generated downloads.
+
+See [the website report](../website/verification.json) for precise sample times,
+media metadata, preparation evidence, and browser/visual checks. This verifies
+short website demos only; no full training-film export, deployment, or package
+publication was performed. Earlier verification records remain historical evidence.

@@ -1,5 +1,15 @@
 # Authoring guide
 
+## Choose the authoring workflow
+
+Use [CodingChamp](coding.md) for fixed code panels and reveals; use [prepared playgrounds](coding-playgrounds.md) for animated source revisions, real results, and explicit value/event bindings. Use [HTML capture](html-to-video.md) for real local page pixels, [OS UI](os-ui.md) for authored virtual files/settings, [ChessChamp](chesschamp.md) for legal timed moves, or [FlowChamp](flowchamp.md) for authored graphs and signals.
+
+Author → prepare when required → validate → sample frames → render a short preview → inspect and fully decode. Preparation verifies inputs and execution, not the exported video. Existing narration uses its original source clock; attach audio once at master zero and translate cue times for local segments.
+
+Only explicit `prepare_playground`/`capture_html` calls execute source programs or browsers. Reopen complete prepared directories for playback. For kit playgrounds, run `fc-kit prepare main` before ordinary workflow commands; changed inputs require preparation again. Python checkpoints use fresh processes with timeout/output limits, but execute with your OS permissions. Web revisions use local assets and offline requests.
+
+Missing preparation produces `PLAYGROUND_UNPREPARED`; inspect checkpoint/binding context for other `PLAYGROUND_*` failures. Illegal chess moves fail before rendering. Flow layout warnings report sampled times and cannot guarantee collision-free motion between samples.
+
 Use [cue chapters and preview helpers](narration.md) for narrated examples:
 `CueScene.at_cue()` maps unchanged word cues to a chapter clock; `finish()` guards
 chapter boundaries. `save_frame()` and `render_storyboard()` inspect key moments

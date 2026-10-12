@@ -1,6 +1,6 @@
 from faceless_champ import Canvas, Circle, Group, Text, Scene, FadeIn
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 cards = []
 for word in ("Compose", "Animate", "Export"):
     dot = Circle(50, fill="#48e0cb", stroke=None)

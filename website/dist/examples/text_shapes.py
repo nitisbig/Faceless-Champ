@@ -1,6 +1,6 @@
 from faceless_champ import Canvas, Scene, Text, Rectangle, Group, PopIn
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 card = Rectangle(width=900, height=360, corner_radius=28,
                  fill="#172238", stroke="#48e0cb", stroke_width=3,
                  position=(960, 540))

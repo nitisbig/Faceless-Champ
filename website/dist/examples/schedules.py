@@ -1,6 +1,6 @@
 from faceless_champ import Canvas, Circle, Scene, Stagger, Succession, Repeat, PopIn
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 dots = [Circle(50, fill="#48e0cb", stroke=None,
                position=(660 + i * 200, 540)) for i in range(4)]
 scene.play(Stagger(*(PopIn(dot) for dot in dots), lag=0.2, duration=0.5))

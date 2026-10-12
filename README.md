@@ -1,5 +1,26 @@
 # Faceless Champ
 
+Current source versions: **faceless-champ 0.1.4** and **facelesschamp-kit 0.1.0rc5** (local release candidate).
+
+| Capability | Core guide | Kit guide |
+| --- | --- | --- |
+| Syntax-colored code and reveals | [CodingChamp](docs/coding.md) | [Editor and playground blocks](facelesschamp-kit/docs/coding-playgrounds.md) |
+| Prepared source edits and bound results | [Coding playgrounds](docs/coding-playgrounds.md) | [Preparation workflow](facelesschamp-kit/docs/coding-playgrounds.md) |
+| Local HTML capture and playback | [HTML to video](docs/html-to-video.md) | [Web blocks](facelesschamp-kit/docs/html-to-video.md) |
+| Virtual desktop, Finder, and settings | [OS UI](docs/os-ui.md) | [OS tutorials](facelesschamp-kit/docs/os-ui.md) |
+| Legal timed games, PGN, and artwork | [ChessChamp](docs/chesschamp.md) | [ChessBoard](facelesschamp-kit/docs/chesschamp.md) |
+| Scripted graphs, routes, and signals | [FlowChamp](docs/flowchamp.md) | [FlowCanvas](facelesschamp-kit/docs/flowchamp.md) |
+
+Install only the capabilities you use from this repository:
+
+```bash
+python -m pip install -e '.[coding,chess,playground]' -e './facelesschamp-kit[playground,chess]'
+# Required only for web checkpoint/capture preparation:
+python -m playwright install chromium
+```
+
+The [local website](website/README.md) provides separate core and kit guides with runnable downloads and black-background previews. [llms.txt](llms.txt) and [kit llms.txt](facelesschamp-kit/llms.txt) provide compact agent instructions.
+
 The [Programming Value example](training%20project/programming-value/README.md)
 uses both packages to compose six chapters against 1,379 original word cues.
 Start with `python3 'training project/programming-value/render.py' --image placeholder`:

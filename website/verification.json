@@ -1,16 +1,20 @@
 {
+  "verified_at": "2026-10-12T07:50:44.631121+00:00",
+  "preview_background": "#000000",
   "guides": {
     "core": {
       "page": "index.html",
-      "chapters": 18
+      "version": "0.1.4",
+      "chapters": 22
     },
     "kit": {
       "page": "kit.html",
-      "chapters": 12
+      "version": "0.1.0rc5",
+      "chapters": 15
     }
   },
-  "chapters": 30,
-  "python_snippets": 38,
+  "chapters": 37,
+  "python_snippets": 45,
   "examples": [
     {
       "file": "hello.py",
@@ -133,6 +137,105 @@
       ]
     },
     {
+      "file": "coding.py",
+      "guide": "core",
+      "duration": 3.5,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        3.45
+      ],
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
+      "file": "playground.py",
+      "guide": "core",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "preparation": {
+        "fingerprint": "8eefcb77415bf542d9ea5b31805889b1a016fcefb26cb4cf4fe5d87910ba288d",
+        "checkpoint_execution": "explicit",
+        "playback_without_execution": true
+      },
+      "playback_without_execution": true
+    },
+    {
+      "file": "os_ui.py",
+      "guide": "core",
+      "duration": 13.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        12.95
+      ],
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
+      "file": "chess.py",
+      "guide": "core",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
+      "file": "flow.py",
+      "guide": "core",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
+      "file": "html_video.py",
+      "guide": "core",
+      "duration": 1.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        0.5,
+        0.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "preparation": {
+        "verification": "synthetic capture playback only; no browser interaction claim"
+      }
+    },
+    {
       "file": "properties.py",
       "guide": "core",
       "duration": 2.5,
@@ -186,36 +289,6 @@
         0,
         1.5,
         4.45
-      ],
-      "size": [
-        640,
-        360
-      ]
-    },
-    {
-      "file": "html_video.py",
-      "guide": "core",
-      "duration": 1.0,
-      "sampled_frames": 3,
-      "sample_times": [
-        0,
-        0.5,
-        0.95
-      ],
-      "size": [
-        640,
-        360
-      ]
-    },
-    {
-      "file": "os_ui.py",
-      "guide": "core",
-      "duration": 13.0,
-      "sampled_frames": 3,
-      "sample_times": [
-        0,
-        1.5,
-        12.95
       ],
       "size": [
         640,
@@ -319,6 +392,63 @@
       "template": "narrated-short"
     },
     {
+      "file": "kit_playground.py",
+      "guide": "kit",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "preparation": [
+        {
+          "kind": "coding-playground",
+          "status": "prepared",
+          "fingerprint": "f4cd3033cecaf394a688fb4c30ff8cf4f7655dab885f40dbc2b84d4dceed86ed",
+          "path": "/tmp/fc-guide-check-6u1dhknu/video/.fc-kit/playgrounds/f4cd3033cecaf394a688fb4c30ff8cf4f7655dab885f40dbc2b84d4dceed86ed"
+        }
+      ],
+      "playback_without_execution": true,
+      "template": "coding-concept"
+    },
+    {
+      "file": "kit_chess.py",
+      "guide": "kit",
+      "duration": 10.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        9.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "template": "chesschamp"
+    },
+    {
+      "file": "kit_flow.py",
+      "guide": "kit",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "template": "flowchamp"
+    },
+    {
       "file": "kit_whiteboard.py",
       "guide": "kit",
       "duration": 10.0,
@@ -360,6 +490,9 @@
         640,
         360
       ],
+      "preparation": {
+        "verification": "synthetic capture playback only; no browser interaction claim"
+      },
       "template": "silent"
     },
     {
@@ -388,7 +521,9 @@
         640
       ],
       "validated": true,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
     },
     {
       "template": "explainer-short",
@@ -398,7 +533,9 @@
         640
       ],
       "validated": true,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
     },
     {
       "template": "narrated-short",
@@ -408,7 +545,9 @@
         640
       ],
       "validated": true,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
     },
     {
       "template": "whiteboard-basic",
@@ -418,7 +557,21 @@
         360
       ],
       "validated": true,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
+    },
+    {
+      "template": "flowchamp",
+      "duration": 6.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
     },
     {
       "template": "os-ui",
@@ -428,8 +581,404 @@
         360
       ],
       "validated": true,
-      "sampled_frames": 3
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
+    },
+    {
+      "template": "chesschamp",
+      "duration": 10.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
+    },
+    {
+      "template": "coding-web",
+      "duration": 6.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3,
+      "prepared_assets": [
+        {
+          "kind": "coding-playground",
+          "status": "prepared",
+          "fingerprint": "1187a5108a97893bbb21d3d4cff24fa0a3dcec1ffd906d63f05e425847bfb08a",
+          "path": "/tmp/fc-guide-starter-zlygzl4w/video/.fc-kit/playgrounds/1187a5108a97893bbb21d3d4cff24fa0a3dcec1ffd906d63f05e425847bfb08a"
+        }
+      ],
+      "playback_without_execution": true
+    },
+    {
+      "template": "coding-concept",
+      "duration": 6.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3,
+      "prepared_assets": [
+        {
+          "kind": "coding-playground",
+          "status": "prepared",
+          "fingerprint": "f4cd3033cecaf394a688fb4c30ff8cf4f7655dab885f40dbc2b84d4dceed86ed",
+          "path": "/tmp/fc-guide-starter-cv_7hh7r/video/.fc-kit/playgrounds/f4cd3033cecaf394a688fb4c30ff8cf4f7655dab885f40dbc2b84d4dceed86ed"
+        }
+      ],
+      "playback_without_execution": true
+    },
+    {
+      "template": "coding-backend",
+      "duration": 6.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3,
+      "prepared_assets": [
+        {
+          "kind": "coding-playground",
+          "status": "prepared",
+          "fingerprint": "0bc07ef4eff2c0517be73c15755917e5560edb5e9b51c891335fbe449d65d99f",
+          "path": "/tmp/fc-guide-starter-sybjkcyi/video/.fc-kit/playgrounds/0bc07ef4eff2c0517be73c15755917e5560edb5e9b51c891335fbe449d65d99f"
+        }
+      ],
+      "playback_without_execution": true
     }
   ],
-  "links_checked": 34
+  "links_checked": 49,
+  "previews": [
+    {
+      "name": "hello",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "45"
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "text-shapes",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "30"
+          }
+        ],
+        "format": {
+          "duration": "2.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "charts",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "45"
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "properties",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "38"
+          }
+        ],
+        "format": {
+          "duration": "2.533333"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "masks",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "38"
+          }
+        ],
+        "format": {
+          "duration": "2.533333"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "indicators",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "68"
+          }
+        ],
+        "format": {
+          "duration": "4.533333"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "kit",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 360,
+            "height": 640,
+            "r_frame_rate": "15/1",
+            "nb_frames": "45"
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "whiteboard",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "150"
+          }
+        ],
+        "format": {
+          "duration": "10.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "coding",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "53"
+          }
+        ],
+        "format": {
+          "duration": "3.533333"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "playground",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "90"
+          }
+        ],
+        "format": {
+          "duration": "6.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "chess",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "90"
+          }
+        ],
+        "format": {
+          "duration": "6.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    },
+    {
+      "name": "flow",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 640,
+            "height": 360,
+            "r_frame_rate": "15/1",
+            "nb_frames": "90"
+          }
+        ],
+        "format": {
+          "duration": "6.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    }
+  ],
+  "html_runner": {
+    "actual_chromium_preparation": true,
+    "duration": 4,
+    "size": [
+      640,
+      360
+    ],
+    "fully_decoded": true,
+    "media": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 640,
+          "height": 360,
+          "r_frame_rate": "15/1"
+        }
+      ],
+      "format": {
+        "duration": "4.000000"
+      }
+    }
+  },
+  "browser_checks": {
+    "viewports": [
+      [
+        1440,
+        900
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "both_guides": true,
+    "no_horizontal_overflow": true,
+    "scoped_chapter_counts": [
+      22,
+      15
+    ],
+    "core_and_kit_search_isolation": true,
+    "keyboard_search_and_escape": true,
+    "mobile_menu_closes_after_selection": true,
+    "theme_persists_across_guides": true,
+    "legacy_chapter_section_redirect": true,
+    "copy_feedback": true,
+    "clipboard_content_readback": "Unavailable in the in-app browser tool; exact generated/downloaded source parity verified separately.",
+    "flow_video_played_to_end": true,
+    "flow_video_duration": 6,
+    "player_letterboxing": "rgb(0, 0, 0)",
+    "console_errors": []
+  },
+  "visual_review": {
+    "encoded_samples": 16,
+    "all_preview_black_backgrounds": true,
+    "all_poster_black_backgrounds": true,
+    "new_preview_early_and_final_frames_inspected": true,
+    "whiteboard_light_strokes_on_black": true
+  },
+  "tests": {
+    "core": {
+      "passed": 207,
+      "skipped": 2
+    },
+    "kit": {
+      "passed": 31
+    },
+    "javascript_syntax": true,
+    "documentation_links_and_python_snippets": true
+  },
+  "content_sha256": "5600c102ff49ae8b4fc7d03c2ce5fe75734a21304515b8889ac98c30586f3f45"
 }

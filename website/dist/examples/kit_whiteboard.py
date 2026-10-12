@@ -1,3 +1,5 @@
+from dataclasses import replace
+from faceless_champ import Canvas
 from facelesschamp_kit.blocks import (
     WhiteboardArrow, WhiteboardCircle, WhiteboardDrawing,
     WhiteboardLine, WhiteboardPath, WhiteboardRectangle,
@@ -6,6 +8,8 @@ from facelesschamp_kit.templates import WhiteboardScene, whiteboard_basic
 
 
 def build(ctx):
+    ctx.theme = replace(ctx.theme, background="#000000", foreground="#F3F6FF")
+    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, "#000000")
     return whiteboard_basic(
         ctx,
         theme=ctx.theme,

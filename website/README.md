@@ -1,24 +1,24 @@
 # Faceless Champ developer guides
 
-Two static pages share the same design, assets, and JavaScript:
+Two static guides share the existing design, search, assets, and JavaScript:
 
-- **Core library:** `dist/index.html` — 17 chapters about scenes, components,
-  timelines, narration, composition, motion graphics, and rendering.
-- **Kit framework:** `dist/kit.html` — 11 chapters about structured projects,
-  blocks, themes, narration, templates, and the kit workflow.
+- **Core:** `dist/index.html` — 22 chapters, source version 0.1.4.
+- **Kit:** `dist/kit.html` — 15 chapters, local release candidate 0.1.0rc5.
 
-The Core / Kit switch stays visible on mobile. Each guide has its own sidebar,
-chapter numbering, search results, installation instructions, and export help.
-Existing core hashes still work. Old framework hashes on `index.html` redirect to
-`kit.html` with their chapter and section intact.
+The guides cover code reveals, prepared concept/backend/web playgrounds, local HTML
+capture, offline OS tutorials, timed legal chess games, FlowChamp diagrams, and the
+existing scenes, motion, narration, charts, composition, and whiteboard workflows.
+All ten registered kit starters are documented. Package versions come from the two
+`pyproject.toml` manifests; availability on a package index is not assumed.
 
-The kit guide covers all four starters: `silent`, its `explainer-short` alias,
-`narrated-short`, and `whiteboard-basic`. It explains editable scaffolds and
-callable templates, whiteboard geometry and timing, format/theme changes, and
-source-time narration. The kit is documented from the bundled local 0.1.0rc1
-release candidate; the guide does not claim published package availability.
+There are 30 downloadable Python examples and 12 video previews. Every preview and
+poster uses a **black canvas background**, including the whiteboard drawing example;
+player letterboxing is black too. Card/editor/board surfaces retain their visual colors.
+The previews include four new short demos: coding (3.5 seconds), playground (6 seconds),
+chess (6 seconds), and flow diagrams (6 seconds). MP4 durations round to frame boundaries.
+The kit overview shows its three-second hook; the whiteboard preview shows both five-second scenes.
 
-## Preview
+## Preview locally
 
 From the repository root:
 
@@ -26,61 +26,62 @@ From the repository root:
 python3 -m http.server 8765 --bind 127.0.0.1 --directory website/dist
 ```
 
-Open [the core guide](http://127.0.0.1:8765/index.html) or
-[the kit guide](http://127.0.0.1:8765/kit.html).
-HTTP serving is required because chapters load from JSON. `website/dist/` works
-on any static host without URL rewrite rules or JavaScript dependencies.
-Fonts use optional Google Fonts with local fallbacks.
+Open [core](http://127.0.0.1:8765/index.html) or
+[kit](http://127.0.0.1:8765/kit.html). HTTP serving is required for chapter JSON.
+The distribution works on a static host without rewrite rules or JavaScript dependencies.
+Existing chapter/section hashes remain supported, including redirects from old kit
+hashes on the core page. Fonts use optional Google Fonts with local fallbacks.
 
 ## Edit and regenerate
 
-Chapter text, guide metadata, and the 18 downloadable Python examples come from
-`scripts/build_content.py`. Every chapter has a `guide` assignment. The shared
-renderer selects the active guide using the HTML body's `data-guide` attribute.
-The two HTML shells, `dist/styles.css`, and `dist/app.js` control presentation.
-Content supports code, tables, notes, and local guide links.
+`scripts/build_content.py` owns guide metadata and existing chapters;
+`scripts/feature_content.py` supplies the recent feature chapters and examples.
+The generator writes chapter JSON, exact downloadable source, and version fallback labels.
+HTML shells, `dist/styles.css`, and `dist/app.js` control presentation.
+
+From the repository root, use the same Python 3.12+ environment for installation,
+checkpoint execution, and verification:
 
 ```bash
-.venv/bin/python website/scripts/build_content.py
-.venv/bin/python website/scripts/verify_examples.py --render
+python -m pip install -e '.[coding,chess,playground]' -e './facelesschamp-kit[playground,chess]'
+python -m playwright install chromium
+python website/scripts/build_content.py
+python website/scripts/verify_examples.py --render
 node --check website/dist/app.js
 ```
 
-The verifier checks both page entrypoints and content links, parses all 30 Python
-snippets, builds all 18 downloadable examples, and validates all four template
-starters. Kit examples declare the scaffold they need, including the narrated
-sample assets and the whiteboard theme/format. Preview dimensions follow the
-composition's canvas. The whiteboard example is also validated and sampled in
-portrait, including drawing, holding, and clearing moments.
+The verifier checks both entrypoints, versions, chapter/section links, all ten template
+entries, 45 Python snippets, source/download parity, 30 example builds, and ten starter
+builds. It samples source-time frames and whiteboard portrait layouts. Playground inputs
+are prepared explicitly in temporary projects; build/validation/frame/export checks
+block checkpoint and browser process launches while permitting FFmpeg/ffprobe.
 
-With `--render`, the verifier exports eight previews, checks their metadata and
-duration with ffprobe, and completely decodes them with FFmpeg. The framework
-quickstart clip shows its three-second hook; the whiteboard clip includes both
-five-second scenes. The remaining narrated whiteboard recipe requires the
-reader's own media; it is syntax-checked rather than claimed as a rendered film.
-Results are written to `verification.json`. Without `--render`, the report covers
-build/frame checks only and does not claim fresh media verification.
+`--render` regenerates all 12 previews and posters. Both modes inspect existing MP4
+metadata (codec, dimensions, FPS, duration) and completely decode every preview with
+FFmpeg. `rendered_this_run` distinguishes regeneration from verification of existing
+media. Results replace `verification.json`; append manual browser/frame-review evidence
+only after the final verifier run. Temporary prepared paths in reports are audit evidence,
+not reusable distributed assets.
 
-## Browser QA
+HTML factory playback uses a clearly identified synthetic one-frame capture fixture.
+It is not claimed as real browser interaction verification. The `coding-web` starter
+uses actual Chromium checkpoint preparation and then verifies browser-free replay.
+The core `html_video.py` runner also offers explicit `--prepare` and `--capture` modes.
+Prepared examples do no execution on import. Narrated recipes requiring reader media
+are syntax-checked rather than claimed as verified full films.
 
-Check both pages at desktop and mobile widths (1440 × 900 and 390 × 844):
+## Browser and media QA
 
-- Core / Kit switching, scoped chapter counts, sidebar and previous/next links.
-- Search isolation, Ctrl/Cmd+K, Escape, and keyboard-operable result links.
-- Exact code and command copying, and downloadable Python source parity.
-- Light/dark theme persistence across pages, mobile menu closing, and overflow.
-- Old framework chapter/section links redirecting to the matching kit page.
-- Preview posters and controls, section links, and browser console errors.
+Check both pages at 1440 × 900 and 390 × 844:
 
-Inspect encoded preview frames in addition to browser screenshots. Manual browser
-and visual inspection results may be recorded separately under `browser_checks`
-and `visual_review` in `verification.json`; rerunning the verifier replaces that
-report, so repeat those inspections before recording them again.
+- Core/Kit switching, scoped chapter counts, previous/next links, and legacy redirects.
+- Search isolation, Ctrl/Cmd+K, Escape, and keyboard-accessible results.
+- Copy feedback, exact source/download parity, and example setup commands.
+- Theme persistence, mobile-menu closing, and horizontal overflow.
+- Posters, player controls/playback, section links, and console errors.
 
-`.openai/hosting.json` retains the existing private Sites identity. Publication
-is a separate step; these local changes do not deploy the site. Do not commit
-credentials or temporary deployment archives.
+Inspect representative encoded frames as well as PNG posters. Preparation, still
+samples, and these short website previews do not verify full training-video exports.
 
-The HTML chapters include `html_video.py` and `kit_web.py` factories for prepared captures.
-The verifier uses a synthetic capture to validate their browser-free composition; browser
-interaction tests live in the core test suite and are enabled with `FC_WEB_BROWSER_TESTS=1`.
+The existing `.openai/hosting.json` identity and audience are preserved. This update
+is local-only; no site deployment or package publication is performed.

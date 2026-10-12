@@ -1,3 +1,5 @@
+from dataclasses import replace
+from faceless_champ import Canvas
 from dataclasses import dataclass
 from faceless_champ import Circle, Group, Text
 from facelesschamp_kit import BlockBuild, Video
@@ -15,6 +17,8 @@ class Badge:
                           {"circle": circle, "label": label})
 
 def build(ctx):
+    ctx.theme = replace(ctx.theme, background="#000000", foreground="#F3F6FF")
+    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, "#000000")
     video = Video(ctx)
     badge = Badge("REUSE")
     for name in ("first", "second"):

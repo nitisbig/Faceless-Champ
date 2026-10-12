@@ -1,5 +1,18 @@
 # API reference
 
+Current source: **0.1.4**. Optional capability references:
+
+| API | Documentation | Extra |
+| --- | --- | --- |
+| CodingChamp, CodeTheme, CodeReveal | [Code editors](coding.md) | coding for syntax highlighting |
+| CodeCheckpoint, PlaygroundScript, prepare_playground, PreparedPlayground, CodeEditor, PlaygroundCanvas, PlaygroundOutput | [Prepared playgrounds](coding-playgrounds.md) | playground; Chromium for web preparation |
+| HtmlPage, WebScript, capture_html, WebCapture, HtmlClip | [HTML capture](html-to-video.md) | web for preparation |
+| OSClip, OSScript, VirtualFileSystem, MacOSPreset | [OS UI](os-ui.md) | none |
+| ChessChamp, ChessScript, ChessTheme, ChessAssets | [Chess](chesschamp.md) | chess |
+| FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme | [Flow diagrams](flowchamp.md) | none |
+
+The default core import does not install optional packages, run checkpoints, launch browsers, or download assets.
+
 All names below are available from `faceless_champ` unless stated otherwise.
 
 ## Narration chapters and preview helpers

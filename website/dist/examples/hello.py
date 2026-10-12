@@ -1,6 +1,9 @@
-from faceless_champ import Scene, Text, Circle, Typewriter, FadeIn
+from faceless_champ import Canvas, Scene, Text, Circle, Typewriter, FadeIn
 
 class Hello(Scene):
+    def __init__(self):
+        super().__init__(Canvas(1920, 1080, "#000000"))
+
     def construct(self):
         title = Text("Hello, world!", font_size=100,
                      position=(960, 400), color="#edf2fc")

@@ -1,6 +1,6 @@
 # HTML to video
 
-`faceless-champ` 0.1.2 provides optional browser preparation and browser-free scene playback.
+`faceless-champ` provides optional browser preparation and browser-free scene playback.
 `facelesschamp-kit` provides presentation blocks. Supply a local HTML app and its assets;
 the application must work without a backend or external requests.
 

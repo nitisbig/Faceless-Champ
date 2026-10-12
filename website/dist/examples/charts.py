@@ -1,6 +1,6 @@
 from faceless_champ import Axis, BarChart, Canvas, ChartReveal, Scene, Text
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 chart = BarChart(
     ["Q1", "Q2", "Q3"], {"Completed": [3, 5, 4]},
     width=1200, height=650, position=(960, 520),

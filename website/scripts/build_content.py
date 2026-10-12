@@ -1,6 +1,10 @@
 """Generate the guide and downloadable examples from one content source."""
 import json
+import hashlib
 import textwrap
+import tomllib
+import re
+from feature_content import HTML, add_features
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -8,9 +12,21 @@ DIST = ROOT / 'dist'
 EXAMPLES = DIST / 'examples'
 EXAMPLES.mkdir(parents=True, exist_ok=True)
 lessons = []
+CORE_VERSION = tomllib.loads((ROOT.parent / 'pyproject.toml').read_text())['project']['version']
+KIT_VERSION = tomllib.loads((ROOT.parent / 'facelesschamp-kit/pyproject.toml').read_text())['project']['version']
 
 def code(source, language='python', filename=None, target=None, kind='core', template='silent'):
     source = textwrap.dedent(source).strip() + '\n'
+    if filename and language == 'python':
+        # Downloaded examples reproduce the website's black preview canvases.
+        source = re.sub(r'Canvas\((\d+, \d+), ["\'][^"\']+["\']\)',
+                        r'Canvas(\1, "#000000")', source)
+        if kind == 'kit' and 'def build(ctx):\n' in source:
+            source = 'from dataclasses import replace\nfrom faceless_champ import Canvas\n' + source
+            source = source.replace('def build(ctx):\n',
+                'def build(ctx):\n'
+                '    ctx.theme = replace(ctx.theme, background="#000000", foreground="#F3F6FF")\n'
+                '    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, "#000000")\n')
     result = dict(type='code', language=language, code=source)
     if filename:
         (EXAMPLES / filename).write_text(source)
@@ -36,9 +52,12 @@ def lesson(id, title, group, description, sections, preview=None, *, guide='core
                         preview=preview, guide=guide, portrait=portrait))
 
 hello = code('''
-from faceless_champ import Scene, Text, Circle, Typewriter, FadeIn
+from faceless_champ import Canvas, Scene, Text, Circle, Typewriter, FadeIn
 
 class Hello(Scene):
+    def __init__(self):
+        super().__init__(Canvas(1920, 1080, "#000000"))
+
     def construct(self):
         title = Text("Hello, world!", font_size=100,
                      position=(960, 400), color="#edf2fc")
@@ -68,7 +87,7 @@ ffmpeg -version
 ffprobe -version
 faceless-champ --help
 ''', 'bash')),
-section('Optional capabilities', 'Charts, shapes, text, and motion graphics use the core Pillow dependency. Equations need Matplotlib; maps need NumPy. Install only the extras you use.', code('python -m pip install -e ".[equations,maps]"', 'bash')),
+section('Optional capabilities', 'Charts, shapes, text, OS UI, and FlowChamp use Pillow. Equations need equations; maps need maps; highlighted code needs coding; chess rules need chess. web and playground enable explicit browser/checkpoint preparation. Install only what you use.', code('python -m pip install -e ".[coding,chess,playground,equations,maps]"\npython -m playwright install chromium', 'bash'), note('Chromium installation is explicit and needed only for browser preparation. Prepared playback does not launch a browser. language="text" works without Pygments.')),
 section('Two packages, two jobs', 'This guide covers faceless_champ: components, animation, timelines, and rendering. For structured projects, reusable blocks, and templates, use the framework guide.', link('Open the facelesschamp-kit guide →', 'kit.html'))
 ])
 canvas = code('''
@@ -274,7 +293,7 @@ fc-kit frame main --time 1.5 -o output/frame.png
 fc-kit storyboard main -o output/storyboard
 fc-kit preview main --segment hook -o output/hook.mp4
 fc-kit render main -o output/main.mp4
-''','bash'),note('facelesschamp-kit 0.1.0rc4 is a local release candidate. The guide uses the implementation in this repository.'))
+''','bash'),note(f'facelesschamp-kit {KIT_VERSION} is a local release candidate. The guide uses the implementation in this repository.'))
 ], 'kit', guide='kit', portrait=True)
 lesson('project-configuration', 'Project configuration', 'The framework', 'Keep format, themes, assets, and export settings in a predictable project layout.', [
 section('Know the project layout', 'The scaffold separates authoring code from local assets and workflow outputs.', code('''
@@ -538,7 +557,7 @@ section('Keep the current scope clear', 'The core currently exports MP4. GPU ren
 ])
 
 lesson('kit-installation', 'Installation', 'Start here', 'Install the framework and its core engine, then check your local video tools.', [
-section('Install from this repository', 'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit 0.1.0rc4 is a local release candidate; these instructions do not assume a published release.', code('''
+section('Install from this repository', f'Use Python 3.12+ and the kit bundled in this checkout. facelesschamp-kit {KIT_VERSION} is a local release candidate; these instructions do not assume a published release.', code('''
 git clone https://github.com/nitisbig/Faceless-Champ.git
 cd Faceless-Champ
 python3.12 -m venv .venv
@@ -578,6 +597,12 @@ section('Choose a starter', 'List the installed templates, then pick a fresh des
     ['explainer-short', 'Alias of the silent scaffold', 'Same files and defaults as silent'],
     ['narrated-short', 'Thirty-second synthetic narration demo', 'Shorts · midnight · sentence SRT cues'],
     ['whiteboard-basic', 'Two five-second drawing scenes', 'Landscape · whiteboard · no captions'],
+    ['os-ui', 'Offline virtual desktop tutorial', 'Landscape · semantic actions'],
+    ['chesschamp', 'Legal timed game in data.json', 'Landscape · chess extra'],
+    ['flowchamp', 'Scripted graph recipes', 'Adapts to canvas · no extra'],
+    ['coding-concept', 'Code and independent cars', 'Six seconds · prepare first'],
+    ['coding-backend', 'Code, flows, and tensor data', 'Six seconds · prepare first'],
+    ['coding-web', 'HTML/CSS/JS and real browser output', 'Six seconds · prepare + Chromium'],
 ])),
 section('Create an editable project', 'Choose one command below. Each creates videos/main.py, facelesschamp.toml, an asset manifest, and local component/data folders. Generated files belong to you; upgrading the package does not rewrite them.', code('''
 fc-kit init silent-video --template silent
@@ -706,6 +731,7 @@ section('Extend the returned video', 'The returned Video supports normal segment
 ], 'whiteboard', guide='kit')
 
 lesson('kit-preview-and-export', 'Preview & export', 'Ship your video', 'Validate the project, inspect its layout, and export using the configured profiles.', [
+section('Prepare declared checkpoints', 'For playground projects, explicitly execute trusted code with prepare before validation or playback. Other starters need no preparation. Refresh matching cached inputs only when you intend to execute again.', code('fc-kit prepare main\nfc-kit prepare main --refresh', 'bash')),
 section('Validate before rendering', 'Validation checks every export profile and writes reports under .fc-kit/reports/. inspect summarizes the built timeline and assets.', code('''
 fc-kit validate main
 fc-kit inspect main --json
@@ -724,6 +750,11 @@ lesson('kit-troubleshooting', 'Troubleshooting', 'Ship your video', 'Use diagnos
 section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Errors include the relevant project or segment context.', dict(type='table', headers=['Symptom', 'Fix'], rows=[
     ['FFmpeg / ffprobe / libx264 missing', 'Install FFmpeg and check PATH with fc-kit doctor.'],
     ['Destination already exists', 'Use a new directory; init does not merge projects.'],
+    ['PLAYGROUND_UNPREPARED / changed lesson', 'Run fc-kit prepare main after editing sources, inputs, bindings, or settings.'],
+    ['PLAYGROUND execution or timeout', 'Inspect checkpoint context; correct trusted code, output size, or preparation timeout.'],
+    ['Illegal chess move / invalid JSON', 'Check schema_version, starting FEN, UCI move order, and annotation times.'],
+    ['FLOW_DATA / MOTION_WINDOW', 'Correct the field path or fit the script into its placement lifetime.'],
+    ['FLOW_BOUNDS / FLOW_OVERLAP / FLOW_LABEL_OVERLAP', 'Inspect the reported source time and adjust graph layout or labels.'],
     ['TEXT_FIT / layout overflow', 'Shorten labels, enlarge bounds, or split the scene.'],
     ['Missing asset / final placeholder', 'Provide the actual manifest asset; final exports reject placeholders by default.'],
     ['Unknown narration marker', 'Use an existing original SRT cue index and the correct marker name.'],
@@ -734,22 +765,12 @@ section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Erro
     ['Output already exists', 'Choose another path or explicitly add --overwrite.'],
 ])),
 section('Bound the work', 'Use a frame, a storyboard, and a short preview before raising resolution or frame rate. The kit uses the core CPU Pillow renderer and FFmpeg encoder.'),
-section('Keep the current scope clear', 'The framework is a local 0.1.0rc4 release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
+section('Keep the current scope clear', f'The framework is a local {KIT_VERSION} release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
 ], guide='kit')
 
 # Browser examples deliberately reopen prepared assets; no browser runs on import.
-web_core = code("""
-from faceless_champ import Canvas, Scene
-from faceless_champ.web import HtmlClip, WebCapture
-
-def build_scene(capture_directory):
-    capture = WebCapture(capture_directory)
-    scene = Scene(Canvas(1920, 1080, '#101827'))
-    scene.add(HtmlClip(capture, width=1440, height=900, position=(960, 540)))
-    scene.wait(capture.duration)
-    return scene
-""", filename='html_video.py', target='build_scene')
-web_core['command'] = 'Prepare a capture first, then call build_scene(capture.directory).'
+web_core = code(HTML, filename='html_video.py', target='build_scene')
+web_core['command'] = 'python html_video.py --prepare --output output/html-tour.mp4'
 lesson('html-to-video', 'HTML to video', 'Media and composition',
        'Prepare real browser interactions, then compose the frames into ordinary scenes.', [
     section('Install browser preparation', 'Browser installation is explicit; normal scene playback stays browser-free.',
@@ -760,7 +781,7 @@ page = HtmlPage('ui.html', viewport=(1440, 900))
 script = WebScript(8).type('#prompt-input', 'Hello', at=1, duration=2)
 script.click('#send', at=3.5).track('.composer')
 capture = capture_html(page, script, fps=30, cache_dir='.web-cache')""")),
-    section('Compose a prepared asset', 'Use the supplied factory from your runner after explicit preparation.', web_core),
+    section('Compose a prepared asset', 'This complete four-second local demo creates HTML and captures button clicks only when --prepare is passed. Use --capture PATH_TO_CAPTURE to replay its printed directory without a browser. Importing the file does no preparation.', web_core),
     section('Prepare only what you need', 'Use start_time/end_time for ranges or sample_times for stills. Earlier interactions replay without saving unused frames. Cache files are lossless and disk-backed.'),
     section('Know the boundaries', 'Local HTML and assets only. Captures preserve real page pixels; selector crops keep backgrounds. Match capture and export FPS. Identical pixels across different browser/font environments are not promised.',
             link('Kit walkthrough blocks →', 'kit.html#html-walkthroughs')),
@@ -777,7 +798,7 @@ def walkthrough(capture_directory):
 def element(capture_directory, selector):
     return WebElement(WebCapture(capture_directory), selector)
 """, filename='kit_web.py', kind='kit')
-web_kit['command'] = 'Call walkthrough(capture.directory) and add the block to a segment.'
+web_kit.pop('command')
 web_kit['placement'] = 'Use these helpers from your project after explicit core capture preparation.'
 lesson('html-walkthroughs', 'HTML walkthroughs', 'Framework fundamentals',
        'Present prepared browser frames with reusable blocks.', [
@@ -796,6 +817,7 @@ lesson('os-ui', 'OS UI rendering', 'Library fundamentals',
             'Use stable file IDs and semantic actions. The cursor and system changes share one deterministic timeline. No browser or macOS installation is required.', os_core),
     section('Embed or isolate',
             'OSClip supports desktop, finder and settings modes. Isolated windows have transparent surroundings. Use ordinary scene position, scale, opacity, masks and groups.'),
+    section('Semantic actions', 'Stable virtual file IDs support navigation, selection, rename, drag, copy, trash/restore, and previews. SettingsPage/Control define toggles, sliders, choices, fields, and buttons. OS blocks expose the ui child for kit motion.'),
     section('Timing and targets',
             'Actions default to one second and accept at and duration. Scripts are chronological and cannot overlap. Hidden targets fail before export. source_start supports excerpts, and the final state holds.'),
     section('Customize',
@@ -829,7 +851,17 @@ lesson('os-ui-tutorials', 'OS UI tutorials', 'Framework fundamentals',
             link('Core OS UI guide →', 'index.html#os-ui')),
 ], guide='kit')
 
-core_lessons = [item for item in lessons if item['guide'] == 'core']
+add_features(ROOT, code, section, note, link, lesson)
+
+core_by_id = {item['id']: item for item in lessons if item['guide'] == 'core'}
+core_order = ['hello-world', 'installation', 'scenes-and-canvas', 'text-and-shapes',
+              'timeline-and-timing', 'groups-and-layout', 'images-and-audio', 'charts-and-numbers',
+              'narration-and-cues', 'composition', 'codingchamp', 'coding-playgrounds', 'os-ui',
+              'chesschamp', 'flowchamp', 'html-to-video', 'animated-properties',
+              'animation-schedules', 'masks-and-wipes', 'progress-and-indicators',
+              'preview-and-export', 'troubleshooting']
+assert set(core_order) == set(core_by_id)
+core_lessons = [core_by_id[key] for key in core_order]
 kit_lessons = {item['id']: item for item in lessons if item['guide'] == 'kit'}
 for item in lessons:
     if item['id'] in ('framework-quickstart', 'project-configuration'):
@@ -839,17 +871,29 @@ for item in lessons:
 # Keep chapter groups contiguous in the sidebar and reading order.
 kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration',
              'blocks-and-themes', 'custom-blocks', 'framework-narration', 'templates',
+             'kit-coding-playgrounds', 'kit-chesschamp', 'kit-flowchamp',
              'whiteboard-videos', 'html-walkthroughs', 'os-ui-tutorials', 'kit-preview-and-export', 'kit-troubleshooting']
 assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]
 guides = {
     'core': dict(title='Faceless Champ Core Guide', label='Core library', file='index.html',
-                 version='0.1.3', kind='PYTHON LIBRARY', home='hello-world',
+                 version=CORE_VERSION, kind='PYTHON LIBRARY', home='hello-world',
                  introduction='Create animated videos with Python scenes, components, and a precise timeline.'),
     'kit': dict(title='facelesschamp-kit Guide', label='Kit framework', file='kit.html',
-                version='0.1.0rc4', kind='FRAMEWORK', home='framework-quickstart',
+                version=KIT_VERSION, kind='FRAMEWORK', home='framework-quickstart',
                 introduction='Build structured video projects with reusable blocks, editable templates, and narration cues.'),
 }
 (DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, guides=guides), indent=2) + '\n')
 print(f'Generated {len(core_lessons)} core and {len(kit_lessons)} kit chapters, '
       f'with {len(list(EXAMPLES.glob("*.py")))} downloadable examples.')
+
+# Keep non-JavaScript fallback labels in sync with generated metadata.
+for guide in guides.values():
+    path = DIST / guide['file']
+    html = path.read_text()
+    html = re.sub(r'(<span id="guide-version">)[^<]+',
+                  lambda m: m[1] + guide['label'] + ' v' + guide['version'], html)
+    css_digest = hashlib.sha256((DIST / 'styles.css').read_bytes()).hexdigest()[:12]
+    html = re.sub(r'href="styles\.css(?:\?[^" ]*)?"',
+                  f'href="styles.css?v={css_digest}"', html)
+    path.write_text(html)

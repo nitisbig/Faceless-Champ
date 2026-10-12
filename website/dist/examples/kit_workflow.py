@@ -1,8 +1,12 @@
+from dataclasses import replace
+from faceless_champ import Canvas
 from faceless_champ import Draw
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import FlowDiagram
 
 def build(ctx):
+    ctx.theme = replace(ctx.theme, background="#000000", foreground="#F3F6FF")
+    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, "#000000")
     video = Video(ctx)
     segment = video.segment("workflow", duration=5)
     direction = "horizontal" if ctx.canvas.width > ctx.canvas.height else "vertical"

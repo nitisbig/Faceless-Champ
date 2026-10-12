@@ -1,6 +1,6 @@
 from faceless_champ import Canvas, Scene, Text, FadeIn, Sequence, Grid
 
-canvas = Canvas(1920, 1080, "#0b101b")
+canvas = Canvas(1920, 1080, "#000000")
 def panel(word):
     scene = Scene(canvas)
     scene.play(FadeIn(Text(word, font_size=120,

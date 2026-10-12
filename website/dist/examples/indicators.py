@@ -3,7 +3,7 @@ from faceless_champ import (
     Countdown, Repeat, linear,
 )
 
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
+scene = Scene(Canvas(1920, 1080, "#000000"))
 ring = ProgressRing(width=240, height=240, label=True, position=(650, 480))
 timer = Countdown(4, font_size=120, position=(1250, 480))
 bar = ProgressBar(width=700, height=30, position=(960, 730))
