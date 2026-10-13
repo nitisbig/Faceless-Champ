@@ -1,6 +1,6 @@
 # facelesschamp-kit
 
-> Python 3.12+ structured video authoring over faceless-champ. Current local source 0.1.0rc5; core dependency >=0.1.4,<0.2.0.
+> Python 3.12+ structured video authoring over faceless-champ. Current local source 0.1.0rc6; core dependency >=0.1.4,<0.2.0.
 
 ## Entry points and installation
 

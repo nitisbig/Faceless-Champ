@@ -123,7 +123,7 @@ def draw_chart(chart, state, factor):
     if names and s.legend:
         row, used = [], 0
         for i, name in enumerate(names):
-            size = d.textlength(name, font=font) + 34 * factor
+            size = d.textlength(name, font=font) + fs + 18 * factor
             if row and used + size > width - 24 * factor:
                 legend_rows.append(row)
                 row, used = [], 0

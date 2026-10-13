@@ -20,14 +20,14 @@ TextPanel fits compact cards; ImageCard reserves labeled core ImageSlot boxes.
 See [API](docs/api.md), [catalog](docs/catalog.md), and [workflow example](examples/workflow.py).
 
 A structured Python video framework built on the independent **faceless-champ** engine.
-Version **0.1.0rc5** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
+Version **0.1.0rc6** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
 
 ## Install and start
 
 Install the two wheels built from these repositories into your environment:
 
 ```bash
-python -m pip install /path/to/faceless_champ-0.1.4-py3-none-any.whl /path/to/facelesschamp_kit-0.1.0rc5-py3-none-any.whl
+python -m pip install /path/to/faceless_champ-0.1.4-py3-none-any.whl /path/to/facelesschamp_kit-0.1.0rc6-py3-none-any.whl
 fc-kit init my-video --template silent
 cd my-video
 fc-kit doctor

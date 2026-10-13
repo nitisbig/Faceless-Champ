@@ -58,3 +58,7 @@ training project/stock-analysis/image/*
 # Prepared CodingChamp assets
 .playground-cache/
 .fc-kit/
+.fc-agent/
+
+# Small verified discovery previews shipped by the agent package.
+!facelesschamp-agent/src/facelesschamp_agent/resources/previews/*.mp4

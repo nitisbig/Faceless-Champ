@@ -231,3 +231,32 @@ def test_raw_data_keyframes_and_structural_rejection():
     ]:
         with pytest.raises(ValueError):
             chart.animate.data_to(target)
+
+
+def test_large_legend_font_leaves_space_before_next_marker(monkeypatch):
+    from PIL import ImageDraw
+
+    labels, markers = [], []
+    original_text = ImageDraw.ImageDraw.text
+    original_rectangle = ImageDraw.ImageDraw.rectangle
+    categories = ["Compute 55%", "Storage 30%", "Network 15%"]
+
+    def text(draw, xy, value, *args, **kwargs):
+        if value in categories:
+            labels.append(draw.textbbox(xy, value, font=kwargs.get("font"), anchor=kwargs.get("anchor")))
+        return original_text(draw, xy, value, *args, **kwargs)
+
+    def rectangle(draw, xy, *args, **kwargs):
+        markers.append(xy)
+        return original_rectangle(draw, xy, *args, **kwargs)
+
+    monkeypatch.setattr(ImageDraw.ImageDraw, "text", text)
+    monkeypatch.setattr(ImageDraw.ImageDraw, "rectangle", rectangle)
+    scene = Scene(Canvas(1600, 900))
+    scene.add(
+        PieChart(categories, [55, 30, 15], width=1500, height=800, style=ChartStyle(font_size=52), position=(800, 450))
+    )
+    PillowRenderer(1).frame(scene, 0, (1600, 900))
+    assert len(labels) == 3
+    for label, next_marker in zip(labels, markers[1:]):
+        assert next_marker[0] - label[2] >= 10

@@ -1,0 +1,125 @@
+# facelesschamp-kit
+
+> Python 3.12+ structured video authoring over faceless-champ. Current local source 0.1.0rc6; core dependency >=0.1.4,<0.2.0.
+
+## Entry points and installation
+
+- [Quickstart](README.md)
+- [API and CLI](docs/api.md)
+- [Blocks and all starters](docs/catalog.md)
+- [Architecture and extension contract](docs/architecture.md)
+- [Verification records](docs/verification.md)
+- [Core agent reference](../llms.txt)
+
+Install matching sources from repository root:
+python -m pip install -e . -e ./facelesschamp-kit
+Optional kit extras forward coding, playground, web, chess, maps, equations to core.
+Explicitly install Chromium only for web preparation: python -m playwright install chromium.
+Do not assume the release candidate is published.
+
+## Authoring contract
+
+build(ctx) returns Video or a core composition. Keep reusable blocks frozen; create fresh
+core objects in compose(ctx, bounds) -> BlockBuild(root, children). Finish layout and
+Group membership before compilation. Named children must belong to the root hierarchy.
+Project -> kit -> core; core must never import kit. Use provided Project services/CLI.
+
+Video.segment(name, duration=... / start=... / window=voice.between(...)) owns a local clock.
+Segment.add/add_core(at=0, duration=None) permits delayed/finite placements. Motion and
+entrances must fit placement lifetimes. segment.play uses local seconds and named children.
+Segment.cue_time(original_index, edge="start", offset=0) translates original SRT times.
+
+Attach narration once at master zero with video.narration(audio, subtitles, markers,
+captions=False). Original cue indices/times remain unchanged. Audio-only narration works,
+but cue methods/captions need subtitles. Final visuals can hold through an audio tail.
+Preview ranges retain the original source clock. Reports distinguish preparation/export.
+
+## Workflow
+
+fc-kit init lesson --template coding-concept
+cd lesson
+fc-kit prepare main
+fc-kit validate main
+fc-kit inspect main --json
+fc-kit frame main --time 4.4 -o output/frame.png
+fc-kit storyboard main -o output/storyboard
+fc-kit preview main --start 0 --end 6 -o output/preview.mp4
+fc-kit render main -o output/main.mp4
+
+prepare is needed only for declared playground dependencies. Project.prepare(video_id="main",
+refresh=False) / fc-kit prepare main [--refresh] executes trusted complete checkpoints.
+Build/validate/inspect/frame/storyboard/preview/render replay prepared assets and never
+launch checkpoint programs or browsers. Changed sources/inputs/bindings/timing/settings
+require prepare again. --refresh explicitly forces matching cached inputs to execute.
+Reports list prepared_assets status, paths, fingerprints; errors retain PLAYGROUND_* context.
+
+CLI commands: init, doctor, list videos/blocks/themes/templates, prepare, validate, inspect,
+frame, storyboard, preview, render. --project PATH and --json are global; workflow commands
+also accept --json. KitError has stable code/message/scope. Build failures return an error
+object on stderr; argument syntax errors remain plain text. Fingerprints are audit identities,
+not cross-machine byte-identical media promises. Inspect frames and fully decode exports.
+
+## Blocks, layouts, and assets
+
+Heading, TextPanel, MetricCard, ImageCard, Comparison, StepList, FlowDiagram, Stack, Split,
+WhiteboardDrawing compose reusable content. Fonts wrap/shrink to the theme minimum; impossible
+fits fail. TextPanel adapts title/body space. ImageCard uses core ImageSlot; missing auto images
+show labeled placeholders, corrupt present assets fail. Named children support core motions.
+FlowDiagram is a simple ordered chain with node-N/label-N/edge-N children.
+
+Themes: midnight/light/whiteboard. Explicit colors override variants and theme defaults.
+Landscape/shorts rebuild layout; export profiles scale the selected canvas. Assets use a
+manifest and ctx.assets.image/audio/subtitle/font; no implicit downloads or installations.
+Declare dependencies for source checksums/reports. [Catalog](docs/catalog.md).
+
+## Prepared CodingChamp playgrounds
+
+blocks.CodeEditor and CodingPlayground; templates.coding_playground(ctx, script, ...).
+ctx.playground(script, timeout=10, output_limit=1_000_000, fps=15) declares prepared input.
+Choose layout="side" or "stacked", code_ratio=.5, and a readable font_size. Named children:
+editor, canvas, output when enabled. Use start or audio/subtitles/markers/cues for narration.
+Checkpoint/edit/event times are local to the script; extra window time holds final output.
+Core CodeCheckpoint/PlaygroundScript specify complete revisions; runtime emit/event helpers
+and explicit ValueBinding/EventBinding supply visual meaning. Intermediate edits never execute.
+Concept cars/objects, backend flows/data/tensors, and actual local web captures are supported.
+Preparation runs trusted code with OS permissions, not a security sandbox.
+[Full guide](docs/coding-playgrounds.md).
+
+## HTML and OS tutorials
+
+WebWalkthrough/WebElement consume prepared core WebCapture assets. Core capture_html is
+explicit preparation; kit composition never starts a browser. Track selectors for crops/focus.
+Use WebFocus/WebHighlight/WebCallout records on the original capture clock, even with
+source_start. Crops retain backgrounds; complete assets are required for chosen ranges.
+[HTML blocks](docs/html-to-video.md).
+
+OSWalkthrough/FinderWindow/SettingsWindow consume core OSScript virtual files/settings.
+Semantic actions are offline authored tutorials, not host filesystem/desktop automation.
+All expose ui; isolated windows preserve transparency. [OS blocks](docs/os-ui.md).
+
+## ChessChamp and FlowChamp
+
+ChessBoard(script, theme=None, assets=None, source_start=0) exposes board.
+templates.chesschamp(ctx, data="data.json") uses required timed legal game data. Optional
+narration.audio is a kit asset ID; core from_pgn/to_dict supports SAN-to-timed-JSON conversion.
+Artwork defaults to bundled PNGs; custom ChessAssets and document-relative assets.directory
+are supported. Install chess extra. [Chess](docs/chesschamp.md).
+
+FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0) exposes diagram.
+Target node/edge IDs through core FlowScript; kit handles animate the entire viewport.
+Neutral outlines inherit Theme.muted; accent is reserved for signals/highlights.
+Compiler samples action boundaries/midpoints and excerpt endpoints for FLOW_BOUNDS,
+FLOW_OVERLAP, FLOW_LABEL_OVERLAP. Diagnostics include segment/placement/script_time/master
+source_time; sampling cannot prove every intermediate frame safe. Use Segment.cue_time for
+narrated graph events. FLOW_DATA and MOTION_WINDOW provide actionable failures.
+[Flow](docs/flowchamp.md).
+
+## All ten registered starters
+
+silent; explainer-short (silent alias); narrated-short (labeled synthetic audio fixture);
+whiteboard-basic; os-ui; chesschamp; flowchamp; coding-concept; coding-backend; coding-web.
+CLI init generates editable files and never merges existing destinations. Playground starters
+need explicit prepare; coding-web additionally needs Chromium. Other starters build directly.
+whiteboard_basic and immutable WhiteboardScene recipes provide sequential geometry/hold/clear
+with explicit durations or original cue windows. [Whiteboard](docs/whiteboard.md).
+Website example canvases are black; package and starter theme defaults remain configurable.

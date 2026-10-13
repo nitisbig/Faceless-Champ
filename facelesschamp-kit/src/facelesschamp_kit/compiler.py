@@ -1,6 +1,6 @@
 """Lower authoring records through public core APIs, with one master clock."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from faceless_champ import Animation, Captions, ChessChamp, FadeIn, Group, PopIn, Scene
 from faceless_champ.flow import FlowChamp, FlowDataError
@@ -8,7 +8,7 @@ from faceless_champ.os_ui import OSClip
 
 from .assets import digest
 from .blocks import BlockBuild
-from .diagnostics import KitError
+from .diagnostics import KitError, number
 
 
 @dataclass
@@ -16,10 +16,42 @@ class CompiledVideo:
     composition: object
     report: dict
     context: object
+    _placements: list = field(default_factory=list, repr=False)
 
     @property
     def duration(self):
         return self.composition.duration
+
+    def layout_at(self, time):
+        """Conservative animated bounds, in master design pixels.
+
+        Only placement lifetimes are filtered. Opacity and masks do not shrink
+        bounds; intersections are review candidates, not collision proofs.
+        Core-authored compositions without kit handles report no placements.
+        """
+        time = number(time, "time")
+        if time >= self.duration:
+            raise KitError("SAMPLE_TIME", "Sample before the end of the composition", source_time=time)
+        rows = []
+        for record in self._placements:
+            if not record["start"] <= time < record["end"]:
+                continue
+
+            def bounds(component):
+                box = self.composition.bounds_at(component, time)
+                return {key: getattr(box, key) for key in ("left", "top", "right", "bottom")}
+
+            rows.append(
+                {
+                    "id": record["id"],
+                    "segment": record["segment"],
+                    "start": record["start"],
+                    "end": record["end"],
+                    "bounds": bounds(record["root"]),
+                    "children": {name: bounds(child) for name, child in record["children"].items()},
+                }
+            )
+        return {"source_time": time, "conservative": True, "placements": rows}
 
 
 def descendants(root):
@@ -39,6 +71,7 @@ def compile_video(video):
     final = max(video.segments, key=lambda s: (s.end, s.start))
     diagnostics, segment_reports, events = [], [], []
     chess_assets = {}
+    layout_records = []
     claimed = set()
     hidden = set()
     if duration > visual_end:
@@ -116,6 +149,16 @@ def compile_video(video):
                     raise KitError("LAYOUT", "Block exceeds allocated bounds; resize content or change its layout")
                 built.root.z_index = placement.z_index
                 builds[placement.handle.placement] = built
+                layout_records.append(
+                    {
+                        "id": placement.handle.placement,
+                        "segment": segment.name,
+                        "start": placement_start,
+                        "end": placement_end,
+                        "root": built.root,
+                        "children": built.children,
+                    }
+                )
                 events.append((placement_start, 1, "add", built.root, None, scope))
                 events.append((placement_end, 0, "remove", built.root, None, scope))
                 segment_reports[-1]["placements"].append(
@@ -240,4 +283,4 @@ def compile_video(video):
         if video.voice
         else None,
     }
-    return CompiledVideo(scene, report, ctx)
+    return CompiledVideo(scene, report, ctx, layout_records)

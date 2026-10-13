@@ -1,0 +1,160 @@
+# Faceless Champ
+
+> Python 3.12+ programmatic video authoring. Current source 0.1.4; Pillow frames and FFmpeg MP4. Core never imports kit.
+
+## Entry points
+
+- [Quickstart and capability index](README.md)
+- [Public API](docs/api.md)
+- [Authoring and troubleshooting](docs/guide.md)
+- [Architecture](docs/architecture.md)
+- [Narration and source-clock previews](docs/narration.md)
+- [Authoring skill](skills/faceless-champ/SKILL.md)
+- [Website and runnable downloads](website/README.md)
+- [Kit agent reference](facelesschamp-kit/llms.txt)
+
+Install from the checkout with python -m pip install -e .; use extras only as needed:
+coding=Pygments, chess=chess rules, web=Playwright, playground=coding+web,
+equations=Matplotlib, maps=NumPy. Explicitly install Chromium for browser preparation
+with python -m playwright install chromium. Default imports and prepared playback
+require no browser. Do not assume a package has been published.
+
+## Scenes, layout, and animation
+
+Import from faceless_champ. Subclass Scene and override construct(), or build Scene(Canvas(...)).
+Coordinates are design pixels, top-left origin, positive Y down; anchors default to center.
+add(), play(), wait(), wait_until(), remove(), and with scene.at(time) schedule the timeline.
+play arguments run concurrently; successive calls advance the cursor. Audio defaults to
+the current cursor: attach master narration explicitly with add_audio(path, start=0).
+
+Text preserves whitespace and indentation. fit_text(text, Bounds(...), font_size=64,
+min_font_size=24) wraps/shrinks into measured bounds and rejects impossible fits.
+Text.font_weight controls an explicit variable font's Weight axis. Number supports
+formatting and animate.value_to(). ColorScheme.named: midnight, paper, ocean.
+
+Create Group(*components) before adding members to a scene; membership is fixed.
+Group.arrange, next_to, align_to, shift, component.bounds and Scene.bounds_at help layout.
+Parent transforms/opacity apply to descendants; remove(group) ends their lifetimes.
+Use Sequence for cuts/crossfades, Grid for simultaneous panels, Layer for transparent overlays.
+Grid padding/start_times also affect audio. Group members retain their original coordinates.
+
+Animations include FadeIn/Out, Draw, Write, Typewriter and Slide/Zoom/Pop/Bounce/Spin,
+Pulse, Shake, Wiggle. animate supports transforms, keyframes, relative values, colors,
+shape dimensions/strokes/corners, independent scale axes, and progress/value changes.
+Explicit play(rate_func=...) overrides preset easing. Stagger/Succession/Repeat are
+finite animation schedules; Repeat cycles counts traversals, including ping-pong reversals.
+RectangleMask/CircleMask/ShapeMask and Wipe affect the complete component.
+ProgressBar/ProgressRing/Gauge/LoadingDots/Checkmark use progress_to; Countdown uses value_to.
+[Motion graphics](docs/motion-graphics.md).
+
+## Assets, charts, and maps
+
+Image.from_source accepts paths, bytes, or Pillow images; trim/tint preserve alpha.
+No implicit URL downloads. ImageSlot mode auto/placeholder/required reserves matching
+geometry; missing auto files show a labeled box, but corrupt present files fail.
+Polyline(draw_by="x") requires strictly increasing open paths; rounded caps are supported.
+Equation uses the equations extra and supports symbol color_map and fixed-layout Write.
+Flag(country_code) uses 254 bundled case-insensitive codes; flag_path/supported_flags
+work offline. [Image and flag APIs](docs/api.md).
+
+BarChart, RankedBarChart, LineChart, ScatterPlot, Histogram, Heatmap, NetworkGraph,
+SankeyChart, VectorField, PieChart use core Pillow. RankedBarChart.animate.data_to()
+interpolates ranks/values with stable category colors; None means missing data.
+Axis fixes limits; ChartStyle controls fonts, line width, and titles. [Charts](docs/charts.md).
+OutlineMap, SatelliteMap, EarthMap need maps; zoom_to/animate.rotate support geography.
+[Maps](docs/maps.md).
+
+## CodingChamp editors
+
+Import CodingChamp, CodeTheme, CodeReveal from faceless_champ.
+CodingChamp(code, language="python", theme="midnight", filename="main.py", ...) is a
+fixed-layout editor. CodeReveal(panel, start=0, end=1) uses normalized progress.
+reveal_mode: typewriter (characters), word (whitespace-separated words), block (lines).
+block_ends are strictly increasing inclusive local line numbers including the final line.
+Whitespace is preserved; code does not wrap, scroll implicitly, or execute.
+CodeTheme.named: midnight/ocean/paper; customize immutable themes with dataclasses.replace.
+language="text" needs no Pygments. code_cache_mb=0 disables editor sprite retention.
+[API](docs/coding.md), [staged example](examples/coding/showcase.py).
+
+## Prepared coding playgrounds
+
+Import CodeCheckpoint, PlaygroundScript, CanvasItem, ValueBinding, EventBinding,
+prepare_playground, PreparedPlayground, CodeEditor, PlaygroundCanvas, PlaygroundOutput
+from faceless_champ. Complete checkpoint revisions execute explicitly during preparation.
+Animated intermediate edits never execute; outputs hold until the next publication.
+Use faceless_champ.playground.runtime.emit/event/inputs in authored Python programs.
+ValueBinding maps emitted keys to authored items; EventBinding maps named events to
+highlights, travelling signals, or tensor cells. No inferred visual meaning.
+Modes: concept (cars/objects), backend (flows/variables/collections/vectors/matrices),
+web (HTML/CSS/JS plus real local WebScript interactions).
+
+asset = prepare_playground(script, cache_dir=".playground-cache", timeout=10,
+                           output_limit=1_000_000, fps=15)
+Saved PreparedPlayground(asset.directory) verifies and reopens without execution.
+Preparation executes trusted local code with OS permissions, not a security sandbox.
+Changed source/input/bindings/timing/settings require preparation; refresh=True forces it.
+Incomplete/failed preparations are not published. PLAYGROUND_* errors retain context.
+Keep the complete asset directory; prepare web frames at intended export FPS.
+[Contracts and examples](docs/coding-playgrounds.md).
+
+## HTML capture
+
+Import HtmlPage, WebScript, capture_html, WebCapture, HtmlClip, WebFocus,
+WebHighlight, WebCallout from faceless_champ.web.
+Author local HTML/assets; WebScript supports move/click/type/press/select/scroll/track.
+Call capture_html explicitly, then reopen WebCapture(directory) for browser-free playback.
+Track selectors before cropping/focus. Capture and export FPS should match. start_time/
+end_time or sample_times prepare ranges/stills while replaying prior interactions.
+HtmlClip(source_start=...) seeks on the original capture clock; final pixels hold.
+Crops retain page backgrounds/occlusions. Offline captures do not record browser audio
+or live external services. [HTML API](docs/html-to-video.md).
+
+## Offline OS tutorials
+
+Import OSClip, OSScript, MacOSPreset, File, Folder, VirtualFileSystem, SettingsPage,
+Control from faceless_champ.os_ui. Author virtual files and semantic actions: opening,
+renaming, dragging, selecting, settings/value changes. No host filesystem or desktop automation.
+Desktop/finder/settings modes support isolated transparent windows; invalid hidden targets
+and overlapping actions fail before export. source_start preserves script time.
+[OS UI](docs/os-ui.md).
+
+## ChessChamp
+
+Import ChessChamp, ChessScript, ChessTheme, ChessAssets from faceless_champ.
+ChessScript.from_json/from_dict validates schema_version=1, positive duration, timed
+legal UCI moves and annotations; default standard start, optional initial_fen/orientation.
+from_pgn imports SAN mainlines; to_dict exports timed JSON. Moves/annotations use script seconds.
+ChessAssets.bundled provides PNG board/pieces; custom directory/board_grid supported.
+JSON assets.directory resolves from the document directory. Core is visual-only; attach
+existing audio once at zero. No interactive play, engine evaluation, or TTS.
+[Chess contracts](docs/chesschamp.md).
+
+## FlowChamp
+
+Import FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme,
+FlowDataError from faceless_champ or faceless_champ.flow.
+Python/JSON graph authoring supports stable IDs, ports, routes, labels, and arrows.
+FlowScript authors draws, signals, reveals, highlights and element transforms and signal/highlight colors.
+Recipes: workflow/system/network/idea-map/circuit in faceless_champ.flow.examples.
+FlowTheme.stroke supplies neutral outlines; None preserves legacy accent outlines.
+diagnostics_at(time) samples visible bounds/labels on the original script clock;
+sampling is not proof of collision-free motion. source_start supports excerpts.
+Label cache defaults to 8 MiB; label_cache_mb=0 disables it. Static intervals reuse keys.
+[Flow contracts](docs/flowchamp.md).
+
+## Narration, previews, and verification
+
+SubtitleTrack.from_srt retains original cue indices/times. overlap_tolerance defaults
+strictly to 0; opt into 0.001 for known source millisecond overlaps without retiming.
+Captions highlight words when explicitly desired; attach captions at source zero.
+CueScene.cue_time/at_cue translates source cues to local chapter clocks; finish holds
+exactly to its interval and rejects overflow. Cut-only Sequence with continuous audio
+on a Layer preserves chapter source timing.
+
+save_frame and render_storyboard sample source-time stills with output protection.
+render(start_time=0, end_time=None) exports ranges preserving animation/audio offsets.
+Use frame/storyboard/short preview before full export; verify metadata, complete FFmpeg
+decoding, audio alignment, and representative encoded frames. Preparation, a successful
+frame, and an excerpt do not prove a full export. render(progress=callback) reports frames.
+PillowRenderer has bounded held-frame/caption/code caches; zero budgets disable retention.
+Website downloadable examples use black canvases; this does not change library defaults.

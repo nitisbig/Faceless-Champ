@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "facelesschamp-kit"
-version = "0.1.0rc5"
+version = "0.1.0rc6"
 description = "Structured video authoring with reusable Faceless Champ components"
 readme = "README.md"
 requires-python = ">=3.12"

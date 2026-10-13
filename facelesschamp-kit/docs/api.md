@@ -1,6 +1,6 @@
 # Public API and workflow
 
-Current source: **0.1.0rc5**, requiring core **>=0.1.4,<0.2.0**.
+Current source: **0.1.0rc6**, requiring core **>=0.1.4,<0.2.0**.
 
 | Capability | Public interface | Guide |
 | --- | --- | --- |
@@ -122,3 +122,19 @@ Library errors are KitError with stable `code`, `message`, and optional scope. C
 
 Default strokes inherit `Theme.muted`. Compilation includes sampled visible core
 diagnostics with placement/segment scope and script/master source times.
+
+## Explanatory recipes and layout inspection
+
+`apply_recipe(segment, recipe_id, content, bounds=None, events=(), id=None)`
+validates content and returns a dictionary of named handles. `recipe_specs()` lists
+all ten recipes with editable content examples and selection constraints.
+`validate_recipe(recipe_id, content)` validates without requiring a renderer.
+Recipe events use local segment time and explicit targets. The `code-result` recipe
+requires prepared playground assets; compilation never executes preparation.
+
+`CompiledVideo.layout_at(time)` reports conservative evaluated bounds for active
+placements and named children at a master-clock time, along with segment/placement
+IDs and lifetimes. It uses public core geometry with retained compiler handles.
+Visibility, masks, and intentional intersections need visual review; intersecting
+bounding boxes alone do not prove a design error. Valid sample times are
+`0 <= time < compiled.duration`.

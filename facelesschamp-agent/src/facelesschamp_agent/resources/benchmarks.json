@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "instructions": "Use the same package versions, assets, render profiles, time budget and repair limit across agents. Record defaults and supply any referenced fixtures. Human reviewers rate clarity, accuracy, pacing and visual quality from 1 (poor) to 5 (excellent), blind to model identity. Report all runs including failures; these prompts are a baseline protocol, not evaluated results.",
+  "prompts": [
+    {
+      "id": "fc-01",
+      "category": "common",
+      "prompt": "Explain how a request travels from a browser through a load balancer, application server, cache, and database in 30 seconds."
+    },
+    {
+      "id": "fc-02",
+      "category": "common",
+      "prompt": "Explain a three-stage compiler pipeline to a first-year programming student."
+    },
+    {
+      "id": "fc-03",
+      "category": "common",
+      "prompt": "Compare a slow manual reporting workflow with an automated one without inventing measured savings."
+    },
+    {
+      "id": "fc-04",
+      "category": "common",
+      "prompt": "Explain how a cache miss causes a database query and then populates the cache."
+    },
+    {
+      "id": "fc-05",
+      "category": "common",
+      "prompt": "Explain why a 95 percent success rate needs the sample size and time window beside it. Use clearly illustrative data."
+    },
+    {
+      "id": "fc-06",
+      "category": "common",
+      "prompt": "Explain an illustrative latency trend before and after a deployment and annotate the change without claiming causation."
+    },
+    {
+      "id": "fc-07",
+      "category": "common",
+      "prompt": "Show how a fictional household divides a monthly budget among four categories, clearly labeled illustrative."
+    },
+    {
+      "id": "fc-08",
+      "category": "common",
+      "prompt": "Explain an organization hierarchy by expanding one level at a time."
+    },
+    {
+      "id": "fc-09",
+      "category": "common",
+      "prompt": "Teach Python list comprehensions using two explicitly prepared code checkpoints and their visible results."
+    },
+    {
+      "id": "fc-10",
+      "category": "common",
+      "prompt": "Explain a web architecture with an overview, a focused cache detail, and return to context."
+    },
+    {
+      "id": "fc-11",
+      "category": "custom",
+      "prompt": "Explain a rotating vector projecting onto a sine wave using a custom composition."
+    },
+    {
+      "id": "fc-12",
+      "category": "custom",
+      "prompt": "Explain a recursive binary search with the active interval and midpoint synchronized."
+    },
+    {
+      "id": "fc-13",
+      "category": "custom",
+      "prompt": "Show a custom packet traveling through a congested network with two routes."
+    },
+    {
+      "id": "fc-14",
+      "category": "custom",
+      "prompt": "Explain matrix multiplication with synchronized row, column, and output-cell highlights."
+    },
+    {
+      "id": "fc-15",
+      "category": "custom",
+      "prompt": "Teach a chess fork with supplied legal moves; preserve orientation and make no engine claims."
+    },
+    {
+      "id": "fc-16",
+      "category": "custom",
+      "prompt": "Explain a local settings workflow with semantic UI actions and a focused detail."
+    },
+    {
+      "id": "fc-17",
+      "category": "sparse",
+      "prompt": "Explain APIs."
+    },
+    {
+      "id": "fc-18",
+      "category": "sparse",
+      "prompt": "Make databases easy to understand."
+    },
+    {
+      "id": "fc-19",
+      "category": "sparse",
+      "prompt": "Show why testing matters."
+    },
+    {
+      "id": "fc-20",
+      "category": "sparse",
+      "prompt": "Explain compound interest visually using illustrative numbers."
+    },
+    {
+      "id": "fc-21",
+      "category": "difficult",
+      "prompt": "Create a portrait explainer comparing six long technical labels; split scenes when necessary to preserve readability."
+    },
+    {
+      "id": "fc-22",
+      "category": "difficult",
+      "prompt": "Explain a system with twelve hierarchy nodes on a light theme without showing all labels at once."
+    },
+    {
+      "id": "fc-23",
+      "category": "difficult",
+      "prompt": "Use supplied audio and cues with a tiny accepted overlap and a cue extending beyond audio. Preserve indices and times and prepare a silent tail."
+    },
+    {
+      "id": "fc-24",
+      "category": "difficult",
+      "prompt": "Create a silent draft when required artwork is missing. Show a labeled placeholder, deliver an asset brief and narration script, and report pending review when vision is unavailable."
+    }
+  ],
+  "result_schema": "benchmark-result.schema.json"
+}

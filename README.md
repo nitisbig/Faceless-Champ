@@ -1,6 +1,6 @@
 # Faceless Champ
 
-Current source versions: **faceless-champ 0.1.4** and **facelesschamp-kit 0.1.0rc5** (local release candidate).
+Current source versions: **faceless-champ 0.1.4**, **facelesschamp-kit 0.1.0rc6**, and **facelesschamp-agent 0.1.0rc1** (local release candidates).
 
 | Capability | Core guide | Kit guide |
 | --- | --- | --- |
@@ -334,3 +334,7 @@ Use `FlowChamp`, `FlowGraph`, and `FlowScript` for workflows, system/network dia
 Neutral strokes, bounded label caching, static-state reuse and timed layout diagnostics
 support narrated architecture videos. The [TikTok-like example](training%20project/tiktok-system-design/README.md)
 uses core and kit; its root `python3 render.py` defaults to a short low-quality preview.
+
+## External-agent production layer
+
+[FacelessChamp Agent](facelesschamp-agent/README.md) adds validated video plans, offline capability discovery, ten reusable kit recipes, a portable authoring skill, JSON production commands, and fingerprinted media/review evidence. External agents supply reasoning and author ordinary Python; no model provider is built in. See the [release verification](facelesschamp-agent/docs/verification.md) for tests and complete export evidence.
