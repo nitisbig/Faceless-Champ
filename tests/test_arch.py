@@ -28,6 +28,7 @@ from faceless_champ import (
     save_frame,
 )
 from faceless_champ.arch import validate_design
+from faceless_champ.arch.camera import part_matrix
 from faceless_champ.arch.rendering import ArchSession
 
 
@@ -211,6 +212,65 @@ def test_scalar_vector_fields_and_streamlines():
     with ArchSession(highlighted) as session:
         session.frame(0.5)
         assert session.actors["model"][0].prop.show_edges
+
+
+@pytest.mark.parametrize("geometry", ["grid", "sphere"])
+@pytest.mark.parametrize("association", ["point", "cell"])
+def test_sparse_vector_glyphs_keep_sampled_points_and_field_values(geometry, association):
+    mesh = pv.ImageData(dimensions=(10, 10, 10)) if geometry == "grid" else pv.Sphere()
+    locations = mesh.points if association == "point" else mesh.cell_centers().points
+    getattr(mesh, f"{association}_data")["flow"] = locations / 100 + [1, 0, 0]
+    snapshot = ArchMesh.from_data(mesh)
+    clip = ArchChamp(snapshot, style=ArchStyle(vectors="flow", association=association), width=160, height=120)
+    field = mesh.cell_data_to_point_data() if association == "cell" else mesh
+    ids = np.linspace(0, field.n_points - 1, 256, dtype=int)
+    with ArchSession(clip) as session:
+        glyphs = session.field_meshes["model"]
+        original_ids = glyphs.point_data["vtkOriginalPointIds"]
+        assert np.array_equal(np.unique(original_ids), ids)
+        assert np.allclose(glyphs.point_data["GlyphVector"], field.point_data["flow"][original_ids])
+        assert np.asarray(session.frame(0))[..., 3].max() > 0
+    assert snapshot.fingerprint == ArchMesh.from_data(mesh).fingerprint
+
+
+@pytest.mark.parametrize("normal", [(1, 0, 0), (-1, 0, 0), (1, 2, -1)])
+@pytest.mark.parametrize("transformed", [False, True])
+def test_capped_sections_keep_uncapped_half_space_and_close_the_cut(normal, transformed):
+    part = ArchPart(
+        "body",
+        ArchMesh.from_data(pv.Cube()),
+        position=(2, -1, 0.5) if transformed else (0, 0, 0),
+        rotation=(15, 30, 45) if transformed else (0, 0, 0),
+        scale=1.5 if transformed else 1,
+    )
+    clips = [
+        ArchChamp(
+            [part],
+            ArchScript().section("body", part.position, normal=normal, cap=cap, at=0.2, duration=1),
+            width=160,
+            height=120,
+        )
+        for cap in (False, True)
+    ]
+    with ArchSession(clips[0]) as uncapped, ArchSession(clips[1]) as capped:
+        for time in (0.2, 1.2, 0.8, 0.2, 1.2):
+            uncapped.frame(time)
+            capped.frame(time)
+            open_mesh = uncapped.actors["body"][0].mapper.dataset
+            closed_mesh = capped.actors["body"][0].mapper.dataset
+            assert closed_mesh.n_points > 0
+            assert closed_mesh.bounds == pytest.approx(open_mesh.bounds, abs=1e-6)
+            assert closed_mesh.is_manifold and closed_mesh.n_open_edges == 0
+            state = clips[1].state_at(time)["parts"]["body"]
+            matrix = part_matrix(state)
+            world_points = closed_mesh.points @ matrix[:3, :3].T + matrix[:3, 3]
+            signed_distance = (world_points - state["section"]["origin"]) @ np.asarray(normal)
+            assert signed_distance.max() <= 1e-6
+            if time == 0.2:
+                assert closed_mesh.volume == pytest.approx(part.mesh.dataset.volume)
+            elif time == 1.2:
+                assert open_mesh.n_open_edges > 0
+                assert closed_mesh.volume == pytest.approx(part.mesh.dataset.volume / 2)
 
 
 def test_sections_cap_constraints_and_backward_sampling():

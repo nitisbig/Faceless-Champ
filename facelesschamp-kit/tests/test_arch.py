@@ -1,8 +1,20 @@
 import json
+from copy import deepcopy
+from dataclasses import asdict, replace
 
 import pytest
 import pyvista as pv
-from faceless_champ import ArchMesh, ArchPart, ArchScript, Canvas
+from faceless_champ import (
+    ArchCamera,
+    ArchDataError,
+    ArchDimension,
+    ArchLabel,
+    ArchMesh,
+    ArchPart,
+    ArchScript,
+    ArchStyle,
+    Canvas,
+)
 
 from facelesschamp_kit import BuildContext, KitError, Project, Video
 from facelesschamp_kit.blocks import ArchCanvas
@@ -10,6 +22,92 @@ from facelesschamp_kit.cli import doctor
 from facelesschamp_kit.dependencies import check_dependencies, dependencies
 from facelesschamp_kit.recipes import apply_recipe, recipe_specs, validate_recipe
 from facelesschamp_kit.scaffold import init_project
+
+
+def design_with_settings():
+    return {
+        "parts": [{"id": "body", "mesh": {"primitive": "cube"}}],
+        "script": ArchScript().orbit(20, duration=1).to_dict(),
+        "camera": asdict(ArchCamera(position=(3, -3, 2))),
+        "style": asdict(ArchStyle(color="#123456")),
+        "labels": [asdict(ArchLabel("Original", (0, 0, 0), part="body"))],
+        "dimensions": [asdict(ArchDimension((0, 0, 0), (0.5, 0, 0), part="body"))],
+        "units": "cm",
+    }
+
+
+@pytest.mark.parametrize("include_settings", [False, True])
+def test_structured_design_applies_explicit_canvas_settings(tmp_path, include_settings):
+    data = design_with_settings()
+    if not include_settings:
+        data = {"parts": data["parts"]}
+    original = deepcopy(data)
+    ctx = BuildContext(tmp_path)
+    script = ArchScript().orbit(90, duration=3)
+    camera = ArchCamera(position=(8, -4, 3))
+    labels = (ArchLabel("Body", (0, 0, 0), part="body"),)
+    dimensions = (ArchDimension((-0.5, 0, 0), (0.5, 0, 0), part="body"),)
+    block = ArchCanvas(data, script, camera=camera, labels=labels, dimensions=dimensions, units="m", source_start=1)
+    first, second = (block.compose(ctx, ctx.bounds).root for _ in range(2))
+    assert first is not second
+    assert first.script.to_dict() == script.to_dict()
+    assert first.state_at(3)["camera"].position != first.state_at(0)["camera"].position
+    assert first.camera == camera
+    assert first.labels == labels and first.dimensions == dimensions
+    assert first.units == "m" and first.source_start == 1
+    assert list(first._annotations(0))[-1][1] == "1.00 m"
+    assert first.fingerprint == second.fingerprint
+    assert data == original
+    # Each compose owns its script and annotation snapshots.
+    script.wait(1)
+    assert first.duration == second.duration == 3
+
+
+@pytest.mark.parametrize("copy_block", [lambda b: b, deepcopy, replace])
+def test_structured_design_preserves_settings_when_canvas_options_are_omitted(tmp_path, copy_block):
+    data = design_with_settings()
+    original = deepcopy(data)
+    ctx = BuildContext(tmp_path)
+    block = copy_block(ArchCanvas(data, style=ArchStyle(color="#abcdef")))
+    clip = block.compose(ctx, ctx.bounds).root
+    assert clip.script.to_dict() == data["script"]
+    assert clip.camera == ArchCamera(**data["camera"])
+    assert clip.labels == tuple(ArchLabel(**v) for v in data["labels"])
+    assert clip.dimensions == tuple(ArchDimension(**v) for v in data["dimensions"])
+    assert clip.units == "cm"
+    assert clip.style == ArchStyle(**data["style"])
+    assert data == original
+
+
+def test_structured_design_accepts_explicit_empty_annotations_and_default_units(tmp_path):
+    ctx = BuildContext(tmp_path)
+    clip = (
+        ArchCanvas(design_with_settings(), ArchScript(), labels=(), dimensions=[], units="model units")
+        .compose(ctx, ctx.bounds)
+        .root
+    )
+    assert clip.duration == 0 and not clip.script.actions
+    assert clip.labels == clip.dimensions == ()
+    assert clip.units == "model units"
+
+
+def test_canvas_defaults_remain_compatible_for_parts_and_structured_designs(tmp_path):
+    ctx = BuildContext(tmp_path)
+    for parts in ([ArchPart("body", ArchMesh.from_data(pv.Cube()))], {"parts": design_with_settings()["parts"]}):
+        block = ArchCanvas(parts)
+        assert block.labels == block.dimensions == ()
+        assert block.units == "model units"
+        clip = block.compose(ctx, ctx.bounds).root
+        assert clip.duration == 0 and clip.labels == clip.dimensions == ()
+        assert clip.units == "model units"
+        assert clip.style.color == ctx.theme.foreground and clip.style.edge_color == ctx.theme.accent
+
+
+def test_structured_design_validates_supplied_annotations(tmp_path):
+    ctx = BuildContext(tmp_path)
+    block = ArchCanvas({"parts": design_with_settings()["parts"]}, labels=(ArchLabel("Missing", (0, 0, 0), "absent"),))
+    with pytest.raises(ArchDataError, match="unknown anchor part"):
+        block.compose(ctx, ctx.bounds)
 
 
 @pytest.mark.parametrize("size", [(1920, 1080), (1080, 1920)])

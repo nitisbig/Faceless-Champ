@@ -1,22 +1,35 @@
 """Themed, fitted technical design viewports."""
 
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 from faceless_champ.arch import ArchChamp, ArchStyle
 
 from .base import BlockBuild
 
 
+class _DefaultAnnotations(tuple):
+    """Keep the empty-tuple default while distinguishing explicit empty overrides."""
+
+
+class _DefaultUnits(str):
+    """Keep the string default while distinguishing an explicit units override."""
+
+
 @dataclass(frozen=True)
 class ArchCanvas:
+    """Explicit settings override structured designs; omitted settings use the design.
+
+    A design's style retains its existing precedence over the block's default style.
+    """
+
     parts: object
     script: object = None
     style: ArchStyle | None = None
     camera: object = None
-    labels: tuple = ()
-    dimensions: tuple = ()
-    units: str = "model units"
+    labels: tuple = _DefaultAnnotations()
+    dimensions: tuple = _DefaultAnnotations()
+    units: str = _DefaultUnits("model units")
     viewport: tuple = (1600, 900)
     source_start: float = 0
 
@@ -33,9 +46,17 @@ class ArchCanvas:
         default_style = self.style or ArchStyle(color=context.theme.foreground, edge_color=context.theme.accent)
         if isinstance(self.parts, dict):
             data = deepcopy(self.parts)
+            if self.script is not None:
+                data["script"] = self.script.to_dict()
+            if self.camera is not None:
+                data["camera"] = asdict(self.camera)
+            for name in ("labels", "dimensions"):
+                annotations = getattr(self, name)
+                if not isinstance(annotations, _DefaultAnnotations):
+                    data[name] = [asdict(item) for item in annotations]
+            if not isinstance(self.units, _DefaultUnits):
+                data["units"] = self.units
             if "style" not in data:
-                from dataclasses import asdict
-
                 data["style"] = asdict(default_style)
             clip = ArchChamp.from_dict(data, mesh_resolver=context.assets.mesh, **options)
         else:

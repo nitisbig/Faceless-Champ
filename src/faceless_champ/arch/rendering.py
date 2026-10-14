@@ -70,7 +70,7 @@ class ArchSession:
                     if style.field_mode == "glyphs":
                         # Deterministic bounded sampling avoids millions of glyphs.
                         ids = np.linspace(0, field.n_points - 1, min(256, field.n_points), dtype=int)
-                        seeds = field.extract_points(ids, adjacent_cells=False)
+                        seeds = field.extract_points(ids, include_cells=False)
                         vectors = seeds.glyph(orient=style.vectors, scale=style.vectors, factor=0.15)
                     else:
                         vectors = field.streamlines(vectors=style.vectors, n_points=30, max_steps=500)
@@ -129,7 +129,8 @@ class ArchSession:
                         clipped = (
                             mesh.extract_surface(algorithm="dataset_surface")
                             .triangulate()
-                            .clip_closed_surface(normal=normal, origin=origin)
+                            # Closed-surface clipping keeps the positive half-space.
+                            .clip_closed_surface(normal=-normal, origin=origin)
                         )
                     else:
                         clipped = mesh.clip(normal=normal, origin=origin, invert=True)
