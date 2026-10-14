@@ -101,3 +101,7 @@ class AssetRegistry:
 
     def font(self, asset_id):
         return self.resolve(asset_id, "font")
+
+    def mesh(self, asset_id):
+        """Resolve and checksum a required local technical geometry asset."""
+        return self.resolve(asset_id, "mesh")

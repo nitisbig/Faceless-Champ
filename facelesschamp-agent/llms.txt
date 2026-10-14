@@ -1,6 +1,10 @@
-# FacelessChamp Agent 0.1.0rc1
+# FacelessChamp Agent 0.1.0rc2
 
 Read README.md, then export the portable skill with fc-agent skill --output DIR.
 Use fc-agent capabilities, describe, recipes and schema for installed contracts.
 Python services: AgentProject and CapabilityRegistry. Agent supplies reasoning; library supplies production and verification.
 See docs/verification.md for measured release evidence.
+
+ArchChamp is discoverable through the arch capability family and arch-design recipe. Plans accept mesh assets and structured geometry/actions/annotations. Dependency versions and geometry hashes participate in evidence fingerprints. No simulation solver, automatic dependency installation, or model fetching is provided.
+
+[ArchChamp planning](docs/archchamp.md).

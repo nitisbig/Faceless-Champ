@@ -90,7 +90,7 @@ class AgentProject:
                 "plan": plan.model_dump(mode="json"),
                 "build": build,
                 "inputs": self._inputs(plan),
-                "agent_version": "0.1.0rc1",
+                "agent_version": "0.1.0rc2",
                 "implementations": implementations,
             }
         )
@@ -176,7 +176,7 @@ class AgentProject:
         context.canvas = replace(context.canvas, bg=context.theme.background)
         context.captions = design.captions
         for asset in plan.brief.assets:
-            if asset.kind in {"image", "audio", "subtitle", "font"}:
+            if asset.kind in {"image", "audio", "subtitle", "font", "mesh"}:
                 entry = {"type": asset.kind, "path": asset.path, "source": asset.source}
                 existing = context.assets.entries.get(asset.id)
                 if existing and (existing.get("path") != asset.path or existing.get("type") != asset.kind):
@@ -636,7 +636,7 @@ def init_project(destination):
         (staging / "asset-brief.md").write_text("# Asset brief\n\nThis starter uses only library-drawn elements.\n")
         (staging / ".gitignore").write_text(".fc-agent/\n.fc-kit/\noutput/\n__pycache__/\n")
         (staging / "pyproject.toml").write_text(
-            '[project]\nname="agent-video"\nversion="0.1.0"\nrequires-python=">=3.12"\ndependencies=["facelesschamp-agent==0.1.0rc1"]\n'
+            '[project]\nname="agent-video"\nversion="0.1.0"\nrequires-python=">=3.12"\ndependencies=["facelesschamp-agent==0.1.0rc2"]\n'
         )
         staging.rename(destination)
     finally:

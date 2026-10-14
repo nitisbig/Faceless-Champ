@@ -10,6 +10,10 @@ from facelesschamp_kit.recipes import recipe_specs
 from .errors import AgentError
 
 GUIDANCE = {
+    "arch": ("architecture engineering scientific geometry mesh point cloud sections dimensions",
+             "Use named parts, focused camera motion and sections to explain geometry.",
+             "Supply real geometry and fields; this renderer does not solve physics or create CAD.",
+             "archchamp.md", ("PyVista/VTK (required)",)),
     "flow": (
         "systems process causality request journey hierarchy networks circuits",
         "Use nodes and edges to explain relationships; follow a single request to explain movement.",
@@ -83,6 +87,7 @@ CHILDREN = {
     "StepList": ["0..N"],
     "FlowDiagram": ["node-N", "label-N", "edge-N"],
     "FlowCanvas": ["diagram"],
+    "ArchCanvas": ["model"],
     "CodeEditor": ["editor"],
     "CodingPlayground": ["editor", "canvas", "output (when enabled)"],
     "ChessBoard": ["board"],
@@ -120,6 +125,7 @@ class CapabilityRegistry:
         groups = [
             ("faceless_champ", None),
             ("faceless_champ.web", None),
+            ("faceless_champ.arch", None),
             ("faceless_champ.os_ui", None),
             ("facelesschamp_kit", None),
             ("facelesschamp_kit.blocks", None),
@@ -180,7 +186,7 @@ class CapabilityRegistry:
                 "tags": spec.purpose.lower().split(),
                 "use_when": spec.purpose,
                 "named_targets": list(spec.targets),
-                "dependencies": [],
+                "dependencies": ["PyVista/VTK (required)"] if spec.id == "arch-design" else [],
                 "preparation": "explicit" if spec.id == "code-result" else "none",
                 "documentation": "recipes.md",
                 "thumbnail": f"previews/{spec.id}.png",

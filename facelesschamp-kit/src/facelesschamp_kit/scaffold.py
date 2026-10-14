@@ -79,6 +79,7 @@ def init_project(destination, template="silent"):
         "narrated-short",
         "whiteboard-basic",
         "flowchamp",
+        "archchamp",
         "os-ui",
         "chesschamp",
         "coding-web",
@@ -107,10 +108,10 @@ def init_project(destination, template="silent"):
             CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
                 'theme = "midnight"', 'theme = "whiteboard"'
             )
-            if whiteboard or os_ui or chess or coding or template == "flowchamp"
+            if whiteboard or os_ui or chess or coding or template in {"flowchamp", "archchamp"}
             else CONFIG
         )
-        if os_ui or chess or coding or template == "flowchamp":
+        if os_ui or chess or coding or template in {"flowchamp", "archchamp"}:
             config = config.replace('theme = "whiteboard"', 'theme = "midnight"')
         (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
@@ -132,8 +133,8 @@ def init_project(destination, template="silent"):
             source = (
                 files("facelesschamp_kit").joinpath("sample_assets/" + template.replace("-", "_") + ".py").read_text()
             )
-        if template == "flowchamp":
-            source = files("facelesschamp_kit").joinpath("sample_assets/flowchamp.py").read_text()
+        if template in {"flowchamp", "archchamp"}:
+            source = files("facelesschamp_kit").joinpath("sample_assets/" + template + ".py").read_text()
         (staging / "videos/main.py").write_text(source)
         manifest = (
             {
@@ -156,7 +157,7 @@ def init_project(destination, template="silent"):
         (staging / "assets/manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         (staging / "pyproject.toml").write_text(
             '[project]\nname = "my-video"\nversion = "0.1.0"\n'
-            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc6"]\n'
+            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc7"]\n'
         )
         if chess:
             project_file = staging / "pyproject.toml"

@@ -1,13 +1,16 @@
 [project]
 name = "faceless-champ"
-version = "0.1.4"
+version = "0.1.5"
 description = "Programmatic animated video editing for developers and AI agents"
 readme = "README.md"
 authors = [
     { name = "Nitesh Ghimire", email = "niteshghimire223@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = ["Pillow>=10.4,<13"]
+dependencies = [
+    "Pillow>=10.4,<13",
+    "pyvista>=0.49.1",
+]
 
 [project.optional-dependencies]
 chess = ["chess>=1.11.2,<2"]

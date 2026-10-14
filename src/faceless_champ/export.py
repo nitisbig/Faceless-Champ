@@ -12,7 +12,7 @@ from pathlib import Path
 
 from .audio import require_tools
 from .components import Canvas, finite
-from .renderer import PillowRenderer, Renderer
+from .renderer import PillowRenderer, Renderer, managed_renderer
 from .timeline import Grid, Layer, Renderable, Scene, Sequence
 
 
@@ -116,6 +116,7 @@ def _audio_command(events, duration, start_time=0.0):
     return inputs, ";".join(filters)
 
 
+@managed_renderer(2)
 def render(
     node: Renderable,
     output: str | Path,

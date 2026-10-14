@@ -95,3 +95,7 @@ into any layout. See [OS UI tutorials](os-ui.md); starter template: `os-ui`.
 - Neutral strokes inherit theme muted; packets/highlights inherit accent.
 - Timed diagnostics: overflow, node overlap, label overlap at action samples.
 - [Usage and timing](flowchamp.md).
+
+## ArchChamp
+
+ArchCanvas places technical 3D geometry with model handle. arch-design is the structured recipe. The silent landscape archchamp starter demonstrates a multipart assembly, camera motion and dimensions. See [ArchChamp](archchamp.md).

@@ -1,0 +1,93 @@
+{
+  "verified_at": "2026-10-14T07:24:15.460018+00:00",
+  "preview_background": "#000000",
+  "guides": {
+    "core": {
+      "page": "index.html",
+      "version": "0.1.5",
+      "chapters": 23
+    },
+    "kit": {
+      "page": "kit.html",
+      "version": "0.1.0rc7",
+      "chapters": 16
+    }
+  },
+  "chapters": 39,
+  "python_snippets": 47,
+  "examples": [
+    {
+      "file": "archchamp.py",
+      "guide": "core",
+      "duration": 12.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        11.95
+      ],
+      "size": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "kit_archchamp.py",
+      "guide": "kit",
+      "duration": 6.0,
+      "sampled_frames": 3,
+      "sample_times": [
+        0,
+        1.5,
+        5.95
+      ],
+      "size": [
+        640,
+        360
+      ],
+      "template": "archchamp"
+    }
+  ],
+  "starters": [
+    {
+      "template": "archchamp",
+      "duration": 6.0,
+      "size": [
+        640,
+        360
+      ],
+      "validated": true,
+      "sampled_frames": 3,
+      "prepared_assets": [],
+      "playback_without_execution": true
+    }
+  ],
+  "links_checked": 53,
+  "previews": [
+    {
+      "name": "archchamp",
+      "media": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 960,
+            "height": 540,
+            "r_frame_rate": "12/1",
+            "nb_frames": "144"
+          }
+        ],
+        "format": {
+          "duration": "12.000000"
+        }
+      },
+      "fully_decoded": true,
+      "rendered_this_run": false,
+      "background": "#000000"
+    }
+  ],
+  "selection": [
+    "archchamp.py",
+    "kit_archchamp.py"
+  ]
+}

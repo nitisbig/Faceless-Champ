@@ -1,6 +1,6 @@
 # Faceless Champ
 
-> Python 3.12+ programmatic video authoring. Current source 0.1.4; Pillow frames and FFmpeg MP4. Core never imports kit.
+> Python 3.12+ programmatic video authoring. Current source 0.1.5; Pillow frames and FFmpeg MP4. Core never imports kit.
 
 ## Entry points
 
@@ -158,3 +158,7 @@ decoding, audio alignment, and representative encoded frames. Preparation, a suc
 frame, and an excerpt do not prove a full export. render(progress=callback) reports frames.
 PillowRenderer has bounded held-frame/caption/code caches; zero budgets disable retention.
 Website downloadable examples use black canvases; this does not change library defaults.
+
+ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK is required; core imports remain lazy. See [ArchChamp](docs/archchamp.md).
+
+Public 3D imports: ArchMesh, ArchPart, ArchStyle, ArchCamera, ArchScript, ArchLabel, ArchDimension, ArchChamp, ArchDataError. ArchMesh snapshots geometry; ArchChamp.state_at/project_at/diagnostics_at support inspection. Close directly owned PillowRenderer sessions with a context manager.

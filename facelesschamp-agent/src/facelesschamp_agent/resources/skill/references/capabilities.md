@@ -24,3 +24,5 @@ dependency guidance and the current core/kit guides; preparation is not a sandbo
 The package does not dynamically install dependencies, fetch remote assets, call model
 providers, or edit arbitrary code. The external agent controls authored Python and
 uses the existing environment's permissions.
+
+ArchChamp/ArchCanvas and arch-design cover technical mesh/point/field/voxel visualization, named assemblies, camera and section actions, and anchored dimensions. Declare model files as mesh assets and external tools in project pyproject.toml. Review geometry/units and field provenance; rendered visuals do not prove physical accuracy.

@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 
 from faceless_champ import Animation, Captions, ChessChamp, FadeIn, Group, PopIn, Scene
+from faceless_champ.arch import ArchChamp, ArchDataError
 from faceless_champ.flow import FlowChamp, FlowDataError
 from faceless_champ.os_ui import OSClip
 
@@ -71,6 +72,7 @@ def compile_video(video):
     final = max(video.segments, key=lambda s: (s.end, s.start))
     diagnostics, segment_reports, events = [], [], []
     chess_assets = {}
+    arch_designs = []
     layout_records = []
     claimed = set()
     hidden = set()
@@ -107,6 +109,28 @@ def compile_video(video):
                     placement.duration if placement.duration is not None else segment.duration - placement.at
                 )
                 for member in members:
+                    if isinstance(member, ArchChamp):
+                        arch_designs.append(
+                            {
+                                "fingerprint": member.fingerprint,
+                                "meshes": {p.id: p.mesh.fingerprint for p in member.parts},
+                            }
+                        )
+                        samples = {member.source_start, min(member.duration, member.source_start + authored_lifetime)}
+                        for action in member.script.actions:
+                            for sample in (action.at, action.at + action.duration / 2, action.at + action.duration):
+                                if member.source_start <= sample <= member.source_start + authored_lifetime:
+                                    samples.add(sample)
+                        diagnostics.extend(
+                            {
+                                **item,
+                                **scope,
+                                "script_time": sample,
+                                "source_time": placement_start + sample - member.source_start,
+                            }
+                            for sample in sorted(samples)
+                            for item in member.diagnostics_at(sample)
+                        )
                     if isinstance(member, FlowChamp):
                         diagnostics.extend({**item, **scope} for item in member.diagnostics)
                         samples = {member.source_start, min(member.duration, member.source_start + authored_lifetime)}
@@ -129,7 +153,7 @@ def compile_video(video):
                     if isinstance(member, ChessChamp):
                         chess_assets[placement.handle.placement] = member.assets.checksums
                     if (
-                        isinstance(member, (OSClip, ChessChamp, FlowChamp))
+                        isinstance(member, (OSClip, ChessChamp, FlowChamp, ArchChamp))
                         and member.duration - member.source_start > authored_lifetime + 1e-9
                     ):
                         raise KitError("MOTION_WINDOW", "Script exceeds authored placement lifetime")
@@ -199,6 +223,15 @@ def compile_video(video):
                     raise KitError(exc.code, str(exc), **(exc.scope | scope)) from exc
                 if isinstance(exc, FlowDataError):
                     raise KitError("FLOW_DATA", str(exc), path=exc.path, **scope) from exc
+                if isinstance(exc, ArchDataError):
+                    code = (
+                        "ARCH_DEPENDENCY"
+                        if exc.field == "dependency"
+                        else "ARCH_RENDER"
+                        if exc.field == "render"
+                        else "ARCH_DATA"
+                    )
+                    raise KitError(code, str(exc), path=exc.field, **scope) from exc
                 raise KitError("BLOCK_BUILD", str(exc), **scope) from exc
         for target, factory, local, run in segment.motions:
             scope = {"segment": segment.name, "placement": target.placement}
@@ -271,6 +304,7 @@ def compile_video(video):
         "segments": segment_reports,
         "diagnostics": diagnostics,
         "chess_assets": chess_assets,
+        "arch_designs": arch_designs,
         "narration": {
             "audio_checksum": digest(video.voice.audio),
             "subtitle_checksum": digest(video.voice.subtitles) if video.voice.subtitles is not None else None,

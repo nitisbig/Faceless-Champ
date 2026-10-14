@@ -208,3 +208,6 @@ __all__ = [
     "WhiteboardPath",
     "WhiteboardRectangle",
 ]
+
+from .arch import ArchCanvas
+__all__ += ["ArchCanvas"]

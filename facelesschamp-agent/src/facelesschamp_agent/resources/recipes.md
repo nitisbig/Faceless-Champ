@@ -212,3 +212,7 @@ Targets: diagram, detail
   "detail": "The cache retains results for repeated requests"
 }
 ```
+
+## arch-design
+
+Content: {"design": {"parts": [{"id": "body", "mesh": {"primitive": "cube"}}]}}. Target: model. See the bundled core/kit ArchChamp guides for cameras, scripts, tracked mesh assets, labels, dimensions, supplied fields and units. Fields require real sources or an illustrative explanation.

@@ -151,7 +151,7 @@ __all__ = [
     "supported_flags",
     "with_alpha",
 ]
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
 from .masks import CircleMask, RectangleMask, ShapeMask, Wipe
@@ -214,3 +214,27 @@ __all__ += [
 from .flow import FlowChamp, FlowDataError, FlowEdge, FlowGraph, FlowNode, FlowPort, FlowScript, FlowTheme
 
 __all__ += ["FlowChamp", "FlowDataError", "FlowEdge", "FlowGraph", "FlowNode", "FlowPort", "FlowScript", "FlowTheme"]
+
+from .arch import (
+    ArchCamera,
+    ArchChamp,
+    ArchDataError,
+    ArchDimension,
+    ArchLabel,
+    ArchMesh,
+    ArchPart,
+    ArchScript,
+    ArchStyle,
+)
+
+__all__ += [
+    "ArchCamera",
+    "ArchChamp",
+    "ArchDataError",
+    "ArchDimension",
+    "ArchLabel",
+    "ArchMesh",
+    "ArchPart",
+    "ArchScript",
+    "ArchStyle",
+]

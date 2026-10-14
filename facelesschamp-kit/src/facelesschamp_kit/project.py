@@ -11,11 +11,12 @@ import threading
 import tomllib
 from contextlib import contextmanager
 from dataclasses import asdict
-from functools import lru_cache
+from functools import lru_cache, wraps
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from faceless_champ import (
+    ArchDataError,
     Canvas,
     ExportSettings,
     Grid,
@@ -76,6 +77,24 @@ def _isolated_imports(root):
         sys.dont_write_bytecode = previous
 
 
+def _arch_errors(operation):
+    @wraps(operation)
+    def wrapped(*args, **kwargs):
+        try:
+            return operation(*args, **kwargs)
+        except ArchDataError as exc:
+            code = (
+                "ARCH_DEPENDENCY"
+                if exc.field == "dependency"
+                else "ARCH_RENDER"
+                if exc.field == "render"
+                else "ARCH_DATA"
+            )
+            raise KitError(code, str(exc), path=exc.field) from exc
+
+    return wrapped
+
+
 class Project:
     def __init__(self, root="."):
         path = Path(root).resolve()
@@ -106,7 +125,16 @@ class Project:
         for name, settings in self.config.get("profiles", {}).items():
             fields(settings, {"width", "height", "fps", "crf", "preset", "antialias", "quality"}, f"profiles.{name}")
 
+    def dependencies(self):
+        """Inspect declared project requirements without importing or installing them."""
+        from .dependencies import dependencies
+
+        return dependencies(self.root)
+
     def build(self, video_id="main", *, strict_assets=False, _preparing=False, _refresh=False):
+        from .dependencies import check_dependencies
+
+        dependency_rows = check_dependencies(self.root)
         try:
             settings = self.config["videos"][video_id]
         except KeyError:
@@ -160,14 +188,35 @@ class Project:
                 "seed": ctx.seed,
                 "assets": list(ctx.assets.resolved.values()),
                 "prepared_assets": ctx.prepared_assets,
+                "dependencies": dependency_rows,
                 "versions": {
                     "kit": package_version("facelesschamp-kit"),
                     "core": package_version("faceless-champ"),
                     "python": platform.python_version(),
+                    "pyvista": package_version("pyvista"),
+                    "vtk": package_version("vtk"),
                 },
             }
         )
         sources = {}
+        from faceless_champ.arch import ArchChamp
+
+        arch_records = []
+
+        def inspect_arch(node):
+            if isinstance(node, Scene):
+                for entry in node.entries:
+                    if isinstance(entry.component, ArchChamp):
+                        c = entry.component
+                        arch_records.append(
+                            {"fingerprint": c.fingerprint, "meshes": {p.id: p.mesh.fingerprint for p in c.parts}}
+                        )
+            else:
+                for child in node.children:
+                    inspect_arch(child)
+
+        inspect_arch(result.composition)
+        result.report["arch_designs"] = arch_records
         for directory, dirs, names in os.walk(self.root):
             dirs[:] = sorted(
                 d for d in dirs if not d.startswith(".") and d not in {"output", "__pycache__", "build", "dist"}
@@ -212,6 +261,7 @@ class Project:
             self.settings(compiled, profile)
         return compiled.report
 
+    @_arch_errors
     def frame(self, video_id, time, output, *, overwrite=False):
         compiled = self.build(video_id)
         size = self.settings(compiled, "preview").dimensions(compiled.composition.canvas)
@@ -219,6 +269,7 @@ class Project:
         self._report(compiled, "frame", path, {"source_time": time})
         return path
 
+    @_arch_errors
     def storyboard(self, video_id, output, *, overwrite=False):
         compiled = self.build(video_id)
         segments = compiled.report["segments"]
@@ -228,6 +279,7 @@ class Project:
         self._report(compiled, "storyboard", path, {})
         return path
 
+    @_arch_errors
     def export(
         self,
         video_id,

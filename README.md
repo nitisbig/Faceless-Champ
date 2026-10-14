@@ -1,6 +1,6 @@
 # Faceless Champ
 
-Current source versions: **faceless-champ 0.1.4**, **facelesschamp-kit 0.1.0rc6**, and **facelesschamp-agent 0.1.0rc1** (local release candidates).
+Current source versions: **faceless-champ 0.1.5**, **facelesschamp-kit 0.1.0rc7**, and **facelesschamp-agent 0.1.0rc2** (local release candidates).
 
 | Capability | Core guide | Kit guide |
 | --- | --- | --- |
@@ -9,6 +9,7 @@ Current source versions: **faceless-champ 0.1.4**, **facelesschamp-kit 0.1.0rc6*
 | Local HTML capture and playback | [HTML to video](docs/html-to-video.md) | [Web blocks](facelesschamp-kit/docs/html-to-video.md) |
 | Virtual desktop, Finder, and settings | [OS UI](docs/os-ui.md) | [OS tutorials](facelesschamp-kit/docs/os-ui.md) |
 | Legal timed games, PGN, and artwork | [ChessChamp](docs/chesschamp.md) | [ChessBoard](facelesschamp-kit/docs/chesschamp.md) |
+| Technical 3D models, assemblies, sections and dimensions | [ArchChamp](docs/archchamp.md) | [ArchCanvas](facelesschamp-kit/docs/archchamp.md) |
 | Scripted graphs, routes, and signals | [FlowChamp](docs/flowchamp.md) | [FlowCanvas](facelesschamp-kit/docs/flowchamp.md) |
 
 Install only the capabilities you use from this repository:
@@ -338,3 +339,5 @@ uses core and kit; its root `python3 render.py` defaults to a short low-quality 
 ## External-agent production layer
 
 [FacelessChamp Agent](facelesschamp-agent/README.md) adds validated video plans, offline capability discovery, ten reusable kit recipes, a portable authoring skill, JSON production commands, and fingerprinted media/review evidence. External agents supply reasoning and author ordinary Python; no model provider is built in. See the [release verification](facelesschamp-agent/docs/verification.md) for tests and complete export evidence.
+
+ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK is required; core imports remain lazy. See [ArchChamp](docs/archchamp.md).

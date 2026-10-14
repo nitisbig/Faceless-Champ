@@ -1,5 +1,6 @@
 """Check both guides, build examples and starters, and optionally render their previews."""
 import ast
+import argparse
 import json
 import re
 import runpy
@@ -26,8 +27,18 @@ previews = {'hello.py': 'hello', 'text_shapes.py': 'text-shapes', 'charts.py': '
             'properties.py': 'properties', 'masks.py': 'masks', 'indicators.py': 'indicators',
             'kit_main.py': 'kit', 'kit_whiteboard.py': 'whiteboard',
             'coding.py': 'coding', 'playground.py': 'playground',
-            'chess.py': 'chess', 'flow.py': 'flow'}
-render_previews = '--render' in sys.argv
+            'chess.py': 'chess', 'flow.py': 'flow', 'archchamp.py': 'archchamp'}
+parser = argparse.ArgumentParser()
+parser.add_argument('--render', action='store_true')
+parser.add_argument('--only', choices=['archchamp'])
+parser.add_argument('--render-preview', choices=sorted(previews.values()))
+args = parser.parse_args()
+selected_files = {'archchamp.py', 'kit_archchamp.py'} if args.only == 'archchamp' else None
+if args.render_preview:
+    selected_files = {name for name, preview in previews.items() if preview == args.render_preview}
+def wants_render(filename):
+    return args.render or previews.get(filename) == args.render_preview
+render_previews = args.render or bool(args.render_preview)
 report = {'verified_at': datetime.now(timezone.utc).isoformat(),
           'preview_background': '#000000', 'guides': {}, 'chapters': len(content['lessons']), 'python_snippets': 0,
           'examples': [], 'starters': [], 'links_checked': 0}
@@ -39,9 +50,9 @@ real_popen = subprocess.Popen
 
 
 def playback_process(args, *positional, **keywords):
-    # Encoding/probing is allowed; checkpoint Python and browser launches are not.
+    # Encoding/media probes and VTK xset -q are allowed; checkpoint Python and browsers are not.
     assert not keywords.get('shell'), 'Playback unexpectedly used a shell'
-    assert Path(str(args[0])).name in {'ffmpeg', 'ffprobe'}, f'Playback launched {args[0]}'
+    assert Path(str(args[0])).name in {'ffmpeg', 'ffprobe'} or list(args) == ['xset', '-q'], f'Playback launched {args[0]}'
     return real_popen(args, *positional, **keywords)
 
 
@@ -77,6 +88,8 @@ def check_link(href, current_guide):
 
 
 def preview_size(node):
+    if getattr(node, '_arch_guide', False):
+        return (960, 540)
     scale = 640 / max(node.canvas.width, node.canvas.height)
     return tuple(max(2, round(value * scale / 2) * 2)
                  for value in (node.canvas.width, node.canvas.height))
@@ -84,10 +97,10 @@ def preview_size(node):
 
 def sample(node, times):
     size = preview_size(node)
-    renderer = PillowRenderer(1)
-    for moment in times:
-        assert 0 <= moment < node.duration
-        assert renderer.frame(node, moment, size).size == size
+    with PillowRenderer(1) as renderer:
+        for moment in times:
+            assert 0 <= moment < node.duration
+            assert renderer.frame(node, moment, size).size == size
     return size
 
 
@@ -128,6 +141,8 @@ for lesson in content['lessons']:
             path = DIST / 'examples' / filename
             assert path.read_text() == block['code'], filename
             check_link(f'examples/{filename}', lesson['guide'])
+            if selected_files is not None and filename not in selected_files:
+                continue
             with tempfile.TemporaryDirectory(prefix='fc-guide-check-') as temporary:
                 preparation = None
                 if filename in {'html_video.py', 'kit_web.py'}:
@@ -169,10 +184,13 @@ for lesson in content['lessons']:
                 else:
                     namespace = runpy.run_path(str(path))
                     node = namespace[block['target']]
-                    if isinstance(node, type):
+                    if callable(node):
                         node = node()
                     if hasattr(node, 'build'):
                         node.build()
+                if filename == 'archchamp.py':
+                    node._arch_guide = True
+                fps = 12 if filename == 'archchamp.py' else 15
                 times = ([0, 0.6, 2.5, 4, 5, 6.2, 9.5] if filename == 'kit_whiteboard.py'
                          else [0, min(1.5, node.duration / 2), max(0, node.duration - 0.05)])
                 with patch('subprocess.Popen', playback_process):
@@ -191,7 +209,7 @@ for lesson in content['lessons']:
                     portrait = project.build('main').composition
                     entry['portrait_size'] = sample(portrait, times)
                     entry['formats_checked'] = ['landscape', 'shorts']
-                if filename in previews and render_previews:
+                if filename in previews and wants_render(filename):
                     name = previews[filename]
                     assert node.canvas.bg in {'#000000', 'black'}, (filename, node.canvas.bg)
                     poster_time = {'playground.py': 4.4, 'flow.py': 4.2, 'chess.py': 4.7,
@@ -200,7 +218,7 @@ for lesson in content['lessons']:
                     # The original kit overview deliberately shows only its three-second hook.
                     end = 3 if filename == 'kit_main.py' else node.duration
                     with patch('subprocess.Popen', playback_process):
-                        node.render(DIST / 'assets' / f'{name}.mp4', width=size[0], height=size[1], fps=15,
+                        node.render(DIST / 'assets' / f'{name}.mp4', width=size[0], height=size[1], fps=fps,
                                     antialias=1, preset='veryfast', overwrite=True, end_time=end)
                     subprocess.run(['ffmpeg', '-v', 'error', '-i', str(DIST / 'assets' / f'{name}.mp4'),
                                     '-f', 'null', '-'], check=True, capture_output=True)
@@ -211,16 +229,18 @@ for lesson in content['lessons']:
                     entry['media'] = json.loads(probe.stdout)
                     entry['fully_decoded'] = True
                     actual = float(entry['media']['format']['duration'])
-                    assert abs(actual - end) <= 1 / 15 + 0.01, (filename, actual, end)
+                    assert abs(actual - end) <= 1 / fps + 0.01, (filename, actual, end)
                     stream = entry['media']['streams'][0]
                     assert (stream['width'], stream['height']) == size
-                    assert stream['r_frame_rate'] == '15/1'
+                    assert stream['r_frame_rate'] == f'{fps}/1'
                     entry['preview_duration'] = end
                     entry['preview_background'] = '#000000'
                 report['examples'].append(entry)
                 print(f'PASS {filename}: {node.duration:g}s', flush=True)
 
 for template in CATALOG['templates']:
+    if selected_files is not None and (args.only != 'archchamp' or template != 'archchamp'):
+        continue
     with tempfile.TemporaryDirectory(prefix='fc-guide-starter-') as temporary:
         root = init_project(Path(temporary) / 'video', template)
         project = Project(root)
@@ -234,6 +254,8 @@ for template in CATALOG['templates']:
 
 report['previews'] = []
 for filename, name in previews.items():
+    if selected_files is not None and filename not in selected_files:
+        continue
     entry = next(item for item in report['examples'] if item['file'] == filename)
     path = DIST / 'assets' / f'{name}.mp4'
     if not entry.get('fully_decoded'):
@@ -245,13 +267,16 @@ for filename, name in previews.items():
     media = json.loads(probe.stdout)
     stream = media['streams'][0]
     expected = 3 if filename == 'kit_main.py' else entry['duration']
-    assert abs(float(media['format']['duration']) - expected) <= 1 / 15 + .01
+    fps = 12 if filename == 'archchamp.py' else 15
+    assert abs(float(media['format']['duration']) - expected) <= 1 / fps + .01
     assert (stream['width'], stream['height']) == tuple(entry['size'])
-    assert stream['r_frame_rate'] == '15/1'
+    assert stream['r_frame_rate'] == f'{fps}/1'
     assert stream['codec_name'] == 'h264'
     report['previews'].append({'name': name, 'media': media, 'fully_decoded': True,
-                               'rendered_this_run': render_previews, 'background': '#000000'})
+                               'rendered_this_run': wants_render(filename), 'background': '#000000'})
 
-(REPO / 'website/verification.json').write_text(json.dumps(report, indent=2) + '\n')
+report_name = 'verification-archchamp.json' if selected_files is not None else 'verification.json'
+report['selection'] = sorted(selected_files) if selected_files is not None else 'all'
+(REPO / 'website' / report_name).write_text(json.dumps(report, indent=2) + '\n')
 print(f"Verified {report['chapters']} chapters, {report['python_snippets']} Python snippets, "
       f"{len(report['examples'])} complete examples, and {len(report['starters'])} starters.")

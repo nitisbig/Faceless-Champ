@@ -117,3 +117,7 @@ existing meaning. The common alpha-mask path handles both attached masks and wip
 clips. This path costs canvas-area work per layer and depth; it avoids per-frame
 retained mask/sprite caches and adds no dependency. Ordinary scenes keep their prior
 sprite transform path. See motion-graphics.md for public semantics and tradeoffs.
+
+## Technical 3D viewports
+
+ArchChamp uses copied, fingerprinted geometry and pure timed state evaluation. Live VTK windows belong to a bounded renderer session cache, never to authoring objects. Layout/validation open no GL context; offscreen frames composite as ordinary RGBA sprites. Internally created renderers close on every helper exit; supplied renderers remain caller-owned. PyVista/VTK is a required backend stack, imported lazily. See [ArchChamp](archchamp.md).

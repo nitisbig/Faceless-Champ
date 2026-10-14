@@ -2,16 +2,16 @@
 
 Two static guides share the existing design, search, assets, and JavaScript:
 
-- **Core:** `dist/index.html` — 22 chapters, source version 0.1.4.
-- **Kit:** `dist/kit.html` — 15 chapters, local release candidate 0.1.0rc5.
+- **Core:** `dist/index.html` — 23 chapters, source version 0.1.5.
+- **Kit:** `dist/kit.html` — 16 chapters, local release candidate 0.1.0rc7.
 
 The guides cover code reveals, prepared concept/backend/web playgrounds, local HTML
 capture, offline OS tutorials, timed legal chess games, FlowChamp diagrams, and the
 existing scenes, motion, narration, charts, composition, and whiteboard workflows.
-All ten registered kit starters are documented. Package versions come from the two
+All eleven registered kit starters are documented. Package versions come from the two
 `pyproject.toml` manifests; availability on a package index is not assumed.
 
-There are 30 downloadable Python examples and 12 video previews. Every preview and
+There are 32 downloadable Python examples and 13 video previews. Every preview and
 poster uses a **black canvas background**, including the whiteboard drawing example;
 player letterboxing is black too. Card/editor/board surfaces retain their visual colors.
 The previews include four new short demos: coding (3.5 seconds), playground (6 seconds),
@@ -85,3 +85,5 @@ samples, and these short website previews do not verify full training-video expo
 
 The existing `.openai/hosting.json` identity and audience are preserved. This update
 is local-only; no site deployment or package publication is performed.
+
+ArchChamp adds technical 3D geometry and a silent 12-second 960x540/12-FPS preview. Run `python website/scripts/verify_examples.py --only archchamp` to verify only the new examples/starter while checking all guide structure. `--only archchamp --render-preview archchamp` regenerates just that preview. This selective run writes verification-archchamp.json and preserves earlier verification records.

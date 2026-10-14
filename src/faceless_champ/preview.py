@@ -11,7 +11,7 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 
 from .components import finite
-from .renderer import PillowRenderer
+from .renderer import PillowRenderer, managed_renderer
 from .timeline import Renderable
 from .typography import load_font
 
@@ -43,6 +43,7 @@ def _sample_time(node: Renderable, time: float) -> float:
     return time
 
 
+@managed_renderer(1)
 def save_frame(
     node: Renderable,
     time: float,
@@ -67,6 +68,7 @@ def save_frame(
     return output
 
 
+@managed_renderer(1)
 def render_storyboard(
     node: Renderable,
     samples: Iterable[StoryboardSample | float],

@@ -144,6 +144,24 @@ def add_features(root, code, section, note, link, lesson):
         section('Narration and scope', 'Core callers attach existing audio once at master zero. ChessChamp supplies visuals and rules, without interactive play or engine evaluation.', link('Kit chess tutorials →', 'kit.html#kit-chesschamp')),
     ], 'chess')
 
+    lesson('archchamp', 'ArchChamp technical 3D', 'Library fundamentals',
+           'Explain geometry through named parts, camera motion, sections and dimensions.', [
+        section('Explore an assembly', 'This original silent 12-second fixture shows transparent geometry, exploded parts and a moving section. PyVista is a required core dependency.',
+                code((root.parent / 'examples/archchamp.py').read_text(), filename='archchamp.py', target='build_scene')),
+        section('Choose a concept', 'Wireframe, topology, transparent/X-ray, clay, blueprint, point cloud, isometric, supplied heatmap/vector fields and voxel views share one viewport. Import local meshes or generate parametric geometry with Python. CAD modeling and simulation solving remain external.'),
+        section('Animate and annotate', 'ArchScript schedules camera, named part, explosion, highlight and section actions. Labels and dimensions follow world or part-local anchors with explicit model units. Source offsets and random seeking preserve the authored clock.'),
+        section('Compose and manage resources', 'Use normal scenes, groups, masks and composition. Renderer-owned offscreen sessions reuse actors; use a renderer context manager for manual frames.', link('Kit ArchCanvas →', 'kit.html#kit-archchamp')),
+    ], 'archchamp')
+
+    lesson('kit-archchamp', 'Technical 3D designs', 'Framework fundamentals',
+           'Fit technical models into reusable authoring blocks and agent recipes.', [
+        section('Start a silent design', 'The archchamp starter contains a small original assembly. ArchCanvas exposes model; ArchScript controls individual 3D parts.',
+                code((root.parent / 'facelesschamp-kit/src/facelesschamp_kit/sample_assets/archchamp.py').read_text(), filename='kit_archchamp.py', kind='kit', template='archchamp')),
+        section('Track models', 'Register files as mesh assets and resolve through ctx.assets.mesh. Geometry hashes, model checksums, and PyVista/VTK versions enter reports and agent evidence fingerprints.'),
+        section('Use external libraries', 'Declare project tools with uv add in pyproject.toml and install with uv sync. Project.dependencies and doctor check installed distribution versions; rendering never installs packages.'),
+        section('Author structured plans', 'The arch-design recipe accepts a design object with named parts, registered meshes or primitives, styles, camera, script, labels, dimensions and units.', link('Core ArchChamp →', 'index.html#archchamp')),
+    ], guide='kit')
+
     lesson('flowchamp', 'FlowChamp diagrams', 'Library fundamentals',
            'Draw workflows, systems, networks, idea maps, and circuits on an authored clock.', [
         section('Animate a system', 'FlowChamp uses core Pillow rendering with no optional extra. This recipe draws the graph, sends packets, and highlights the service.', code(FLOW, filename='flow.py', target='FlowDemo')),

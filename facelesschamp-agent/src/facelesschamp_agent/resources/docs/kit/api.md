@@ -138,3 +138,7 @@ IDs and lifetimes. It uses public core geometry with retained compiler handles.
 Visibility, masks, and intentional intersections need visual review; intersecting
 bounding boxes alone do not prove a design error. Valid sample times are
 `0 <= time < compiled.duration`.
+
+## Technical models and dependencies
+
+ArchCanvas exposes model and fits a fresh core viewport. assets.mesh(id) resolves/checksums required model files. The arch-design recipe uses a shared structured design contract. Project.dependencies() inspects standard pyproject requirements before factory imports; reports include dependency versions and geometry fingerprints. See [ArchChamp and external tools](archchamp.md).

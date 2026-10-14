@@ -36,6 +36,14 @@ class RecipeSpec:
 
 _SPECS = (
     RecipeSpec(
+        "arch-design",
+        "Demonstrate named geometry, assemblies, sections and technical dimensions",
+        ("design",),
+        ("model",),
+        {"design": {"parts": [{"id": "body", "mesh": {"primitive": "cube"}}]}},
+        "Use supplied models and fields; mark illustrative scientific values.",
+    ),
+    RecipeSpec(
         "process-flow",
         "Explain ordered steps through progressive disclosure",
         ("steps",),
@@ -157,6 +165,14 @@ def validate_recipe(recipe_id, content):
     missing = set(spec.fields) - content.keys()
     if missing:
         raise KitError("RECIPE_CONTENT", "Missing content fields", recipe=recipe_id, fields=sorted(missing))
+    if recipe_id == "arch-design":
+        from faceless_champ.arch import ArchDataError, validate_design
+
+        try:
+            validate_design(content["design"], registered_only=True)
+        except ArchDataError as exc:
+            raise KitError("ARCH_DATA", str(exc), path=exc.field) from exc
+        return deepcopy(content)
     for key in set(spec.fields) - {"steps", "points", "parts", "nodes", "focus", "value", "prepared"}:
         _text(content[key], key)
     if "steps" in content:
@@ -438,7 +454,11 @@ def apply_recipe(segment, recipe_id, content, *, bounds=None, events=(), id=None
         handles[name] = handle
         return handle
 
-    if recipe_id in {"process-flow", "request-journey", "cause-effect", "hierarchy"}:
+    if recipe_id == "arch-design":
+        from .blocks import ArchCanvas
+
+        add("model", ArchCanvas(content["design"]), enter=None)
+    elif recipe_id in {"process-flow", "request-journey", "cause-effect", "hierarchy"}:
         add("diagram", _Diagram(recipe_id, content, duration), enter=None)
     elif recipe_id == "overview-detail":
         add("diagram", _Region(_Diagram(recipe_id, content, duration), 0, 0.68), enter=None)

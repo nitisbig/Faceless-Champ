@@ -1,7 +1,7 @@
 # Motion graphics
 
-All APIs below are public imports from `faceless_champ`; Pillow is the only required
-Python dependency. See `examples/motion_graphics/render.py` for a complete 18-second,
+All APIs below are public imports from `faceless_champ` and rasterize with Pillow.
+The package also requires PyVista for ArchChamp. See `examples/motion_graphics/render.py` for a complete 18-second,
 960×540, 24 fps showcase.
 
 ## Animated properties

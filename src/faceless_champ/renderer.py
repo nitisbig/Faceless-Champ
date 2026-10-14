@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections import OrderedDict
 from copy import copy
+from functools import wraps
 from io import BytesIO
 from itertools import pairwise
 from typing import Protocol
@@ -12,6 +13,7 @@ from typing import Protocol
 from PIL import Image as PILImage
 from PIL import ImageChops, ImageColor, ImageDraw, ImageOps
 
+from .arch import ArchChamp
 from .charts import Chart
 from .charts.drawing import draw_chart
 from .chess import ChessChamp
@@ -48,9 +50,33 @@ class Renderer(Protocol):
     def frame(self, node: Renderable, time: float, size: tuple[int, int]) -> PILImage.Image: ...
 
 
+def managed_renderer(antialias=1):
+    """Close renderers created by an export/preview helper, including failures."""
+
+    def decorate(function):
+        @wraps(function)
+        def owned(*args, **kwargs):
+            if kwargs.get("renderer") is not None:
+                return function(*args, **kwargs)
+            settings = kwargs.get("settings")
+            aa = settings.antialias if settings is not None else kwargs.get("antialias", antialias)
+            with PillowRenderer(aa) as renderer:
+                return function(*args, **{**kwargs, "renderer": renderer})
+
+        return owned
+
+    return decorate
+
+
 class PillowRenderer:
     def __init__(
-        self, antialias: int = 2, *, frame_cache_mb: float = 64, caption_cache_mb: float = 32, code_cache_mb: float = 32
+        self,
+        antialias: int = 2,
+        *,
+        frame_cache_mb: float = 64,
+        caption_cache_mb: float = 32,
+        code_cache_mb: float = 32,
+        arch_session_limit: int = 4,
     ):
         if antialias not in (1, 2, 3, 4):
             raise ValueError("antialias must be 1, 2, 3, or 4")
@@ -71,6 +97,33 @@ class PillowRenderer:
         self._caption_layouts = OrderedDict()
         self._caption_cache_limit = round(finite(caption_cache_mb, "caption_cache_mb", 0) * 1024 * 1024)
         self._caption_cache_bytes = 0
+        if isinstance(arch_session_limit, bool) or not isinstance(arch_session_limit, int) or arch_session_limit < 1:
+            raise ValueError("arch_session_limit must be a positive integer")
+        self._arch_session_limit = arch_session_limit
+        self._arch_sessions = OrderedDict()
+
+    def close(self):
+        for session in self._arch_sessions.values():
+            session.close()
+        self._arch_sessions.clear()
+        for cache in (
+            self._images,
+            self._fonts,
+            self._sprites,
+            self._equations,
+            self._scene_frames,
+            self._caption_sprites,
+            self._caption_layouts,
+            self._code_sprites,
+        ):
+            cache.clear()
+        self._frame_cache_bytes = self._caption_cache_bytes = self._code_cache_bytes = 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
 
     def _font(self, component: Text | Captions, size: int):
         path = component.font or DEFAULT_FONT
@@ -163,7 +216,7 @@ class PillowRenderer:
                         ImageColor.getcolor(c.future_color, "RGBA")
                         for phrase in c.phrases:
                             self._caption_sprite(c, 1, phrase[0].start)
-                elif isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp)):
+                elif isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp, ArchChamp)):
                     pass  # Prepared ranges are checked at requested frame time.
                 elif isinstance(c, Image):
                     self._image(c)
@@ -259,7 +312,7 @@ class PillowRenderer:
                     if isinstance(c, Captions)
                     else (
                         c.frame_key(age)
-                        if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp))
+                        if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp, ArchChamp))
                         else (age if isinstance(c, Image) and len(self._image(c)[0]) > 1 else None)
                     ),
                 )
@@ -432,6 +485,17 @@ class PillowRenderer:
         if isinstance(c, CodingChamp):
             return draw_code(c, state, factor, self)
 
+        if isinstance(c, ArchChamp):
+            from .arch.rendering import ArchSession
+
+            key = (c, factor)
+            session = self._arch_sessions.pop(key, None)
+            if session is None:
+                while len(self._arch_sessions) >= self._arch_session_limit:
+                    self._arch_sessions.popitem(last=False)[1].close()
+                session = ArchSession(c, factor)
+            self._arch_sessions[key] = session
+            return session.frame(age)
         if isinstance(c, (HtmlClip, OSClip, ChessChamp, PlaygroundView, FlowChamp)):
             return c.frame_image(age, factor)
         if isinstance(c, ProgressBar):

@@ -3,7 +3,7 @@
 from .errors import AgentError
 from .models import DesignSpec, QualityReport, ReviewFinding, ScenePlan, StoryPlan, VideoBrief, VideoPlan
 
-__version__ = "0.1.0rc1"
+__version__ = "0.1.0rc2"
 __all__ = [
     "AgentError",
     "AgentProject",

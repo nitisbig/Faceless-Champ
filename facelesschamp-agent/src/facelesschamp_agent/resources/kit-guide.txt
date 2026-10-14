@@ -1,6 +1,6 @@
 # facelesschamp-kit
 
-> Python 3.12+ structured video authoring over faceless-champ. Current local source 0.1.0rc6; core dependency >=0.1.4,<0.2.0.
+> Python 3.12+ structured video authoring over faceless-champ. Current local source 0.1.0rc7; core dependency >=0.1.5,<0.2.0.
 
 ## Entry points and installation
 
@@ -117,9 +117,11 @@ narrated graph events. FLOW_DATA and MOTION_WINDOW provide actionable failures.
 ## All ten registered starters
 
 silent; explainer-short (silent alias); narrated-short (labeled synthetic audio fixture);
-whiteboard-basic; os-ui; chesschamp; flowchamp; coding-concept; coding-backend; coding-web.
+whiteboard-basic; os-ui; chesschamp; flowchamp; archchamp; coding-concept; coding-backend; coding-web.
 CLI init generates editable files and never merges existing destinations. Playground starters
 need explicit prepare; coding-web additionally needs Chromium. Other starters build directly.
 whiteboard_basic and immutable WhiteboardScene recipes provide sequential geometry/hold/clear
 with explicit durations or original cue windows. [Whiteboard](docs/whiteboard.md).
 Website example canvases are black; package and starter theme defaults remain configurable.
+
+Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffold with `fc-kit init my-design --template archchamp`. Register files as mesh assets; declare external tools in project pyproject.toml with uv add. Project.dependencies() and doctor check installed requirements without installation. See [ArchChamp](docs/archchamp.md).

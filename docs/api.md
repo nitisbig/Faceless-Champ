@@ -119,8 +119,8 @@ letters; full LaTeX packages/environments are not supported. Fontsets are `stix`
 `stixsans`, `cm`, `dejavusans`, and `dejavuserif`. `max_width` shrinks a formula to
 fit design pixels while preserving its aspect ratio. `Write(equation)` reveals the
 already typeset sprite from left to right, preserving layout and position. MathText
-is imported only when an Equation renders; ordinary scenes keep the Pillow-only
-dependency footprint. Invalid expressions fail during renderer validation.
+is imported only when an Equation renders. PyVista brings NumPy and Matplotlib as
+package dependencies; ordinary 2D rendering still uses Pillow. Invalid expressions fail during renderer validation.
 
 `color_map` maps individual symbols to colors: keys are single characters or TeX
 symbol commands such as `r"\mu"`, `r"\sigma"`, and `r"\prime"`. Matching glyphs,
@@ -581,3 +581,7 @@ staged animation, optional language support, layout limits, and cache controls.
 structure from emphasis. `FlowChamp.diagnostics_at(time)` returns visible overflow,
 node-overlap and label-overlap warnings on the original script clock.
 `FlowChamp(..., label_cache_mb=8)` bounds label sprite memory; zero disables caching.
+
+## ArchChamp
+
+Import ArchMesh, ArchPart, ArchStyle, ArchCamera, ArchScript, ArchLabel, ArchDimension, ArchChamp and ArchDataError from faceless_champ or faceless_champ.arch. See [technical 3D API and structured contract](archchamp.md). PyVista is a required runtime dependency. PillowRenderer supports close/context-manager and arch_session_limit=4; internally created export/preview renderers close automatically.

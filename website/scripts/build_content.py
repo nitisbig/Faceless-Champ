@@ -600,6 +600,7 @@ section('Choose a starter', 'List the installed templates, then pick a fresh des
     ['os-ui', 'Offline virtual desktop tutorial', 'Landscape · semantic actions'],
     ['chesschamp', 'Legal timed game in data.json', 'Landscape · chess extra'],
     ['flowchamp', 'Scripted graph recipes', 'Adapts to canvas · no extra'],
+    ['archchamp', 'Technical 3D assembly', 'Landscape · silent · PyVista'],
     ['coding-concept', 'Code and independent cars', 'Six seconds · prepare first'],
     ['coding-backend', 'Code, flows, and tensor data', 'Six seconds · prepare first'],
     ['coding-web', 'HTML/CSS/JS and real browser output', 'Six seconds · prepare + Chromium'],
@@ -857,7 +858,7 @@ core_by_id = {item['id']: item for item in lessons if item['guide'] == 'core'}
 core_order = ['hello-world', 'installation', 'scenes-and-canvas', 'text-and-shapes',
               'timeline-and-timing', 'groups-and-layout', 'images-and-audio', 'charts-and-numbers',
               'narration-and-cues', 'composition', 'codingchamp', 'coding-playgrounds', 'os-ui',
-              'chesschamp', 'flowchamp', 'html-to-video', 'animated-properties',
+              'chesschamp', 'flowchamp', 'archchamp', 'html-to-video', 'animated-properties',
               'animation-schedules', 'masks-and-wipes', 'progress-and-indicators',
               'preview-and-export', 'troubleshooting']
 assert set(core_order) == set(core_by_id)
@@ -871,7 +872,7 @@ for item in lessons:
 # Keep chapter groups contiguous in the sidebar and reading order.
 kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration',
              'blocks-and-themes', 'custom-blocks', 'framework-narration', 'templates',
-             'kit-coding-playgrounds', 'kit-chesschamp', 'kit-flowchamp',
+             'kit-coding-playgrounds', 'kit-chesschamp', 'kit-flowchamp', 'kit-archchamp',
              'whiteboard-videos', 'html-walkthroughs', 'os-ui-tutorials', 'kit-preview-and-export', 'kit-troubleshooting']
 assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]

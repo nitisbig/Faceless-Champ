@@ -30,7 +30,7 @@ class NarrationInput(Record):
 class AssetInput(Record):
     id: Id
     path: Text
-    kind: Literal["image", "audio", "subtitle", "font", "data", "prepared"] = "image"
+    kind: Literal["image", "audio", "subtitle", "font", "data", "prepared", "mesh"] = "image"
     required: bool = True
     description: Text = "Supplied project asset"
     source: str = ""

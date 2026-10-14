@@ -14,6 +14,7 @@ from .scaffold import init_project
 
 CATALOG = {
     "blocks": [
+        "ArchCanvas",
         "ChessBoard",
         "CodeEditor",
         "CodingPlayground",
@@ -38,6 +39,7 @@ CATALOG = {
         "explainer-short",
         "narrated-short",
         "whiteboard-basic",
+        "archchamp",
         "flowchamp",
         "os-ui",
         "chesschamp",
@@ -59,8 +61,11 @@ def doctor(root="."):
         "ffmpeg": bool(ffmpeg),
         "ffprobe": bool(ffprobe),
         "libx264": encoder,
+        "pyvista": package_version("pyvista") != "source",
+        "vtk": package_version("vtk") != "source",
     }
     root = Path(root).resolve()
+    root = root.parent if root.is_file() else root
     for directory in (root / "output", root / ".fc-kit"):
         parent = directory
         while not parent.exists():
@@ -77,11 +82,16 @@ def doctor(root="."):
             ("web", "playwright"),
         )
     }
+    from .dependencies import dependencies
+
+    dependency_rows = dependencies(root)
+    checks["project_dependencies"] = all(r["status"] not in {"missing", "incompatible"} for r in dependency_rows)
     return {
+        "dependencies": dependency_rows,
         "ok": all(checks.values()),
         "checks": checks,
         "optional": optional,
-        "versions": {name: package_version(name) for name in ("faceless-champ", "facelesschamp-kit")},
+        "versions": {name: package_version(name) for name in ("faceless-champ", "facelesschamp-kit", "pyvista", "vtk")},
     }
 
 

@@ -9,3 +9,7 @@ Definitions contain block props and deferred animation callbacks. Concrete compo
 The kit supports existing primitive types. New renderable primitives require engine/renderer support. Custom blocks merely compose primitives; they do not register drawing code. Package resources use durable local materialization. There are no global mutable theme defaults, automatic plugin discovery, network providers, watch service, or persistent frame caches in the kit.
 
 Release boundaries: versioned report schema 1, Python-first public authoring API, private normalized events, independent wheel and sdist. Initial compatibility is the core 0.1 minor line. Compatibility claims are limited to tested versions; CI tests the pinned source baseline and current core master on Python 3.12 and 3.13. Public publishing and licensing are separate decisions.
+
+## External geometry and declared tools
+
+ArchCanvas composes the public core ArchChamp API. Mesh asset checksums and geometry content fingerprints join reports, with installed project dependency versions. Requirements come from standard project pyproject.toml; build checks them before imports, and never installs tools. Core owns the offscreen native render sessions. See [ArchChamp](archchamp.md).

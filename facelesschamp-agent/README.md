@@ -1,7 +1,7 @@
 # FacelessChamp Agent
 
-Version **0.1.0rc1** supplies offline production tools for external AI agents. It uses
-FacelessChamp Kit **0.1.0rc6** and core **0.1.4**. These are local source releases.
+Version **0.1.0rc2** supplies offline production tools for external AI agents. It uses
+FacelessChamp Kit **0.1.0rc7** and core **0.1.5**. These are local source releases.
 Python 3.12+ and FFmpeg/ffprobe with libx264 are required for video exports.
 
 ```bash
@@ -76,3 +76,7 @@ The bundled `benchmarks.json` has 24 prompts and a result schema for external-ag
 runs. No human-level quality or model-comparison result is claimed by this release.
 
 MCP, model runners, TTS, artwork generation, and automatic research are outside v1.
+
+ArchChamp is discoverable through the arch capability family and arch-design recipe. Plans accept mesh assets and structured geometry/actions/annotations. Dependency versions and geometry hashes participate in evidence fingerprints. No simulation solver, automatic dependency installation, or model fetching is provided.
+
+See [ArchChamp structured plans and model assets](docs/archchamp.md).

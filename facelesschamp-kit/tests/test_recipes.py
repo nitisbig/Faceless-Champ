@@ -6,7 +6,7 @@ from facelesschamp_kit.recipes import apply_recipe, recipe_specs, validate_recip
 from facelesschamp_kit.themes import LIGHT, MIDNIGHT
 
 
-@pytest.mark.parametrize("spec", [s for s in recipe_specs() if s.id != "code-result"], ids=lambda s: s.id)
+@pytest.mark.parametrize("spec", [s for s in recipe_specs() if s.id not in {"code-result", "arch-design"}], ids=lambda s: s.id)
 @pytest.mark.parametrize("size", [(1920, 1080), (1080, 1920)])
 @pytest.mark.parametrize("theme", [MIDNIGHT, LIGHT])
 def test_recipe_frames_at_entrance_action_exit(tmp_path, spec, size, theme):
