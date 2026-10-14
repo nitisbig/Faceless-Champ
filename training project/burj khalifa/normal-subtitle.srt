@@ -1,0 +1,220 @@
+1
+00:00:00,280 --> 00:00:02,930
+How do you build an 828m tower in
+
+2
+00:00:02,930 --> 00:00:05,400
+the middle of a desert, where powerful winds
+
+3
+00:00:05,400 --> 00:00:08,820
+threaten to bend and twist the entire structure?
+
+4
+00:00:08,820 --> 00:00:13,230
+The answer isn't simply stronger materials, it's intelligent
+
+5
+00:00:13,230 --> 00:00:16,120
+geometry. From above, the Burj Khalifa doesn't look
+
+6
+00:00:16,120 --> 00:00:19,140
+like a conventional skyscraper. Its floor plan forms
+
+7
+00:00:19,140 --> 00:00:21,650
+a Y shape, with three wings extending from
+
+8
+00:00:21,650 --> 00:00:25,490
+a central hexagonal core. Inspired by the Hymenicalis
+
+9
+00:00:25,490 --> 00:00:29,600
+Desert Flower, this geometry provides structural stability while
+
+10
+00:00:29,600 --> 00:00:33,290
+maximizing natural light and panoramic views. But the
+
+11
+00:00:33,290 --> 00:00:37,560
+real engineering breakthrough lies inside. Imagine removing the
+
+12
+00:00:37,560 --> 00:00:41,280
+glass exterior and exposing the building's structural skeleton.
+
+13
+00:00:41,280 --> 00:00:43,610
+At the center is a reinforced concrete core
+
+14
+00:00:43,610 --> 00:00:47,060
+connected to three wings containing thick structural walls
+
+15
+00:00:47,060 --> 00:00:50,690
+and perimeter columns. Each wing supports the other
+
+16
+00:00:50,690 --> 00:00:53,880
+two through the central core. Engineers call this
+
+17
+00:00:53,880 --> 00:00:56,620
+the "butrist core" system. When wind pushes against
+
+18
+00:00:56,620 --> 00:00:58,450
+one side of the building, the other wings
+
+19
+00:00:58,450 --> 00:01:02,160
+help resist the horizontal force. Meanwhile, the central
+
+20
+00:01:02,160 --> 00:01:05,420
+core provides resistance against twisting. Together they create
+
+21
+00:01:05,420 --> 00:01:08,970
+an incredibly stiff structure capable of reaching extraordinary
+
+22
+00:01:08,970 --> 00:01:12,840
+heights. But structural strength alone isn't enough. At
+
+23
+00:01:12,840 --> 00:01:16,350
+828m, wind becomes one of the greatest engineering
+
+24
+00:01:16,350 --> 00:01:19,220
+challenges. As air flows around at all building,
+
+25
+00:01:19,220 --> 00:01:22,000
+it creates alternating swirling vortices that can cause
+
+26
+00:01:22,000 --> 00:01:25,050
+the structure to sway. The Burj Khalifa solves
+
+27
+00:01:25,050 --> 00:01:28,430
+this problem through its distinctive tapering shape. Notice
+
+28
+00:01:28,430 --> 00:01:30,750
+how the three wings gradually step backward as
+
+29
+00:01:30,750 --> 00:01:33,660
+the building rises? These setbacks follow a spiraling
+
+30
+00:01:33,660 --> 00:01:37,570
+pattern, constantly changing the tower's cross-section. This disrupts
+
+31
+00:01:37,570 --> 00:01:40,150
+the formation of organized wind vortices, reducing the
+
+32
+00:01:40,150 --> 00:01:43,170
+forces acting on the building. Essentially, the tower's
+
+33
+00:01:43,170 --> 00:01:45,250
+geometry helps prevent the wind from establishing a
+
+34
+00:01:45,250 --> 00:01:49,360
+consistent rhythm. Now, let's travel beneath the surface.
+
+35
+00:01:49,360 --> 00:01:51,900
+The enormous weight of the building must eventually
+
+36
+00:01:51,900 --> 00:01:55,250
+transfer into the ground. Our reinforced concrete raft,
+
+37
+00:01:55,250 --> 00:01:59,580
+approximately 3.7m thick, distributes these loads across the
+
+38
+00:01:59,580 --> 00:02:04,390
+foundation. Beneath it, 192 reinforced concrete piles extend
+
+39
+00:02:04,390 --> 00:02:07,830
+deep into the ground, helping support the entire
+
+40
+00:02:07,830 --> 00:02:11,570
+structure. But constructing a tower this tall introduced
+
+41
+00:02:11,570 --> 00:02:15,080
+another problem. How do you deliver concrete hundreds
+
+42
+00:02:15,080 --> 00:02:18,860
+of meters above ground level? Engineers developed specialized
+
+43
+00:02:18,860 --> 00:02:23,010
+high-performance concrete mixtures and pumping systems. In construction,
+
+44
+00:02:23,010 --> 00:02:25,720
+concrete was pumped to a record-breaking height of
+
+45
+00:02:25,720 --> 00:02:29,510
+more than 600 meters. Finally, the entire structure
+
+46
+00:02:29,510 --> 00:02:32,790
+is enclosed by a high-performance glass facade, nearly
+
+47
+00:02:32,790 --> 00:02:36,560
+26,000 glass panels form the reflective exterior, with
+
+48
+00:02:36,560 --> 00:02:39,870
+specialized coatings that help reduce solar heat entering
+
+49
+00:02:39,870 --> 00:02:43,220
+the building. Above the reinforced concrete tower, a
+
+50
+00:02:43,220 --> 00:02:47,220
+structural steel spire completes its iconic silhouette. The
+
+51
+00:02:47,220 --> 00:02:49,840
+result is more than the world's tallest building.
+
+52
+00:02:49,850 --> 00:02:53,340
+It's a demonstration of how architecture, mathematics, structural
+
+53
+00:02:53,340 --> 00:02:57,120
+engineering and aerodynamics can work together. Because the
+
+54
+00:02:57,120 --> 00:02:59,970
+secret behind the Burj Khalifa isn't simply building
+
+55
+00:02:59,970 --> 00:03:01,880
+higher. It's designing smarter.
+

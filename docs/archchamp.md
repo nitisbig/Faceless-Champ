@@ -65,6 +65,9 @@ preserve field semantics. Self-intersecting surfaces must be repaired upstream.
 `opacity`, `show`, `hide`, `highlight`, `explode`, `camera_to`, `orbit`, `section`
 and `wait`. Actions default to sequential one-second intervals; `at` and `duration`
 allow independent tracks to run together. Conflicting tracks on one property fail.
+Continuous actions accept `easing="smooth"` for eased starts and stops; the default
+`"linear"` preserves existing playback. This option round-trips in script JSON.
+Visibility (`show`/`hide`) still switches immediately at the action's start.
 Part IDs are explicit; `camera` is reserved. Explosions target each part's initial
 position plus its `explode_vector * factor`, so factor zero reassembles it.
 Orbit rotates around world Z. Visibility switches at the beginning of the action.

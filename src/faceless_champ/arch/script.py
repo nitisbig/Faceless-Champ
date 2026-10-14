@@ -14,6 +14,7 @@ class ArchAction:
     at: float
     duration: float
     args: tuple
+    easing: str = "linear"
 
     @property
     def options(self):
@@ -60,7 +61,9 @@ class ArchScript:
         self._hold = self.duration + number(duration, "wait", 0)
         return self
 
-    def _add(self, kind, targets, *, at=None, duration=1, **options):
+    def _add(self, kind, targets, *, at=None, duration=1, easing="linear", **options):
+        if not isinstance(easing, str) or easing not in {"linear", "smooth"}:
+            raise ArchDataError("easing", "expected linear or smooth")
         if set(options) != OPTIONS[kind]:
             raise ArchDataError("action", "unknown or missing action options")
         targets = (targets,) if isinstance(targets, str) else tuple(targets)
@@ -75,7 +78,7 @@ class ArchScript:
                 and max(at, old.at) < min(at + duration, old.at + old.duration) - 1e-9
             ):
                 raise ArchDataError("actions", f"conflicting {kind} tracks")
-        self._actions.append(ArchAction(kind, targets, at, duration, tuple(sorted(deepcopy(options).items()))))
+        self._actions.append(ArchAction(kind, targets, at, duration, tuple(sorted(deepcopy(options).items())), easing))
         return self
 
     def move(self, targets, position, **timing):
@@ -131,6 +134,7 @@ class ArchScript:
                     "targets": list(a.targets),
                     "at": a.at,
                     "duration": a.duration,
+                    **({"easing": a.easing} if a.easing != "linear" else {}),
                     **{k: asdict(v) if isinstance(v, ArchCamera) else v for k, v in a.options.items()},
                 }
                 for a in self.actions

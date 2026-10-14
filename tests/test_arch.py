@@ -37,6 +37,46 @@ def cube(script=None, **kwargs):
     )
 
 
+def test_smooth_action_easing_round_trip_random_seek_and_legacy_default():
+    script = (
+        ArchScript()
+        .move("body", (8, 0, 0), duration=4, easing="smooth")
+        .opacity("body", 0.2, at=0, duration=4, easing="smooth")
+        .orbit(80, at=0, duration=4, easing="smooth")
+    )
+    clip = cube(script, camera=ArchCamera())
+    restored = cube(ArchScript.from_dict(script.to_dict()), camera=ArchCamera())
+    for time in (4, 1, 3, 0, 2, 1):
+        assert clip.state_at(time) == restored.state_at(time)
+    state = clip.state_at(1)
+    assert state["parts"]["body"]["position"][0] == pytest.approx(1.25)
+    assert state["parts"]["body"]["opacity"] == pytest.approx(0.875)
+    assert clip.state_at(4)["parts"]["body"]["position"] == (8, 0, 0)
+    linear = ArchScript().move("body", (8, 0, 0), duration=4)
+    assert cube(linear).state_at(1)["parts"]["body"]["position"][0] == 2
+    assert "easing" not in linear.to_dict()["actions"][0]
+    assert ArchScript.from_dict(linear.to_dict()).actions[0].easing == "linear"
+    with pytest.raises(ArchDataError, match="easing"):
+        ArchScript().orbit(easing="spring")
+
+
+def test_smooth_camera_sections_and_immediate_visibility():
+    target = ArchCamera(position=(8, -4, 3), focal_point=(0, 0, 0))
+    script = (
+        ArchScript()
+        .camera_to(target, duration=4, easing="smooth")
+        .section("body", (0, 0, 0), at=0, duration=4, cap=True, easing="smooth")
+        .show("body", at=1, duration=2, easing="smooth")
+    )
+    clip = cube(script, camera=ArchCamera())
+    assert not clip.state_at(0.9)["parts"]["body"]["visible"]
+    assert clip.state_at(1)["parts"]["body"]["visible"]
+    assert clip.state_at(1)["camera"].position[0] == pytest.approx(4.625)
+    assert clip.state_at(4)["camera"] == target
+    start_plane = clip.state_at(0)["parts"]["body"]["section"]["origin"][0]
+    assert clip.state_at(1)["parts"]["body"]["section"]["origin"][0] == pytest.approx(start_plane * 0.84375)
+
+
 def scene(clip):
     node = Scene(Canvas(160, 120, "#000000"))
     node.add(clip)

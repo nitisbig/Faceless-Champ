@@ -320,6 +320,10 @@ class ArchChamp(Component):
             if time < a.at:
                 continue
             progress = min(1, (time - a.at) / a.duration)
+            if a.easing == "smooth":
+                from ..animation import smooth
+
+                progress = smooth(progress)
             o = a.options
 
             def blend(old, new, progress=progress):

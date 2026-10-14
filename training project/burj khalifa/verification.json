@@ -1,0 +1,231 @@
+{
+  "samples": 2208,
+  "annotation_observations": 2430,
+  "findings": [],
+  "cue_count": 436,
+  "last_cue_end": 181.88,
+  "duration": 182.2,
+  "chapters": [
+    {
+      "id": "introduction",
+      "start": 0,
+      "end": 13.96
+    },
+    {
+      "id": "geometry",
+      "start": 13.96,
+      "end": 32.82
+    },
+    {
+      "id": "structure",
+      "start": 32.82,
+      "end": 70.08
+    },
+    {
+      "id": "aerodynamics",
+      "start": 70.08,
+      "end": 106.8
+    },
+    {
+      "id": "foundation",
+      "start": 106.8,
+      "end": 128.84
+    },
+    {
+      "id": "construction",
+      "start": 128.84,
+      "end": 166.92
+    },
+    {
+      "id": "final",
+      "start": 166.92,
+      "end": 182.2
+    }
+  ],
+  "model": {
+    "height_m": 828,
+    "raft_thickness_m": 3.7,
+    "pile_count": 192,
+    "pile_diameter_m": 1.5,
+    "pile_length_m": 43,
+    "pump_height_m": 606,
+    "geometry": "simplified procedural teaching model",
+    "fields": "illustrative; no solver"
+  },
+  "audio_tracks": 1,
+  "audio_start": 0.0,
+  "full_export_verified": false,
+  "excerpts": [
+    {
+      "path": "output/3-6s-preview.mp4",
+      "source_range": [
+        3,
+        6
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9994625850448042,
+      "best_lag_samples": 0,
+      "frame": "output/3-6s-preview.png"
+    },
+    {
+      "path": "output/20-23s-preview.mp4",
+      "source_range": [
+        20,
+        23
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9996693901419689,
+      "best_lag_samples": 0,
+      "frame": "output/20-23s-preview.png"
+    },
+    {
+      "path": "output/47-50s-preview.mp4",
+      "source_range": [
+        47,
+        50
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9997363917094123,
+      "best_lag_samples": 0,
+      "frame": "output/47-50s-preview.png"
+    },
+    {
+      "path": "output/94-97s-preview.mp4",
+      "source_range": [
+        94,
+        97
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9994187970034002,
+      "best_lag_samples": 0,
+      "frame": "output/94-97s-preview.png"
+    },
+    {
+      "path": "output/114-117s-preview.mp4",
+      "source_range": [
+        114,
+        117
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9997138309969051,
+      "best_lag_samples": 0,
+      "frame": "output/114-117s-preview.png"
+    },
+    {
+      "path": "output/142-145s-preview.mp4",
+      "source_range": [
+        142,
+        145
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9998475662121621,
+      "best_lag_samples": 0,
+      "frame": "output/142-145s-preview.png"
+    },
+    {
+      "path": "output/177-180s-preview.mp4",
+      "source_range": [
+        177,
+        180
+      ],
+      "dimensions": [
+        960,
+        540
+      ],
+      "fps": 15,
+      "frames": 45,
+      "complete_decode": true,
+      "audio_correlation": 0.9997436709237905,
+      "best_lag_samples": 0,
+      "frame": "output/177-180s-preview.png"
+    }
+  ],
+  "source_sha256": {
+    "audio.mp3": "07917545224599e57d95d7342fc224c9dc8d167dc38d61b812ed53f9604be3ad",
+    "cue-per-word.srt": "aa42eb278075b21d1459606865b050ccd7c115042c5bc4e52363c05cba623292",
+    "normal-subtitle.srt": "3fcb366b15f5f66c47e6583240738f28ecf09f7b41049f6bf332769252000756",
+    "voicover.md": "89e2f5a6ebdaed207184d9094d7dc79f67b29f2c0b47b8669721f870551026b1",
+    "design-guidelines.md": "d1015ddb2a59aec9a1cd134f3bbdd93e8516da719e72db4f938e8748fa1ff079"
+  },
+  "editorial_review": {
+    "storyboard": "output/storyboard-final/storyboard.png",
+    "storyboard_frames": 25,
+    "encoded_frame_count": 7,
+    "hd_stills": [
+      "output/structure-hd.png",
+      "output/final-hd.png"
+    ],
+    "inspected": true,
+    "scope": "Selected stills and encoded frames; no complete film export"
+  },
+  "validation": {
+    "core": {
+      "passed": 551,
+      "skipped": 2
+    },
+    "kit": {
+      "passed": 211
+    },
+    "project": {
+      "passed": 3
+    },
+    "installed_core_arch": {
+      "passed": 29
+    },
+    "installed_project_build": true,
+    "ruff": true,
+    "git_diff_whitespace": true
+  },
+  "still_verification": {
+    "size": [
+      1920,
+      1080
+    ],
+    "still_times": [
+      45.5,
+      181.88
+    ],
+    "tail_comparison": [
+      181.88,
+      182.19
+    ],
+    "tail_frames_identical": true,
+    "full_export_verified": false
+  }
+}
