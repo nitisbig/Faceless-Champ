@@ -351,8 +351,7 @@ class AgentProject:
             for t in times
         ]
         sheet = render_storyboard(compiled.composition, samples, directory)
-        frames = sorted(p for p in directory.glob("*.png"))
-        frames.remove(sheet)
+        frames = sorted((p for p in directory.glob("*.png") if p != sheet), key=lambda p: int(p.stem.split("-", 1)[0]))
         artifacts = [
             {"path": str(p), "kind": "frame", "source_time": time} for p, time in zip(frames, times, strict=True)
         ]

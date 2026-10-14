@@ -307,7 +307,17 @@ class _Diagram:
         if self.recipe == "hierarchy":
             raw = self.content["nodes"]
             nodes = tuple(FlowNode(n["id"], n["label"], size=node_size) for n in raw)
-            edges = tuple(FlowEdge(f"edge-{i}", n["parent"], n["id"]) for i, n in enumerate(raw) if n.get("parent"))
+            used_ids = {node.id for node in nodes}
+            edges = []
+            for i, node in enumerate(raw):
+                if node.get("parent") is None:
+                    continue
+                edge_id = f"edge-{i}"
+                while edge_id in used_ids:
+                    edge_id += "-edge"
+                used_ids.add(edge_id)
+                edges.append(FlowEdge(edge_id, node["parent"], node["id"]))
+            edges = tuple(edges)
             parents = {n["id"]: n.get("parent") for n in raw}
 
             def depth(name):
@@ -409,10 +419,13 @@ class _Prepared:
         side = box.width >= box.height
         editor_width = (box.width - ctx.theme.spacing) / 2 if side else box.width
         longest = max(
-            len(line)
-            for cp in prepared.script.checkpoints
-            for source in cp.files.values()
-            for line in source.splitlines()
+            (
+                len(line)
+                for cp in prepared.script.checkpoints
+                for source in cp.files.values()
+                for line in source.splitlines()
+            ),
+            default=0,
         )
         font_size = max(ctx.theme.minimum_font_size, min(36, (editor_width - 180) / max(1, longest * 0.65)))
         return CodingPlayground(

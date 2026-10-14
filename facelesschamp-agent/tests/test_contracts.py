@@ -129,6 +129,25 @@ def test_storyboard_has_more_than_midpoints(project):
     assert all(Path(a["path"]).is_file() for a in result["artifacts"])
 
 
+def test_storyboard_timestamps_follow_numeric_frame_order(project, monkeypatch):
+    from faceless_champ import render_storyboard
+
+    times = [i / 25 for i in range(120)]
+    monkeypatch.setattr(project, "sample_times", lambda: times)
+    monkeypatch.setattr(
+        "facelesschamp_agent.project.render_storyboard",
+        lambda composition, samples, directory: render_storyboard(composition, samples, directory, size=(80, 45)),
+    )
+    result = project.storyboard()
+    frames = [a for a in result["artifacts"] if a["kind"] == "frame"]
+    assert len(frames) == len(times)
+    assert [a["source_time"] for a in frames] == times
+    for index, artifact in enumerate(frames, start=1):
+        number, timestamp = Path(artifact["path"]).stem.split("-", 1)
+        assert int(number) == index
+        assert float(timestamp.removesuffix("s")) == pytest.approx(artifact["source_time"])
+
+
 def test_data_requires_provenance_or_illustrative_label():
     raw = INITIAL_PLAN.model_dump(mode="json")
     raw["scenes"][0].update(recipe="part-whole", content={"parts": {"a": 2, "b": 3}})

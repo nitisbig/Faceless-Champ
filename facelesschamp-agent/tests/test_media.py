@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 
 from facelesschamp_agent import AgentError
-from facelesschamp_agent.media import verify_media
+from facelesschamp_agent.media import alignment, run_tool, verify_media
 
 
-def write_audio(path, duration=6):
+def write_audio(path, duration=6, *, silent_after=None):
     rate = 8000
     with wave.open(str(path), "wb") as wav:
         wav.setparams((1, 2, rate, 0, "NONE", "not compressed"))
@@ -19,6 +19,8 @@ def write_audio(path, duration=6):
                 * math.sin(2 * math.pi * (150 * i / rate + 37 * (i / rate) ** 2))
                 * (0.4 + 0.6 * abs(math.sin(i / rate * 3.17)))
             )
+            if silent_after is None or i / rate < silent_after
+            else 0
             for i in range(round(rate * duration))
         ]
         wav.writeframes(struct.pack(f"<{len(samples)}h", *samples))
@@ -84,3 +86,62 @@ def test_wrong_metadata_is_failed(project, tmp_path):
     )
     assert check["status"] == "failed"
     assert not check["checks"]["dimensions"]
+
+
+@pytest.mark.parametrize("damage", ["muted", "truncated", "partial_window"])
+def test_missing_narration_fails_alignment_despite_matching_first_window(tmp_path, damage):
+    reference = tmp_path / "reference.wav"
+    actual = tmp_path / "actual.wav"
+    output = tmp_path / "output.mp4"
+    write_audio(reference, 12)
+    write_audio(
+        actual,
+        {"muted": 12, "truncated": 3, "partial_window": 11}[damage],
+        silent_after=3 if damage == "muted" else None,
+    )
+    run_tool(
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=black:s=64x64:r=5:d=12",
+            "-i",
+            str(actual),
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-c:a",
+            "aac",
+            str(output),
+        ]
+    )
+    check = verify_media(
+        output,
+        width=64,
+        height=64,
+        fps=5,
+        duration=12,
+        require_audio=True,
+        frame_directory=tmp_path / "frames",
+        reference=reference,
+    )
+    assert check["status"] == "passed"
+    result = check["narration_alignment"]
+    assert result["status"] == "failed"
+    assert len(result["windows"]) == 3
+    assert result["windows"][0]["correlation"] >= 0.8
+    assert result["windows"][-1]["correlation"] < 0.8
+
+
+@pytest.mark.parametrize("silent_after,status", [(3, "passed"), (0, "unverified")])
+def test_reference_silence_does_not_count_as_missing_narration(tmp_path, silent_after, status):
+    reference = tmp_path / "reference.wav"
+    write_audio(reference, 12, silent_after=silent_after)
+    result = alignment(reference, reference, source_start=0, duration=12)
+    assert result["status"] == status
+    if status == "passed":
+        assert len(result["windows"]) == 1

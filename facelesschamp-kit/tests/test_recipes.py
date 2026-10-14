@@ -6,7 +6,9 @@ from facelesschamp_kit.recipes import apply_recipe, recipe_specs, validate_recip
 from facelesschamp_kit.themes import LIGHT, MIDNIGHT
 
 
-@pytest.mark.parametrize("spec", [s for s in recipe_specs() if s.id not in {"code-result", "arch-design"}], ids=lambda s: s.id)
+@pytest.mark.parametrize(
+    "spec", [s for s in recipe_specs() if s.id not in {"code-result", "arch-design"}], ids=lambda s: s.id
+)
 @pytest.mark.parametrize("size", [(1920, 1080), (1080, 1920)])
 @pytest.mark.parametrize("theme", [MIDNIGHT, LIGHT])
 def test_recipe_frames_at_entrance_action_exit(tmp_path, spec, size, theme):
@@ -92,3 +94,46 @@ def test_impossible_recipe_text_is_an_error(tmp_path):
     )
     with pytest.raises(KitError, match="TEXT_FIT"):
         video.compile()
+
+
+@pytest.mark.parametrize("root_id", ["edge-1", "edge-2"])
+def test_hierarchy_edges_do_not_collide_with_node_ids(tmp_path, root_id):
+    video = Video(BuildContext(tmp_path))
+    apply_recipe(
+        video.segment("hierarchy", duration=3),
+        "hierarchy",
+        {
+            "nodes": [
+                {"id": root_id, "label": "Root"},
+                {"id": "edge-1-edge", "label": "Child", "parent": root_id},
+                {"id": "edge-1-edge-edge", "label": "Leaf", "parent": "edge-1-edge"},
+            ]
+        },
+    )
+    compiled = video.compile()
+    assert compiled.layout_at(2)["placements"]
+    assert PillowRenderer(1).frame(compiled.composition, 2, (320, 180)).size == (320, 180)
+
+
+@pytest.mark.parametrize("size", [(1920, 1080), (1080, 1920)])
+def test_code_result_accepts_empty_prepared_sources(tmp_path, monkeypatch, size):
+    from faceless_champ import CanvasItem, CodeCheckpoint, PlaygroundScript, prepare_playground
+
+    script = PlaygroundScript(
+        [CodeCheckpoint("empty", {"main.py": "", "other.py": ""}, "main.py", "main.py", 0, 0, 0)],
+        duration=3,
+        mode="concept",
+        items=[CanvasItem("static", "variable", "Static value", value=42)],
+    )
+    prepared = prepare_playground(script, cache_dir=tmp_path / "prepared")
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Prepared playback must not execute code")
+
+    monkeypatch.setattr("subprocess.Popen", forbidden)
+    video = Video(BuildContext(tmp_path, Canvas(*size)))
+    apply_recipe(video.segment("code", duration=3), "code-result", {"prepared": str(prepared.directory)})
+    compiled = video.compile()
+    assert compiled.layout_at(2)["placements"]
+    frame_size = (320, 180) if size[0] > size[1] else (180, 320)
+    assert PillowRenderer(1).frame(compiled.composition, 2, frame_size).size == frame_size

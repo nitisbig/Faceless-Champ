@@ -59,8 +59,8 @@ def pcm(path, start, duration, *, rate=2000):
 
 
 def _correlation(reference, actual):
-    n = min(len(reference), len(actual))
-    if n < 100:
+    n = len(reference)
+    if n < 100 or len(actual) < n:
         return None
     a, b = reference[:n], actual[:n]
     ma, mb = sum(a) / n, sum(b) / n
@@ -81,10 +81,20 @@ def alignment(reference, output, *, source_start, duration):
     rows = []
     for start in positions:
         ref = pcm(reference, source_start + start, width)
+        if _correlation(ref, ref) is None:
+            continue
         actual = pcm(output, start - margin, width + 2 * margin)
         center = round(margin * rate)
         direct = _correlation(ref, actual[center : center + len(ref)])
         if direct is None:
+            rows.append(
+                {
+                    "output_time": start,
+                    "correlation": 0.0,
+                    "offset_seconds": None,
+                    "reason": "Output narration is silent or truncated where reference audio is present",
+                }
+            )
             continue
         best = (direct, 0)
         if direct < 0.97:
@@ -99,7 +109,7 @@ def alignment(reference, output, *, source_start, duration):
                     best = (corr, lag)
         rows.append({"output_time": start, "correlation": round(best[0], 5), "offset_seconds": best[1] / rate})
     if not rows:
-        return {"status": "unverified", "reason": "No non-silent matching windows"}
+        return {"status": "unverified", "reason": "No non-silent reference windows"}
     passed = all(row["correlation"] >= 0.8 and abs(row["offset_seconds"]) <= 0.04 for row in rows)
     return {
         "status": "passed" if passed else "failed",
