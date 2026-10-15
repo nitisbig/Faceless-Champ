@@ -340,6 +340,23 @@ Neutral strokes, bounded label caching, static-state reuse and timed layout diag
 support narrated architecture videos. The [TikTok-like example](training%20project/tiktok-system-design/README.md)
 uses core and kit; its root `python3 render.py` defaults to a short low-quality preview.
 
+The approved networking design is available as
+`FlowDesign.named("networking")`: rounded asset cards, protocol popups, fluid motion,
+and softly highlighted bound connections. Icons, DM Sans and the background ship
+with core for offline rendering. Use `FlowScript.signal(marker="capsule")` for
+rounded glossy packets, and the kit's `FlowCard`, `FlowPopup`, and `FlowBackdrop`
+for measured placements. See the [saved design guide](docs/flowchamp.md#saved-networking-design).
+
+```python
+from faceless_champ import Canvas, FlowDesign, Scene
+
+design = FlowDesign.named("networking")
+scene = Scene(Canvas(1920, 1080, design.palette["background"]))
+scene.add(design.backdrop())
+scene.add(design.node_card("Laptop", icon="laptop", position=(960, 540)))
+scene.wait(4)
+```
+
 ## External-agent production layer
 
 [FacelessChamp Agent](facelesschamp-agent/README.md) adds validated video plans, offline capability discovery, ten reusable kit recipes, a portable authoring skill, JSON production commands, and fingerprinted media/review evidence. External agents supply reasoning and author ordinary Python; no model provider is built in. See the [release verification](facelesschamp-agent/docs/verification.md) for tests and complete export evidence.

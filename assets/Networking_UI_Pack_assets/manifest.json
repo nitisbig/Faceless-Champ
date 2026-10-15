@@ -1,0 +1,531 @@
+{
+  "pack_name": "FacelessChamp Networking UI Pack",
+  "items": [
+    {
+      "name": "laptop",
+      "category": "nodes",
+      "description": "Client laptop glass node card",
+      "svg": "svg/nodes/laptop.svg",
+      "png": "png/nodes/laptop.png"
+    },
+    {
+      "name": "laptop_icon",
+      "category": "nodes",
+      "description": "Client laptop transparent icon without card",
+      "svg": "svg/nodes/laptop_icon.svg",
+      "png": "png/nodes/laptop_icon.png"
+    },
+    {
+      "name": "desktop",
+      "category": "nodes",
+      "description": "Desktop PC glass node card",
+      "svg": "svg/nodes/desktop.svg",
+      "png": "png/nodes/desktop.png"
+    },
+    {
+      "name": "desktop_icon",
+      "category": "nodes",
+      "description": "Desktop PC transparent icon without card",
+      "svg": "svg/nodes/desktop_icon.svg",
+      "png": "png/nodes/desktop_icon.png"
+    },
+    {
+      "name": "mobile",
+      "category": "nodes",
+      "description": "Mobile device glass node card",
+      "svg": "svg/nodes/mobile.svg",
+      "png": "png/nodes/mobile.png"
+    },
+    {
+      "name": "mobile_icon",
+      "category": "nodes",
+      "description": "Mobile device transparent icon without card",
+      "svg": "svg/nodes/mobile_icon.svg",
+      "png": "png/nodes/mobile_icon.png"
+    },
+    {
+      "name": "server",
+      "category": "nodes",
+      "description": "Web server glass node card",
+      "svg": "svg/nodes/server.svg",
+      "png": "png/nodes/server.png"
+    },
+    {
+      "name": "server_icon",
+      "category": "nodes",
+      "description": "Web server transparent icon without card",
+      "svg": "svg/nodes/server_icon.svg",
+      "png": "png/nodes/server_icon.png"
+    },
+    {
+      "name": "router",
+      "category": "nodes",
+      "description": "Router glass node card",
+      "svg": "svg/nodes/router.svg",
+      "png": "png/nodes/router.png"
+    },
+    {
+      "name": "router_icon",
+      "category": "nodes",
+      "description": "Router transparent icon without card",
+      "svg": "svg/nodes/router_icon.svg",
+      "png": "png/nodes/router_icon.png"
+    },
+    {
+      "name": "switch",
+      "category": "nodes",
+      "description": "Network switch glass node card",
+      "svg": "svg/nodes/switch.svg",
+      "png": "png/nodes/switch.png"
+    },
+    {
+      "name": "switch_icon",
+      "category": "nodes",
+      "description": "Network switch transparent icon without card",
+      "svg": "svg/nodes/switch_icon.svg",
+      "png": "png/nodes/switch_icon.png"
+    },
+    {
+      "name": "database",
+      "category": "nodes",
+      "description": "Database glass node card",
+      "svg": "svg/nodes/database.svg",
+      "png": "png/nodes/database.png"
+    },
+    {
+      "name": "database_icon",
+      "category": "nodes",
+      "description": "Database transparent icon without card",
+      "svg": "svg/nodes/database_icon.svg",
+      "png": "png/nodes/database_icon.png"
+    },
+    {
+      "name": "cloud",
+      "category": "nodes",
+      "description": "Cloud service glass node card",
+      "svg": "svg/nodes/cloud.svg",
+      "png": "png/nodes/cloud.png"
+    },
+    {
+      "name": "cloud_icon",
+      "category": "nodes",
+      "description": "Cloud service transparent icon without card",
+      "svg": "svg/nodes/cloud_icon.svg",
+      "png": "png/nodes/cloud_icon.png"
+    },
+    {
+      "name": "internet",
+      "category": "nodes",
+      "description": "Internet glass node card",
+      "svg": "svg/nodes/internet.svg",
+      "png": "png/nodes/internet.png"
+    },
+    {
+      "name": "internet_icon",
+      "category": "nodes",
+      "description": "Internet transparent icon without card",
+      "svg": "svg/nodes/internet_icon.svg",
+      "png": "png/nodes/internet_icon.png"
+    },
+    {
+      "name": "firewall",
+      "category": "nodes",
+      "description": "Firewall glass node card",
+      "svg": "svg/nodes/firewall.svg",
+      "png": "png/nodes/firewall.png"
+    },
+    {
+      "name": "firewall_icon",
+      "category": "nodes",
+      "description": "Firewall transparent icon without card",
+      "svg": "svg/nodes/firewall_icon.svg",
+      "png": "png/nodes/firewall_icon.png"
+    },
+    {
+      "name": "load_balancer",
+      "category": "nodes",
+      "description": "Load balancer glass node card",
+      "svg": "svg/nodes/load_balancer.svg",
+      "png": "png/nodes/load_balancer.png"
+    },
+    {
+      "name": "load_balancer_icon",
+      "category": "nodes",
+      "description": "Load balancer transparent icon without card",
+      "svg": "svg/nodes/load_balancer_icon.svg",
+      "png": "png/nodes/load_balancer_icon.png"
+    },
+    {
+      "name": "wifi",
+      "category": "nodes",
+      "description": "Wi-Fi access point glass node card",
+      "svg": "svg/nodes/wifi.svg",
+      "png": "png/nodes/wifi.png"
+    },
+    {
+      "name": "wifi_icon",
+      "category": "nodes",
+      "description": "Wi-Fi access point transparent icon without card",
+      "svg": "svg/nodes/wifi_icon.svg",
+      "png": "png/nodes/wifi_icon.png"
+    },
+    {
+      "name": "dns",
+      "category": "nodes",
+      "description": "DNS server glass node card",
+      "svg": "svg/nodes/dns.svg",
+      "png": "png/nodes/dns.png"
+    },
+    {
+      "name": "dns_icon",
+      "category": "nodes",
+      "description": "DNS server transparent icon without card",
+      "svg": "svg/nodes/dns_icon.svg",
+      "png": "png/nodes/dns_icon.png"
+    },
+    {
+      "name": "api_gateway",
+      "category": "nodes",
+      "description": "API gateway glass node card",
+      "svg": "svg/nodes/api_gateway.svg",
+      "png": "png/nodes/api_gateway.png"
+    },
+    {
+      "name": "api_gateway_icon",
+      "category": "nodes",
+      "description": "API gateway transparent icon without card",
+      "svg": "svg/nodes/api_gateway_icon.svg",
+      "png": "png/nodes/api_gateway_icon.png"
+    },
+    {
+      "name": "user",
+      "category": "nodes",
+      "description": "User glass node card",
+      "svg": "svg/nodes/user.svg",
+      "png": "png/nodes/user.png"
+    },
+    {
+      "name": "user_icon",
+      "category": "nodes",
+      "description": "User transparent icon without card",
+      "svg": "svg/nodes/user_icon.svg",
+      "png": "png/nodes/user_icon.png"
+    },
+    {
+      "name": "lock_tls",
+      "category": "nodes",
+      "description": "TLS security glass node card",
+      "svg": "svg/nodes/lock_tls.svg",
+      "png": "png/nodes/lock_tls.png"
+    },
+    {
+      "name": "lock_tls_icon",
+      "category": "nodes",
+      "description": "TLS security transparent icon without card",
+      "svg": "svg/nodes/lock_tls_icon.svg",
+      "png": "png/nodes/lock_tls_icon.png"
+    },
+    {
+      "name": "packet",
+      "category": "nodes",
+      "description": "Data packet glass node card",
+      "svg": "svg/nodes/packet.svg",
+      "png": "png/nodes/packet.png"
+    },
+    {
+      "name": "packet_icon",
+      "category": "nodes",
+      "description": "Data packet transparent icon without card",
+      "svg": "svg/nodes/packet_icon.svg",
+      "png": "png/nodes/packet_icon.png"
+    },
+    {
+      "name": "straight_gradient",
+      "category": "connections",
+      "description": "Gradient line with endpoint nodes",
+      "svg": "svg/connections/straight_gradient.svg",
+      "png": "png/connections/straight_gradient.png"
+    },
+    {
+      "name": "dashed_gradient",
+      "category": "connections",
+      "description": "Dotted line for asynchronous or optional connections",
+      "svg": "svg/connections/dashed_gradient.svg",
+      "png": "png/connections/dashed_gradient.png"
+    },
+    {
+      "name": "curved_gradient",
+      "category": "connections",
+      "description": "Curved smooth cable",
+      "svg": "svg/connections/curved_gradient.svg",
+      "png": "png/connections/curved_gradient.png"
+    },
+    {
+      "name": "wave_gradient",
+      "category": "connections",
+      "description": "Wave connection for dynamic signal or streaming",
+      "svg": "svg/connections/wave_gradient.svg",
+      "png": "png/connections/wave_gradient.png"
+    },
+    {
+      "name": "directional_arrow",
+      "category": "connections",
+      "description": "One-way communication",
+      "svg": "svg/connections/directional_arrow.svg",
+      "png": "png/connections/directional_arrow.png"
+    },
+    {
+      "name": "bidirectional",
+      "category": "connections",
+      "description": "Bidirectional request and response",
+      "svg": "svg/connections/bidirectional.svg",
+      "png": "png/connections/bidirectional.png"
+    },
+    {
+      "name": "packet_transfer",
+      "category": "connections",
+      "description": "Packets travelling along network line",
+      "svg": "svg/connections/packet_transfer.svg",
+      "png": "png/connections/packet_transfer.png"
+    },
+    {
+      "name": "fiber_burst",
+      "category": "connections",
+      "description": "Bundled neon fiber connections",
+      "svg": "svg/connections/fiber_burst.svg",
+      "png": "png/connections/fiber_burst.png"
+    },
+    {
+      "name": "encrypted_link",
+      "category": "connections",
+      "description": "Encrypted TLS connection",
+      "svg": "svg/connections/encrypted_link.svg",
+      "png": "png/connections/encrypted_link.png"
+    },
+    {
+      "name": "latency_ping",
+      "category": "connections",
+      "description": "Sample round-trip latency indicator",
+      "svg": "svg/connections/latency_ping.svg",
+      "png": "png/connections/latency_ping.png"
+    },
+    {
+      "name": "branch_split",
+      "category": "connections",
+      "description": "Split traffic to two services",
+      "svg": "svg/connections/branch_split.svg",
+      "png": "png/connections/branch_split.png"
+    },
+    {
+      "name": "request_response_lanes",
+      "category": "connections",
+      "description": "Two-lane client-server exchange",
+      "svg": "svg/connections/request_response_lanes.svg",
+      "png": "png/connections/request_response_lanes.png"
+    },
+    {
+      "name": "http",
+      "category": "protocols",
+      "description": "HTTP protocol / network-layer badge",
+      "svg": "svg/protocols/http.svg",
+      "png": "png/protocols/http.png"
+    },
+    {
+      "name": "https",
+      "category": "protocols",
+      "description": "HTTPS protocol / network-layer badge",
+      "svg": "svg/protocols/https.svg",
+      "png": "png/protocols/https.png"
+    },
+    {
+      "name": "tcp",
+      "category": "protocols",
+      "description": "TCP protocol / network-layer badge",
+      "svg": "svg/protocols/tcp.svg",
+      "png": "png/protocols/tcp.png"
+    },
+    {
+      "name": "udp",
+      "category": "protocols",
+      "description": "UDP protocol / network-layer badge",
+      "svg": "svg/protocols/udp.svg",
+      "png": "png/protocols/udp.png"
+    },
+    {
+      "name": "ip",
+      "category": "protocols",
+      "description": "IP protocol / network-layer badge",
+      "svg": "svg/protocols/ip.svg",
+      "png": "png/protocols/ip.png"
+    },
+    {
+      "name": "dns",
+      "category": "protocols",
+      "description": "DNS protocol / network-layer badge",
+      "svg": "svg/protocols/dns.svg",
+      "png": "png/protocols/dns.png"
+    },
+    {
+      "name": "tls",
+      "category": "protocols",
+      "description": "TLS protocol / network-layer badge",
+      "svg": "svg/protocols/tls.svg",
+      "png": "png/protocols/tls.png"
+    },
+    {
+      "name": "ssh",
+      "category": "protocols",
+      "description": "SSH protocol / network-layer badge",
+      "svg": "svg/protocols/ssh.svg",
+      "png": "png/protocols/ssh.png"
+    },
+    {
+      "name": "dhcp",
+      "category": "protocols",
+      "description": "DHCP protocol / network-layer badge",
+      "svg": "svg/protocols/dhcp.svg",
+      "png": "png/protocols/dhcp.png"
+    },
+    {
+      "name": "icmp",
+      "category": "protocols",
+      "description": "ICMP protocol / network-layer badge",
+      "svg": "svg/protocols/icmp.svg",
+      "png": "png/protocols/icmp.png"
+    },
+    {
+      "name": "quic",
+      "category": "protocols",
+      "description": "QUIC protocol / network-layer badge",
+      "svg": "svg/protocols/quic.svg",
+      "png": "png/protocols/quic.png"
+    },
+    {
+      "name": "ftp",
+      "category": "protocols",
+      "description": "FTP protocol / network-layer badge",
+      "svg": "svg/protocols/ftp.svg",
+      "png": "png/protocols/ftp.png"
+    },
+    {
+      "name": "application",
+      "category": "protocols",
+      "description": "Application protocol / network-layer badge",
+      "svg": "svg/protocols/application.svg",
+      "png": "png/protocols/application.png"
+    },
+    {
+      "name": "presentation",
+      "category": "protocols",
+      "description": "Presentation protocol / network-layer badge",
+      "svg": "svg/protocols/presentation.svg",
+      "png": "png/protocols/presentation.png"
+    },
+    {
+      "name": "session",
+      "category": "protocols",
+      "description": "Session protocol / network-layer badge",
+      "svg": "svg/protocols/session.svg",
+      "png": "png/protocols/session.png"
+    },
+    {
+      "name": "transport",
+      "category": "protocols",
+      "description": "Transport protocol / network-layer badge",
+      "svg": "svg/protocols/transport.svg",
+      "png": "png/protocols/transport.png"
+    },
+    {
+      "name": "network",
+      "category": "protocols",
+      "description": "Network protocol / network-layer badge",
+      "svg": "svg/protocols/network.svg",
+      "png": "png/protocols/network.png"
+    },
+    {
+      "name": "data_link",
+      "category": "protocols",
+      "description": "Data Link protocol / network-layer badge",
+      "svg": "svg/protocols/data_link.svg",
+      "png": "png/protocols/data_link.png"
+    },
+    {
+      "name": "physical",
+      "category": "protocols",
+      "description": "Physical protocol / network-layer badge",
+      "svg": "svg/protocols/physical.svg",
+      "png": "png/protocols/physical.png"
+    },
+    {
+      "name": "point_to_point",
+      "category": "topologies",
+      "description": "Direct two-device connection",
+      "svg": "svg/topologies/point_to_point.svg",
+      "png": "png/topologies/point_to_point.png"
+    },
+    {
+      "name": "star",
+      "category": "topologies",
+      "description": "Central hub and spokes",
+      "svg": "svg/topologies/star.svg",
+      "png": "png/topologies/star.png"
+    },
+    {
+      "name": "ring",
+      "category": "topologies",
+      "description": "Circular node ring",
+      "svg": "svg/topologies/ring.svg",
+      "png": "png/topologies/ring.png"
+    },
+    {
+      "name": "bus",
+      "category": "topologies",
+      "description": "Nodes connected to shared bus",
+      "svg": "svg/topologies/bus.svg",
+      "png": "png/topologies/bus.png"
+    },
+    {
+      "name": "mesh",
+      "category": "topologies",
+      "description": "Fully interconnected mesh",
+      "svg": "svg/topologies/mesh.svg",
+      "png": "png/topologies/mesh.png"
+    },
+    {
+      "name": "tree",
+      "category": "topologies",
+      "description": "Hierarchical branching network",
+      "svg": "svg/topologies/tree.svg",
+      "png": "png/topologies/tree.png"
+    },
+    {
+      "name": "packet_inspector",
+      "category": "panels",
+      "description": "Example IP packet inspector overlay; sample/demo values",
+      "svg": "svg/panels/packet_inspector.svg",
+      "png": "png/panels/packet_inspector.png"
+    },
+    {
+      "name": "connection_status",
+      "category": "panels",
+      "description": "Sample connection statistics UI panel",
+      "svg": "svg/panels/connection_status.svg",
+      "png": "png/panels/connection_status.png"
+    },
+    {
+      "name": "http_request",
+      "category": "panels",
+      "description": "Example HTTP request-response card",
+      "svg": "svg/panels/http_request.svg",
+      "png": "png/panels/http_request.png"
+    },
+    {
+      "name": "tcp_handshake",
+      "category": "panels",
+      "description": "Three-step TCP connection setup diagram",
+      "svg": "svg/panels/tcp_handshake.svg",
+      "png": "png/panels/tcp_handshake.png"
+    }
+  ],
+  "sample_values_note": "All numeric network values are illustrative"
+}

@@ -191,12 +191,17 @@ class FlowTheme:
     sketch: bool = False
     seed: int = 0
     stroke: str | None = None
+    node_stroke: str | None = None
+    highlight_width: float = 2
 
     def __post_init__(self):
         for name in ("foreground", "surface", "accent", "background"):
             color(getattr(self, name), f"theme.{name}")
         if self.stroke is not None:
             color(self.stroke, "theme.stroke")
+        if self.node_stroke is not None:
+            color(self.node_stroke, "theme.node_stroke")
+        number(self.highlight_width, "theme.highlight_width", 0)
         for name in ("font_size", "minimum_font_size", "stroke_width"):
             number(getattr(self, name), f"theme.{name}", 0.1)
         if self.font is not None:

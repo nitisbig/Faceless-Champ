@@ -10,10 +10,13 @@ from facelesschamp_kit.recipes import recipe_specs
 from .errors import AgentError
 
 GUIDANCE = {
-    "arch": ("architecture engineering scientific geometry mesh point cloud sections dimensions",
-             "Use named parts, focused camera motion and sections to explain geometry.",
-             "Supply real geometry and fields; this renderer does not solve physics or create CAD.",
-             "archchamp.md", ("PyVista/VTK (required)",)),
+    "arch": (
+        "architecture engineering scientific geometry mesh point cloud sections dimensions",
+        "Use named parts, focused camera motion and sections to explain geometry.",
+        "Supply real geometry and fields; this renderer does not solve physics or create CAD.",
+        "archchamp.md",
+        ("PyVista/VTK (required)",),
+    ),
     "flow": (
         "systems process causality request journey hierarchy networks circuits",
         "Use nodes and edges to explain relationships; follow a single request to explain movement.",
@@ -86,7 +89,10 @@ CHILDREN = {
     "Comparison": ["0", "1"],
     "StepList": ["0..N"],
     "FlowDiagram": ["node-N", "label-N", "edge-N"],
-    "FlowCanvas": ["diagram"],
+    "FlowCanvas": ["diagram", "glow (with design)"],
+    "FlowCard": ["surface", "label", "icon", "detail (when supplied)", "address (when supplied)"],
+    "FlowPopup": ["surface", "icon", "kind", "value"],
+    "FlowBackdrop": ["background"],
     "ArchCanvas": ["model"],
     "CodeEditor": ["editor"],
     "CodingPlayground": ["editor", "canvas", "output (when enabled)"],

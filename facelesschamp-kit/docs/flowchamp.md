@@ -1,6 +1,6 @@
 # FlowChamp in the kit
 
-`FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0)`
+`FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0, design=None)`
 composes the core `FlowChamp` component. The `"diagram"` handle addresses the whole
 viewport. Use `FlowScript` target IDs for individual node/connection animations.
 
@@ -57,3 +57,61 @@ segments, and use `segment.cue_time(original_index)` for FlowScript action times
 Keep source rounding overlaps with `overlap_tolerance=0.001` where appropriate.
 The [TikTok example](../../training%20project/tiktok-system-design/README.md) provides
 an editable, label-only landscape composition and a preview-default root renderer.
+
+## Approved networking design
+
+Select `FlowCanvas(..., design="networking")` for the approved soft networking
+connections. Author `FlowScript.signal(marker="capsule")` or use core
+`FlowDesign.signal` for rounded traffic markers. `design` also accepts a core `FlowDesign`
+instance. This is an explicit diagram-level selection; it does not change the
+video's global kit theme. Existing placements without `design` retain their theme
+inheritance and appearance. `theme` and `design` are mutually exclusive; the design
+owns its connection styling. Persistent neutral wire strokes remain visible across
+quiet spans and final holds; transparent proxy-node outlines and constant focus
+width keep the connections clean. Supplied script duration and actions stay unchanged.
+
+Use the measured companion blocks for visible components:
+
+| Block | Parameters | Named children |
+| --- | --- | --- |
+| `FlowCard` | `label, icon, size=(240,260), detail=None, address=None, design="networking"` | `surface`, `label`, `icon`, optional `detail`, optional `address` |
+| `FlowPopup` | `kind, value, design="networking"` | `surface`, `icon`, `kind`, `value` |
+| `FlowBackdrop` | `design="networking"` | `background` |
+
+Cards and popups preserve their design proportions and fit their full allocation,
+including soft shadow clearance, inside the supplied bounds. `FlowCard.size` is
+the visible face size in design pixels. `FlowBackdrop` fills its allocation with
+the packaged background. The available icon names are `laptop`, `router`,
+`internet`, `cloud`, `server`, `dns`, `lock_tls`, and `packet`. These assets and DM
+Sans are bundled with core; rendering requires no preparation or downloads.
+
+```python
+from faceless_champ import Bounds
+from facelesschamp_kit import Video
+from facelesschamp_kit.blocks import FlowBackdrop, FlowCard, FlowPopup
+
+def build(ctx):
+    video = Video(ctx)
+    segment = video.segment("network", duration=6)
+    segment.add(FlowBackdrop(), bounds=ctx.bounds, enter=None, exit=None, z_index=-1)
+    segment.add(
+        FlowCard("Laptop", "laptop", size=(400, 430),
+                 detail="192.168.1.20", address="example.com"),
+        bounds=Bounds(180, 280, 700, 850), enter=None, exit=None,
+    )
+    segment.add(
+        FlowPopup("DNS", "example.com"),
+        bounds=Bounds(900, 160, 1550, 430), enter=None, exit=None,
+    )
+    return video
+```
+
+Use core `FlowDesign.pop_frames`/`move_frames` with `apply_transform` and
+`transform_animation` when cards and graph ports move together. These are authored
+timeline helpers; the blocks do not add a lesson clock or automatic node binding.
+Designed `FlowCanvas` placements expose `diagram` for foreground connections and
+packets, plus `glow` for their soft highlight layer. Animate the placement handle
+itself to move or fade both layers together. Ordinary placements retain the whole
+`diagram` handle. Target graph IDs through `FlowScript`.
+The core [saved design guide](../../docs/flowchamp.md#saved-networking-design)
+documents connection layering, native `capsule` markers, and fluid motion.

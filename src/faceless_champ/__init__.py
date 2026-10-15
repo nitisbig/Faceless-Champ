@@ -221,9 +221,31 @@ __all__ += [
     "prepare_playground",
 ]
 
-from .flow import FlowChamp, FlowDataError, FlowEdge, FlowGraph, FlowNode, FlowPort, FlowScript, FlowTheme
+from .flow import (
+    FlowChamp,
+    FlowDataError,
+    FlowDesign,
+    FlowEdge,
+    FlowGraph,
+    FlowNode,
+    FlowPort,
+    FlowScript,
+    FlowTheme,
+    FlowVisual,
+)
 
-__all__ += ["FlowChamp", "FlowDataError", "FlowEdge", "FlowGraph", "FlowNode", "FlowPort", "FlowScript", "FlowTheme"]
+__all__ += [
+    "FlowChamp",
+    "FlowDataError",
+    "FlowDesign",
+    "FlowEdge",
+    "FlowGraph",
+    "FlowNode",
+    "FlowPort",
+    "FlowScript",
+    "FlowTheme",
+    "FlowVisual",
+]
 
 from .arch import (
     ArchCamera,

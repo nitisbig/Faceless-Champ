@@ -290,7 +290,8 @@
                   "marker": {
                     "enum": [
                       "dot",
-                      "packet"
+                      "packet",
+                      "capsule"
                     ]
                   },
                   "color": {
@@ -767,6 +768,16 @@
             "string",
             "null"
           ]
+        },
+        "node_stroke": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "highlight_width": {
+          "type": "number",
+          "minimum": 0
         }
       },
       "required": [],

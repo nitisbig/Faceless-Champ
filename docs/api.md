@@ -9,7 +9,7 @@ Current source: **0.1.4**. Optional capability references:
 | HtmlPage, WebScript, capture_html, WebCapture, HtmlClip | [HTML capture](html-to-video.md) | web for preparation |
 | OSClip, OSScript, VirtualFileSystem, MacOSPreset | [OS UI](os-ui.md) | none |
 | ChessChamp, ChessScript, ChessTheme, ChessAssets | [Chess](chesschamp.md) | chess |
-| FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme | [Flow diagrams](flowchamp.md) | none |
+| FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme, FlowDesign, FlowVisual | [Flow diagrams](flowchamp.md) | none |
 
 The default core import does not install optional packages, run checkpoints, launch browsers, or download assets.
 
@@ -607,6 +607,17 @@ composes its existing code children without executing them.
 structure from emphasis. `FlowChamp.diagnostics_at(time)` returns visible overflow,
 node-overlap and label-overlap warnings on the original script clock.
 `FlowChamp(..., label_cache_mb=8)` bounds label sprite memory; zero disables caching.
+`FlowTheme.node_stroke=None` inherits the ordinary outline color; set a separate
+node color to style node boundaries independently of cables. `highlight_width=2`
+preserves the legacy focus expansion; `0` keeps connection widths constant.
+
+`FlowDesign.named("networking")` selects the approved rounded networking cards,
+protocol popups, soft background, coordinated connections and fluid motion helpers.
+Cards, popups, markers and connections return `FlowVisual` groups with named `parts`
+and `face_bounds`; the backdrop is a core `Image`. Artwork and
+DM Sans are bundled for offline use. `FlowScript.signal(marker="capsule")` adds
+rounded glossy traffic markers while retaining existing `dot` and `packet` markers.
+See the [saved design guide](flowchamp.md#saved-networking-design).
 
 ## ArchChamp
 

@@ -51,6 +51,34 @@ def test_clean_flow_theme_is_in_plan_schema():
     assert "clean-flow" in VideoPlan.model_json_schema()["$defs"]["DesignSpec"]["properties"]["theme"]["enum"]
 
 
+def test_networking_design_discovery_has_installed_guide_and_block_handles():
+    registry = CapabilityRegistry()
+    design = registry.describe("faceless_champ.FlowDesign")
+    assert design["family"] == "flow"
+    assert 'FlowDesign.named("networking")' in design["guide"]
+    assert 'marker="capsule"' in design["guide"]
+    card = registry.describe("facelesschamp_kit.blocks.FlowCard")
+    assert card["named_targets"] == [
+        "surface",
+        "label",
+        "icon",
+        "detail (when supplied)",
+        "address (when supplied)",
+    ]
+    assert "Approved networking design" in card["guide"]
+    assert registry.describe("facelesschamp_kit.blocks.FlowPopup")["named_targets"] == [
+        "surface",
+        "icon",
+        "kind",
+        "value",
+    ]
+    assert registry.describe("facelesschamp_kit.blocks.FlowBackdrop")["named_targets"] == ["background"]
+    assert registry.describe("facelesschamp_kit.blocks.FlowCanvas")["named_targets"] == [
+        "diagram",
+        "glow (with design)",
+    ]
+
+
 def test_clean_flow_preserves_packaged_font_when_plan_omits_font(project):
     from faceless_champ import Canvas
     from facelesschamp_kit import BuildContext

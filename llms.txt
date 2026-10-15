@@ -150,6 +150,19 @@ Python/JSON graph authoring supports stable IDs, ports, routes, labels, and arro
 FlowScript authors draws, signals, reveals, highlights and element transforms and signal/highlight colors.
 Recipes: workflow/system/network/idea-map/circuit in faceless_champ.flow.examples.
 FlowTheme.stroke supplies neutral outlines; None preserves legacy accent outlines.
+FlowTheme.node_stroke=None inherits stroke/accent; explicit colors separate node
+outlines from cables. highlight_width=2 preserves legacy emphasis width; 0 keeps it fixed.
+FlowDesign.named("networking") saves the approved white rounded networking cards,
+short protocol popups, blue/teal traffic, soft shadows, DM Sans and washed background.
+node_card/popup/packet_marker/connections return FlowVisual Group components
+with named parts and transformed face_bounds (normal bounds include shadow allocation).
+backdrop returns a core Image fitted to explicit bounds.
+Eight transparent icons and backdrop are bundled offline. pop_frames/move_frames,
+apply_transform and transform_animation coordinate card and graph-node motion.
+signal authors eased capsule traffic. connections uses persistent neutral wires,
+transparent proxy node outlines and constant focus width, preserving caller script
+duration/actions. complete_connections optionally authors neutral gaps or a longer horizon.
+FlowScript.signal(marker="capsule") uses native glossy rounded packets; dot/packet remain.
 diagnostics_at(time) samples visible bounds/labels on the original script clock;
 sampling is not proof of collision-free motion. source_start supports excerpts.
 Label cache defaults to 8 MiB; label_cache_mb=0 disables it. Static intervals reuse keys.

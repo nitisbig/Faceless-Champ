@@ -14,7 +14,10 @@ The `clean-flow` theme adds white cards with measured shadow clearance, packaged
 | FinderWindow | Authored isolated Finder | ui | [OS UI](os-ui.md) |
 | SettingsWindow | Authored isolated settings | ui | [OS UI](os-ui.md) |
 | ChessBoard | Legal timed ChessScript | board | [Chess](chesschamp.md) |
-| FlowCanvas | Graph and timed FlowScript | diagram | [Flow](flowchamp.md) |
+| FlowCanvas | Graph and timed FlowScript | diagram, glow (with design) | [Flow](flowchamp.md) |
+| FlowCard | Networking label, bundled icon, optional address/detail | surface, label, icon, optional address/detail | [Flow](flowchamp.md) |
+| FlowPopup | Short protocol and value | surface, icon, kind, value | [Flow](flowchamp.md) |
+| FlowBackdrop | Approved networking background | background | [Flow](flowchamp.md) |
 
 Check named children in the feature guide before targeting a handle. OS/window blocks preserve transparent surroundings where applicable. FlowDiagram remains a simple ordered chain; FlowCanvas provides authored graph topology and timed element actions.
 

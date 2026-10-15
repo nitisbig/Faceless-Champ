@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="100" viewBox="0 0 240 100"><defs>
+ <linearGradient id="grad" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0" stop-color="#F575E2"/><stop offset=".54" stop-color="#4E91FF"/><stop offset="1" stop-color="#A679FF"/></linearGradient>
+ <linearGradient id="stream" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0"><stop offset="0" stop-color="#36E5FA"/><stop offset=".55" stop-color="#6888FF"/><stop offset="1" stop-color="#F575E2"/></linearGradient>
+ <linearGradient id="reverse" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0"><stop offset="0" stop-color="#F575E2"/><stop offset=".5" stop-color="#B477FF"/><stop offset="1" stop-color="#36E5FA"/></linearGradient>
+ <linearGradient id="warm" x1="0%" x2="100%"><stop offset="0" stop-color="#A679FF"/><stop offset=".5" stop-color="#F575E2"/><stop offset="1" stop-color="#FFBE69"/></linearGradient>
+ <linearGradient id="glass" x1="0%" x2="100%" y1="0%" y2="100%"><stop stop-color="#172A4D" stop-opacity=".95"/><stop offset="1" stop-color="#0B1932" stop-opacity=".92"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#F575E2" stop-opacity=".26"/><stop offset=".58" stop-color="#F575E2" stop-opacity=".07"/><stop offset="1" stop-color="#F575E2" stop-opacity="0"/></radialGradient>
+ <linearGradient id="glassline" x1="0%" x2="100%"><stop stop-color="#F575E2" stop-opacity=".85"/><stop offset="1" stop-color="#A679FF" stop-opacity=".62"/></linearGradient>
+ </defs><rect x="9" y="12" width="222" height="72" rx="18" fill="url(#glass)" stroke="#F575E2" stroke-opacity=".8" stroke-width="2.5"/><path d="M28 13 H113" stroke="url(#grad)" stroke-width="3" stroke-linecap="round"/><circle cx="33" cy="49" r="7" fill="#F575E2"/><text x="128" y="56" fill="#F1F6FF" text-anchor="middle" font-size="14" font-family="DejaVu Sans,sans-serif" font-weight="700">Data Link</text></svg>

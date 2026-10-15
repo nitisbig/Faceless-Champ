@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240"><defs>
+ <linearGradient id="grad" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0" stop-color="#458EFF"/><stop offset=".54" stop-color="#4E91FF"/><stop offset="1" stop-color="#A679FF"/></linearGradient>
+ <linearGradient id="stream" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0"><stop offset="0" stop-color="#36E5FA"/><stop offset=".55" stop-color="#6888FF"/><stop offset="1" stop-color="#F575E2"/></linearGradient>
+ <linearGradient id="reverse" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0"><stop offset="0" stop-color="#F575E2"/><stop offset=".5" stop-color="#B477FF"/><stop offset="1" stop-color="#36E5FA"/></linearGradient>
+ <linearGradient id="warm" x1="0%" x2="100%"><stop offset="0" stop-color="#A679FF"/><stop offset=".5" stop-color="#F575E2"/><stop offset="1" stop-color="#FFBE69"/></linearGradient>
+ <linearGradient id="glass" x1="0%" x2="100%" y1="0%" y2="100%"><stop stop-color="#172A4D" stop-opacity=".95"/><stop offset="1" stop-color="#0B1932" stop-opacity=".92"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#458EFF" stop-opacity=".26"/><stop offset=".58" stop-color="#458EFF" stop-opacity=".07"/><stop offset="1" stop-color="#458EFF" stop-opacity="0"/></radialGradient>
+ <linearGradient id="glassline" x1="0%" x2="100%"><stop stop-color="#458EFF" stop-opacity=".85"/><stop offset="1" stop-color="#A679FF" stop-opacity=".62"/></linearGradient>
+ </defs><ellipse cx="180" cy="151" rx="133" ry="104" fill="url(#aura)"/><path d="M116 104 V189 C116 215 244 215 244 189 V104" fill="#123059" stroke="#458EFF" stroke-width="3"/><ellipse cx="180" cy="104" rx="64" ry="24" fill="url(#grad)" stroke="#458EFF" stroke-width="3"/><path d="M116 135 C116 169 244 169 244 135 M116 166 C116 199 244 199 244 166" fill="none" stroke="#67B7F5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>

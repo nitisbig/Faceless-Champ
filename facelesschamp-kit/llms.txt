@@ -109,7 +109,16 @@ narration.audio is a kit asset ID; core from_pgn/to_dict supports SAN-to-timed-J
 Artwork defaults to bundled PNGs; custom ChessAssets and document-relative assets.directory
 are supported. Install chess extra. [Chess](docs/chesschamp.md).
 
-FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0) exposes diagram.
+FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0, design=None) exposes diagram.
+design="networking" (or FlowDesign instance) selects approved soft connections;
+omitting design preserves existing kit theme inheritance.
+theme and design are mutually exclusive. Designed placements expose diagram/glow;
+animate the placement handle to transform both layers together. Persistent neutral
+cables survive quiet spans/final holds; input script duration/actions stay intact.
+FlowCard(label,icon,size=(240,260),detail=None,address=None,design="networking"):
+surface,label,icon plus supplied detail/address handles; measured rounded asset card.
+FlowPopup(kind,value,design="networking"): surface,icon,kind,value handles.
+FlowBackdrop(design="networking"): background handle. Artwork and font bundled in core.
 Target node/edge IDs through core FlowScript; kit handles animate the entire viewport.
 Neutral outlines inherit Theme.muted; accent is reserved for signals/highlights.
 Compiler samples action boundaries/midpoints and excerpt endpoints for FLOW_BOUNDS,

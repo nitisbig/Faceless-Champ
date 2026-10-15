@@ -8,7 +8,7 @@ Current source: **0.1.0rc6**, requiring core **>=0.1.4,<0.2.0**.
 | HTML walkthroughs | WebWalkthrough, WebElement | [HTML to video](html-to-video.md) |
 | Virtual OS tutorials | OSWalkthrough, FinderWindow, SettingsWindow | [OS UI](os-ui.md) |
 | Legal games | ChessBoard, templates.chesschamp | [ChessChamp](chesschamp.md) |
-| Scripted graphs | FlowCanvas | [FlowChamp](flowchamp.md) |
+| Scripted graphs and networking cards | FlowCanvas, FlowCard, FlowPopup, FlowBackdrop | [FlowChamp](flowchamp.md) |
 
 ### Explicit preparation
 
@@ -118,7 +118,13 @@ Library errors are KitError with stable `code`, `message`, and optional scope. C
 
 ## FlowCanvas
 
-`FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0)` exposes the whole `"diagram"` handle. See [FlowChamp](flowchamp.md).
+`FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0, design=None)` exposes the `"diagram"` handle. Pass `design="networking"` or a core `FlowDesign` instance for the approved soft connection styling; this adds a `"glow"` handle. Animate the placement handle to transform both layers together. `theme` and `design` are mutually exclusive. Without `design`, kit theme inheritance is unchanged.
+
+`FlowCard(label, icon, size=(240,260), detail=None, address=None, design="networking")`,
+`FlowPopup(kind, value, design="networking")`, and `FlowBackdrop(design="networking")`
+compose the approved networking components. Cards expose `surface`, `label`, `icon`
+and supplied `detail`/`address`; popups expose `surface`, `icon`, `kind`, `value`;
+backdrops expose `background`. See [FlowChamp](flowchamp.md).
 
 Default strokes inherit `Theme.muted`. Compilation includes sampled visible core
 diagnostics with placement/segment scope and script/master source times.

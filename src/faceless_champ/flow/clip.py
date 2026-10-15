@@ -40,6 +40,12 @@ class FlowChamp(Component):
         self._edges = {e.id: e for e in self.graph.edges}
         self._positions = layout_graph(self.graph, self.width, self.height)
         self._actions = tuple(sorted(self.script.actions, key=lambda a: a.at))
+        self._capsule_edges = frozenset(
+            target
+            for action in self._actions
+            if action.kind == "signal" and action.options.get("marker") == "capsule"
+            for target in action.targets
+        )
         self._label_cache_limit = int(number(label_cache_mb, "label_cache_mb", 0) * 1024 * 1024)
         self._label_cache = OrderedDict()
         self._label_cache_bytes = 0
@@ -233,7 +239,9 @@ class FlowChamp(Component):
                 remaining = progress * sum(spans)
                 for id, path, span in zip(a.targets, paths, spans):
                     if remaining <= span or id == a.targets[-1]:
-                        local = remaining / span if span else 0
+                        # Accumulating multiple edge lengths can leave reverse
+                        # activation a few ulps above 1 at the final endpoint.
+                        local = max(0.0, min(1.0, remaining / span)) if span else 0
                         if states[id]["opacity"] > 0 and local <= states[id]["draw"]:
                             signals.append(
                                 {
@@ -267,7 +275,10 @@ class FlowChamp(Component):
             b = self._label_bounds(target, states)
             points += [(b.left, b.top), (b.right, b.bottom)]
         xs, ys = zip(*points)
-        pad = self.theme.stroke_width / 2 + (12 if target in self._edges else 0)
+        marker_pad = 27 if target in self._capsule_edges else 12
+        # Preserve legacy bounds while reserving space for wider custom focus.
+        focus_pad = max(0, self.theme.highlight_width - 2) / 2
+        pad = self.theme.stroke_width / 2 + focus_pad + (marker_pad if target in self._edges else 0)
         return Bounds(min(xs) - pad, min(ys) - pad, max(xs) + pad, max(ys) + pad)
 
     def frame_image(self, age, factor=1):

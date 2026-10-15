@@ -11,6 +11,7 @@ from .chess import ChessBoard
 from .coding import CodeEditor, CodingPlayground
 from .flow import FlowDiagram
 from .flow_canvas import FlowCanvas
+from .flow_design import FlowBackdrop, FlowCard, FlowPopup
 from .os_ui import FinderWindow, OSWalkthrough, SettingsWindow
 from .web import WebElement, WebWalkthrough
 from .whiteboard import (
@@ -206,8 +207,11 @@ __all__ = [
     "CodingPlayground",
     "Comparison",
     "FinderWindow",
+    "FlowBackdrop",
     "FlowCanvas",
+    "FlowCard",
     "FlowDiagram",
+    "FlowPopup",
     "Heading",
     "ImageCard",
     "MetricCard",

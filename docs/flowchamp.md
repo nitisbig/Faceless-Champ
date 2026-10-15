@@ -82,7 +82,7 @@ seconds. Omitted `at` appends after the script's current end; default duration i
 | `scale` | `value` | Set node scale; retain the final scale |
 | `rotate` | `value` | Set clockwise degrees; retain the final rotation |
 | `draw` | `stagger=0`, `tool="pencil"` | Draw by path length; tool is `pencil`, `pen`, or `none` |
-| `signal` | `direction="forward"`, `repeat=1`, `marker="dot"`, `color` | Travel an edge or connected edge sequence; reverse direction and packet markers supported |
+| `signal` | `direction="forward"`, `repeat=1`, `marker="dot"`, `color` | Travel an edge or connected edge sequence; reverse direction and `dot`, `packet`, or rounded `capsule` markers supported |
 | `highlight` | `dim=1`, `color`, `mode="outline"` | Temporarily emphasize targets; `tint` fills card shapes, `dim` fades unrelated elements |
 
 Reveal, hide and draw share a visibility channel. Overlapping actions on the same
@@ -179,6 +179,12 @@ diagrams. Highlights and signals continue to use `accent` or their explicit colo
 Kit `FlowCanvas` inherits its neutral stroke from `context.theme.muted`; an explicit
 `FlowTheme` takes precedence. Exterior labels allow two lines at the theme's font size.
 
+`FlowTheme.node_stroke=None` inherits the ordinary `stroke`/`accent` outline color.
+Set it to a separate color, including transparent, to style node boundaries
+independently of the connections. `highlight_width=2` preserves the legacy focus
+outline expansion; choose `0` for a constant connection width during color emphasis.
+Both fields are optional and included in diagram JSON.
+
 ```python
 theme = FlowTheme(background="#000000", surface="#000000", foreground="#F4F3EE",
                   stroke="#B1ADA1", accent="#C15F3C", font_size=38, minimum_font_size=28)
@@ -214,3 +220,73 @@ uses `Video`, `Segment.cue_time`, `FlowCanvas`, and core primitives. Run its roo
 ranges, scene selection, frames, storyboards and checks. Full export requires
 `--full`; short previews do not verify the complete film.
 The core showcase also accepts `--clean` for this palette and hidden drawing tools.
+
+## Saved networking design
+
+`FlowDesign.named("networking")` saves the approved Networking Explained visual
+design: cool washed background, white rounded cards, soft shadows, bundled DM Sans,
+dark labels, blue requests, teal responses, and violet DNS emphasis. It is an
+explicit design selection; existing FlowChamp themes keep their defaults.
+
+The design composes ordinary core components through `node_card`, `popup`,
+`packet_marker`, and `backdrop`. Device cards accept a label, one bundled icon,
+position and face size, with optional detail and browser address. Protocol popups
+accept short `kind` and `value` text. Cards, popups, packet markers and connection
+layers return `FlowVisual` objects, which are ordinary
+`Group` components with named `parts` and transformed `face_bounds`. Add and animate
+the visual directly. Its `bounds` includes symmetric shadow clearance; the visible
+face remains centered. `backdrop` returns an ordinary core `Image`.
+
+```python
+from faceless_champ import Bounds, Canvas, FlowDesign, Scene
+
+design = FlowDesign.named("networking")
+scene = Scene(Canvas(1920, 1080, design.palette["background"]))
+scene.add(design.backdrop(Bounds(0, 0, 1920, 1080)))
+laptop = design.node_card(
+    "Laptop", icon="laptop", position=(420, 540), size=(400, 430),
+    detail="192.168.1.20", address="example.com",
+)
+scene.add(laptop)
+# Named parts are components: laptop.parts["icon"], laptop.parts["address"].
+scene.wait(4)
+```
+
+The bundled icon names are `laptop`, `router`, `internet`, `cloud`, `server`, `dns`,
+`lock_tls`, and `packet`. Icons and the approved background are package assets and
+resolve independently of the current working directory. No preparation step,
+download, or optional image-processing dependency is required.
+
+`design.connections(graph, script, width=..., height=..., source_start=...)`
+provides the coordinated diagram and soft connection glow as named visual parts.
+Connections have a persistent neutral wire stroke, transparent proxy-node outlines,
+and constant width during focus. Authored highlights supply emphasis colors. The
+caller's script remains unchanged, including its duration, so a bare graph gets
+visible connections and final holds retain their neutral cables without extra actions.
+Keep visible device cards above those connections. Author graph node positions,
+sizes and ports to match the card faces; the connection layers use transparent
+graph nodes as proxy geometry. Bézier edges without fixed control points reshape
+from their moving named ports. `FlowScript.signal(..., marker="capsule")` renders a rounded,
+glossy packet natively along the same routed path; dot and rectangular packet
+markers retain their existing appearance.
+
+`pop_frames` supplies the small lift, overshoot and settling motion;
+`move_frames` supplies a smooth repositioning curve. Apply the same frame sequence
+to graph nodes with `apply_transform` and to a card's root with
+`transform_animation`. Both helpers accept the same sampled frame sequence;
+`apply_transform(script, target, frames, at=..., duration=...)` authors public
+FlowScript moves/scales and `transform_animation(component, frames, offset=...)`
+returns the corresponding core animation. These helpers keep the card and its
+connection ports on the same deterministic timeline.
+
+`design.signal(script, targets, at=..., duration=..., direction=..., color=...)`
+authors capsule traffic with eased connection emphasis. Optionally call
+`design.complete_connections(script, edges, duration=...)` after authoring traffic
+to add explicit neutral-color actions or extend the authored horizon to a desired
+scene length. Connections already retain their neutral base stroke without this
+step. Timings and lesson content remain authored
+by the caller. Select `tool="none"` on connection draws for the clean presentation.
+
+The [approved training scene](../training%20project/networking-explained/README.md)
+demonstrates the complete silent 120-second request journey. Its addresses and
+network exchanges are illustrative; the design does not simulate a network.

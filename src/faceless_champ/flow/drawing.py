@@ -2,9 +2,10 @@
 
 import math
 import random
+from functools import lru_cache
 from itertools import pairwise
 
-from PIL import Image, ImageColor, ImageDraw
+from PIL import Image, ImageColor, ImageDraw, ImageFilter
 
 from ..typography import load_font
 from .geometry import length, prefix, sample, transform
@@ -45,6 +46,29 @@ def prepare_labels(clip):
 def rgba(color, opacity=1):
     r, g, b, a = ImageColor.getcolor(color, "RGBA")
     return r, g, b, round(a * opacity)
+
+
+@lru_cache(maxsize=128)
+def capsule_sprite(color, factor=1):
+    """Approved networking packet: 30×18 face, soft shadow, and rounded gloss."""
+    # Keep inclusive rectangle endpoints valid before downsampling tiny markers.
+    q = max(1, 2 * factor)
+    size = (max(1, round(54 * q)), max(1, round(42 * q)))
+    sprite = Image.new("RGBA", size)
+    shadow = Image.new("RGBA", size)
+    alpha = ImageColor.getcolor(color, "RGBA")[3] / 255
+    ImageDraw.Draw(shadow).rounded_rectangle(
+        (12 * q, 15 * q, 42 * q - 1, 33 * q - 1), radius=9 * q, fill=(41, 71, 118, round(32 * alpha))
+    )
+    sprite.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(3 * q)))
+    draw = ImageDraw.Draw(sprite)
+    draw.rounded_rectangle((12 * q, 12 * q, 42 * q - 1, 30 * q - 1), radius=9 * q, fill=rgba(color))
+    gloss = Image.new("RGBA", size)
+    ImageDraw.Draw(gloss).rounded_rectangle(
+        (18 * q, 15.5 * q, 36 * q, 18.5 * q), radius=1.5 * q, fill=(255, 255, 255, round(166 * alpha))
+    )
+    sprite.alpha_composite(gloss)
+    return sprite.resize((max(1, round(54 * factor)), max(1, round(42 * factor))), Image.Resampling.LANCZOS)
 
 
 def stroke(draw, points, fill, width, dashed=False):
@@ -140,7 +164,7 @@ def draw_frame(clip, snapshot, factor):
         paths = clip.paths_for(id, states)
         # Integer origins preserve rasterization while avoiding viewport-sized element layers.
         bounds = clip._bounds_for(id, states, labels=False)
-        pad = math.ceil((clip.theme.stroke_width + 4) * factor) + 4
+        pad = math.ceil((clip.theme.stroke_width + max(4, clip.theme.highlight_width)) * factor) + 4
         left = max(0, math.floor(bounds.left * factor) - pad)
         top = max(0, math.floor(bounds.top * factor) - pad)
         right = min(size[0], math.ceil(bounds.right * factor) + pad)
@@ -162,8 +186,12 @@ def draw_frame(clip, snapshot, factor):
         total = sum(length(path) for path in paths)
         remaining = total * s["draw"]
         highlighted = [h for h in snapshot["highlights"] if id in h["targets"]]
-        outline = highlighted[-1]["color"] if highlighted else (clip.theme.stroke or clip.theme.accent)
-        sw = width + (max(1, round(2 * factor)) if highlighted else 0)
+        base_outline = clip.theme.stroke or clip.theme.accent
+        if node and clip.theme.node_stroke is not None:
+            base_outline = clip.theme.node_stroke
+        outline = highlighted[-1]["color"] if highlighted else base_outline
+        extra_width = max(1, round(clip.theme.highlight_width * factor)) if clip.theme.highlight_width else 0
+        sw = width + (extra_width if highlighted else 0)
         rng = random.Random(f"{clip.theme.seed}:{id}")
         if node and (item.symbol in CARD_SYMBOLS or item.symbol == "junction") and s["draw"] >= 1:
             fill = outline if item.symbol == "junction" else clip.theme.surface
@@ -212,6 +240,13 @@ def draw_frame(clip, snapshot, factor):
     draw = ImageDraw.Draw(canvas)
     for signal in snapshot["signals"]:
         x, y = (v * factor for v in signal["position"])
+        if signal["marker"] == "capsule":
+            sprite = capsule_sprite(signal["color"], factor)
+            if signal["opacity"] < 1:
+                sprite = sprite.copy()
+                sprite.putalpha(sprite.getchannel("A").point(lambda a, opacity=signal["opacity"]: round(a * opacity)))
+            composite_center(canvas, sprite, (x, y))
+            continue
         r = 6 * factor
         fill = rgba(signal["color"], signal["opacity"])
         if signal["marker"] == "packet":

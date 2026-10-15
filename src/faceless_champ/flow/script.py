@@ -84,7 +84,7 @@ class FlowScript:
                 raise FlowDataError("action.dim", "must be <= 1")
         for key, values in (
             ("direction", ("forward", "reverse")),
-            ("marker", ("dot", "packet")),
+            ("marker", ("dot", "packet", "capsule")),
             ("mode", ("outline", "tint")),
             ("tool", ("none", "pen", "pencil")),
         ):
