@@ -28,7 +28,7 @@ caption_space = 220
 [videos.main]
 factory = "videos.main:build"
 format = "shorts" # or landscape
-theme = "midnight" # or light, whiteboard
+theme = "midnight" # or light, whiteboard, clean-flow
 captions = false
 [profiles.preview]
 fps = 15
@@ -60,7 +60,7 @@ Programmatic output paths, like CLI output paths, are relative to the calling wo
 
 `Video(ctx).segment(name, duration=N)` appends. Supply `start=T` for an absolute window, or `window=voice.between(...)` for a cue window. Names must be unique. Segments are context managers but can also be populated directly. Empty segments represent intentional holds/gaps.
 
-`segment.add(block, id=None, bounds=None, anchor="center", enter=None, enter_duration=None, z_index=0, at=0, duration=None)` returns a placement handle. `bounds` overrides the context safe area, including for deliberate overlays. `at` is segment-local seconds; `duration` gives an explicit positive lifetime. Omitting duration holds to the segment end (including a final audio-tail hold). Entry recipes are `fade`, `pop`, and `stagger`; their default duration comes from the theme (0.6 seconds). Entrances must fit the placement lifetime. Stagger enters immediate children in order. Build reports include absolute placement start/end times.
+`segment.add(block, id=None, bounds=None, anchor="center", enter="theme", enter_duration=None, exit="theme", exit_duration=None, z_index=0, at=0, duration=None)` returns a placement handle. `bounds` overrides the context safe area, including for deliberate overlays. `at` is segment-local seconds; `duration` gives an explicit positive lifetime. Omitting duration holds to the segment end (including a final audio-tail hold). Entry recipes are `theme`, `flow`, `fade`, `pop`, `stagger`, or `None`; outros are `theme`, `flow`, `fade`, or `None`. The theme supplies default durations (0.6 seconds). Entrance and outro windows must fit without overlapping. `stagger` enters immediate children; `flow` recursively enters leaves and reverses their order on exit. Explicit `None` disables a side. Existing themes resolve omitted motion to none; `clean-flow` enables flow on both sides. Build reports include resolved motion and absolute placement start/end times. See [Clean-flow](clean-flow.md).
 
 `segment.play(handle_or_child, callback, at=0, duration=1)` schedules a core Animation within the placement's authored lifetime. Local `at` becomes global time once. Use `handle["value"]` for named children. Overlapping writes to the same property are rejected by the engine; different properties and distinct placements may overlap. A finite placement disappears at its own end; an open placement disappears at the segment end.
 
@@ -80,7 +80,7 @@ Implement `compose(context, bounds) -> BlockBuild(root, children={}, bounds=None
 
 Block content props are defensively copied when added. Prefer frozen dataclasses and tuples. Store core components only inside `compose`, never on the reusable block definition. Do not mutate the context while composing a block. Failed compilations publish no result and can be retried with fresh components.
 
-Themes are frozen dataclasses in `facelesschamp_kit.themes`. Assign a custom Theme to `ctx.theme` in the factory before constructing Video; update `ctx.canvas` with a matching background if desired. Heading, TextPanel, and MetricCard support default/accent/muted variants and explicit color overrides. Precedence is theme defaults → chosen theme → variant → explicit color. Stack and Split are composable blocks; Split uses rows in portrait and columns in landscape.
+Themes are frozen dataclasses in `facelesschamp_kit.themes`; `Theme` and `CLEAN_FLOW` are also exported at package root. Assign a custom Theme to `ctx.theme` in the factory before constructing Video; update `ctx.canvas` with a matching background if desired. Heading, TextPanel, and MetricCard support default/accent/muted variants and explicit color overrides. Precedence is theme defaults → chosen theme → variant → explicit color. Stack and Split are composable blocks; Split uses rows in portrait and columns in landscape. Optional theme tokens cover font weights, card shadows, a dot-grid backdrop, default entrances/outros, motion distance/stagger and editor theme. For regular custom fonts clear the variable-font weights. [Clean-flow](clean-flow.md) documents defaults and measured card content bounds.
 
 `whiteboard_basic(ctx, *, scenes, audio=None, subtitles=None, markers=None, captions=None, theme=None,
 draw_fraction=0.7)` and immutable `WhiteboardScene` recipes are available from `facelesschamp_kit.templates`.

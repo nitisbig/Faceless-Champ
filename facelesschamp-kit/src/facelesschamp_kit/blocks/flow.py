@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from itertools import pairwise
 
-from faceless_champ import Arrow, Bounds, Group, Rectangle
+from faceless_champ import Arrow, Bounds, Group, Rectangle, card_content_bounds, card_surface
 
 from ..diagnostics import KitError
 from .base import BlockBuild, fit_text
@@ -49,6 +49,9 @@ class FlowDiagram:
                 corner_radius=min(ctx.theme.radius, min(box.width, box.height) / 2),
                 position=box.center,
             )
+            if ctx.theme.shadow:
+                card = card_surface(box, fill=ctx.theme.surface, radius=ctx.theme.radius, shadow=ctx.theme.shadow)
+                box = card_content_bounds(box, shadow=ctx.theme.shadow, padding=0)
             label = fit_text(text, ctx, Bounds(box.left + 16, box.top + 16, box.right - 16, box.bottom - 16))
             node = Group(card, label)
             roots.append(node)

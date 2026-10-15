@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from faceless_champ import Bounds, ImageSlot, Number, Rectangle
+from faceless_champ import Bounds, ImageSlot, Number, Rectangle, card_content_bounds, card_surface
 
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
@@ -30,6 +30,8 @@ def palette(ctx, variant, color):
 
 
 def panel(ctx, box):
+    if ctx.theme.shadow is not None:
+        return card_surface(box, fill=ctx.theme.surface, radius=ctx.theme.radius, shadow=ctx.theme.shadow)
     return Rectangle(
         width=max(1, box.width - 4),
         height=max(1, box.height - 4),
@@ -39,6 +41,11 @@ def panel(ctx, box):
         corner_radius=min(ctx.theme.radius, (box.height - 4) / 2),
         position=box.center,
     )
+
+
+def panel_face(ctx, box):
+    """Content uses the card face rather than its transparent shadow clearance."""
+    return card_content_bounds(box, shadow=ctx.theme.shadow, padding=0) if ctx.theme.shadow else box
 
 
 @dataclass(frozen=True)
@@ -54,6 +61,7 @@ class Heading:
             bounds,
             size=context.theme.heading_size,
             color=palette(context, self.variant, self.color),
+            heading=True,
         )
         return BlockBuild(text, {"text": text})
 
@@ -67,8 +75,10 @@ class TextPanel:
 
     def compose(self, ctx, bounds):
         box = centered(bounds, 600)
+        background = panel(ctx, box)
+        box = panel_face(ctx, box)
         p = min(ctx.theme.spacing, max(8, box.height / 12))
-        children = {"background": panel(ctx, box)}
+        children = {"background": background}
         top = box.top + p
         if self.title:
             title_height = min(120, (box.height - 3 * p) * 0.38)
@@ -78,6 +88,7 @@ class TextPanel:
                 Bounds(box.left + p, top, box.right - p, top + title_height),
                 size=min(ctx.theme.heading_size, ctx.theme.body_size * 1.4),
                 color=ctx.theme.accent,
+                heading=True,
             )
             top += title_height + p
         children["text"] = fit_text(
@@ -99,14 +110,17 @@ class MetricCard:
     def compose(self, ctx, bounds):
         value = number(self.value, "MetricCard.value", minimum=-float("inf"))
         box = centered(bounds, 460)
+        background = panel(ctx, box)
+        box = panel_face(ctx, box)
         p = ctx.theme.spacing
         if box.height < 180:
             raise KitError("LAYOUT", "MetricCard needs at least 180 design pixels in height")
-        children = {"background": panel(ctx, box)}
+        children = {"background": background}
         area = Bounds(box.left + p, box.top + p, box.right - p, box.top + box.height * 0.62)
         metric = Number(
             value,
             font=ctx.theme.font,
+            font_weight=ctx.theme.heading_weight,
             font_size=132,
             color=palette(ctx, self.variant, self.color),
             position=area.center,
@@ -128,8 +142,10 @@ class ImageCard:
 
     def compose(self, ctx, bounds):
         box = centered(bounds, 760)
+        background = panel(ctx, box)
+        box = panel_face(ctx, box)
         p = ctx.theme.spacing
-        children = {"background": panel(ctx, box)}
+        children = {"background": background}
         image_box = Bounds(box.left + p, box.top + p, box.right - p, box.bottom - (120 if self.label else p))
         path = ctx.assets.image(self.asset, self.mode)
         entry = ctx.assets.entries.get(self.asset, {})
@@ -210,4 +226,5 @@ __all__ = [
 ]
 
 from .arch import ArchCanvas
+
 __all__ += ["ArchCanvas"]

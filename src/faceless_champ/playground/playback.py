@@ -183,9 +183,18 @@ def _text(draw, text, box, *, size=24, minimum=18, color="#E9EFF9", font_path=No
     )
 
 
+def _optional_theme(theme):
+    if isinstance(theme, str):
+        theme = CodeTheme.named(theme)
+    if theme is not None and not isinstance(theme, CodeTheme):
+        raise TypeError("theme must be a named theme, CodeTheme, or None")
+    return theme
+
+
 class PlaygroundCanvas(PlaygroundView):
-    def __init__(self, prepared, *, width=800, height=620, font_size=24, minimum_font_size=18, **kwargs):
+    def __init__(self, prepared, *, width=800, height=620, font_size=24, minimum_font_size=18, theme=None, **kwargs):
         super().__init__(width=width, height=height, **kwargs)
+        self.theme = _optional_theme(theme)
         self.prepared = prepared if isinstance(prepared, PreparedPlayground) else PreparedPlayground(prepared)
         self.font_size, self.minimum_font_size = (
             finite(font_size, "font_size", 12),
@@ -251,7 +260,9 @@ class PlaygroundCanvas(PlaygroundView):
     def frame_image(self, age, factor=1):
         time = self.source_start + age
         state = self.state_at(time)
-        image = Image.new("RGBA", (round(self.width), round(self.height)), "#101A2B")
+        image = Image.new(
+            "RGBA", (round(self.width), round(self.height)), self.theme.background if self.theme else "#101A2B"
+        )
         draw = ImageDraw.Draw(image)
         if state is not None:
             result = state["result"]
@@ -282,20 +293,24 @@ class PlaygroundCanvas(PlaygroundView):
                     if event["to"]:
                         a, b = boxes[event["target"]], boxes[event["to"]]
                         start, end = ((a[0] + a[2]) / 2, (a[1] + a[3]) / 2), ((b[0] + b[2]) / 2, (b[1] + b[3]) / 2)
-                        draw.line((start, end), fill="#F5C86B", width=3)
+                        signal = self.theme.accent if self.theme else "#F5C86B"
+                        draw.line((start, end), fill=signal, width=3)
                         t = (time - event["at"]) / event["duration"]
                         x, y = (u + (v - u) * t for u, v in zip(start, end))
-                        draw.ellipse((x - 7, y - 7, x + 7, y + 7), fill="#F5C86B")
+                        draw.ellipse((x - 7, y - 7, x + 7, y + 7), fill=signal)
         return image.resize(
             (max(1, round(self.width * factor)), max(1, round(self.height * factor))), Image.Resampling.LANCZOS
         )
 
     def _draw_item(self, draw, item, box, active, cells=()):
         l, t, r, b = box
-        color = "#F5C86B" if active else item["color"]
-        draw.rounded_rectangle(box, radius=12, fill="#18263B", outline=color, width=4 if active else 2)
+        color = (self.theme.accent if self.theme else "#F5C86B") if active else item["color"]
+        draw.rounded_rectangle(
+            box, radius=12, fill=self.theme.chrome if self.theme else "#18263B", outline=color, width=4 if active else 2
+        )
 
-        def text(value, bounds, color="#E9EFF9"):
+        def text(value, bounds, color=None):
+            color = color or (self.theme.foreground if self.theme else "#E9EFF9")
             _text(draw, value, bounds, size=self.font_size, minimum=self.minimum_font_size, color=color)
 
         text(item["label"] or item["id"], (l + 14, t + 12, r - 14, t + 45), color)
@@ -324,7 +339,9 @@ class PlaygroundCanvas(PlaygroundView):
                     left, upper = l + 14 + x * cw, top + y * ch
                     draw.rectangle(
                         (left, upper, left + cw - 3, upper + ch - 3),
-                        fill="#745A22" if (y, x) in cells else "#253952",
+                        fill=(self.theme.highlight if self.theme else "#745A22")
+                        if (y, x) in cells
+                        else (self.theme.chrome if self.theme else "#253952"),
                         outline=color,
                     )
                     text(f"{cell:g}", (left + 5, upper + 4, left + cw - 8, upper + ch - 7))
@@ -337,8 +354,9 @@ class PlaygroundCanvas(PlaygroundView):
 
 
 class PlaygroundOutput(PlaygroundView):
-    def __init__(self, prepared, *, width=800, height=160, font_size=18, **kwargs):
+    def __init__(self, prepared, *, width=800, height=160, font_size=18, theme=None, **kwargs):
         super().__init__(width=width, height=height, **kwargs)
+        self.theme = _optional_theme(theme)
         self.prepared = prepared if isinstance(prepared, PreparedPlayground) else PreparedPlayground(prepared)
         self.font_size = finite(font_size, "font_size", 12)
         self.script = self.prepared.script
@@ -354,7 +372,9 @@ class PlaygroundOutput(PlaygroundView):
     def frame_image(self, age, factor=1):
         from ..coding import MONO_FONT
 
-        image = Image.new("RGBA", (round(self.width), round(self.height)), "#080F1C")
+        image = Image.new(
+            "RGBA", (round(self.width), round(self.height)), self.theme.background if self.theme else "#080F1C"
+        )
         draw = ImageDraw.Draw(image)
         font = load_font(str(MONO_FONT), round(self.font_size))
         time = self.source_start + age
@@ -386,7 +406,7 @@ class PlaygroundOutput(PlaygroundView):
                 (12, 12),
                 "\n".join(lines),
                 font=font,
-                fill="#FF9299" if result["exit_code"] else "#ADC4DC",
+                fill="#FF9299" if result["exit_code"] else (self.theme.muted if self.theme else "#ADC4DC"),
                 spacing=self.font_size * 0.5,
             )
         return image.resize(

@@ -432,7 +432,7 @@ class _Prepared:
             prepared,
             layout="side" if side else "stacked",
             font_size=font_size,
-            theme="paper" if ctx.theme.name in {"light", "whiteboard"} else "midnight",
+            theme="paper" if ctx.theme.name in {"light", "whiteboard"} else ctx.theme.code_theme,
         ).compose(ctx, box)
 
 

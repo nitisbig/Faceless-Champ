@@ -25,7 +25,7 @@ class Block(Protocol):
     def compose(self, context, bounds: Bounds) -> BlockBuild: ...
 
 
-def fit_text(text, ctx, box, *, size=None, color=None, align="center"):
+def fit_text(text, ctx, box, *, size=None, color=None, align="center", heading=False):
     if not isinstance(text, str) or not text.strip():
         raise KitError("BLOCK_PROPS", "Text must be a nonempty string")
     theme = ctx.theme
@@ -40,6 +40,7 @@ def fit_text(text, ctx, box, *, size=None, color=None, align="center"):
             font_size=size,
             min_font_size=minimum,
             font=theme.font,
+            font_weight=theme.heading_weight if heading else theme.font_weight,
             color=color or theme.foreground,
             align=align,
         )

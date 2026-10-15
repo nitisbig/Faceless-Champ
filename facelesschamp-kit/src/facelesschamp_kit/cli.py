@@ -11,6 +11,7 @@ from pathlib import Path
 from .diagnostics import KitError
 from .project import Project, package_version
 from .scaffold import init_project
+from .themes import THEMES
 
 CATALOG = {
     "blocks": [
@@ -33,7 +34,7 @@ CATALOG = {
         "FinderWindow",
         "SettingsWindow",
     ],
-    "themes": ["midnight", "light", "whiteboard"],
+    "themes": list(THEMES),
     "templates": [
         "silent",
         "explainer-short",

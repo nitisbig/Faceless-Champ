@@ -67,10 +67,12 @@ from .narration import CueScene
 from .preview import StoryboardSample, render_storyboard, save_frame
 from .renderer import PillowRenderer, Renderer
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
+from .surfaces import ShadowStyle, card_content_bounds, card_surface, dot_grid
 from .timeline import Grid, Layer, Scene, Sequence
-from .typography import fit_text
+from .typography import CLEAN_FLOW_FONT, fit_text
 
 __all__ = [
+    "CLEAN_FLOW_FONT",
     "COLOR_SCHEMES",
     "Animation",
     "Arrow",
@@ -122,6 +124,7 @@ __all__ = [
     "ScatterPlot",
     "Scene",
     "Sequence",
+    "ShadowStyle",
     "Shake",
     "SlideIn",
     "SlideOut",
@@ -138,6 +141,9 @@ __all__ = [
     "Write",
     "ZoomIn",
     "ZoomOut",
+    "card_content_bounds",
+    "card_surface",
+    "dot_grid",
     "ease_in",
     "ease_out",
     "fit_text",

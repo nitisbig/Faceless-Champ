@@ -11,16 +11,10 @@ from faceless_champ import Canvas, Scene, CodingChamp, CodeReveal
 
 scene = Scene(Canvas(1920, 1080, "#080E1B"))
 code = CodingChamp(
-    "class Player:\n    health = 100",
-    language="python",
-    theme="midnight",
-    filename="player.py",
-    width=1500,
-    height=720,
-    font_size=48,
-    position=(960, 540),
-    reveal_mode="typewriter",
-    highlighted_lines=(2,),
+    'class Player:\n    health = 100',
+    language="python", theme="midnight", filename="player.py",
+    width=1500, height=720, font_size=48, position=(960, 540),
+    reveal_mode="typewriter", highlighted_lines=(2,),
 )
 scene.play(CodeReveal(code), run_time=2)
 scene.wait(1)
@@ -44,15 +38,16 @@ an error with suggestions to use a shorter excerpt, enlarge the panel, or reduce
 There is no implicit wrapping, scrolling, or execution.
 
 `CodeTheme.named("midnight")`, `"ocean"`, and `"paper"` provide dark, teal, and light
-palettes. Customize immutable themes with `dataclasses.replace`, for example:
+palettes. `"clean-flow"` uses a charcoal editor and chrome, orange accent, and
+restrained syntax colors alongside the light clean-flow card style. Customize
+immutable themes with `dataclasses.replace`, for example:
 
 ```python
 from dataclasses import replace
 from faceless_champ import CodeTheme
 
-theme = replace(
-    CodeTheme.named("midnight"), accent="#FFCF70", syntax={"Keyword": "#C6A0F6", "Literal.String": "#A6DA95"}
-)
+theme = replace(CodeTheme.named("midnight"), accent="#FFCF70",
+                syntax={"Keyword": "#C6A0F6", "Literal.String": "#A6DA95"})
 ```
 
 Theme fields are `background`, `chrome`, `foreground`, `muted`, `accent`, `highlight`,

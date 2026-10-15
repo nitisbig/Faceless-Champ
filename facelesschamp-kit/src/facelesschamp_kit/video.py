@@ -40,6 +40,8 @@ class Placement:
     core: bool = False
     at: float = 0
     duration: float | None = None
+    exit: str | None = "theme"
+    exit_duration: float | None = None
 
 
 @dataclass
@@ -88,16 +90,20 @@ class Segment:
         id=None,
         bounds=None,
         anchor="center",
-        enter=None,
+        enter="theme",
         enter_duration=None,
+        exit="theme",
+        exit_duration=None,
         z_index=0,
         at=0,
         duration=None,
     ):
         if anchor != "center":
             raise KitError("LAYOUT", "Use anchor='center' or explicit bounds for placement")
-        if enter not in {None, "fade", "pop", "stagger"}:
-            raise KitError("MOTION", "Entry must be fade, pop, or stagger")
+        if enter not in {None, "theme", "flow", "fade", "pop", "stagger"}:
+            raise KitError("MOTION", "Entry must be theme, flow, fade, pop, stagger, or None")
+        if exit not in {None, "theme", "flow", "fade"}:
+            raise KitError("MOTION", "Outro must be theme, flow, fade, or None")
         name = id or f"block-{len(self.placements) + 1}"
         if not isinstance(name, str) or not name or "/" in name:
             raise KitError("PLACEMENT_ID", "Placement IDs must be nonempty and cannot contain '/'")
@@ -107,10 +113,21 @@ class Segment:
         at = number(at, "at")
         life = number(duration, "duration", positive=True) if duration is not None else None
         run = number(enter_duration, "enter_duration", positive=True) if enter_duration is not None else None
+        outro = number(exit_duration, "exit_duration", positive=True) if exit_duration is not None else None
         if at >= self.duration or (life is not None and at + life > self.duration + 1e-9):
             raise KitError("PLACEMENT_WINDOW", "Placement exceeds its segment", segment=self.name)
-        if enter and run is not None and run > (life if life is not None else self.duration - at):
+        if (
+            enter not in {None, "theme"}
+            and run is not None
+            and run > (life if life is not None else self.duration - at)
+        ):
             raise KitError("MOTION_WINDOW", "Entrance exceeds placement lifetime", segment=self.name)
+        if (
+            exit not in {None, "theme"}
+            and outro is not None
+            and outro > (life if life is not None else self.duration - at)
+        ):
+            raise KitError("MOTION_WINDOW", "Outro exceeds placement lifetime", segment=self.name)
         self.placements.append(
             Placement(
                 handle,
@@ -121,6 +138,8 @@ class Segment:
                 number(z_index, "z_index", minimum=-float("inf")),
                 at=at,
                 duration=life,
+                exit=exit,
+                exit_duration=outro,
             )
         )
         return handle

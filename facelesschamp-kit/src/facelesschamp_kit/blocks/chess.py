@@ -15,9 +15,20 @@ class ChessBoard:
     assets: ChessAssets | None = None
 
     def compose(self, context, bounds):
+        theme = self.theme
+        if theme is None and context.theme.name == "clean-flow":
+            theme = ChessTheme(
+                light="#FFFFFF",
+                dark="#D6D2CA",
+                background=context.theme.background,
+                panel=context.theme.surface,
+                foreground=context.theme.foreground,
+                muted=context.theme.muted,
+                accent=context.theme.accent,
+            )
         board = ChessChamp(
             self.script,
-            theme=self.theme,
+            theme=theme,
             source_start=self.source_start,
             assets=self.assets,
             width=bounds.width,

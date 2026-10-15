@@ -187,7 +187,13 @@ across separate preparations.
 `ctx.playground(script, ...)` declares a dependency resolved by `Project.prepare()`.
 `CodeEditor` and `CodingPlayground` are exported from `facelesschamp_kit.blocks`.
 `CodingPlayground` has `layout="side"|"stacked"`, `code_ratio=.5`, `font_size=24`,
-`theme="midnight"`, `output=True`, and `source_start=0`. Named children are `editor`,
+`theme=None` (inherit the kit editor theme), `output=True`, and `source_start=0`. Named children are `editor`,
 `canvas`, and optional `output`, usable with ordinary kit animations. Composition
 belongs to the kit; preparation, source edits, pixels, and result validation belong
 to core. Existing display-only `CodingChamp` and `CodeReveal` remain unchanged.
+
+`PlaygroundCanvas` and `PlaygroundOutput` accept optional `theme=None`, a named
+`CodeTheme`, or a `CodeTheme` instance. Omitting it preserves their original
+appearance. Clean-flow kit playgrounds apply one palette to editor, result canvas,
+and output; explicit editor themes override that palette. Captured web output keeps
+its authored CSS. Styling prepared playback does not execute checkpoints again.

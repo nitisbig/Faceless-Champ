@@ -5,6 +5,7 @@ from pathlib import Path
 from PIL import ImageFont
 
 DEFAULT_FONT = str(Path(__file__).parent / "assets" / "DejaVuSans.ttf")
+CLEAN_FLOW_FONT = str(Path(__file__).parent / "assets" / "DMSans[opsz,wght].ttf")
 
 
 def fit_text(

@@ -30,6 +30,12 @@ Python in the normal kit project remains executable authoring. Start `build(ctx)
 with `AgentProject(ctx.root).new_video(ctx)` to apply style, assets and narration.
 Match plan IDs/times to kit segments. Use `apply_recipe` or compose public APIs.
 
+`DesignSpec.theme` accepts `midnight`, `light`, `whiteboard`, and `clean-flow`.
+Clean-flow supplies warm gray surfaces, rounded white cards, orange accents, packaged
+DM Sans and smooth element reveals/outros. Omit `design.font` to retain the selected
+theme font; a supplied custom font clears inherited variable-font weights. Explicit
+`segment.add(..., enter=None, exit=None)` disables automatic clean-flow motion.
+
 All commands emit structured JSON. Results are under `result`; failures include
 `error.code`, `message`, `suggested_fix`, and relevant locations. Paths explicitly
 passed as outputs are relative to the caller; inputs in the plan are project-relative.

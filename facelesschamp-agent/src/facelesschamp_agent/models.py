@@ -51,7 +51,7 @@ class VideoBrief(Record):
 
 
 class DesignSpec(Record):
-    theme: Literal["midnight", "light", "whiteboard"] = "midnight"
+    theme: Literal["midnight", "light", "whiteboard", "clean-flow"] = "midnight"
     rationale: Text = "High contrast with a restrained accent and readable labels"
     font: Text | None = None
     palette: dict[str, str] = Field(default_factory=dict)

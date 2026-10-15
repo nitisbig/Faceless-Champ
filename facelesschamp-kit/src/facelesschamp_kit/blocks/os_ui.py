@@ -21,10 +21,17 @@ class OSWalkthrough:
     def compose(self, context, bounds):
         width, height = self.viewport
         ratio = min(bounds.width / width, bounds.height / height)
+        preset = self.preset
+        if preset is None and context.theme.name == "clean-flow":
+            preset = MacOSPreset(
+                wallpaper=context.theme.background,
+                accent=context.theme.accent,
+                font=context.theme.font,
+            )
         clip = OSClip(
             self.filesystem,
             self.script,
-            preset=self.preset,
+            preset=preset,
             pages=self.pages,
             source_start=self.source_start,
             cursor=self.cursor,

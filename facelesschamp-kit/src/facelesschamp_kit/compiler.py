@@ -2,7 +2,21 @@
 
 from dataclasses import dataclass, field
 
-from faceless_champ import Animation, Captions, ChessChamp, FadeIn, Group, PopIn, Scene
+from faceless_champ import (
+    Animation,
+    Bounds,
+    Captions,
+    ChessChamp,
+    FadeIn,
+    FadeOut,
+    Group,
+    PopIn,
+    Scene,
+    SlideIn,
+    SlideOut,
+    dot_grid,
+    smooth,
+)
 from faceless_champ.arch import ArchChamp, ArchDataError
 from faceless_champ.flow import FlowChamp, FlowDataError
 from faceless_champ.os_ui import OSClip
@@ -62,6 +76,14 @@ def descendants(root):
             yield from descendants(child)
 
 
+def _flow_targets(root):
+    return [component for component in descendants(root) if not isinstance(component, Group)]
+
+
+def _flow_step(theme, window, count):
+    return min(theme.motion_stagger, 0.35 * window / (count - 1)) if count > 1 else 0
+
+
 def compile_video(video):
     ctx = video.context
     scene = Scene(ctx.canvas)
@@ -76,6 +98,20 @@ def compile_video(video):
     layout_records = []
     claimed = set()
     hidden = set()
+    if ctx.theme.background_pattern == "dots":
+        backdrop = dot_grid(
+            Bounds(0, 0, ctx.canvas.width, ctx.canvas.height),
+            color=ctx.theme.grid_color,
+            spacing=ctx.theme.grid_spacing,
+            radius=ctx.theme.grid_radius,
+            z_index=-1_000_000,
+        )
+        run = min(ctx.theme.motion_duration, duration / 2)
+        with scene.at(0):
+            scene.add(backdrop)
+            scene.play(FadeIn(backdrop), run_time=run)
+        with scene.at(duration - run):
+            scene.play(FadeOut(backdrop), run_time=run)
     if duration > visual_end:
         diagnostics.append({"code": "AUDIO_TAIL_HOLD", "segment": final.name, "seconds": duration - visual_end})
     for segment in video.segments:
@@ -108,6 +144,12 @@ def compile_video(video):
                 authored_lifetime = (
                     placement.duration if placement.duration is not None else segment.duration - placement.at
                 )
+                entrance = ctx.theme.default_enter if placement.enter == "theme" else placement.enter
+                outro = ctx.theme.default_exit if placement.exit == "theme" else placement.exit
+                entry_run = (placement.enter_duration or ctx.theme.motion_duration) if entrance else 0
+                exit_run = (placement.exit_duration or ctx.theme.motion_duration) if outro else 0
+                if entry_run + exit_run > authored_lifetime + 1e-9:
+                    raise KitError("MOTION_WINDOW", "Entrance and outro must fit without overlapping")
                 for member in members:
                     if isinstance(member, ArchChamp):
                         arch_designs.append(
@@ -193,27 +235,56 @@ def compile_video(video):
                         "z_index": placement.z_index,
                         "start": placement_start,
                         "end": placement_end,
+                        "enter": entrance,
+                        "exit": outro,
+                        "enter_duration": entry_run,
+                        "exit_duration": exit_run,
                     }
                 )
-                if placement.enter:
-                    run = placement.enter_duration or ctx.theme.motion_duration
-                    authored_lifetime = (
-                        placement.duration if placement.duration is not None else segment.duration - placement.at
-                    )
-                    if run > authored_lifetime:
-                        raise KitError("MOTION_WINDOW", "Entry recipe exceeds placement; shorten enter_duration")
+                if entrance:
+                    run = entry_run
                     targets = (
-                        list(built.root.children)
-                        if placement.enter == "stagger" and isinstance(built.root, Group)
+                        _flow_targets(built.root)
+                        if entrance == "flow"
+                        else list(built.root.children)
+                        if entrance == "stagger" and isinstance(built.root, Group)
                         else [built.root]
                     )
-                    step = run / (len(targets) + 1) if len(targets) > 1 else 0
+                    step = (
+                        _flow_step(ctx.theme, run, len(targets))
+                        if entrance == "flow"
+                        else run / (len(targets) + 1)
+                        if len(targets) > 1
+                        else 0
+                    )
                     leaf_duration = run - step * (len(targets) - 1)
                     for i, target in enumerate(targets):
-                        recipe = PopIn if placement.enter == "pop" else FadeIn
-                        animation = recipe(target)
+                        if entrance == "flow":
+                            animation = SlideIn(target, direction="up", distance=ctx.theme.motion_distance)
+                            animation.starts["position"] = (
+                                target.position[0],
+                                target.position[1] + ctx.theme.motion_distance,
+                            )
+                            animation.targets["position"] = target.position
+                            animation.relative = ()
+                            animation.rate_func = smooth
+                        else:
+                            animation = (PopIn if entrance == "pop" else FadeIn)(target)
                         hidden.add(target)
                         events.append((placement_start + i * step, 2, "play", animation, leaf_duration, scope))
+                if outro:
+                    targets = list(reversed(_flow_targets(built.root))) if outro == "flow" else [built.root]
+                    step = _flow_step(ctx.theme, exit_run, len(targets)) if outro == "flow" else 0
+                    leaf_duration = exit_run - step * (len(targets) - 1)
+                    for i, target in enumerate(targets):
+                        animation = (
+                            SlideOut(target, direction="up", distance=ctx.theme.motion_distance)
+                            if outro == "flow"
+                            else FadeOut(target)
+                        )
+                        if outro == "flow":
+                            animation.rate_func = smooth
+                        events.append((placement_end - exit_run + i * step, 2, "play", animation, leaf_duration, scope))
             except KitError as exc:
                 raise KitError(exc.code, exc.message, **(exc.scope | scope)) from exc
             except (ValueError, TypeError, OSError) as exc:

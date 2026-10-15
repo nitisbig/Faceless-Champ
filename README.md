@@ -11,6 +11,7 @@ Current source versions: **faceless-champ 0.1.5**, **facelesschamp-kit 0.1.0rc7*
 | Legal timed games, PGN, and artwork | [ChessChamp](docs/chesschamp.md) | [ChessBoard](facelesschamp-kit/docs/chesschamp.md) |
 | Technical 3D models, assemblies, sections and dimensions | [ArchChamp](docs/archchamp.md) | [ArchCanvas](facelesschamp-kit/docs/archchamp.md) |
 | Scripted graphs, routes, and signals | [FlowChamp](docs/flowchamp.md) | [FlowCanvas](facelesschamp-kit/docs/flowchamp.md) |
+| Clean-flow styling, shadows, and smooth reveals | [Surfaces and palette](docs/clean-flow.md) | [Theme and motion](facelesschamp-kit/docs/clean-flow.md) |
 
 Install only the capabilities you use from this repository:
 

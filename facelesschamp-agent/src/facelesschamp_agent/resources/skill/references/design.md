@@ -1,9 +1,23 @@
 # Choosing visual treatments
 
 Select one coherent theme family for the video: midnight for high-contrast technical
-diagrams, light for editorial/data explanations, whiteboard for drawn explanations.
+diagrams, light for editorial/data explanations, whiteboard for drawn explanations,
+or clean-flow for a warm gray dashboard with rounded white cards and an orange accent.
 These are starting points, not mandatory mappings. Record the reason in DesignSpec.
 Apply shared typography, semantic colors and motion timing through new_video(ctx).
+
+Clean-flow uses packaged DM Sans at weight 700 for headings and 400 for body text,
+soft card shadows, a subtle dot grid, dark code panels, and peach highlights.
+Omit DesignSpec.font to retain the theme font; supplying a custom font clears the
+theme's variable-font weights. Apply the same palette to local HTML before capture.
+
+Kit placements default to enter="theme" and exit="theme". Clean-flow resolves both
+to a smooth 0.6-second "flow" reveal, moving 24 pixels upward while changing opacity.
+Nested groups reveal in stable order and leave in reverse order; scripted viewports
+keep their internal animation. Pass enter=None or exit=None to disable either side.
+For scene continuity, retain one background and overlap outgoing/incoming content
+for 0.6 seconds centered on a major boundary. Explicit durations must fit the
+placement lifetime and entrance/outro windows must not overlap.
 
 Use relationships that carry meaning: position for sequence, edges for dependency,
 length for magnitude, repeated objects for quantity, and motion for a process.

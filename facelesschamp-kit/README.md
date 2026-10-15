@@ -80,7 +80,9 @@ with video.segment("comparison", window=voice.between("comparison", "recap")) as
 
 ## Reuse and configuration
 
-The built-ins support portrait `shorts` and `landscape` design canvases, with `midnight`, `light`, and `whiteboard` themes. Export profiles scale the selected canvas; switching format rebuilds layout. Text wraps, then shrinks, and fails if it cannot fit at the theme minimum.
+The built-ins support portrait `shorts` and `landscape` design canvases, with `midnight`, `light`, `whiteboard`, and `clean-flow` themes. Export profiles scale the selected canvas; switching format rebuilds layout. Text wraps, then shrinks, and fails if it cannot fit at the theme minimum.
+
+[Clean-flow](docs/clean-flow.md) combines a warm gray dot-grid canvas, rounded white shadowed cards, bold packaged DM Sans, charcoal editors, and orange accents. Selecting it enables smooth staggered entrances and outros automatically. `enter=None` or `exit=None` disables a placement side; existing themes keep their previous behavior. A silent 60-second feature tour and preview-first `render.py` live in [training project/clean-flow](../training%20project/clean-flow/README.md).
 
 Create a whiteboard video with `fc-kit init my-board --template whiteboard-basic`, or import
 `whiteboard_basic` and `WhiteboardScene` from `facelesschamp_kit.templates`. Ordered paths, lines, arrows, rectangles,

@@ -13,7 +13,7 @@ from .base import BlockBuild
 class CodeEditor:
     script: PlaygroundScript
     font_size: float = 24
-    theme: str = "midnight"
+    theme: str | None = None
     source_start: float = 0
 
     def compose(self, context, bounds):
@@ -24,7 +24,7 @@ class CodeEditor:
             width=bounds.width,
             height=bounds.height,
             font_size=self.font_size,
-            theme=self.theme,
+            theme=self.theme or context.theme.code_theme,
             source_start=self.source_start,
             position=bounds.center,
         )
@@ -37,7 +37,7 @@ class CodingPlayground:
     layout: str = "side"
     code_ratio: float = 0.5
     font_size: float = 24
-    theme: str = "midnight"
+    theme: str | None = None
     output: bool = True
     source_start: float = 0
 
@@ -60,6 +60,8 @@ class CodingPlayground:
             editor_box = Bounds(bounds.left, bounds.top, bounds.right, edge)
             canvas_box = Bounds(bounds.left, edge + gap, bounds.right, bounds.bottom)
         children = {}
+        editor_theme = self.theme or context.theme.code_theme
+        result_theme = editor_theme if context.theme.name == "clean-flow" or editor_theme == "clean-flow" else None
         if self.output:
             output_height = max(100, canvas_box.height * 0.22)
             children["output"] = PlaygroundOutput(
@@ -70,6 +72,7 @@ class CodingPlayground:
                 source_start=self.source_start,
                 position=(canvas_box.left, canvas_box.bottom - output_height),
                 anchor="top_left",
+                theme=result_theme,
             )
             canvas_box = Bounds(
                 canvas_box.left, canvas_box.top, canvas_box.right, canvas_box.bottom - output_height - gap
@@ -86,5 +89,6 @@ class CodingPlayground:
             minimum_font_size=minimum,
             source_start=self.source_start,
             position=canvas_box.center,
+            theme=result_theme,
         )
         return BlockBuild(Group(*children.values()), children)

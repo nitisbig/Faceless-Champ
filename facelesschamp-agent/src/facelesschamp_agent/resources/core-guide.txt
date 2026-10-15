@@ -30,7 +30,7 @@ the current cursor: attach master narration explicitly with add_audio(path, star
 Text preserves whitespace and indentation. fit_text(text, Bounds(...), font_size=64,
 min_font_size=24) wraps/shrinks into measured bounds and rejects impossible fits.
 Text.font_weight controls an explicit variable font's Weight axis. Number supports
-formatting and animate.value_to(). ColorScheme.named: midnight, paper, ocean.
+formatting and animate.value_to(). ColorScheme.named: midnight, paper, ocean, clean-flow.
 
 Create Group(*components) before adding members to a scene; membership is fixed.
 Group.arrange, next_to, align_to, shift, component.bounds and Scene.bounds_at help layout.
@@ -52,6 +52,12 @@ ProgressBar/ProgressRing/Gauge/LoadingDots/Checkmark use progress_to; Countdown 
 Image.from_source accepts paths, bytes, or Pillow images; trim/tint preserve alpha.
 No implicit URL downloads. ImageSlot mode auto/placeholder/required reserves matching
 geometry; missing auto files show a labeled box, but corrupt present files fail.
+ShadowStyle(blur=16, offset=(0,12), color="#00000026") configures a cached card shadow.
+card_surface(bounds, fill="#FFFFFF", radius=44, shadow=None, **transform) returns an
+Image with transparent shadow padding; card_content_bounds(bounds, shadow=None, padding=28)
+measures its content area. dot_grid(bounds, color="#B7B3AE55", spacing=28, radius=1,
+**transform) rasterizes a reusable background once during composition. CLEAN_FLOW_FONT
+is the packaged DM Sans variable font; its license ships with the core assets.
 Polyline(draw_by="x") requires strictly increasing open paths; rounded caps are supported.
 Equation uses the equations extra and supports symbol color_map and fixed-layout Write.
 Flag(country_code) uses 254 bundled case-insensitive codes; flag_path/supported_flags
@@ -72,7 +78,10 @@ fixed-layout editor. CodeReveal(panel, start=0, end=1) uses normalized progress.
 reveal_mode: typewriter (characters), word (whitespace-separated words), block (lines).
 block_ends are strictly increasing inclusive local line numbers including the final line.
 Whitespace is preserved; code does not wrap, scroll implicitly, or execute.
-CodeTheme.named: midnight/ocean/paper; customize immutable themes with dataclasses.replace.
+CodeTheme.named: midnight/ocean/paper/clean-flow; customize immutable themes with dataclasses.replace.
+CodeTheme selects editor colors; code keeps the bundled monospaced font unless font= is explicit.
+For clean-flow graphic labels, use CLEAN_FLOW_FONT with font_weight=400 or 700. Regular
+custom fonts omit font_weight; kit custom fonts clear both font_weight and heading_weight.
 language="text" needs no Pygments. code_cache_mb=0 disables editor sprite retention.
 [API](docs/coding.md), [staged example](examples/coding/showcase.py).
 

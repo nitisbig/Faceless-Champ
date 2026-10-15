@@ -1,0 +1,26 @@
+{
+  "brand-mark": {
+    "type": "image",
+    "path": "assets/brand-mark.png",
+    "source": "Original geometric artwork for the clean-flow test project"
+  },
+  "knight": {
+    "type": "image",
+    "package": "faceless_champ",
+    "resource": "assets/chess/white-knight.png",
+    "source": "Faceless Champ bundled chess assets"
+  },
+  "nepal-flag": {
+    "type": "image",
+    "package": "faceless_champ",
+    "resource": "assets/flags/np.png",
+    "source": "Faceless Champ bundled flags"
+  },
+  "ui-font": {
+    "type": "font",
+    "package": "faceless_champ",
+    "resource": "assets/DMSans[opsz,wght].ttf",
+    "source": "DM Sans",
+    "license": "SIL Open Font License 1.1"
+  }
+}

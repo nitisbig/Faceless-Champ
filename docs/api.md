@@ -87,6 +87,10 @@ fallback for characters absent from the selected font.
 that font's axis range; static fonts reject this option. `None` preserves the font's
 default weight. The renderer keeps separate cached instances for each weight.
 
+`CLEAN_FLOW_FONT` is the absolute path to bundled variable DM Sans. Use
+`font=CLEAN_FLOW_FONT, font_weight=400` for body text and `font_weight=700` for
+headings. Its OFL license is packaged alongside the font.
+
 Images accept PNG, JPG/JPEG, WebP, and GIF files. `contain` preserves the entire image
 with transparent padding; `cover` crops to fill. GIF timing starts when the component
 is added and loops while visible. Non-GIF formats use their first frame.
@@ -141,6 +145,25 @@ formula = Equation(
 )
 self.play(Write(formula))
 ```
+
+## Card and backdrop surfaces
+
+`ShadowStyle(color="#00000026", blur=16, offset=(0, 12))` is an immutable soft
+shadow style. Blur and offset use design pixels. `card_surface(bounds, *,
+fill="#FFFFFF", radius=44, shadow=None, **component_options)` returns an in-memory
+Image with a rounded face and optional Gaussian shadow. `card_content_bounds(bounds,
+*, shadow=None, padding=28)` returns the content allocation inside that card.
+Shadow clearance is included inside the outer bounds, and an allocation too small
+for the shadow or content padding raises `ValueError`.
+
+`dot_grid(bounds, *, color="#B7B3AE55", spacing=28, radius=1,
+**component_options)` returns a transparent dotted backdrop Image; spacing is at
+least one design pixel. Both helpers generate pixels once at twice the design
+resolution and preserve transparent padding. Their returned viewport and center
+follow the supplied Bounds; geometry options (`width`, `height`, `position`,
+`anchor`, `fit`, `trim`) are reserved. Ordinary opacity, scale, rotation, mask,
+z-index, and image animations apply. Surfaces contain fixed pixels; recreate a
+surface to change its fill or pattern. See [the clean-flow example](clean-flow.md).
 
 ## Groups and measured layout
 
@@ -245,7 +268,7 @@ Render [examples/flags.py](../examples/flags.py) with the ordinary render CLI.
 
 ## Color schemes
 
-`ColorScheme.named(name)` selects `midnight`, `paper`, or `ocean`. `COLOR_SCHEMES`
+`ColorScheme.named(name)` selects `midnight`, `paper`, `ocean`, or `clean-flow`. `COLOR_SCHEMES`
 is the read-only mapping of preset names to immutable scheme objects. Fields are
 `name`, `background`, `surface`, `text`, `muted`, `axis`, `border`, `grid`, `primary`,
 `secondary`, `tertiary`, and `highlight`. Construct `ColorScheme(...)` with overrides

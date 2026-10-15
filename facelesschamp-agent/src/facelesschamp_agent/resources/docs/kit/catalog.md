@@ -1,5 +1,7 @@
 # v0.1 block catalog
 
+The `clean-flow` theme adds white cards with measured shadow clearance, packaged DM Sans weights, orange highlights and automatic nested flow entrances/outros. Specialized code, OS, chess, FlowChamp and ArchChamp blocks inherit their clean-flow defaults unless explicitly styled. See [Clean-flow](clean-flow.md) for placement overrides and card sizing.
+
 ## Current capability catalog
 
 | Block | Content | Named children | Guide |

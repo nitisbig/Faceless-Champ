@@ -41,27 +41,19 @@ instruction. Successful preparation is not a claim that a video export was verif
 
 ```python
 from faceless_champ import (
-    Canvas,
-    CanvasItem,
-    CodeCheckpoint,
-    CodeEditor,
-    PlaygroundCanvas,
-    PlaygroundOutput,
-    PlaygroundScript,
-    Scene,
-    ValueBinding,
-    prepare_playground,
+    Canvas, CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas,
+    PlaygroundOutput, PlaygroundScript, Scene, ValueBinding, prepare_playground,
 )
 
-source = """from faceless_champ.playground.runtime import emit
+source = '''from faceless_champ.playground.runtime import emit
 x = 6 * 7
 emit("answer", x)
 print(x)
-"""
+'''
 script = PlaygroundScript(
-    [CodeCheckpoint("answer", {"main.py": source}, "main.py", "main.py", edit_start=0, edit_end=1, publish=1)],
-    duration=3,
-    mode="backend",
+    [CodeCheckpoint("answer", {"main.py": source}, "main.py", "main.py",
+                    edit_start=0, edit_end=1, publish=1)],
+    duration=3, mode="backend",
     items=[CanvasItem("answer", "variable", "Answer")],
     bindings=[ValueBinding("answer", "answer")],
 )
@@ -116,7 +108,6 @@ Each checkpoint runs in a fresh subprocess and temporary project directory, with
 
 ```python
 from faceless_champ.playground.runtime import emit, event, inputs
-
 emit("car", {"speed": 40, "color": "red"})
 event("accelerated", {"amount": 40})
 ```
@@ -196,7 +187,13 @@ across separate preparations.
 `ctx.playground(script, ...)` declares a dependency resolved by `Project.prepare()`.
 `CodeEditor` and `CodingPlayground` are exported from `facelesschamp_kit.blocks`.
 `CodingPlayground` has `layout="side"|"stacked"`, `code_ratio=.5`, `font_size=24`,
-`theme="midnight"`, `output=True`, and `source_start=0`. Named children are `editor`,
+`theme=None` (inherit the kit editor theme), `output=True`, and `source_start=0`. Named children are `editor`,
 `canvas`, and optional `output`, usable with ordinary kit animations. Composition
 belongs to the kit; preparation, source edits, pixels, and result validation belong
 to core. Existing display-only `CodingChamp` and `CodeReveal` remain unchanged.
+
+`PlaygroundCanvas` and `PlaygroundOutput` accept optional `theme=None`, a named
+`CodeTheme`, or a `CodeTheme` instance. Omitting it preserves their original
+appearance. Clean-flow kit playgrounds apply one palette to editor, result canvas,
+and output; explicit editor themes override that palette. Captured web output keeps
+its authored CSS. Styling prepared playback does not execute checkpoints again.

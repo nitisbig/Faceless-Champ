@@ -30,6 +30,10 @@ accepting the same preparation settings plus timing and layout options.
 `code_ratio=.5`, and a font size at or above the theme's minimum. Named children
 `editor`, `canvas`, and optional `output` work with existing kit animations.
 
+Omitting `theme` inherits the kit's editor palette. Clean-flow applies its dark
+palette consistently to editor, result canvas and console; an explicit code theme
+overrides that palette. Existing themes retain their original result appearance.
+
 Use `start` for absolute placement, or `audio`, `subtitles`, `markers`, and `cues`
 for a narration window. Checkpoint and event times are local to that window; authored
 edits must finish before publication. Extra narration time holds the completed result.

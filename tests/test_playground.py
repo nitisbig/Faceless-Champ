@@ -49,6 +49,20 @@ def prepare(tmp_path, source="print(42)", **kwargs):
     return prepare_playground(script(source), cache_dir=tmp_path, **kwargs)
 
 
+def test_result_panels_accept_palette_and_preserve_legacy_default(tmp_path):
+    prepared = prepare(tmp_path)
+    for view, legacy in ((PlaygroundCanvas, (16, 26, 43, 255)), (PlaygroundOutput, (8, 15, 28, 255))):
+        old = view(prepared, width=400, height=220)
+        themed = view(prepared, width=400, height=220, theme="clean-flow")
+        override = view(prepared, width=400, height=220, theme="paper")
+        assert old.frame_image(0).getpixel((0, 0)) == legacy
+        assert themed.frame_image(0).getpixel((0, 0)) == (20, 22, 26, 255)
+        assert override.frame_image(0).getpixel((0, 0)) != themed.frame_image(0).getpixel((0, 0))
+        assert themed.frame_image(2).getpixel((0, 0)) == (20, 22, 26, 255)
+        with pytest.raises(TypeError, match="theme"):
+            view(prepared, theme=object())
+
+
 @pytest.mark.parametrize("path", ["../out.py", "/out.py", "a/../../out.py", "a\\b.py", "a//b", "./a.py", "C:/x"])
 def test_sources_cannot_escape_project(path):
     with pytest.raises(PlaygroundError):

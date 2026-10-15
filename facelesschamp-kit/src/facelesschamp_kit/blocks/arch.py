@@ -44,6 +44,8 @@ class ArchCanvas:
             "scale": min(bounds.width / width, bounds.height / height),
         }
         default_style = self.style or ArchStyle(color=context.theme.foreground, edge_color=context.theme.accent)
+        if self.style is None and context.theme.name == "clean-flow":
+            default_style = ArchStyle(color="#D8D5CF", edge_color=context.theme.muted)
         if isinstance(self.parts, dict):
             data = deepcopy(self.parts)
             if self.script is not None:

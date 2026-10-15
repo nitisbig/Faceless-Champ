@@ -67,7 +67,11 @@ fits fail. TextPanel adapts title/body space. ImageCard uses core ImageSlot; mis
 show labeled placeholders, corrupt present assets fail. Named children support core motions.
 FlowDiagram is a simple ordered chain with node-N/label-N/edge-N children.
 
-Themes: midnight/light/whiteboard. Explicit colors override variants and theme defaults.
+Themes: midnight/light/whiteboard/clean-flow. Explicit colors override variants and theme defaults.
+clean-flow uses packaged DM Sans, warm gray dot-grid background, rounded shadowed cards, orange accents and dark code editors.
+Segment.add defaults enter="theme", exit="theme"; clean-flow resolves both to flow, other themes to none. Explicit None disables a side.
+Flow enters nested leaves with a 24px upward slide and opacity, reverses order for outros, and validates non-overlapping side windows.
+Core card_surface/card_content_bounds and dot_grid provide reusable measured surfaces. Prepare code/HTML separately; playback replays assets.
 Landscape/shorts rebuild layout; export profiles scale the selected canvas. Assets use a
 manifest and ctx.assets.image/audio/subtitle/font; no implicit downloads or installations.
 Declare dependencies for source checksums/reports. [Catalog](docs/catalog.md).

@@ -1,0 +1,29 @@
+schema_version = 1
+
+[project]
+name = "clean-flow feature tour"
+seed = 14
+safe_margin = 48
+caption_space = 0
+
+[videos.main]
+factory = "videos.main:build"
+format = "landscape"
+theme = "clean-flow"
+captions = false
+
+[profiles.preview]
+width = 960
+height = 540
+fps = 15
+antialias = 1
+crf = 23
+preset = "veryfast"
+
+[profiles.final]
+width = 1920
+height = 1080
+fps = 30
+antialias = 2
+crf = 18
+preset = "medium"

@@ -66,6 +66,25 @@ class CodeTheme:
             return cls()
         if name == "ocean":
             return cls(background="#062C38", chrome="#104352", accent="#5DE4C7", highlight="#175064")
+        if name == "clean-flow":
+            return cls(
+                background="#14161A",
+                chrome="#1F2329",
+                foreground="#F5F5F5",
+                muted="#A6A7AD",
+                accent="#FF5A20",
+                highlight="#302522",
+                syntax={
+                    "Keyword": "#BCA7E6",
+                    "Name.Builtin": "#81B6D9",
+                    "Name.Function": "#8FC6D9",
+                    "Name.Class": "#E8C47A",
+                    "Literal.String": "#A3C9A6",
+                    "Literal.Number": "#F3B69D",
+                    "Comment": "#A6A7AD",
+                    "Operator": "#F5F5F5",
+                },
+            )
         if name == "paper":
             return cls(
                 background="#F6F8FC",
@@ -85,7 +104,7 @@ class CodeTheme:
                     "Operator": "#006B86",
                 },
             )
-        raise ValueError("Unknown code theme; use midnight, ocean, or paper")
+        raise ValueError("Unknown code theme; use midnight, ocean, paper, or clean-flow")
 
     def token_color(self, name):
         name = name.removeprefix("Token.")

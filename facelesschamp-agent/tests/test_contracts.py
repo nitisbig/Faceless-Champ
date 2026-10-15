@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from facelesschamp_agent import AgentError, CapabilityRegistry, VideoPlan
+from facelesschamp_agent import AgentError, CapabilityRegistry, DesignSpec, VideoPlan
 from facelesschamp_agent.cli import main
 from facelesschamp_agent.models import ReviewSubmission
 from facelesschamp_agent.scaffold import INITIAL_PLAN
@@ -42,6 +42,48 @@ def test_registry_covers_public_api_and_bundled_docs():
     assert "guide" in registry.describe("faceless_champ.FlowChamp")
     with pytest.raises(AgentError, match="CAPABILITY_ID"):
         registry.describe("CodeEditor")
+
+
+def test_clean_flow_theme_is_in_plan_schema():
+    design = DesignSpec(theme="clean-flow")
+    assert DesignSpec.model_validate_json(design.model_dump_json()) == design
+    assert "clean-flow" in DesignSpec.model_json_schema()["properties"]["theme"]["enum"]
+    assert "clean-flow" in VideoPlan.model_json_schema()["$defs"]["DesignSpec"]["properties"]["theme"]["enum"]
+
+
+def test_clean_flow_preserves_packaged_font_when_plan_omits_font(project):
+    from faceless_champ import Canvas
+    from facelesschamp_kit import BuildContext
+    from facelesschamp_kit.themes import THEMES
+
+    plan = project.plan
+    plan.design.theme = "clean-flow"
+    plan.design.palette = {"accent": "#E15422"}
+    project.plan_path.write_text(plan.model_dump_json())
+    ctx = BuildContext(project.root, Canvas(1920, 1080))
+    project.new_video(ctx)
+    selected = THEMES["clean-flow"]
+    assert ctx.theme.font == selected.font
+    assert Path(ctx.theme.font).is_file()
+    assert ctx.theme.font_weight == 400
+    assert ctx.theme.heading_weight == 700
+    assert ctx.theme.accent == "#E15422"
+    assert ctx.canvas.bg == selected.background
+
+
+def test_plan_custom_font_clears_packaged_variable_weights(project):
+    from faceless_champ import Canvas
+    from facelesschamp_kit import BuildContext
+
+    plan = project.plan
+    plan.design.theme = "clean-flow"
+    plan.design.font = "assets/custom-font.ttf"
+    project.plan_path.write_text(plan.model_dump_json())
+    ctx = BuildContext(project.root, Canvas(1920, 1080))
+    project.new_video(ctx)
+    assert ctx.theme.font == str(project.root / "assets/custom-font.ttf")
+    assert ctx.theme.font_weight is None
+    assert ctx.theme.heading_weight is None
 
 
 def test_schema_round_trip_and_cli_from_other_directory(project, tmp_path, monkeypatch, capsys):

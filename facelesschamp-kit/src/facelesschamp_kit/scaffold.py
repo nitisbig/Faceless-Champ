@@ -208,7 +208,7 @@ def init_project(destination, template="silent"):
             + instructions
             + "Run `fc-kit validate main`, `fc-kit preview main -o output/preview.mp4`, and "
             "`fc-kit render main -o output/main.mp4`. Preview defaults to the first ten seconds.\n\n"
-            "Choose format `shorts` or `landscape`, and theme `midnight`, `light`, or `whiteboard` in facelesschamp.toml. "
+            "Choose format `shorts` or `landscape`, and theme `midnight`, `light`, `whiteboard`, or `clean-flow` in facelesschamp.toml. "
             "Enable captions explicitly with `captions = true`.\n"
         )
         # Reserve the destination before moving content; never merge with an existing project.

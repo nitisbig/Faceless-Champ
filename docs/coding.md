@@ -38,7 +38,9 @@ an error with suggestions to use a shorter excerpt, enlarge the panel, or reduce
 There is no implicit wrapping, scrolling, or execution.
 
 `CodeTheme.named("midnight")`, `"ocean"`, and `"paper"` provide dark, teal, and light
-palettes. Customize immutable themes with `dataclasses.replace`, for example:
+palettes. `"clean-flow"` uses a charcoal editor and chrome, orange accent, and
+restrained syntax colors alongside the light clean-flow card style. Customize
+immutable themes with `dataclasses.replace`, for example:
 
 ```python
 from dataclasses import replace

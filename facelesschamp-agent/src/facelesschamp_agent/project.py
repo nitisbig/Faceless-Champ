@@ -163,10 +163,20 @@ class AgentProject:
         """
         plan = self.plan
         design = plan.design
+        base_theme = THEMES[design.theme]
+        typography = {}
+        if design.font:
+            # A plan's font may be static. Variable-font weights belong to the
+            # selected packaged font, so do not carry them into a replacement.
+            typography = {
+                "font": str(self.root / design.font),
+                "font_weight": None,
+                "heading_weight": None,
+            }
         context.theme = replace(
-            THEMES[design.theme],
+            base_theme,
             **design.palette,
-            font=str(self.root / design.font) if design.font else None,
+            **typography,
             body_size=design.body_size,
             heading_size=design.heading_size,
             minimum_font_size=design.minimum_font_size,
