@@ -66,6 +66,7 @@ from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
 from .narration import CueScene
 from .preview import StoryboardSample, render_storyboard, save_frame
 from .renderer import PillowRenderer, Renderer
+from .spring import Spring
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
 from .surfaces import ShadowStyle, card_content_bounds, card_surface, dot_grid
 from .timeline import Grid, Layer, Scene, Sequence
@@ -129,6 +130,7 @@ __all__ = [
     "SlideIn",
     "SlideOut",
     "SpinIn",
+    "Spring",
     "Square",
     "StoryboardSample",
     "SubtitleCue",

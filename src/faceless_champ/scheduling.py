@@ -1,9 +1,11 @@
 """Finite, nested animation schedules compiled transactionally."""
 
+import math
 from copy import copy, deepcopy
 
 from .animation import Animation, _cycles
 from .components import finite
+from .spring import Spring, _ReversedSpring
 
 
 class Schedule:
@@ -47,6 +49,27 @@ class Repeat(Schedule):
         return self.delay + self.child_time(self.children[0]) * self.cycles
 
 
+def _reverse_easing(easing):
+    if isinstance(easing, _ReversedSpring):
+        return easing.spring
+    if isinstance(easing, Spring):
+        return _ReversedSpring(easing)
+    return lambda x, f=easing: 1 - f(1 - x)
+
+
+def _align_spring_end(track, end):
+    """Align terminal roundoff during authoring, preserving exact Track endpoints."""
+    if not isinstance(track.easing, (Spring, _ReversedSpring)) or not math.isfinite(end):
+        return
+    actual_end = track.start + track.duration
+    # Never extend an earlier leaf into an intentional terminal hold.
+    if 0 <= actual_end - end <= 16 * max(math.ulp(actual_end), math.ulp(end)):
+        duration = end - track.start
+        if not math.isfinite(duration) or duration <= 0:
+            raise ValueError("Spring schedule endpoint must leave a positive finite interval")
+        track.duration = duration
+
+
 def play_schedule(scene, animations, run_time, rate_func):
     # Copy entries, preserving the public authoring objects as ownership keys.
     trial = copy(scene)
@@ -57,6 +80,7 @@ def play_schedule(scene, animations, run_time, rate_func):
     natural = root.run_time
     factor = 1 if run_time is None else finite(run_time, "run_time", 0.000001) / natural
     start = scene.time
+    end = start + natural * factor
 
     def flatten(node, offset, duration=1):
         if isinstance(node, Animation):
@@ -93,7 +117,7 @@ def play_schedule(scene, animations, run_time, rate_func):
                 frames = t.keyframes
                 if reverse and frames:
                     frames = tuple((1 - p, v) for p, v in reversed(frames))
-                easing = (lambda x, f=t.easing: 1 - f(1 - x)) if reverse else t.easing
+                easing = _reverse_easing(t.easing) if reverse else t.easing
                 batch.append(
                     Animation(
                         c,
@@ -106,6 +130,8 @@ def play_schedule(scene, animations, run_time, rate_func):
         before = {c: len(e.tracks) for c, e in trial._objects.items()}
         trial._play(*batch, run_time=event["duration"], rate_func=rate_func if "animation" in event else None)
         event["tracks"] = [(c, t) for c, e in trial._objects.items() for t in e.tracks[before.get(c, 0) :]]
+        for _, track in event["tracks"]:
+            _align_spring_end(track, end)
 
     # Keep existing Entry references valid for callers inspecting the timeline.
     for old, new in zip(scene.entries, trial.entries):
@@ -115,5 +141,5 @@ def play_schedule(scene, animations, run_time, rate_func):
         new.parent = old_by_trial.get(id(new.parent), new.parent)
         scene.entries.append(new)
     scene._objects = {c: old_by_trial.get(id(e), e) for c, e in trial._objects.items()}
-    scene._cursor = start + natural * factor
+    scene._cursor = end
     return scene

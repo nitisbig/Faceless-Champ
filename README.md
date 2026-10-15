@@ -12,6 +12,7 @@ Current source versions: **faceless-champ 0.1.5**, **facelesschamp-kit 0.1.0rc7*
 | Technical 3D models, assemblies, sections and dimensions | [ArchChamp](docs/archchamp.md) | [ArchCanvas](facelesschamp-kit/docs/archchamp.md) |
 | Scripted graphs, routes, and signals | [FlowChamp](docs/flowchamp.md) | [FlowCanvas](facelesschamp-kit/docs/flowchamp.md) |
 | Clean-flow styling, shadows, and smooth reveals | [Surfaces and palette](docs/clean-flow.md) | [Theme and motion](facelesschamp-kit/docs/clean-flow.md) |
+| Analytical spring transforms | [Spring motion](docs/motion-graphics.md#spring-motion) | Core scene API |
 
 Install only the capabilities you use from this repository:
 
@@ -284,6 +285,22 @@ complete groups with local masks and directional `Wipe` reveals. Six reusable
 indicators include progress bars/rings, gauges, countdowns, loading dots and checkmarks.
 See the [API and timing guide](docs/motion-graphics.md) and
 [self-contained showcase](examples/motion_graphics/render.py).
+
+Use `Spring` for deterministic position, rotation, and safe scale motion through
+the same tracks and schedules:
+
+```python
+from faceless_champ import Spring
+
+scene.play(card.animate.move_to(700, 270).scale_to(1.1),
+           run_time=0.8, rate_func=Spring(stiffness=180, damping=23, mass=1))
+```
+
+Read the [spring guide](docs/motion-graphics.md#spring-motion) for damping regimes,
+duration semantics, supported properties, and independent fades. Run the silent
+10-second [showcase](examples/spring_motion/render.py) with
+`.venv/bin/python examples/spring_motion/render.py --frames` for a 960×540 preview
+and sampled storyboard; use `--check` for its layout audit.
 
 ### Stock-analysis narration
 

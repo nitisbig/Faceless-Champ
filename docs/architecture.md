@@ -40,6 +40,22 @@ A custom easing function must be deterministic. The base Component and renderer
 protocol provide extension points; adding a new visual type requires a renderer
 that understands it. v0.1 does not have a global plugin registry.
 
+`spring.py` adds one immutable `Spring` easing callable without a separate
+animation or rendering system. Standard-library closed forms cover underdamped,
+critical, and overdamped zero-initial-velocity responses. Cached coefficients and
+a bounded analytical settling-horizon search are computed during construction;
+arbitrary normalized samples do not advance simulation state. Retiming makes
+`run_time` the screen duration and damping ratio the normalized curve's shape.
+The timeline recognizes Spring when preparing resolved transform segments and
+certifies finite interpolation and positive scale using continuous progress
+bounds. Other properties are rejected before publication. The scheduler preserves
+those bounds through a private immutable time-reversal adapter, revalidates
+resolved segments, and aligns representable spring endpoints to compiled spans
+without extending intentional terminal holds. Generic callable behavior and
+runtime Track evaluation remain unchanged. All spring-specific work stays above
+the existing Pillow/FFmpeg path. See [Spring motion](motion-graphics.md#spring-motion)
+for parameter limits, scope of safety checks, and FPS semantics.
+
 Group addition validates ownership before snapshotting the hierarchy into flat
 scene entries with parent/child links. Parents and members have independent
 property tracks. The renderer traverses siblings by z_index, evaluates active

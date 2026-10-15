@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass, field
 from itertools import pairwise
+from numbers import Real
 from pathlib import Path
 from typing import Any, Self
 
@@ -14,6 +16,7 @@ from .animation import Animation, interpolate, relative_value, smooth
 from .audio import AudioClip
 from .components import Canvas, Component, finite
 from .layout import Group
+from .spring import _spring_progress_bounds
 from .subtitles import Captions
 
 
@@ -389,11 +392,11 @@ class Scene(Renderable):
                     frames = tuple(frames)
                 _validate_animated_value(key, initial)
                 _validate_animated_value(key, target)
-                tracks.append(
-                    Track(
-                        key, self._cursor, duration, initial, target, rate_func or animation.rate_func or smooth, frames
-                    )
+                track = Track(
+                    key, self._cursor, duration, initial, target, rate_func or animation.rate_func or smooth, frames
                 )
+                _validate_spring_track(track)
+                tracks.append(track)
             prepared.append((animation.component, tracks))
         # Validate the whole play call before changing the scene.
         self.add(*(component for component, _ in prepared))
@@ -421,6 +424,57 @@ class Scene(Renderable):
             AudioClip(path, self._cursor if start is None else start, trim_start, trim_end, volume, fade_in, fade_out)
         )
         return self
+
+
+def _validate_spring_track(track: Track) -> None:
+    """Certify each resolved spring segment before publishing any scene changes.
+
+    Interpolation's rounded subtraction, multiplication, and addition are
+    monotone in progress for a fixed finite difference. Evaluating its interval
+    endpoints therefore includes arithmetic rounding, without subtracting an
+    arbitrary margin from an exactly valid initial scale of 0.001. Underdamped
+    progress gets 32 additional outward ulps for kernel evaluation roundoff;
+    nonoscillatory formulas stay in [0, 1], and forward progress never goes below
+    zero. Reversed springs carry the transformed, already padded interval.
+    These are continuous bounds, not frame samples or renderer clamps.
+    """
+    bounds = _spring_progress_bounds(track.easing)
+    if bounds is None:
+        return
+    end_time = track.start + track.duration
+    if not math.isfinite(end_time) or end_time <= track.start:
+        raise ValueError("Spring animation interval must have a finite end after its start")
+    # Use the representable clock interval so subtraction at its end gives the
+    # identical duration, rather than progress one ulp below the terminal return.
+    track.duration = end_time - track.start
+    key = track.property
+    if key not in {"position", "rotation", "scale", "scale_x", "scale_y"}:
+        raise ValueError(
+            f"Spring does not support animation property '{key}'; use a separate conventional easing track"
+        )
+
+    lower, upper = bounds
+    points = track.keyframes or ((0, track.initial), (1, track.target))
+    for segment, ((_, initial), (_, target)) in enumerate(pairwise(points), start=1):
+        coordinates = zip(initial, target) if key == "position" else ((initial, target),)
+        for start, end in coordinates:
+            if not isinstance(start, Real) or not isinstance(end, Real):
+                raise TypeError(f"Spring animation for {key} requires real numeric values")
+            # Validate differences as well as endpoints: finite inputs can still
+            # overflow in subtraction, multiplication, or overshoot addition.
+            try:
+                difference = end - start
+                bounds = (start + difference * lower, start + difference * upper)
+                finite_range = math.isfinite(difference) and all(math.isfinite(value) for value in bounds)
+            except OverflowError:
+                finite_range = False
+            if not finite_range:
+                raise ValueError(f"Spring animation for {key} has nonfinite interpolation in segment {segment}")
+            if key in {"scale", "scale_x", "scale_y"} and min(bounds) < 0.001:
+                raise ValueError(
+                    f"Spring cannot certify {key} >= 0.001 throughout segment {segment}; "
+                    "reduce overshoot or change scale endpoints"
+                )
 
 
 def _validate_animated_value(key: str, value) -> None:

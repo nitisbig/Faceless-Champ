@@ -1,0 +1,1448 @@
+{
+  "phase": 5,
+  "verified_on": "2026-10-15",
+  "base_commit": "d61fe16594e4f46358f61cb5bca86a982d3b77da",
+  "base_branch": "facelesschamp-agent",
+  "feature_branch": "codex/spring-motion-v1",
+  "status": "implementation and local QA complete; focused review handoff ready",
+  "user_authorization": "User requested next complete phase 5 after receiving the Phase 4 preview and verification handoff.",
+  "tests": {
+    "core_full": {
+      "passed": 1272,
+      "skipped": 2,
+      "seconds": 129.88
+    },
+    "new_release_cases": {
+      "passed": 6,
+      "seconds": 17.01
+    },
+    "kit": {
+      "passed": 255,
+      "seconds": 78.25
+    },
+    "agent": {
+      "passed": 41,
+      "seconds": 75.8
+    },
+    "unique_total_passed": 1574,
+    "skipped": 2,
+    "skip_reason": "Existing opt-in Chromium cases require FC_WEB_BROWSER_TESTS=1; unchanged from baseline."
+  },
+  "lint": {
+    "ruff_core_kit_agent_examples": "passed",
+    "touched_python_files_formatted": 12,
+    "full_core_format_baseline": {
+      "unchanged_failures": [
+        "examples/chesschamp/showcase.py",
+        "src/faceless_champ/layout.py",
+        "src/faceless_champ/surfaces.py",
+        "tests/test_surfaces.py"
+      ]
+    },
+    "whitespace": "passed"
+  },
+  "fps_verification": {
+    "cases": [
+      {
+        "spring": {
+          "stiffness": 100.0,
+          "damping": 10.0,
+          "mass": 1.0
+        },
+        "frame_cache_mb": 0,
+        "method": "direct shared timeline sampling, not encoded FPS exports",
+        "shared_grid_times": [
+          0.0,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.5,
+          0.6666666666666666,
+          0.8333333333333334,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.5,
+          1.6666666666666667
+        ],
+        "probe_times": [
+          0.0,
+          0.125,
+          0.16666666666666666,
+          0.25,
+          0.3,
+          0.3333333333333333,
+          0.5,
+          0.625,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.875,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.375,
+          1.5,
+          1.6666666666666667
+        ],
+        "reference_frame_sha256": {
+          "0.0": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.125": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.16666666666666666": "a2ed68de2299f9c61916064c7ae56fab62f640ee64bd1bfe62c989b325b78687",
+          "0.25": "1c060a3a6342e23bae703c4f85a1da3f317cba190583d2aa86131dcdf5d02148",
+          "0.3": "e3ac0520486cad7e4037e88a87f04d4914fe7bae7785f89b7af42e660ef66a82",
+          "0.3333333333333333": "57bde9c56dee55b9439634e2969864a51dae0b4b6fc5b401c63d726d94824386",
+          "0.5": "7538389dfc1d6ed444e23a5a695416e5669dcdd9d9ef1c82f1dd727cd3b50d03",
+          "0.625": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.6666666666666666": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.8333333333333334": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.875": "57273d3bd64a740d889bd8b9528346ba548d1cbf84b01a20867a59097d9c2e3f",
+          "1.0": "4dd3cdb82aec7b9b8363039fb933ec5a651985069d236a7a212ecdd2683b5eaf",
+          "1.1666666666666667": "a3559fd28282e9ef1908eefdbe9bb34f1cfaa504ef4bc04929314cedb6540952",
+          "1.3333333333333333": "3d3ab698a2a12d343e9a093253e1f0697de905f2a6e6ab43ab4ac4fe2d25831e",
+          "1.375": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.5": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.6666666666666667": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26"
+        },
+        "states_and_pixels_equal": true,
+        "sources_unchanged": true,
+        "runs": [
+          {
+            "fps": 24,
+            "frames_sampled": 42,
+            "order": "forward",
+            "matching_probes": 17
+          },
+          {
+            "fps": 30,
+            "frames_sampled": 53,
+            "order": "reverse",
+            "matching_probes": 17
+          },
+          {
+            "fps": 60,
+            "frames_sampled": 105,
+            "order": "shuffled",
+            "matching_probes": 17
+          }
+        ]
+      },
+      {
+        "spring": {
+          "stiffness": 100.0,
+          "damping": 10.0,
+          "mass": 1.0
+        },
+        "frame_cache_mb": 64,
+        "method": "direct shared timeline sampling, not encoded FPS exports",
+        "shared_grid_times": [
+          0.0,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.5,
+          0.6666666666666666,
+          0.8333333333333334,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.5,
+          1.6666666666666667
+        ],
+        "probe_times": [
+          0.0,
+          0.125,
+          0.16666666666666666,
+          0.25,
+          0.3,
+          0.3333333333333333,
+          0.5,
+          0.625,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.875,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.375,
+          1.5,
+          1.6666666666666667
+        ],
+        "reference_frame_sha256": {
+          "0.0": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.125": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.16666666666666666": "a2ed68de2299f9c61916064c7ae56fab62f640ee64bd1bfe62c989b325b78687",
+          "0.25": "1c060a3a6342e23bae703c4f85a1da3f317cba190583d2aa86131dcdf5d02148",
+          "0.3": "e3ac0520486cad7e4037e88a87f04d4914fe7bae7785f89b7af42e660ef66a82",
+          "0.3333333333333333": "57bde9c56dee55b9439634e2969864a51dae0b4b6fc5b401c63d726d94824386",
+          "0.5": "7538389dfc1d6ed444e23a5a695416e5669dcdd9d9ef1c82f1dd727cd3b50d03",
+          "0.625": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.6666666666666666": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.8333333333333334": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.875": "57273d3bd64a740d889bd8b9528346ba548d1cbf84b01a20867a59097d9c2e3f",
+          "1.0": "4dd3cdb82aec7b9b8363039fb933ec5a651985069d236a7a212ecdd2683b5eaf",
+          "1.1666666666666667": "a3559fd28282e9ef1908eefdbe9bb34f1cfaa504ef4bc04929314cedb6540952",
+          "1.3333333333333333": "3d3ab698a2a12d343e9a093253e1f0697de905f2a6e6ab43ab4ac4fe2d25831e",
+          "1.375": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.5": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.6666666666666667": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26"
+        },
+        "states_and_pixels_equal": true,
+        "sources_unchanged": true,
+        "runs": [
+          {
+            "fps": 24,
+            "frames_sampled": 42,
+            "order": "forward",
+            "matching_probes": 17
+          },
+          {
+            "fps": 30,
+            "frames_sampled": 53,
+            "order": "reverse",
+            "matching_probes": 17
+          },
+          {
+            "fps": 60,
+            "frames_sampled": 105,
+            "order": "shuffled",
+            "matching_probes": 17
+          }
+        ]
+      },
+      {
+        "spring": {
+          "stiffness": 100.0,
+          "damping": 20.0,
+          "mass": 1.0
+        },
+        "frame_cache_mb": 0,
+        "method": "direct shared timeline sampling, not encoded FPS exports",
+        "shared_grid_times": [
+          0.0,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.5,
+          0.6666666666666666,
+          0.8333333333333334,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.5,
+          1.6666666666666667
+        ],
+        "probe_times": [
+          0.0,
+          0.125,
+          0.16666666666666666,
+          0.25,
+          0.3,
+          0.3333333333333333,
+          0.5,
+          0.625,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.875,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.375,
+          1.5,
+          1.6666666666666667
+        ],
+        "reference_frame_sha256": {
+          "0.0": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.125": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.16666666666666666": "a2ed68de2299f9c61916064c7ae56fab62f640ee64bd1bfe62c989b325b78687",
+          "0.25": "1c060a3a6342e23bae703c4f85a1da3f317cba190583d2aa86131dcdf5d02148",
+          "0.3": "e3ac0520486cad7e4037e88a87f04d4914fe7bae7785f89b7af42e660ef66a82",
+          "0.3333333333333333": "959b9fce2faa17b6cf464b8ff9880771eab963d813417596f16d308ac4d45368",
+          "0.5": "1079e4e39c713d7920b6499e34aa199c100ffc7315077913e86b4d11b1409e2c",
+          "0.625": "86466750e1c87b0289ed4caf132c7150fbb03bde9ef05b5b2a9e399ed5ba19a0",
+          "0.6666666666666666": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.8333333333333334": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.875": "dc36917b3ea4b544bd2e2ac22eb33292d7d5b40639ea96c6880596a85c62e7ca",
+          "1.0": "4dd3cdb82aec7b9b8363039fb933ec5a651985069d236a7a212ecdd2683b5eaf",
+          "1.1666666666666667": "d6f42b861f657198f05992e5337a1465e89a3c7fac557a0d754b2dd0f70c8b32",
+          "1.3333333333333333": "e5042774a8aa4e32ff5f8073d71f1eab2072ba89b3dfbdbdbf4b1a47a4efb76a",
+          "1.375": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.5": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.6666666666666667": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26"
+        },
+        "states_and_pixels_equal": true,
+        "sources_unchanged": true,
+        "runs": [
+          {
+            "fps": 24,
+            "frames_sampled": 42,
+            "order": "forward",
+            "matching_probes": 17
+          },
+          {
+            "fps": 30,
+            "frames_sampled": 53,
+            "order": "reverse",
+            "matching_probes": 17
+          },
+          {
+            "fps": 60,
+            "frames_sampled": 105,
+            "order": "shuffled",
+            "matching_probes": 17
+          }
+        ]
+      },
+      {
+        "spring": {
+          "stiffness": 100.0,
+          "damping": 20.0,
+          "mass": 1.0
+        },
+        "frame_cache_mb": 64,
+        "method": "direct shared timeline sampling, not encoded FPS exports",
+        "shared_grid_times": [
+          0.0,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.5,
+          0.6666666666666666,
+          0.8333333333333334,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.5,
+          1.6666666666666667
+        ],
+        "probe_times": [
+          0.0,
+          0.125,
+          0.16666666666666666,
+          0.25,
+          0.3,
+          0.3333333333333333,
+          0.5,
+          0.625,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.875,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.375,
+          1.5,
+          1.6666666666666667
+        ],
+        "reference_frame_sha256": {
+          "0.0": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.125": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.16666666666666666": "a2ed68de2299f9c61916064c7ae56fab62f640ee64bd1bfe62c989b325b78687",
+          "0.25": "1c060a3a6342e23bae703c4f85a1da3f317cba190583d2aa86131dcdf5d02148",
+          "0.3": "e3ac0520486cad7e4037e88a87f04d4914fe7bae7785f89b7af42e660ef66a82",
+          "0.3333333333333333": "959b9fce2faa17b6cf464b8ff9880771eab963d813417596f16d308ac4d45368",
+          "0.5": "1079e4e39c713d7920b6499e34aa199c100ffc7315077913e86b4d11b1409e2c",
+          "0.625": "86466750e1c87b0289ed4caf132c7150fbb03bde9ef05b5b2a9e399ed5ba19a0",
+          "0.6666666666666666": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.8333333333333334": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.875": "dc36917b3ea4b544bd2e2ac22eb33292d7d5b40639ea96c6880596a85c62e7ca",
+          "1.0": "4dd3cdb82aec7b9b8363039fb933ec5a651985069d236a7a212ecdd2683b5eaf",
+          "1.1666666666666667": "d6f42b861f657198f05992e5337a1465e89a3c7fac557a0d754b2dd0f70c8b32",
+          "1.3333333333333333": "e5042774a8aa4e32ff5f8073d71f1eab2072ba89b3dfbdbdbf4b1a47a4efb76a",
+          "1.375": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.5": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.6666666666666667": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26"
+        },
+        "states_and_pixels_equal": true,
+        "sources_unchanged": true,
+        "runs": [
+          {
+            "fps": 24,
+            "frames_sampled": 42,
+            "order": "forward",
+            "matching_probes": 17
+          },
+          {
+            "fps": 30,
+            "frames_sampled": 53,
+            "order": "reverse",
+            "matching_probes": 17
+          },
+          {
+            "fps": 60,
+            "frames_sampled": 105,
+            "order": "shuffled",
+            "matching_probes": 17
+          }
+        ]
+      },
+      {
+        "spring": {
+          "stiffness": 100.0,
+          "damping": 25.0,
+          "mass": 1.0
+        },
+        "frame_cache_mb": 0,
+        "method": "direct shared timeline sampling, not encoded FPS exports",
+        "shared_grid_times": [
+          0.0,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.5,
+          0.6666666666666666,
+          0.8333333333333334,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.5,
+          1.6666666666666667
+        ],
+        "probe_times": [
+          0.0,
+          0.125,
+          0.16666666666666666,
+          0.25,
+          0.3,
+          0.3333333333333333,
+          0.5,
+          0.625,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.875,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.375,
+          1.5,
+          1.6666666666666667
+        ],
+        "reference_frame_sha256": {
+          "0.0": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.125": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.16666666666666666": "a2ed68de2299f9c61916064c7ae56fab62f640ee64bd1bfe62c989b325b78687",
+          "0.25": "1c060a3a6342e23bae703c4f85a1da3f317cba190583d2aa86131dcdf5d02148",
+          "0.3": "e3ac0520486cad7e4037e88a87f04d4914fe7bae7785f89b7af42e660ef66a82",
+          "0.3333333333333333": "e6d0a446e1545598287c0d38ae68aea6a5fb3751f2c44b2e3fa57f743d36c94c",
+          "0.5": "bfe5e1a9a15d2e9e2a7832c6d52319929a8c25ce6d686ba849b4b2550669040d",
+          "0.625": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.6666666666666666": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.8333333333333334": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.875": "bb6731757101a40a86446c09ce3d76fae2594de8b711a85be9d1b0ee2a8322b5",
+          "1.0": "4dd3cdb82aec7b9b8363039fb933ec5a651985069d236a7a212ecdd2683b5eaf",
+          "1.1666666666666667": "f409f7edf5eb6c3b4dda2edf4f7cc867a3c6d0a7058dbe28330694878e1e9e1a",
+          "1.3333333333333333": "553f2a95f98245868465757a9dec0e5b8885743309fc248665d486bb7bb89bc6",
+          "1.375": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.5": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.6666666666666667": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26"
+        },
+        "states_and_pixels_equal": true,
+        "sources_unchanged": true,
+        "runs": [
+          {
+            "fps": 24,
+            "frames_sampled": 42,
+            "order": "forward",
+            "matching_probes": 17
+          },
+          {
+            "fps": 30,
+            "frames_sampled": 53,
+            "order": "reverse",
+            "matching_probes": 17
+          },
+          {
+            "fps": 60,
+            "frames_sampled": 105,
+            "order": "shuffled",
+            "matching_probes": 17
+          }
+        ]
+      },
+      {
+        "spring": {
+          "stiffness": 100.0,
+          "damping": 25.0,
+          "mass": 1.0
+        },
+        "frame_cache_mb": 64,
+        "method": "direct shared timeline sampling, not encoded FPS exports",
+        "shared_grid_times": [
+          0.0,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.5,
+          0.6666666666666666,
+          0.8333333333333334,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.5,
+          1.6666666666666667
+        ],
+        "probe_times": [
+          0.0,
+          0.125,
+          0.16666666666666666,
+          0.25,
+          0.3,
+          0.3333333333333333,
+          0.5,
+          0.625,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.875,
+          1.0,
+          1.1666666666666667,
+          1.3333333333333333,
+          1.375,
+          1.5,
+          1.6666666666666667
+        ],
+        "reference_frame_sha256": {
+          "0.0": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.125": "ef45d391d7b1245092903e51817e6bf660984e0af2658ea892bcbd78d9e42f95",
+          "0.16666666666666666": "a2ed68de2299f9c61916064c7ae56fab62f640ee64bd1bfe62c989b325b78687",
+          "0.25": "1c060a3a6342e23bae703c4f85a1da3f317cba190583d2aa86131dcdf5d02148",
+          "0.3": "e3ac0520486cad7e4037e88a87f04d4914fe7bae7785f89b7af42e660ef66a82",
+          "0.3333333333333333": "e6d0a446e1545598287c0d38ae68aea6a5fb3751f2c44b2e3fa57f743d36c94c",
+          "0.5": "bfe5e1a9a15d2e9e2a7832c6d52319929a8c25ce6d686ba849b4b2550669040d",
+          "0.625": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.6666666666666666": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.8333333333333334": "08a625716c170ec8b0bdfd33c372462d3979839f57ae2aadae552ef6ac8eb6d1",
+          "0.875": "bb6731757101a40a86446c09ce3d76fae2594de8b711a85be9d1b0ee2a8322b5",
+          "1.0": "4dd3cdb82aec7b9b8363039fb933ec5a651985069d236a7a212ecdd2683b5eaf",
+          "1.1666666666666667": "f409f7edf5eb6c3b4dda2edf4f7cc867a3c6d0a7058dbe28330694878e1e9e1a",
+          "1.3333333333333333": "553f2a95f98245868465757a9dec0e5b8885743309fc248665d486bb7bb89bc6",
+          "1.375": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.5": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26",
+          "1.6666666666666667": "182b6f42c274da10365d404000bf01db8b01941843969b7ebfc01b0666ff2c26"
+        },
+        "states_and_pixels_equal": true,
+        "sources_unchanged": true,
+        "runs": [
+          {
+            "fps": 24,
+            "frames_sampled": 42,
+            "order": "forward",
+            "matching_probes": 17
+          },
+          {
+            "fps": 30,
+            "frames_sampled": 53,
+            "order": "reverse",
+            "matching_probes": 17
+          },
+          {
+            "fps": 60,
+            "frames_sampled": 105,
+            "order": "shuffled",
+            "matching_probes": 17
+          }
+        ]
+      }
+    ]
+  },
+  "benchmark": {
+    "environment": {
+      "python": "3.12.3",
+      "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39"
+    },
+    "workload": {
+      "size": [
+        960,
+        540
+      ],
+      "antialias": 1,
+      "components": 12,
+      "property": "position",
+      "frames_per_trial": 180,
+      "trials": 7,
+      "warmup_frames_per_mode": 30,
+      "trial_order": [
+        [
+          "static",
+          "smooth",
+          "spring",
+          "spring_lookup"
+        ],
+        [
+          "smooth",
+          "spring",
+          "spring_lookup",
+          "static"
+        ],
+        [
+          "spring",
+          "spring_lookup",
+          "static",
+          "smooth"
+        ],
+        [
+          "spring_lookup",
+          "static",
+          "smooth",
+          "spring"
+        ],
+        [
+          "static",
+          "smooth",
+          "spring",
+          "spring_lookup"
+        ],
+        [
+          "smooth",
+          "spring",
+          "spring_lookup",
+          "static"
+        ],
+        [
+          "spring",
+          "spring_lookup",
+          "static",
+          "smooth"
+        ]
+      ],
+      "static_time_seconds": 0.5,
+      "moving_source_span_seconds": 3,
+      "spring": {
+        "stiffness": 100,
+        "damping": 10,
+        "mass": 1
+      }
+    },
+    "construction": {
+      "under": {
+        "trials_seconds": [
+          0.07923403500171844,
+          0.08071462500083726,
+          0.07850421000330243,
+          0.07996687699778704,
+          0.09377664999919944,
+          0.08277890900353668,
+          0.0873733509943122
+        ],
+        "operations_per_trial": 1000,
+        "median_us_per_operation": 80.71462500083726,
+        "min_us_per_operation": 78.50421000330243,
+        "max_us_per_operation": 93.77664999919944,
+        "stdev_us_per_operation": 5.535774863903431
+      },
+      "critical": {
+        "trials_seconds": [
+          0.07957386400084943,
+          0.08882043899939163,
+          0.07461277499533026,
+          0.08397809699818026,
+          0.07552714399935212,
+          0.12572899099905044,
+          0.12386808500014013
+        ],
+        "operations_per_trial": 1000,
+        "median_us_per_operation": 83.97809699818026,
+        "min_us_per_operation": 74.61277499533026,
+        "max_us_per_operation": 125.72899099905042,
+        "stdev_us_per_operation": 22.159892572389776
+      },
+      "over": {
+        "trials_seconds": [
+          0.1575492629999644,
+          0.16177970400167396,
+          0.1318151469968143,
+          0.0895247959997505,
+          0.3441565190005349,
+          0.1002794960004394,
+          0.08176043500134256
+        ],
+        "operations_per_trial": 1000,
+        "median_us_per_operation": 131.8151469968143,
+        "min_us_per_operation": 81.76043500134256,
+        "max_us_per_operation": 344.1565190005349,
+        "stdev_us_per_operation": 90.34063155370362
+      }
+    },
+    "authoring": {
+      "smooth": {
+        "trials_seconds": [
+          0.13387693600088824,
+          0.18083923700032756,
+          0.19240483099565608,
+          0.17444607600191375,
+          0.1496866349989432,
+          0.14948754000215558,
+          0.18836843600001885
+        ],
+        "operations_per_trial": 100,
+        "median_us_per_operation": 1744.4607600191375,
+        "min_us_per_operation": 1338.7693600088824,
+        "max_us_per_operation": 1924.0483099565608,
+        "stdev_us_per_operation": 225.55703403772765
+      },
+      "spring": {
+        "trials_seconds": [
+          0.20717180999781704,
+          0.20055587100068806,
+          0.18947439699695678,
+          0.20798922299582046,
+          0.19907585199689493,
+          0.17398587700154167,
+          0.17727327500324463
+        ],
+        "operations_per_trial": 100,
+        "median_us_per_operation": 1990.7585199689495,
+        "min_us_per_operation": 1739.8587700154167,
+        "max_us_per_operation": 2079.8922299582046,
+        "stdev_us_per_operation": 137.71310885681484
+      }
+    },
+    "evaluation": {
+      "smooth": {
+        "trials_seconds": [
+          0.01100445299380226,
+          0.011254459001065698,
+          0.01179515800322406,
+          0.010675276003894396,
+          0.011499708001792897,
+          0.011108771999715827,
+          0.010854510001081508
+        ],
+        "operations_per_trial": 50000,
+        "median_us_per_operation": 0.22217543999431655,
+        "min_us_per_operation": 0.21350552007788792,
+        "max_us_per_operation": 0.2359031600644812,
+        "stdev_us_per_operation": 0.007668563054283675
+      },
+      "spring": {
+        "trials_seconds": [
+          0.2284024269974907,
+          0.18979565399786225,
+          0.19015128099999856,
+          0.19495713400101522,
+          0.19129366299603134,
+          0.19085630799963837,
+          0.19319037300010677
+        ],
+        "operations_per_trial": 50000,
+        "median_us_per_operation": 3.8258732599206273,
+        "min_us_per_operation": 3.795913079957245,
+        "max_us_per_operation": 4.568048539949814,
+        "stdev_us_per_operation": 0.2797494057105653
+      }
+    },
+    "rendering": {
+      "static": {
+        "trials_seconds": [
+          0.19657446000201162,
+          0.19931542900303612,
+          0.20550353799626464,
+          0.19966373500210466,
+          0.2658108550022007,
+          0.2379979160032235,
+          0.20004281400179025
+        ],
+        "operations_per_trial": 180,
+        "median_us_per_operation": 1111.3489666766125,
+        "min_us_per_operation": 1092.080333344509,
+        "max_us_per_operation": 1476.7269722344483,
+        "stdev_us_per_operation": 147.7759234114107
+      },
+      "smooth": {
+        "trials_seconds": [
+          0.8457888859993545,
+          0.5799080919969128,
+          0.5903104440003517,
+          0.597183235004195,
+          0.6686513730019215,
+          0.6408137079997687,
+          0.640895331001957
+        ],
+        "operations_per_trial": 180,
+        "median_us_per_operation": 3560.0761555542704,
+        "min_us_per_operation": 3221.7116222050713,
+        "max_us_per_operation": 4698.827144440858,
+        "stdev_us_per_operation": 507.59428574513174
+      },
+      "spring": {
+        "trials_seconds": [
+          0.6930090489986469,
+          0.6438886769974488,
+          0.9306423180023558,
+          0.8630698580018361,
+          0.7168656920039211,
+          0.8269231879967265,
+          0.7646565230024862
+        ],
+        "operations_per_trial": 180,
+        "median_us_per_operation": 4248.091794458257,
+        "min_us_per_operation": 3577.159316652493,
+        "max_us_per_operation": 5170.2351000130875,
+        "stdev_us_per_operation": 564.9570579139777
+      },
+      "spring_lookup": {
+        "trials_seconds": [
+          0.5931520500016632,
+          0.5943531679949956,
+          0.6238666260032915,
+          0.5931341819959925,
+          0.649677049004822,
+          0.7935910649975995,
+          0.6511907859967323
+        ],
+        "operations_per_trial": 180,
+        "median_us_per_operation": 3465.925700018286,
+        "min_us_per_operation": 3295.1898999777363,
+        "max_us_per_operation": 4408.839249986664,
+        "stdev_us_per_operation": 396.0502482852924
+      }
+    },
+    "isolated_memory": {
+      "static": {
+        "python_retained_bytes": 254360,
+        "python_peak_bytes": 338712,
+        "process_peak_rss_kib": 49684
+      },
+      "smooth": {
+        "python_retained_bytes": 242813,
+        "python_peak_bytes": 364352,
+        "process_peak_rss_kib": 49684
+      },
+      "spring": {
+        "python_retained_bytes": 242821,
+        "python_peak_bytes": 364152,
+        "process_peak_rss_kib": 49684
+      },
+      "spring_lookup": {
+        "python_retained_bytes": 242789,
+        "python_peak_bytes": 363920,
+        "process_peak_rss_kib": 49684
+      }
+    },
+    "spring_minus_smooth_us_per_frame": 688.0156389039867,
+    "spring_overhead_vs_smooth_percent": 19.325868572518477,
+    "spring_minus_identical_lookup_us_per_frame": 782.166094439971,
+    "lookup_control_states_equal": true,
+    "paired_spring_minus_lookup_us_per_frame": [
+      554.7611055387986,
+      275.197272235851,
+      1704.3093999948017,
+      1499.6426444769086,
+      373.2702388838839,
+      185.17846110626124,
+      630.3652055875217
+    ],
+    "notes": [
+      "Local CPU result; timings are warmed, interleaved, and exclude FFmpeg encoding.",
+      "Rendering uses identical sprites, dimensions, track counts, and translation distances; curve paths differ.",
+      "RSS is Linux whole-process high-water KiB, including imports/warmup; it is not incremental spring memory.",
+      "Tracemalloc memory passes exclude native Pillow buffers and are separate from performance timings.",
+      "Static rendering deliberately exercises repeated-frame cache reuse; moving modes evaluate changing tracks.",
+      "spring_lookup uses exactly the live spring's sampled coordinates with precomputed easing values."
+    ]
+  },
+  "exploratory_benchmarks": {
+    "90_frames": {
+      "environment": {
+        "python": "3.12.3",
+        "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39"
+      },
+      "workload": {
+        "size": [
+          960,
+          540
+        ],
+        "antialias": 1,
+        "components": 12,
+        "property": "position",
+        "frames_per_trial": 90,
+        "trials": 7,
+        "warmup_frames_per_mode": 30,
+        "trial_order": [
+          [
+            "static",
+            "smooth",
+            "spring"
+          ],
+          [
+            "smooth",
+            "spring",
+            "static"
+          ],
+          [
+            "spring",
+            "static",
+            "smooth"
+          ],
+          [
+            "static",
+            "smooth",
+            "spring"
+          ],
+          [
+            "smooth",
+            "spring",
+            "static"
+          ],
+          [
+            "spring",
+            "static",
+            "smooth"
+          ],
+          [
+            "static",
+            "smooth",
+            "spring"
+          ]
+        ],
+        "static_time_seconds": 0.5,
+        "moving_source_span_seconds": 3,
+        "spring": {
+          "stiffness": 100,
+          "damping": 10,
+          "mass": 1
+        }
+      },
+      "construction": {
+        "under": {
+          "trials_seconds": [
+            0.07730159899801947,
+            0.08090054700005567,
+            0.07793951400526566,
+            0.0787892299995292,
+            0.079661916999612,
+            0.07972537000023294,
+            0.08077202099957503
+          ],
+          "operations_per_trial": 1000,
+          "median_us_per_operation": 79.661916999612,
+          "min_us_per_operation": 77.30159899801947,
+          "max_us_per_operation": 80.90054700005567,
+          "stdev_us_per_operation": 1.3629576325437294
+        },
+        "critical": {
+          "trials_seconds": [
+            0.07747526899765944,
+            0.09014414600096643,
+            0.08801304799999343,
+            0.1443946799990954,
+            0.1675655010039918,
+            0.07227217000036035,
+            0.07336522699915804
+          ],
+          "operations_per_trial": 1000,
+          "median_us_per_operation": 88.01304799999343,
+          "min_us_per_operation": 72.27217000036035,
+          "max_us_per_operation": 167.5655010039918,
+          "stdev_us_per_operation": 38.16065110267699
+        },
+        "over": {
+          "trials_seconds": [
+            0.0958478219981771,
+            0.09549661199707771,
+            0.09723491500335513,
+            0.09583114000270143,
+            0.09220255100080976,
+            0.09572748599748593,
+            0.09394003599300049
+          ],
+          "operations_per_trial": 1000,
+          "median_us_per_operation": 95.72748599748593,
+          "min_us_per_operation": 92.20255100080976,
+          "max_us_per_operation": 97.23491500335513,
+          "stdev_us_per_operation": 1.6276405290884686
+        }
+      },
+      "authoring": {
+        "smooth": {
+          "trials_seconds": [
+            0.17672555000171997,
+            0.17650927499926183,
+            0.14782240399654256,
+            0.1766785029976745,
+            0.14142560699838214,
+            0.1428915450014756,
+            0.1486627159974887
+          ],
+          "operations_per_trial": 100,
+          "median_us_per_operation": 1486.627159974887,
+          "min_us_per_operation": 1414.2560699838214,
+          "max_us_per_operation": 1767.2555000171997,
+          "stdev_us_per_operation": 169.9359442679407
+        },
+        "spring": {
+          "trials_seconds": [
+            0.1705851189981331,
+            0.16594264000013936,
+            0.16596178200416034,
+            0.16532565500529017,
+            0.16503888800070854,
+            0.1707109290000517,
+            0.16759114200249314
+          ],
+          "operations_per_trial": 100,
+          "median_us_per_operation": 1659.6178200416034,
+          "min_us_per_operation": 1650.3888800070854,
+          "max_us_per_operation": 1707.109290000517,
+          "stdev_us_per_operation": 24.205603986949868
+        }
+      },
+      "evaluation": {
+        "smooth": {
+          "trials_seconds": [
+            0.011582213999645319,
+            0.011705791999702342,
+            0.011808963005023543,
+            0.011693740998452995,
+            0.011720417998731136,
+            0.011686150995956268,
+            0.011579174002690706
+          ],
+          "operations_per_trial": 50000,
+          "median_us_per_operation": 0.2338748199690599,
+          "min_us_per_operation": 0.23158348005381413,
+          "max_us_per_operation": 0.23617926010047086,
+          "stdev_us_per_operation": 0.0016092702346314157
+        },
+        "spring": {
+          "trials_seconds": [
+            0.22614482999779284,
+            0.23557323899876792,
+            0.23694170200178633,
+            0.2463883519958472,
+            0.25701522499730345,
+            0.2421383499968215,
+            0.24183308099600254
+          ],
+          "operations_per_trial": 50000,
+          "median_us_per_operation": 4.836661619920051,
+          "min_us_per_operation": 4.522896599955857,
+          "max_us_per_operation": 5.140304499946069,
+          "stdev_us_per_operation": 0.192175984264567
+        }
+      },
+      "rendering": {
+        "static": {
+          "trials_seconds": [
+            0.09973913599969819,
+            0.10236433999671135,
+            0.09837091899680672,
+            0.09810323699639412,
+            0.09865403499861713,
+            0.10127454399480484,
+            0.09982128500269027
+          ],
+          "operations_per_trial": 90,
+          "median_us_per_operation": 1108.2126222188688,
+          "min_us_per_operation": 1090.0359666266013,
+          "max_us_per_operation": 1137.381555519015,
+          "stdev_us_per_operation": 17.555427642203995
+        },
+        "smooth": {
+          "trials_seconds": [
+            0.3196525160019519,
+            0.3183486459965934,
+            0.28917076800280483,
+            0.2952373950029141,
+            0.5294603209986235,
+            0.3179137670013006,
+            0.31268731800082605
+          ],
+          "operations_per_trial": 90,
+          "median_us_per_operation": 3532.37518890334,
+          "min_us_per_operation": 3213.0085333644984,
+          "max_us_per_operation": 5882.892455540261,
+          "stdev_us_per_operation": 936.2193949092249
+        },
+        "spring": {
+          "trials_seconds": [
+            0.3510354489990277,
+            0.3222030909964815,
+            0.32760057699488243,
+            0.372381797998969,
+            0.46215488499728963,
+            0.35683653299929574,
+            0.3536424749981961
+          ],
+          "operations_per_trial": 90,
+          "median_us_per_operation": 3929.3608333132906,
+          "min_us_per_operation": 3580.03434440535,
+          "max_us_per_operation": 5135.054277747662,
+          "stdev_us_per_operation": 519.2300279034038
+        }
+      },
+      "isolated_memory": {
+        "static": {
+          "python_retained_bytes": 196488,
+          "python_peak_bytes": 275270,
+          "process_peak_rss_kib": 47348
+        },
+        "smooth": {
+          "python_retained_bytes": 150605,
+          "python_peak_bytes": 325688,
+          "process_peak_rss_kib": 47348
+        },
+        "spring": {
+          "python_retained_bytes": 150621,
+          "python_peak_bytes": 325800,
+          "process_peak_rss_kib": 47348
+        }
+      },
+      "spring_minus_smooth_us_per_frame": 396.9856444099505,
+      "spring_overhead_vs_smooth_percent": 11.23849034091983,
+      "notes": [
+        "Local CPU result; timings are warmed, interleaved, and exclude FFmpeg encoding.",
+        "Rendering uses identical sprites, dimensions, track counts, and translation distances; curve paths differ.",
+        "RSS is Linux whole-process high-water KiB, including imports/warmup; it is not incremental spring memory.",
+        "Tracemalloc memory passes exclude native Pillow buffers and are separate from performance timings.",
+        "Static rendering deliberately exercises repeated-frame cache reuse; moving modes evaluate changing tracks."
+      ]
+    },
+    "300_frames": {
+      "environment": {
+        "python": "3.12.3",
+        "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39"
+      },
+      "workload": {
+        "size": [
+          960,
+          540
+        ],
+        "antialias": 1,
+        "components": 12,
+        "property": "position",
+        "frames_per_trial": 300,
+        "trials": 7,
+        "warmup_frames_per_mode": 30,
+        "trial_order": [
+          [
+            "static",
+            "smooth",
+            "spring"
+          ],
+          [
+            "smooth",
+            "spring",
+            "static"
+          ],
+          [
+            "spring",
+            "static",
+            "smooth"
+          ],
+          [
+            "static",
+            "smooth",
+            "spring"
+          ],
+          [
+            "smooth",
+            "spring",
+            "static"
+          ],
+          [
+            "spring",
+            "static",
+            "smooth"
+          ],
+          [
+            "static",
+            "smooth",
+            "spring"
+          ]
+        ],
+        "static_time_seconds": 0.5,
+        "moving_source_span_seconds": 3,
+        "spring": {
+          "stiffness": 100,
+          "damping": 10,
+          "mass": 1
+        }
+      },
+      "construction": {
+        "under": {
+          "trials_seconds": [
+            0.07090190699818777,
+            0.06607516499934718,
+            0.07297943699813914,
+            0.06479143199976534,
+            0.08441826100170147,
+            0.0666831389971776,
+            0.07816626600106247
+          ],
+          "operations_per_trial": 1000,
+          "median_us_per_operation": 70.90190699818777,
+          "min_us_per_operation": 64.79143199976534,
+          "max_us_per_operation": 84.41826100170147,
+          "stdev_us_per_operation": 7.184906010769988
+        },
+        "critical": {
+          "trials_seconds": [
+            0.07662663600058295,
+            0.18212494200270157,
+            0.16547506500501186,
+            0.11484898599883309,
+            0.132861222999054,
+            0.10037850000662729,
+            0.0964017260048422
+          ],
+          "operations_per_trial": 1000,
+          "median_us_per_operation": 114.84898599883309,
+          "min_us_per_operation": 76.62663600058295,
+          "max_us_per_operation": 182.12494200270157,
+          "stdev_us_per_operation": 38.350911286601814
+        },
+        "over": {
+          "trials_seconds": [
+            0.10429957399901468,
+            0.11134142599621555,
+            0.11086890300066443,
+            0.11864471899752971,
+            0.1437136210006429,
+            0.09268678799708141,
+            0.12585297899931902
+          ],
+          "operations_per_trial": 1000,
+          "median_us_per_operation": 111.34142599621555,
+          "min_us_per_operation": 92.68678799708141,
+          "max_us_per_operation": 143.7136210006429,
+          "stdev_us_per_operation": 16.317396005871355
+        }
+      },
+      "authoring": {
+        "smooth": {
+          "trials_seconds": [
+            0.20381632199860178,
+            0.1743365470028948,
+            0.3066171789978398,
+            0.26825043099961476,
+            0.14663361600105418,
+            0.12188442600017879,
+            0.11895154399826424
+          ],
+          "operations_per_trial": 100,
+          "median_us_per_operation": 1743.365470028948,
+          "min_us_per_operation": 1189.5154399826424,
+          "max_us_per_operation": 3066.171789978398,
+          "stdev_us_per_operation": 726.996887613753
+        },
+        "spring": {
+          "trials_seconds": [
+            0.14651761500135763,
+            0.16081157400185475,
+            0.16970225700060837,
+            0.1702324630023213,
+            0.1622590249971836,
+            0.21955456000432605,
+            0.3989631130025373
+          ],
+          "operations_per_trial": 100,
+          "median_us_per_operation": 1697.0225700060837,
+          "min_us_per_operation": 1465.1761500135763,
+          "max_us_per_operation": 3989.631130025373,
+          "stdev_us_per_operation": 889.577755476009
+        }
+      },
+      "evaluation": {
+        "smooth": {
+          "trials_seconds": [
+            0.018580283998744562,
+            0.010513090004678816,
+            0.014157896999677178,
+            0.0169667890004348,
+            0.017302936998021323,
+            0.024128929995640647,
+            0.0179768329981016
+          ],
+          "operations_per_trial": 50000,
+          "median_us_per_operation": 0.34605873996042646,
+          "min_us_per_operation": 0.2102618000935763,
+          "max_us_per_operation": 0.48257859991281293,
+          "stdev_us_per_operation": 0.08345355968197804
+        },
+        "spring": {
+          "trials_seconds": [
+            0.20591180000337772,
+            0.19827715900464682,
+            0.2086256839975249,
+            0.19637011200393317,
+            0.19658826700469945,
+            0.1980380500026513,
+            0.19583245099784108
+          ],
+          "operations_per_trial": 50000,
+          "median_us_per_operation": 3.9607610000530262,
+          "min_us_per_operation": 3.916649019956822,
+          "max_us_per_operation": 4.172513679950498,
+          "stdev_us_per_operation": 0.10274095336702785
+        }
+      },
+      "rendering": {
+        "static": {
+          "trials_seconds": [
+            0.32632274299976416,
+            0.3371474310042686,
+            0.3290386500011664,
+            0.3308273319998989,
+            0.536390184002812,
+            0.4514028390040039,
+            0.4499194309973973
+          ],
+          "operations_per_trial": 300,
+          "median_us_per_operation": 1123.8247700142285,
+          "min_us_per_operation": 1087.7424766658805,
+          "max_us_per_operation": 1787.9672800093736,
+          "stdev_us_per_operation": 281.2633343801625
+        },
+        "smooth": {
+          "trials_seconds": [
+            0.9926202930000727,
+            0.9833790799966664,
+            1.0673430289971293,
+            1.073175353994884,
+            1.1150985149943153,
+            2.0028972899963264,
+            1.252684542996576
+          ],
+          "operations_per_trial": 300,
+          "median_us_per_operation": 3577.251179982947,
+          "min_us_per_operation": 3277.9302666555545,
+          "max_us_per_operation": 6676.324299987755,
+          "stdev_us_per_operation": 1199.656659631666
+        },
+        "spring": {
+          "trials_seconds": [
+            1.4074849719982012,
+            1.1239724429979105,
+            1.4369662520039128,
+            1.4987015029983013,
+            2.7824418489981326,
+            1.8794183709978824,
+            1.3771374600037234
+          ],
+          "operations_per_trial": 300,
+          "median_us_per_operation": 4789.887506679709,
+          "min_us_per_operation": 3746.574809993035,
+          "max_us_per_operation": 9274.806163327108,
+          "stdev_us_per_operation": 1832.337815254747
+        }
+      },
+      "isolated_memory": {
+        "static": {
+          "python_retained_bytes": 206064,
+          "python_peak_bytes": 386592,
+          "process_peak_rss_kib": 47288
+        },
+        "smooth": {
+          "python_retained_bytes": 223773,
+          "python_peak_bytes": 375072,
+          "process_peak_rss_kib": 47288
+        },
+        "spring": {
+          "python_retained_bytes": 224405,
+          "python_peak_bytes": 375792,
+          "process_peak_rss_kib": 47288
+        }
+      },
+      "spring_minus_smooth_us_per_frame": 1212.636326696762,
+      "spring_overhead_vs_smooth_percent": 33.898551308956236,
+      "notes": [
+        "Local CPU result; timings are warmed, interleaved, and exclude FFmpeg encoding.",
+        "Rendering uses identical sprites, dimensions, track counts, and translation distances; curve paths differ.",
+        "RSS is Linux whole-process high-water KiB, including imports/warmup; it is not incremental spring memory.",
+        "Tracemalloc memory passes exclude native Pillow buffers and are separate from performance timings.",
+        "Static rendering deliberately exercises repeated-frame cache reuse; moving modes evaluate changing tracks."
+      ]
+    }
+  },
+  "review": {
+    "Track_ast_unchanged": true,
+    "Entry_ast_unchanged": true,
+    "base_modules_and_dependencies_unchanged": true,
+    "review": {
+      "independent_oracles": "80-digit Decimal ODE recurrence, critical/real-root solutions, underdamped extrema identities",
+      "continuous_safety": "padded analytical progress interval applied to resolved segment arithmetic; reversed interval preserved",
+      "rollback": "invalid settings/fields/scale/overflow/collision/lifetime rejected before publication, including later nested children",
+      "limitations": "local transform certification only; world bounds, wrapped arbitrary callables, retargeting and velocity handoff excluded"
+    }
+  },
+  "legacy_demo": {
+    "path": "output/spring_motion/phase5/existing-motion-graphics-preview.mp4",
+    "sha256": "5879f43c26e9a7dc59077615f2a49a83ea15babcb37d253b8b48a7a9b2d816cd",
+    "width": 480,
+    "height": 270,
+    "fps": 24,
+    "frames": 432,
+    "duration_seconds": 18,
+    "audio_streams": 0,
+    "full_decode_passed": true,
+    "source_and_encoded_frames_inspected": true,
+    "frame_comparisons": [
+      {
+        "frame_index": 24,
+        "time_seconds": 1.0,
+        "mean_absolute_rgb_error": 0.7552880658436214
+      },
+      {
+        "frame_index": 60,
+        "time_seconds": 2.5,
+        "mean_absolute_rgb_error": 0.8244470164609053
+      },
+      {
+        "frame_index": 163,
+        "time_seconds": 6.791666666666667,
+        "mean_absolute_rgb_error": 0.8727906378600823
+      },
+      {
+        "frame_index": 216,
+        "time_seconds": 9.0,
+        "mean_absolute_rgb_error": 0.8381687242798354
+      },
+      {
+        "frame_index": 312,
+        "time_seconds": 13.0,
+        "mean_absolute_rgb_error": 0.613914609053498
+      },
+      {
+        "frame_index": 420,
+        "time_seconds": 17.5,
+        "mean_absolute_rgb_error": 0.7679423868312757
+      }
+    ],
+    "original_960x540_antialias_2_run": "interrupted after several minutes; not verified"
+  },
+  "spring_preview": {
+    "path": "output/spring_motion/preview.mp4",
+    "sha256": "f62749cdabb27eeff31ac79efd01e625882483af489a3d44123b8fa589d221e0",
+    "bytes": 128922,
+    "width": 960,
+    "height": 540,
+    "fps": 30,
+    "frames": 300,
+    "duration_seconds": 10,
+    "codec": "h264",
+    "pixel_format": "yuv420p",
+    "audio_streams": 0,
+    "full_decode_passed": true
+  },
+  "packaging": {
+    "offline_wheel_and_sdist_built": true,
+    "isolated_wheel_import_root": "/tmp/faceless-spring-phase5-installed",
+    "isolated_three_regime_ping_pong_cpu_smoke": "passed",
+    "sdist_includes_qa_scripts_and_tests": true,
+    "dependencies": "reused installed third-party runtime; no fresh dependency resolution or clean environment claim"
+  },
+  "source_sha256": {
+    "src/faceless_champ/spring.py": "a354627c4e09a657d95d800a27796eef0435ad6ab0cf489c4ff2862c7f811a8e",
+    "src/faceless_champ/timeline.py": "319f7ebdc761844eb5ada87170beb533d1c81cfc0836f8317187ae84ba35c935",
+    "src/faceless_champ/scheduling.py": "e8192fc08e224c5fa07a5850d237d64c387479002aeb8e96af1767205175a557",
+    "src/faceless_champ/__init__.py": "9a63b32189793fcc6c6a4a06e6f4b56e52954a72cefbd3709143697a2ce96651",
+    "examples/spring_motion/render.py": "701aa8b7d71de2840e405c33472cb5f83fa89276938cff779563d9df1223d8e5",
+    "examples/spring_motion/verify.py": "bd9dcfc15b6c92391734a8225338dc06a6cf52a083e31eefd1a753bc7b76ce5a",
+    "examples/spring_motion/benchmark.py": "de34a0ed7f420f6533e9fa41abc6a745c4e811fb4e5079fa042e7a51f0df216f",
+    "tests/test_spring.py": "d79e2d6dd2e855e38a8789a79dca94aaa53750576e8aac0f89699a523d1d45bd",
+    "tests/test_spring_timeline.py": "bdf45bac7a2d6c0ad7f233850e58704a13ba8afc6f9b4ce38bfded9b3e8a2435",
+    "tests/test_spring_scheduling.py": "59dffc5400d408ec0b098efa1896bce0b703ed993f4cfc946ff30ec6c9499b59",
+    "tests/test_spring_example.py": "d19abcf23831a94b0a10f2756602b2781f3e3fb66fe854de92c227385514542b",
+    "tests/test_spring_release.py": "04ce7b2ee184c30720e095dd48d7629715f927fe73f99a9e4d23777c418a6cda"
+  },
+  "limits": [
+    "FPS checks use direct shared-timeline source frames, not three encoded exports.",
+    "Legacy demo is verified at 480x270/24 fps/AA1; original 960x540/AA2 run was interrupted and remains unverified.",
+    "Benchmarks are local CPU measurements with visible trial variation; no universal percentage-overhead guarantee.",
+    "Spring preview is complete at 960x540; optional 1920x1080 export was not run.",
+    "No merge or Premium Motion System 02 work is authorized by this handoff."
+  ]
+}

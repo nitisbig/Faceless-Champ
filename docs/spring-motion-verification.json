@@ -1,0 +1,169 @@
+{
+  "phase": 4,
+  "verified_on": "2026-10-15",
+  "preview": {
+    "path": "output/spring_motion/preview.mp4",
+    "sha256": "f62749cdabb27eeff31ac79efd01e625882483af489a3d44123b8fa589d221e0",
+    "bytes": 128922,
+    "width": 960,
+    "height": 540,
+    "fps": 30,
+    "frames": 300,
+    "duration_seconds": 10,
+    "codec": "h264",
+    "pixel_format": "yuv420p",
+    "audio_streams": 0,
+    "full_decode_passed": true
+  },
+  "storyboard": {
+    "path": "output/spring_motion/storyboard/storyboard.png",
+    "sha256": "88875d4073aa86676538661cc503b40d2f2fd71f8aff39bfc43a68c02e37efd6",
+    "samples": 12,
+    "size": [
+      1440,
+      1216
+    ]
+  },
+  "layout": {
+    "bounds_checked": 17759,
+    "samples_per_shot": 301,
+    "minimum_canvas_clearance_px": 23.0
+  },
+  "analytical_first_extrema": [
+    {
+      "time_seconds": 0.6412250789086205,
+      "minimum_canvas_clearance_px": 23.0,
+      "frame": "output/spring_motion/peak-0.641225s.png"
+    },
+    {
+      "time_seconds": 4.732386593090584,
+      "minimum_canvas_clearance_px": 32.0,
+      "frame": "output/spring_motion/peak-4.732387s.png"
+    },
+    {
+      "time_seconds": 7.367676971636074,
+      "minimum_canvas_clearance_px": 32.0,
+      "frame": "output/spring_motion/peak-7.367677s.png"
+    },
+    {
+      "time_seconds": 7.497676971636074,
+      "minimum_canvas_clearance_px": 32.0,
+      "frame": "output/spring_motion/peak-7.497677s.png"
+    },
+    {
+      "time_seconds": 7.627676971636074,
+      "minimum_canvas_clearance_px": 32.0,
+      "frame": "output/spring_motion/peak-7.627677s.png"
+    },
+    {
+      "time_seconds": 7.757676971636074,
+      "minimum_canvas_clearance_px": 32.0,
+      "frame": "output/spring_motion/peak-7.757677s.png"
+    }
+  ],
+  "encoded_frame_comparisons": [
+    {
+      "frame_index": 0,
+      "time_seconds": 0.0,
+      "mean_absolute_rgb_error": 1.0806629372427985
+    },
+    {
+      "frame_index": 19,
+      "time_seconds": 0.6333333333333333,
+      "mean_absolute_rgb_error": 1.063411779835391
+    },
+    {
+      "frame_index": 53,
+      "time_seconds": 1.7666666666666666,
+      "mean_absolute_rgb_error": 1.052201646090535
+    },
+    {
+      "frame_index": 119,
+      "time_seconds": 3.966666666666667,
+      "mean_absolute_rgb_error": 1.0543203446502056
+    },
+    {
+      "frame_index": 129,
+      "time_seconds": 4.3,
+      "mean_absolute_rgb_error": 0.9009137088477366
+    },
+    {
+      "frame_index": 142,
+      "time_seconds": 4.733333333333333,
+      "mean_absolute_rgb_error": 1.0167148919753086
+    },
+    {
+      "frame_index": 209,
+      "time_seconds": 6.966666666666667,
+      "mean_absolute_rgb_error": 0.9918962191358025
+    },
+    {
+      "frame_index": 218,
+      "time_seconds": 7.266666666666667,
+      "mean_absolute_rgb_error": 0.8540830761316872
+    },
+    {
+      "frame_index": 230,
+      "time_seconds": 7.666666666666667,
+      "mean_absolute_rgb_error": 0.8965309927983539
+    },
+    {
+      "frame_index": 252,
+      "time_seconds": 8.4,
+      "mean_absolute_rgb_error": 0.9177031893004116
+    },
+    {
+      "frame_index": 270,
+      "time_seconds": 9.0,
+      "mean_absolute_rgb_error": 0.9175501543209877
+    },
+    {
+      "frame_index": 299,
+      "time_seconds": 9.966666666666667,
+      "mean_absolute_rgb_error": 0.9174774948559671
+    }
+  ],
+  "encoded_contact_sheet": "output/spring_motion/encoded/contact-sheet.png",
+  "maximum_left_terminal_coordinate_change": 8.000000661922968e-08,
+  "terminal_holds_source_frames_equal": true,
+  "public_guide_snippets_executed": 2,
+  "high_resolution_export_verified": false,
+  "phase_5_complete": true,
+  "environment": {
+    "python": "3.12.3",
+    "faceless-champ": "0.1.5",
+    "Pillow": "12.3.0",
+    "pytest": "9.1.1",
+    "ruff": "0.16.10"
+  },
+  "visual_inspection": {
+    "source_storyboard": true,
+    "encoded_contact_sheet": true,
+    "analytical_peak_contact_sheet": "output/spring_motion/peak-contact-sheet.png",
+    "analytical_first_peak_stills": true,
+    "unexpected_clipping_observed": false,
+    "user_approval": "continuation authorized by Phase 5 request"
+  },
+  "full_preview_verified": true,
+  "full_export_verified": false,
+  "scope": "Phase 4 example and documentation only; no production, renderer, dependency, or prior example changes.",
+  "tests": {
+    "showcase": {
+      "passed": 4,
+      "seconds": 40.85
+    },
+    "existing_focused": {
+      "passed": 588,
+      "seconds": 8.48
+    },
+    "total_passed": 592
+  },
+  "checks": {
+    "ruff_core_kit_agent_examples": "passed",
+    "ruff_format_listed_python_files": 9,
+    "whitespace": "passed",
+    "spring_document_links": 12,
+    "evidence_json": "passed"
+  },
+  "phase_5_evidence": "docs/spring-motion-release.json"
+}
