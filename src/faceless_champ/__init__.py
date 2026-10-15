@@ -183,6 +183,10 @@ from .coding import CodeReveal, CodeTheme, CodingChamp
 
 __all__ += ["CodeReveal", "CodeTheme", "CodingChamp"]
 
+from .coding_workspace import CodeWindow, CodeWorkspaceDesign
+
+__all__ += ["CodeWindow", "CodeWorkspaceDesign"]
+
 from .chess import ChessAssets, ChessChamp, ChessScript, ChessTheme
 
 __all__ += ["ChessAssets", "ChessChamp", "ChessScript", "ChessTheme"]

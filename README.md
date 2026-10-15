@@ -314,6 +314,9 @@ reveals using `CodingChamp`, `CodeTheme`, and `CodeReveal`. Install the optional
 `coding` extra for Pygments languages; plain text needs no extra dependency.
 See [the CodingChamp guide](docs/coding.md), [the staged example](examples/coding/showcase.py),
 and the cue-synchronized `training project/coding-video` tutorial.
+The approved fullscreen editor and fluid terminal transitions are saved as
+`CodeWorkspaceDesign.named("clean-flow")`; see the [workspace design](docs/coding.md#saved-clean-flow-workspace-design)
+and [reusable example](examples/coding/workspace.py).
 
 ### OS UI rendering
 

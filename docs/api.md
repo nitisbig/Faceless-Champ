@@ -4,7 +4,7 @@ Current source: **0.1.4**. Optional capability references:
 
 | API | Documentation | Extra |
 | --- | --- | --- |
-| CodingChamp, CodeTheme, CodeReveal | [Code editors](coding.md) | coding for syntax highlighting |
+| CodingChamp, CodeTheme, CodeReveal, CodeWorkspaceDesign, CodeWindow | [Code editors](coding.md) | coding for syntax highlighting |
 | CodeCheckpoint, PlaygroundScript, prepare_playground, PreparedPlayground, CodeEditor, PlaygroundCanvas, PlaygroundOutput | [Prepared playgrounds](coding-playgrounds.md) | playground; Chromium for web preparation |
 | HtmlPage, WebScript, capture_html, WebCapture, HtmlClip | [HTML capture](html-to-video.md) | web for preparation |
 | OSClip, OSScript, VirtualFileSystem, MacOSPreset | [OS UI](os-ui.md) | none |
@@ -586,6 +586,9 @@ The guide defines interpolation, ranges, coordinate systems and exact loop endpo
 editor surfaces and source-preserving character/word/block reveals. See the
 [complete CodingChamp API and examples](coding.md) for constructor options, themes,
 staged animation, optional language support, layout limits, and cache controls.
+`CodeWorkspaceDesign.named("clean-flow")` saves the fullscreen editor, uniformly
+scaled run layout, terminal chrome, and fluid shrink/restore motion. `CodeWindow`
+composes its existing code children without executing them.
 
 ## OS UI
 

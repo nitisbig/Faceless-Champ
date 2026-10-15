@@ -75,3 +75,61 @@ Set `code_cache_mb=0` and `frame_cache_mb=0` to disable both code and held-frame
 
 See `examples/coding/showcase.py` for staged blocks and `training project/coding-video`
 for a complete narrated tutorial with export controls. Existing `Text`/`Typewriter` APIs are unchanged.
+
+## Saved clean-flow workspace design
+
+`CodeWorkspaceDesign.named("clean-flow")` preserves the approved fullscreen editor
+and terminal design from `training project/python-functions`. It contains no lesson
+text, narration, or execution. The editor fills its bounds while typing; the whole
+window scales uniformly to 64% and moves left before the terminal appears. On a
+1920×1080 canvas the run layout has a 48px outer margin and 32px window gap.
+
+The saved timings are 0.8s to shrink, 0.6s for terminal entrance, 0.45s for terminal
+exit, and 0.9s to restore the editor. The monotonic `design.fluid` easing settles
+without overshoot. Code, chrome, highlights and shadow share the window transform.
+Only source, window labels, commands and output need appear on screen.
+
+```python
+from faceless_champ import Canvas, CodeWorkspaceDesign, CodingChamp, Scene
+
+design = CodeWorkspaceDesign.named("clean-flow")
+scene = Scene(Canvas(1920, 1080, design.background))
+box = design.code_bounds
+code = CodingChamp(
+    'print("Hello, Python!")', language="python", theme=design.theme,
+    chrome=False, font_size=design.code_size * design.unit, padding=8 * design.unit,
+    width=box.width, height=box.height,
+    position=(box.left, box.top), anchor="top_left",
+)
+editor = design.window(design.editor_full, "functions.py", children=(code,), fullscreen=True)
+# Add the complete hierarchy before animating its code or highlights.
+scene.add(editor)
+scene.play(
+    design.editor_motion(editor, running=True),
+    *design.editor_corners(editor, running=True),
+    run_time=design.shrink_duration,
+)
+# After the terminal exits, restore with running=False and restore_duration.
+```
+
+`CodeWorkspaceDesign(bounds=Bounds(...))` adapts the layout to an allocated region;
+`unit` scales the typography and chrome from the 1920×1080 reference. `editor_full`,
+`editor_split`, `terminal_bounds`, and `code_bounds` expose the layout. Customize
+the immutable design with `dataclasses.replace`; the default remains the saved look.
+Allocations must leave at least `192 * unit` of terminal width for window chrome;
+an `editor_scale` that leaves less room raises `ValueError` during design construction.
+
+`CodeWindow` is an ordinary `Group` built by `design.window(...)`. It exposes
+`face`, `header`, `heading`, `shadow`, and `bounds_box` (the face allocation).
+Direct window faces also require at least `192 * unit` width. Long or multiline
+titles scale down uniformly to stay within the header, preserving their text.
+Pass chrome-free content as `children` when constructing it. Build a terminal with
+`design.window(design.terminal_bounds, "Terminal", children=(command, output))`,
+then animate it with `design.terminal_in(window)` / `design.terminal_out(window)`.
+The caller schedules typing, output publication, visibility and durations; these
+helpers never run code or add audio. Existing editor/playground defaults are unchanged.
+
+See `examples/coding/workspace.py` for a complete silent example. In Kit projects,
+use `Segment.add_core` with a factory returning a fresh window hierarchy. A full-screen
+window's shadow extends outside its face bounds; allocate shadow clearance or keep
+the full-screen composition at the core Scene level, as the reference tutorial does.
