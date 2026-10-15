@@ -116,7 +116,9 @@ def raster_label(clip, id, state, factor):
         position = transform(local, state)
         sprite = sprite.rotate(-state["rotation"], expand=True, resample=Image.Resampling.BICUBIC)
     else:
-        position = sample(state["path"], 0.5)
+        edge = clip._edges[id]
+        anchor = sample(state["path"], edge.label_position)
+        position = tuple(a + offset for a, offset in zip(anchor, edge.label_offset))
     sprite.putalpha(sprite.getchannel("A").point(lambda a: round(a * state["draw"])))
     return sprite, tuple(x * factor for x in position)
 

@@ -47,6 +47,11 @@ Only times inside the authored playback window are sampled. `FLOW_LABEL_OVERLAP`
 checks actual labels against labels/node rectangles rather than full connection bounds.
 Sampling cannot guarantee that no collision occurs between the inspected times.
 
+Core `FlowEdge(label_position=0.5, label_offset=(0, 0))` also works inside
+`FlowCanvas`: move labels along routed connections by path-length fraction and
+offset them in viewport design pixels. The compiler's label diagnostics use the
+adjusted geometry. Defaults preserve existing placement.
+
 For narration, attach audio/SRT once with `video.narration(...)`, create cue-bounded
 segments, and use `segment.cue_time(original_index)` for FlowScript action times.
 Keep source rounding overlaps with `overlap_tolerance=0.001` where appropriate.

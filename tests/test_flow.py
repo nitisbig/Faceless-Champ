@@ -3,6 +3,7 @@
 import json
 import math
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from PIL import Image
@@ -344,3 +345,92 @@ def test_tiny_node_scale_does_not_clip_fixed_pixel_label_padding():
     actual = c.frame_image(1).crop((left, top, left + backing.width, top + backing.height))
     assert actual.tobytes() == backing.tobytes()
     assert c.bounds_for("db", 1).width >= backing.width
+
+
+def test_edge_label_defaults_preserve_positional_constructor_and_legacy_pixels(monkeypatch):
+    from faceless_champ.flow import drawing
+
+    edge = FlowEdge("e", "a", "b", "out", "in", "Request", "orthogonal", (), False, "end")
+    assert edge.label_position == 0.5 and edge.label_offset == (0, 0)
+    c = FlowChamp(replace(graph(), edges=(edge,)), width=600, height=400)
+    actual = c.frame_image(0, 0.75).tobytes()
+    current = drawing.raster_label
+
+    def legacy_label(clip, id, state, factor):
+        sprite, position = current(clip, id, state, factor)
+        if id in clip._edges:
+            position = tuple(v * factor for v in sample(state["path"], 0.5))
+        return sprite, position
+
+    monkeypatch.setattr(drawing, "raster_label", legacy_label)
+    assert c.frame_image(0, 0.75).tobytes() == actual
+
+
+@pytest.mark.parametrize("route", ["straight", "orthogonal", "bezier"])
+def test_edge_label_follows_routed_distance_moving_endpoints_and_scaled_offset(route):
+    from faceless_champ.flow.drawing import raster_label
+
+    c = FlowChamp(
+        graph(route=route, label="Request", label_position=0.25, label_offset=(12, -35)),
+        FlowScript().move("b", (470, 250), duration=2),
+        width=600,
+        height=400,
+    )
+    centers = []
+    for time in (2, 0, 1, 2):
+        state = c.state_at(time)["elements"]["e"]
+        anchor = sample(state["path"], 0.25)
+        _, center = raster_label(c, "e", state, 1.5)
+        assert center == pytest.approx(((anchor[0] + 12) * 1.5, (anchor[1] - 35) * 1.5))
+        centers.append(center)
+        assert c.frame_image(time, 1.5).getbbox()
+    assert centers[0] == centers[-1] and centers[0] != centers[1]
+
+
+@pytest.mark.parametrize("position", [0, 1])
+def test_edge_label_endpoints_and_json_roundtrip(position):
+    c = FlowChamp(graph(label="Read", label_position=position, label_offset=[5, -30]), width=600, height=400)
+    restored = FlowChamp.from_dict(json.loads(json.dumps(c.to_dict())))
+    assert restored.graph.edges[0].label_offset == (5, -30)
+    assert restored.to_dict() == c.to_dict()
+    assert restored.frame_image(0).tobytes() == c.frame_image(0).tobytes()
+
+
+@pytest.mark.parametrize("value", [-0.1, 1.1, True, float("nan"), float("inf"), "0.5"])
+def test_invalid_edge_label_position_has_field_path(value):
+    with pytest.raises(FlowDataError, match="e.label_position"):
+        FlowEdge("e", "a", "b", label_position=value)
+
+
+@pytest.mark.parametrize("value", [None, (1,), (1, 2, 3), (0, True), (float("nan"), 0), "0,0"])
+def test_invalid_edge_label_offset_has_field_path(value):
+    with pytest.raises(FlowDataError, match="e.label_offset"):
+        FlowEdge("e", "a", "b", label_offset=value)
+
+
+def test_edge_label_offset_changes_raster_bounds_and_collision_diagnostics():
+    # The normal midpoint label is clear; offsetting it onto node b must report a collision.
+    clear = FlowChamp(graph(label="Request", label_offset=(0, -40)), width=600, height=400)
+    collision = FlowChamp(graph(label="Request", label_offset=(150, 0)), width=600, height=400)
+    assert not any(d["code"] == "FLOW_LABEL_OVERLAP" for d in clear.diagnostics_at(0))
+    assert any(d.get("elements") == ["b", "e"] for d in collision.diagnostics_at(0))
+    outside = FlowChamp(graph(label="Request", label_offset=(0, -200)), width=600, height=400)
+    assert outside.bounds_for("e").top < 0
+    assert any(d.get("element") == "e" and d["code"] == "FLOW_BOUNDS" for d in outside.diagnostics_at(0))
+    assert clear.frame_image(0).tobytes() != collision.frame_image(0).tobytes()
+
+
+def test_edge_label_schema_accepts_new_fields_and_legacy_documents():
+    schema = json.loads((Path(__file__).parents[1] / "src/faceless_champ/flow/schema.json").read_text())
+    edge = schema["$defs"]["edge"]["properties"]
+    assert edge["label_position"] == {"type": "number", "minimum": 0, "maximum": 1, "default": 0.5}
+    assert edge["label_offset"]["$ref"] == "#/$defs/point"
+    point = schema["$defs"]["point"]
+    assert point["minItems"] == point["maxItems"] == 2
+    assert point["prefixItems"] == [{"type": "number"}, {"type": "number"}]
+    assert not {"label_position", "label_offset"} & set(schema["$defs"]["edge"]["required"])
+    old = clip().to_dict()
+    for item in old["graph"]["edges"]:
+        item.pop("label_position")
+        item.pop("label_offset")
+    assert FlowChamp.from_dict(old).graph.edges[0].label_position == 0.5

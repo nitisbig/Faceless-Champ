@@ -156,6 +156,8 @@ class FlowEdge:
     waypoints: tuple = ()
     dashed: bool = False
     arrows: str = "end"
+    label_position: float = 0.5
+    label_offset: tuple = (0, 0)
 
     def __post_init__(self):
         for name in ("id", "source", "target"):
@@ -167,6 +169,10 @@ class FlowEdge:
             raise FlowDataError(self.id, "label must be text and dashed must be boolean")
         choice(self.route, ("straight", "orthogonal", "bezier"), self.id)
         choice(self.arrows, ("none", "start", "end", "both"), self.id)
+        number(self.label_position, f"{self.id}.label_position", 0)
+        if self.label_position > 1:
+            raise FlowDataError(f"{self.id}.label_position", "must be <= 1")
+        object.__setattr__(self, "label_offset", point(self.label_offset, f"{self.id}.label_offset"))
         object.__setattr__(self, "waypoints", tuple(point(p, self.id) for p in self.waypoints))
         if self.route == "bezier" and len(self.waypoints) not in (0, 2):
             raise FlowDataError(self.id, "Bezier routes need zero or two control points")

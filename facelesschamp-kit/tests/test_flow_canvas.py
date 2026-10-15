@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
 import pytest
-from faceless_champ import Canvas, FlowGraph, FlowNode, FlowScript, FlowTheme, PillowRenderer
+from faceless_champ import Canvas, FlowEdge, FlowGraph, FlowNode, FlowScript, FlowTheme, PillowRenderer
 from faceless_champ.flow.examples import recipe
 
 from facelesschamp_kit import Video
@@ -81,3 +81,18 @@ def test_explicit_flow_theme_retains_legacy_accent_stroke(tmp_path):
     g = FlowGraph((FlowNode("a"),))
     built = FlowCanvas(g, theme=FlowTheme(accent="#C15F3C")).compose(ctx, ctx.bounds)
     assert built.root.theme.stroke is None
+
+
+def test_adjusted_edge_labels_keep_compiler_diagnostic_scope(tmp_path):
+    graph = FlowGraph(
+        (FlowNode("a", position=(150, 150)), FlowNode("b", position=(450, 150))),
+        (FlowEdge("read", "a", "b", label="Read", label_position=0.5, label_offset=(150, 0)),),
+        layout="manual",
+    )
+    video = Video(BuildContext(tmp_path))
+    video.segment("feed", start=2, duration=3).add(FlowCanvas(graph, viewport=(600, 400)))
+    compiled = video.compile()
+    warnings = [d for d in compiled.report["diagnostics"] if d["code"] == "FLOW_LABEL_OVERLAP"]
+    assert warnings
+    assert all(d["segment"] == "feed" and d["placement"] == "feed/block-1" for d in warnings)
+    assert any(d.get("source_time") == 2 for d in warnings)

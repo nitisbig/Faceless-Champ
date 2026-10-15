@@ -51,13 +51,22 @@ with an actionable error if they cannot fit. Technical-symbol labels appear belo
 symbols; ordinary card labels appear inside.
 
 `FlowEdge(id, source, target, source_port=None, target_port=None, label="",
-route="orthogonal", waypoints=(), dashed=False, arrows="end")` connects node IDs.
+route="orthogonal", waypoints=(), dashed=False, arrows="end",
+label_position=0.5, label_offset=(0,0))` connects node IDs.
 Arrow choices are `none`, `start`, `end`, `both`. Straight routes follow any supplied
 waypoints; orthogonal routes insert right-angle bends through them; Bezier routes
 accept zero or two control points. Waypoints remain in fixed viewport coordinates
 while node endpoints move. Wires cross without a junction; use a `junction` node
 and distinct edges to represent an electrical connection. Self-loops are supported.
 Bezier curves use deterministic subdivision and approximate arc-length travel.
+
+Use `label_position` (0 to 1) to anchor a label by distance along the current routed
+path, and `label_offset=(dx, dy)` to shift it in viewport design pixels. Offsets use
+the viewport's horizontal/vertical axes and scale with the whole diagram. The anchor
+follows moving endpoints; fixed waypoints retain their existing behavior. Defaults
+preserve midpoint labels. Rendering, bounds and collision diagnostics share the same
+label geometry. For example, `FlowEdge("read", "api", "cache", label="Read",
+label_position=0.35, label_offset=(0, -24))` places the label above the wire.
 
 `FlowGraph(nodes, edges=(), layout="layered", direction="horizontal")` supports
 `manual`, `layered`, `grid`, and `radial`. Every explicit node position takes precedence.
