@@ -1,8 +1,9 @@
 # Spring Motion v1: Phase 0 architecture proposal
 
 Status: **architecture approved; Phases 1–5 implementation and local QA complete**.
-The user authorized Phase 5 after the inspected Phase 4 handoff; PR review/merge
-is a separate action. Audited on 2026-10-15
+The user authorized Phase 5 after the inspected Phase 4 handoff and then requested
+that the completed changes remain local. A PR description is prepared; nothing
+was pushed or merged. Audited on 2026-10-15
 (Asia/Kathmandu), branch `facelesschamp-agent`, HEAD
 `d61fe16594e4f46358f61cb5bca86a982d3b77da`.
 
@@ -810,5 +811,7 @@ See [the full verification report](../spring-motion-verification.md#phase-5-fina
 and [release JSON](../spring-motion-release.json) for methods, raw trials, source
 hashes, artifact paths, limitations, and reproducible commands. The dedicated
 `codex/spring-motion-v1` review branch targets `facelesschamp-agent`, the verified
-base, to exclude earlier unrelated commits. PR publication is recorded in the
-final handoff. No merge or later Premium Motion subsystem is performed here.
+base, to exclude earlier unrelated commits. After automatic approval review
+rejected publication, the user explicitly selected **Keep changes local**. The
+[prepared PR description](../spring-motion-pr.md) is retained for review; no push,
+GitHub PR, merge, or later Premium Motion subsystem was performed.

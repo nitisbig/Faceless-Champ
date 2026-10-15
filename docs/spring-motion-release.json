@@ -5,6 +5,13 @@
   "base_branch": "facelesschamp-agent",
   "feature_branch": "codex/spring-motion-v1",
   "status": "implementation and local QA complete; focused review handoff ready",
+  "publication": {
+    "status": "local_only_user_requested",
+    "branch_pushed": false,
+    "github_pr_opened": false,
+    "prepared_pr_description": "docs/spring-motion-pr.md",
+    "reason": "Automatic approval review rejected public disclosure; the user explicitly selected Keep changes local."
+  },
   "user_authorization": "User requested next complete phase 5 after receiving the Phase 4 preview and verification handoff.",
   "tests": {
     "core_full": {

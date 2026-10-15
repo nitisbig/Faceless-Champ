@@ -6,8 +6,9 @@ documentation phase. [Machine-readable evidence](spring-motion-verification.json
 includes artifact hashes and individual sample results. Phase 5 QA is complete;
 see the [release evidence](spring-motion-release.json) and final checks below.
 The user authorized Phase 5 after receiving the inspected Phase 4 preview.
-PR publication/review is recorded in the final handoff; no automatic merge is part
-of these checks. The following sections preserve the Phase 4 results.
+The user requested that the changes remain local. The
+[prepared PR description](spring-motion-pr.md) is saved for review; no push or
+GitHub PR was performed. The following sections preserve the Phase 4 results.
 
 ## Delivered example
 
@@ -242,6 +243,7 @@ dependencies were reused from the existing environment; this is not a fresh
 dependency resolution. The sdist includes the QA scripts and release regressions.
 
 The focused feature branch is `codex/spring-motion-v1`, based on the verified
-`facelesschamp-agent` commit recorded above. A PR targets that branch so earlier
-unrelated work is excluded. Merge remains a review action. The optional Spring
+`facelesschamp-agent` commit recorded above. The prepared local PR description
+targets that branch so earlier unrelated work is excluded. Publication was
+declined by the user; no push or GitHub PR was performed. The optional Spring
 1080p export and all later Premium Motion subsystems remain outside this handoff.
