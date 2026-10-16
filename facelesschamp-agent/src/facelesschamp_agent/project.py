@@ -42,6 +42,20 @@ def _file_identity(path):
     return digest(path) if path.is_file() else None
 
 
+def _package_identity(directory):
+    """Include packaged fonts/icons/media so their updates invalidate review evidence."""
+    directory = Path(directory)
+    return _hash(
+        {
+            str(path.relative_to(directory)): digest(path)
+            for path in sorted(directory.rglob("*"))
+            if path.is_file()
+            and not any(part.startswith((".", "__")) for part in path.relative_to(directory).parts[:-1])
+            and path.suffix not in {".pyc", ".pyo"}
+        }
+    )
+
+
 class AgentProject:
     def __init__(self, root="."):
         root = Path(root).resolve()
@@ -82,9 +96,7 @@ class AgentProject:
         implementations = {}
         for package in ("faceless_champ", "facelesschamp_kit", "facelesschamp_agent"):
             directory = Path(importlib.import_module(package).__file__).parent
-            implementations[package] = _hash(
-                {str(p.relative_to(directory)): digest(p) for p in sorted(directory.rglob("*.py"))}
-            )
+            implementations[package] = _package_identity(directory)
         return _hash(
             {
                 "plan": plan.model_dump(mode="json"),
@@ -310,6 +322,30 @@ class AgentProject:
             diagnostics=compiled.report["diagnostics"],
             scene_count=len(plan.scenes),
         )
+
+    def audit_layout(self, *, detailed=False):
+        """Audit public layout geometry at boundaries, actions and motion samples."""
+        from .layout import audit_layout
+
+        compiled, plan, fingerprint = self._build()
+        result = audit_layout(compiled, plan)
+        record = self._record("audit-layout", fingerprint, **result)
+        if detailed:
+            return record
+        return {
+            **{key: value for key, value in record.items() if key != "sample_times"},
+            "sample_count": len(record["sample_times"]),
+            "report_path": str(self.state / "records" / f"{record['id']}.json"),
+        }
+
+    def entrypoint(self):
+        """Write the portable, preview-first render.py without replacing user code."""
+        import shlex
+
+        from .delivery import write_render_entrypoint
+
+        path = write_render_entrypoint(self.root)
+        return {"path": str(path), "command": shlex.join(["python", str(path)])}
 
     def prepare(self):
         _, _, narration = self._narration(prepare=True)
@@ -564,6 +600,8 @@ class AgentProject:
         reviewed = {"visual": {}, "editorial": {}}
         latest_full = next((r["id"] for r in reversed(current) if r["operation"] == "render"), None)
         for record in current:
+            if record["operation"] == "audit-layout":
+                report.layout_validation = record["status"]
             if record["operation"] == "verify" and all(self._intact(a) for a in record["artifacts"]):
                 field = (
                     "full_export_media_verification"
@@ -600,12 +638,18 @@ class AgentProject:
                     seen.add(key)
         attempts = {}
         for record in self._records():
+            if record["operation"] == "audit-layout" and record["status"] == "failed":
+                for scene in {f["scene_id"] for f in record["findings"]}:
+                    if scene in {s.id for s in plan.scenes}:
+                        attempts.setdefault(scene, set()).add(record["fingerprint"])
             if record["operation"] == "review" and record["submission"]["status"] == "failed":
                 review = record["submission"]
                 for scene in {f["scene_id"] for f in review["findings"]} or set(review["reviewed_scenes"]):
                     if scene in {s.id for s in plan.scenes}:
                         attempts.setdefault(scene, set()).add(record["fingerprint"])
         report.repair_passes = {s: max(0, len(values) - 1) for s, values in attempts.items()}
+        if report.layout_validation != "passed":
+            report.next_actions.append("Run audit-layout and repair unintended boundary, overflow or overlap findings")
         if not any(
             r["operation"] == "storyboard" and all(a["id"] in artifacts for a in r["artifacts"]) for r in current
         ):
@@ -626,6 +670,7 @@ class AgentProject:
 
 def init_project(destination):
     """Create an editable ordinary kit project atomically; never merge existing work."""
+    from .delivery import write_render_entrypoint
     from .scaffold import CONFIG, INITIAL_PLAN, SOURCE
 
     destination = Path(destination).resolve()
@@ -647,6 +692,7 @@ def init_project(destination):
         (staging / "pyproject.toml").write_text(
             '[project]\nname="agent-video"\nversion="0.1.0"\nrequires-python=">=3.12"\ndependencies=["facelesschamp-agent==0.1.0rc2"]\n'
         )
+        write_render_entrypoint(staging)
         staging.rename(destination)
     finally:
         if staging.exists():

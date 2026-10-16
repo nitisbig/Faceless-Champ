@@ -1,5 +1,9 @@
 # Editable production examples
 
+The checked-in [scene-selection example](scene-selection/README.md) includes exact
+fixture cues, a detailed authored plan and render.py. It demonstrates context
+ingestion, scene direction, layout gates and a verified short silent preview.
+
 Run from any directory after installing the packages:
 
 ```python

@@ -12,6 +12,45 @@ from any directory. Run `fc-agent doctor` before a new production environment.
 
 ## Plan and author
 
+Follow the user's explicit design, scene, motion and delivery instructions first.
+Project constraints come next; the premium defaults fill only unspecified choices.
+Do not add titles, captions, cards or effects that contradict custom direction.
+
+Use this five-stage loop when creating or improving a narrated project:
+
+1. Run `fc-agent --project PROJECT plan --prompt "USER REQUEST"`, passing custom
+   `--instructions "..."`, `--instructions-file FILE`, or `--design FILE.json`.
+   It reads normal-subtitle.srt, cue-per-word.srt, voiceover.md (also voicover.md),
+   narration.md and supplementary project files without executing their code.
+   Word cues own timing; preserve every source time and tiny overlap. Read the
+   returned selection artifact and consult source refs if context was truncated.
+2. Understand the whole narration, then refine its suggested beats into meaningful
+   ideas. Each beat needs a teaching purpose, evidence, visual relationship and
+   attention sequence. Estimated timing must remain labelled until cues exist.
+3. Select a treatment for every beat. The packet ranks the installed library and
+   assets; confirm the choice against the meaning, not only matching words.
+   Use `capabilities "QUERY" --recommend --limit 5`, then `describe ID` only for
+   chosen APIs. New public APIs, designs, fonts and icons are discovered locally.
+   Write detailed ScenePlan direction: capabilities, selection_rationale,
+   composition, motion_plan, transition, layout_strategy, cue-linked key_events,
+   required_assets and provenance. Author real recipe content or custom Python.
+   For long films, read beat rows in small batches from the JSON artifact and reuse
+   shared direction; retrieve only affected beats during repairs. Read the complete
+   narration once, and avoid repeatedly loading the full cue clock or catalog.
+4. Run `audit-layout`, then inspect `storyboard` and motion previews. Repair only
+   failing scenes and rerun checks, up to brief.repair_limit. Preserve readable
+   type; reflow/split crowded content. Declare only verified intentional overlaps
+   in intentional_overlaps (placement/child IDs). allow_bleed permits safe-area
+   use, never clipping outside the canvas. Record unresolved failures honestly.
+5. Run `entrypoint` for existing projects (new starters include render.py). Run
+   `python PROJECT/render.py` for an audited, verified short preview, inspect
+   encoded frames, and deliver the script and preview. `--full` is available for
+   an explicitly requested full export. Report visual/editorial review separately.
+
+The planner supplies a retrieval draft, not semantic understanding or a quality
+verdict. You supply that reasoning, scene code and visual repairs. Never hand the
+user the untouched starter as an interpretation of their narration.
+
 For a new video, `fc-agent init PROJECT` creates an editable example, not a finished
 interpretation of the prompt. Replace its `agent-plan.json`, narration draft, and
 Python content. Existing projects retain their files; add or update a plan in place.
@@ -19,7 +58,7 @@ Python content. Existing projects retain their files; add or update a plan in pl
 Read [planning](references/planning.md) to convert the user's goal into story beats
 and timed scene purposes. Use `fc-agent schema VideoPlan` for the current contract.
 Read [design](references/design.md) when choosing visual treatments and art direction.
-Use `fc-agent capabilities "meaning or subject"`, `recipes`, and `describe ID` to
+Use `fc-agent capabilities "meaning or subject" --recommend --limit 5`, `recipes`, and `describe ID` to
 retrieve only relevant capabilities. [Discovery](references/capabilities.md) explains
 imports, optional dependencies, and custom Python compositions.
 

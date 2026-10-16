@@ -3,6 +3,14 @@
 Read README.md, then export the portable skill with fc-agent skill --output DIR.
 Use fc-agent capabilities, describe, recipes and schema for installed contracts.
 Python services: AgentProject and CapabilityRegistry. Agent supplies reasoning; library supplies production and verification.
+Context-aware workflow: plan --prompt reads narration/subtitles/supplements and writes
+fingerprinted context + scene-selection artifacts. Read both; refine the beats and author Python.
+Use capabilities QUERY --recommend --limit 5, then describe only selected IDs.
+Custom instructions/design override defaults; preserve existing project design.
+audit-layout provides scoped geometry repairs; inspect storyboard and encoded motion.
+entrypoint creates render.py; python render.py validates/audits and verifies a short preview.
+See docs/scene-selection.md. The local planner is explainable retrieval; semantic and
+editorial reasoning and code repairs belong to the external authoring agent.
 DesignSpec themes: midnight, light, whiteboard, clean-flow. Omit font to preserve the selected
 theme's packaged font. Clean-flow supplies DM Sans body 400/heading 700, warm gray/white/orange
 styling and automatic flow entrances/outros; explicit enter=None or exit=None disables a side.

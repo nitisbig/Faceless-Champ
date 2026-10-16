@@ -1,0 +1,7 @@
+1
+00:00:00,000 --> 00:00:06,000
+Before caching, every request repeats the work. After caching, repeated requests reuse the result.
+
+2
+00:00:06,000 --> 00:00:12,000
+First check the cache, then fetch missing data, and finally return the result.

@@ -382,6 +382,6 @@ scene.wait(4)
 
 ## External-agent production layer
 
-[FacelessChamp Agent](facelesschamp-agent/README.md) adds validated video plans, offline capability discovery, ten reusable kit recipes, a portable authoring skill, JSON production commands, and fingerprinted media/review evidence. External agents supply reasoning and author ordinary Python; no model provider is built in. See the [release verification](facelesschamp-agent/docs/verification.md) for tests and complete export evidence.
+[FacelessChamp Agent](facelesschamp-agent/README.md) adds validated video plans, offline capability discovery, reusable kit recipes, a portable authoring skill, JSON production commands, and fingerprinted media/review evidence. Its [scene-selection workflow](facelesschamp-agent/docs/scene-selection.md) ingests narration and supplements, suggests beats and treatments, discovers installed APIs/assets, audits layout and delivers render.py with a verified short preview. Custom direction overrides design defaults. External agents supply reasoning and author ordinary Python; no model provider is built in. See the [release verification](facelesschamp-agent/docs/verification.md) for earlier complete-export evidence.
 
 ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK is required; core imports remain lazy. See [ArchChamp](docs/archchamp.md).

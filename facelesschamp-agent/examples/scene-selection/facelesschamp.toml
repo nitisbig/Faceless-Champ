@@ -1,0 +1,19 @@
+schema_version = 1
+[project]
+name = "Agent video"
+seed = 0
+[videos.main]
+factory = "videos.main:build"
+format = "landscape"
+theme = "clean-flow"
+captions = false
+[profiles.preview]
+width=640
+height=360
+fps = 15
+antialias = 1
+preset = "veryfast"
+[profiles.final]
+fps = 30
+antialias = 2
+preset = "medium"

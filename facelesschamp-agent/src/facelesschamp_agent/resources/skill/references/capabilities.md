@@ -1,5 +1,14 @@
 # Discovering and composing
 
+Prefer `capabilities "meaning or subject" --recommend --limit 5`. This returns a
+small ranked set with matching evidence, dependencies and preparation boundaries.
+Use `--compact --limit N` for bounded search without scores. Retrieve full signatures
+and guide text with describe only for selected IDs. The installed export/source and
+resource inventory discovers future public APIs, modules, design presets, fonts and
+icons without loading project code. Source-only entries may still need optional
+dependencies; inspect availability before selecting them. Bundled guide excerpts
+can lag the installed signatures. Avoid serially reading the entire library.
+
 `fc-agent capabilities "request through services"` searches installed API records and
 recipe selection guidance. `fc-agent describe facelesschamp_kit.blocks.FlowCanvas`
 returns constructor parameters, handles and a bundled guide. Ambiguous names require

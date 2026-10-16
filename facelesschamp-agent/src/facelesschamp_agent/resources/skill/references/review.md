@@ -1,5 +1,19 @@
 # Evidence-based review
 
+Run `fc-agent audit-layout` before exporting. It samples scene/placement boundaries,
+key events and animation windows, checks canvas/safe bounds and named children,
+and reports scoped repair suggestions plus internal engine layout diagnostics.
+Bounds are conservative: opacity and masks do not shrink them and widget internals
+may be opaque. A passed audit is sampled geometry evidence, not an aesthetic verdict.
+Repair findings in Python; rerun the audit and inspect changed motion and frames.
+Use intentional_overlaps and allow_bleed only for exact reviewed IDs. Misspelled
+exceptions fail, and allow_bleed never permits clipping outside the canvas.
+
+New projects include render.py; `entrypoint` adds it to existing projects without
+overwriting user code. `python render.py` validates, audits, renders up to ten seconds
+and verifies the encoded preview. `--start` and `--duration` target another passage.
+It does not prepare executable checkpoints implicitly. Layout failure blocks export.
+
 Use `fc-agent storyboard` for entrances, key events, and exits. `fc-agent preview`
 without a range renders short excerpts around planned actions and boundaries.
 Pass `--scene ID` or `--start S --end E` for a particular concern. Verify each video

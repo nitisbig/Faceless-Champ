@@ -64,6 +64,9 @@ class CompiledVideo:
                     "end": record["end"],
                     "bounds": bounds(record["root"]),
                     "children": {name: bounds(child) for name, child in record["children"].items()},
+                    "child_ancestors": {
+                        name: list(parents) for name, parents in record.get("child_ancestors", {}).items()
+                    },
                 }
             )
         return {"source_time": time, "conservative": True, "placements": rows}
@@ -215,6 +218,17 @@ def compile_video(video):
                     raise KitError("LAYOUT", "Block exceeds allocated bounds; resize content or change its layout")
                 built.root.z_index = placement.z_index
                 builds[placement.handle.placement] = built
+                # Record hierarchy once, rather than rediscovering it for every
+                # animated layout sample. Containment alone is not ancestry.
+                named_members = {name: set(descendants(child)) for name, child in built.children.items()}
+                child_ancestors = {
+                    name: [
+                        parent_name
+                        for parent_name, parent in built.children.items()
+                        if parent is not child and child in named_members[parent_name]
+                    ]
+                    for name, child in built.children.items()
+                }
                 layout_records.append(
                     {
                         "id": placement.handle.placement,
@@ -223,6 +237,7 @@ def compile_video(video):
                         "end": placement_end,
                         "root": built.root,
                         "children": built.children,
+                        "child_ancestors": child_ancestors,
                     }
                 )
                 events.append((placement_start, 1, "add", built.root, None, scope))

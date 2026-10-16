@@ -110,6 +110,14 @@ class ScenePlan(Record):
     narration: str = ""
     sources: list[Text] = Field(default_factory=list)
     illustrative: bool = False
+    capabilities: list[Text] = Field(default_factory=list)
+    selection_rationale: str = ""
+    composition: str = ""
+    motion_plan: str = ""
+    transition: str = ""
+    layout_strategy: str = ""
+    intentional_overlaps: list[tuple[Text, Text]] = Field(default_factory=list)
+    allow_bleed: list[Text] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def valid_recipe_and_events(self):
@@ -190,6 +198,7 @@ class QualityReport(Record):
     schema_version: Literal[1] = 1
     fingerprint: str
     structural_validation: Status = "pending"
+    layout_validation: Status = "pending"
     preview_media_verification: Status = "pending"
     full_export_media_verification: Status = "pending"
     visual_review: Status = "pending"
@@ -227,6 +236,60 @@ class BenchmarkResult(Record):
     human_scores: HumanScores | None = None
 
 
+class BeatSelection(Record):
+    """A directing brief, deliberately separate from executable recipe content."""
+
+    scene_id: Id
+    start: Seconds
+    duration: Positive
+    narration: str
+    cue_ids: list[str] = Field(default_factory=list)
+    purpose: Text
+    intent: Text
+    evidence: list[Text]
+    candidates: list[dict]
+    selected_capability: Text | None = None
+    selection_rationale: Text
+    composition: Text
+    motion: Text
+    transition: Text
+    attention_sequence: list[Text]
+    required_inputs: list[Text]
+    layout_checks: list[Text]
+    requires_authoring: Literal[True] = True
+
+
+class SelectionPlan(Record):
+    schema_version: Literal[1] = 1
+    context_fingerprint: Text
+    registry_fingerprint: Text
+    request_fingerprint: Text
+    prompt: Text
+    instructions: list[Text] = Field(default_factory=list)
+    format: Literal["landscape", "shorts"] = "landscape"
+    duration: Positive
+    timing: Literal["source", "estimated"]
+    design: DesignSpec
+    guidelines: dict
+    sources: list[dict]
+    beats: list[BeatSelection] = Field(min_length=1)
+    warnings: list[str] = Field(default_factory=list)
+    editorial_review: Literal["pending"] = "pending"
+
+    @model_validator(mode="after")
+    def coverage(self):
+        end = 0.0
+        ids = set()
+        for beat in self.beats:
+            if beat.scene_id in ids or abs(beat.start - end) > 1e-6:
+                raise ValueError("Selection beats must be unique and cover the clock contiguously from zero")
+            ids.add(beat.scene_id)
+            end = beat.start + beat.duration
+        if abs(end - self.duration) > 1e-6:
+            raise ValueError("Selection beats must cover the complete duration")
+        return self
+
+
 SCHEMAS = {
     cls.__name__: cls
     for cls in (
@@ -239,5 +302,7 @@ SCHEMAS = {
         ReviewFinding,
         ReviewSubmission,
         BenchmarkResult,
+        BeatSelection,
+        SelectionPlan,
     )
 }

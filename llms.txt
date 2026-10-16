@@ -12,6 +12,8 @@
 - [Authoring skill](skills/faceless-champ/SKILL.md)
 - [Website and runnable downloads](website/README.md)
 - [Kit agent reference](facelesschamp-kit/llms.txt)
+- [Agent planning and production](facelesschamp-agent/llms.txt)
+- [Context-aware scene selection](facelesschamp-agent/docs/scene-selection.md)
 
 Install from the checkout with python -m pip install -e .; use extras only as needed:
 coding=Pygments, chess=chess rules, web=Playwright, playground=coding+web,

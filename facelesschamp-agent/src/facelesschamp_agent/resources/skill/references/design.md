@@ -1,5 +1,14 @@
 # Choosing visual treatments
 
+Premium defaults fill unspecified choices: landscape 1920×1080 at 30 fps (or
+1080×1920 when shorts is requested), clean-flow theme with its packaged DM Sans,
+body 44 px, heading 76 px, minimum 24 px, spacing 28 px, safe margin 64 px,
+0.6-second meaningful motion, restrained color and no automatic captions. Keep
+one idea and focal change per beat; use a settled hold, aligned geometry and
+negative space. Do not treat this as a requirement for every scene to have a title,
+card, heading, transition or subtitle. User instructions override every design
+default, including these. Layout checks still report actual geometry problems.
+
 Select one coherent theme family for the video: midnight for high-contrast technical
 diagrams, light for editorial/data explanations, whiteboard for drawn explanations,
 or clean-flow for a warm gray dashboard with rounded white cards and an orange accent.

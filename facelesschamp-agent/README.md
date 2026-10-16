@@ -22,6 +22,29 @@ example. Your external agent replaces its plan and Python content using the expo
 skill. `fc-agent` does not call an LLM, generate speech, or automatically write videos
 from natural language. The external agent plans, authors, inspects, and repairs.
 
+## Context-aware scene selection
+
+```bash
+fc-agent --project my-video plan --prompt "Explain the supplied narration"
+fc-agent capabilities "request through a cache" --recommend --limit 5
+fc-agent --project my-video audit-layout
+python my-video/render.py
+```
+
+`plan` reads subtitles, voiceover and supplements, preserves the source cue clock,
+and saves a detailed beat/scene selection brief with ranked installed capabilities.
+Compact retrieval and fingerprinted reuse reduce repeated catalog/context output.
+New public APIs, designs, fonts, icons and project assets are discovered locally.
+Custom instructions and design override premium defaults; existing project design
+is retained. The external agent confirms semantic choices, authors scenes, repairs
+layout findings and inspects the rendered result.
+
+New starters include render.py. `entrypoint` adds it to existing projects without
+replacing user code. It validates and audits layout before exporting and verifying
+a short preview; `--full` explicitly exports the complete video. See the
+[scene-selection workflow](docs/scene-selection.md) for configuration, contracts,
+limits and the five-stage authoring loop.
+
 ## Production contract
 
 `agent-plan.json` contains a versioned `VideoPlan`: brief, story beats, scene purposes,
@@ -57,11 +80,11 @@ in a derived file only by explicit `prepare`; source cues/audio are unchanged.
 
 ## Recipes and discovery
 
-Ten reusable kit recipes cover process flow, request journey, before/after,
+Reusable kit recipes cover process flow, request journey, before/after,
 cause/mechanism/effect, metrics, trends, part/whole, hierarchy, prepared code/result,
-and overview/detail. `recipes` lists content examples; `describe recipe:ID` includes
+overview/detail and technical geometry. `recipes` lists content examples; `describe recipe:ID` includes
 selection guidance. Registry records include all current public core exports and kit
-blocks, layouts, templates and recipes, plus web/OS submodule exports. Runtime Python
+blocks, layouts, templates and recipes, plus public module source and packaged assets. Runtime Python
 signatures come from installed APIs; bundled guide excerpts work offline.
 
 The registry's dependency descriptions distinguish preparation from playback. Discovery

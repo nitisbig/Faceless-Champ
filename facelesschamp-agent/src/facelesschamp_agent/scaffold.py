@@ -20,6 +20,10 @@ INITIAL_PLAN = VideoPlan.model_validate(
                 }
             ],
         },
+        "design": {
+            "theme": "clean-flow",
+            "rationale": "Readable packaged typography, restrained accent and coherent motion",
+        },
         "scenes": [
             {
                 "id": "process",
@@ -47,7 +51,7 @@ seed = 0
 [videos.main]
 factory = "videos.main:build"
 format = "landscape"
-theme = "midnight"
+theme = "clean-flow"
 captions = false
 [profiles.preview]
 fps = 15

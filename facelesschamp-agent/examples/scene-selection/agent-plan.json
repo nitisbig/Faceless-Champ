@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "video_id": "main",
+  "brief": {
+    "title": "Caching: repeated work to reuse",
+    "prompt": "Explain caching through a change and an ordered request path",
+    "audience": "General audience",
+    "intended_understanding": "A cache reuses results and fetches missing data only when needed",
+    "format": "landscape",
+    "duration": 12.32,
+    "delivery": "preview",
+    "constraints": [],
+    "narration": {
+      "audio": null,
+      "subtitles": null,
+      "overlap_tolerance": 0.0
+    },
+    "assets": [],
+    "repair_limit": 3
+  },
+  "story": {
+    "thesis": "Caching avoids repeated work while preserving a path for misses",
+    "beats": [
+      {
+        "scene_id": "change",
+        "idea": "Repeated work becomes reuse",
+        "purpose": "Contrast the same request before and after caching"
+      },
+      {
+        "scene_id": "path",
+        "idea": "A miss still fetches the needed data",
+        "purpose": "Show the ordered cache lookup path"
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "id": "change",
+      "purpose": "Contrast the same request before and after caching",
+      "start": 0,
+      "duration": 6,
+      "recipe": "before-after",
+      "content": {
+        "before": "Every request repeats the work",
+        "after": "Repeated requests reuse the result"
+      },
+      "narration": "Before caching, every request repeats the work. After caching, repeated requests reuse the result.",
+      "capabilities": [
+        "recipe:before-after"
+      ],
+      "selection_rationale": "The narration explicitly contrasts before and after behavior; a consistent pair makes the change visible.",
+      "composition": "Two aligned panels share the same reading order and typography.",
+      "motion_plan": "Reveal each side on its source cue and hold the completed contrast.",
+      "transition": "Clean cut into the request path.",
+      "layout_strategy": "Equal measured panel widths and readable wrapped text inside the safe area.",
+      "key_events": [
+        {
+          "at": 0.6,
+          "label": "Reveal repeated work"
+        },
+        {
+          "at": 3,
+          "label": "Reveal reuse"
+        }
+      ]
+    },
+    {
+      "id": "path",
+      "purpose": "Explain a cache lookup and miss path",
+      "start": 6,
+      "duration": 6.32,
+      "recipe": "process-flow",
+      "content": {
+        "steps": [
+          "Check cache",
+          "Fetch on miss",
+          "Return result"
+        ]
+      },
+      "narration": "First check the cache, then fetch missing data, and finally return the result.",
+      "capabilities": [
+        "recipe:process-flow"
+      ],
+      "selection_rationale": "First, then and finally express order; a progressive directed path makes that relationship visible.",
+      "composition": "Three aligned stages with concise labels.",
+      "motion_plan": "Reveal lookup, miss handling and result in order; settle before the final hold.",
+      "transition": "Hold the result.",
+      "layout_strategy": "Measured diagram labels and nonintersecting stage allocations.",
+      "key_events": [
+        {
+          "at": 0.6,
+          "label": "Check cache"
+        },
+        {
+          "at": 2.4,
+          "label": "Fetch on miss"
+        },
+        {
+          "at": 4.2,
+          "label": "Return result"
+        }
+      ]
+    }
+  ],
+  "design": {
+    "theme": "clean-flow",
+    "rationale": "Readable packaged typography, restrained accent and coherent motion",
+    "font": null,
+    "palette": {},
+    "semantic_colors": {},
+    "body_size": 44.0,
+    "minimum_font_size": 24.0,
+    "heading_size": 76.0,
+    "spacing": 28.0,
+    "motion_duration": 0.6,
+    "motion": "Reveal relationships progressively and emphasize the narrated subject",
+    "captions": false
+  }
+}

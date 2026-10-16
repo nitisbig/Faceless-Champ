@@ -271,6 +271,24 @@ class _Region:
 
 
 @dataclass(frozen=True)
+class _RecipeMotionBounds:
+    block: object
+    enter: str | None
+
+    def compose(self, ctx, bounds):
+        # Flow motion translates content rather than changing its allocation.
+        # Reserve its travel inside the default safe area before subdividing a
+        # recipe. Explicit authored bounds remain the caller's responsibility.
+        entrance = ctx.theme.default_enter if self.enter == "theme" else self.enter
+        top = ctx.theme.motion_distance if ctx.theme.default_exit == "flow" else 0
+        bottom = ctx.theme.motion_distance if entrance == "flow" else 0
+        if bounds.height <= top + bottom:
+            raise KitError("LAYOUT", "Recipe area is too short for the theme's flow motion")
+        box = Bounds(bounds.left, bounds.top + top, bounds.right, bounds.bottom - bottom)
+        return self.block.compose(ctx, box)
+
+
+@dataclass(frozen=True)
 class _ComparisonHalf:
     text: str
     title: str
@@ -441,6 +459,8 @@ def apply_recipe(segment, recipe_id, content, *, bounds=None, events=(), id=None
 
     Events use segment-local seconds. Use distinct ``id`` values when applying
     the same recipe more than once in one segment. Content is copied immediately.
+    Default content areas reserve space for theme flow motion. Explicit bounds
+    are used as supplied, including any required animation clearance.
     """
     content = validate_recipe(recipe_id, content)
     events = tuple(e if isinstance(e, RecipeEvent) else RecipeEvent(**e) for e in events)
@@ -455,6 +475,8 @@ def apply_recipe(segment, recipe_id, content, *, bounds=None, events=(), id=None
     handles = {}
 
     def add(name, block, *, at=0, life=None, enter="fade"):
+        if bounds is None:
+            block = _RecipeMotionBounds(block, enter)
         handle = segment.add(
             block,
             id=f"{prefix}-{name}",
