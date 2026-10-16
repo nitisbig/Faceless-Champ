@@ -1,0 +1,55 @@
+{
+  "revision": "e1312dd409da072e38f308095491418836e9699d",
+  "pillow": "12.3.0",
+  "cases": [
+    {
+      "name": "opaque",
+      "fill": "#FFFFFF",
+      "shadow": null,
+      "png": "38f702e6802095f6a0348cf18939efd617ea9e23304111b6b93ec8c112975cf6",
+      "rgba": "f070bd24616376331c4580c288c25d2a3bd6777a7c47cb9654621b43bc8c7054"
+    },
+    {
+      "name": "default",
+      "fill": "#FFFFFF",
+      "shadow": {
+        "color": "#00000026",
+        "blur": 16.0,
+        "offset": [
+          0.0,
+          12.0
+        ]
+      },
+      "png": "099e660895f8cec02f15e96f615ae950b42d291679ef5545942bc8cad0b69c46",
+      "rgba": "8eb6070e487d1c25b937112cb4243f48d68879497d2063cba4fe305d750e06fd"
+    },
+    {
+      "name": "colored",
+      "fill": "#FFFFFF",
+      "shadow": {
+        "color": "#EF432180",
+        "blur": 8.0,
+        "offset": [
+          -7.25,
+          5.5
+        ]
+      },
+      "png": "33ca5a1fce51ef39c9669a3b5ca005fcb7f436315b7ff1159ce3ea719d221eb7",
+      "rgba": "97944341ea213e6528c396fd186315699448799a09039366415e514807f197cd"
+    },
+    {
+      "name": "translucent",
+      "fill": "#317BC040",
+      "shadow": {
+        "color": "#BB44EEA0",
+        "blur": 4.0,
+        "offset": [
+          2.5,
+          -3.75
+        ]
+      },
+      "png": "e65130e45ae628034ad36661cdd52d206a9e0cb89f13cc0e8c1f8c69f1c8e499",
+      "rgba": "6b733129fd6fd52a18a0d446759512628f4ed9972ae6b9f0a73fe4b3b0d24c17"
+    }
+  ]
+}

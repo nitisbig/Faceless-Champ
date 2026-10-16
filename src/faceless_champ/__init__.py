@@ -61,6 +61,7 @@ from .components import (
 )
 from .export import ExportSettings, render
 from .flags import Flag, flag_path, supported_flags
+from .gradients import GradientStop, LinearGradient, RadialGradient
 from .layout import Bounds, Group
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
 from .narration import CueScene
@@ -68,7 +69,7 @@ from .preview import StoryboardSample, render_storyboard, save_frame
 from .renderer import PillowRenderer, Renderer
 from .spring import Spring
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
-from .surfaces import ShadowStyle, card_content_bounds, card_surface, dot_grid
+from .surfaces import ShadowStyle, card_content_bounds, card_surface, dot_grid, gradient_surface
 from .timeline import Grid, Layer, Scene, Sequence
 from .typography import CLEAN_FLOW_FONT, fit_text
 
@@ -98,6 +99,7 @@ __all__ = [
     "FadeIn",
     "FadeOut",
     "Flag",
+    "GradientStop",
     "Grid",
     "Group",
     "Heatmap",
@@ -108,6 +110,7 @@ __all__ = [
     "Layer",
     "Line",
     "LineChart",
+    "LinearGradient",
     "NetworkGraph",
     "Number",
     "OutlineMap",
@@ -117,6 +120,7 @@ __all__ = [
     "PopIn",
     "PopOut",
     "Pulse",
+    "RadialGradient",
     "RankedBarChart",
     "Rectangle",
     "Renderer",
@@ -150,6 +154,7 @@ __all__ = [
     "ease_out",
     "fit_text",
     "flag_path",
+    "gradient_surface",
     "linear",
     "render",
     "render_storyboard",

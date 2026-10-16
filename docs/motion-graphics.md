@@ -1,5 +1,11 @@
 # Motion graphics
 
+Static gradient cards and backdrops are ordinary Image components. Use
+`GradientStop`, `LinearGradient`, `RadialGradient`, `card_surface` and
+`gradient_surface`; see [gradient surfaces and shadows](premium-effects.md).
+Their paint/shadow parameters remain fixed while existing transform, opacity,
+mask and Spring tracks animate the component or its group.
+
 All APIs below are public imports from `faceless_champ` and rasterize with Pillow.
 The package also requires PyVista for ArchChamp. See `examples/motion_graphics/render.py` for a complete 18-second,
 960×540, 24 fps showcase.

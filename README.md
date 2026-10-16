@@ -13,6 +13,7 @@ Current source versions: **faceless-champ 0.1.5**, **facelesschamp-kit 0.1.0rc7*
 | Scripted graphs, routes, and signals | [FlowChamp](docs/flowchamp.md) | [FlowCanvas](facelesschamp-kit/docs/flowchamp.md) |
 | Clean-flow styling, shadows, and smooth reveals | [Surfaces and palette](docs/clean-flow.md) | [Theme and motion](facelesschamp-kit/docs/clean-flow.md) |
 | Analytical spring transforms | [Spring motion](docs/motion-graphics.md#spring-motion) | Core scene API |
+| Static linear/radial gradient cards and alpha-safe shadows | [Gradient surfaces](docs/premium-effects.md) | Core Image composition |
 
 Install only the capabilities you use from this repository:
 

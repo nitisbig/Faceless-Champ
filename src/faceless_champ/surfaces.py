@@ -1,12 +1,14 @@
 """Offline card and backdrop surfaces, rasterized once in design pixels."""
 
 import math
+from contextlib import closing
 from dataclasses import dataclass
 
 from PIL import Image as PILImage
 from PIL import ImageColor, ImageDraw, ImageFilter
 
 from .components import Image, finite
+from .gradients import LinearGradient, RadialGradient
 from .layout import Bounds
 
 _RASTER_SCALE = 2
@@ -60,10 +62,14 @@ def card_content_bounds(bounds, *, shadow=None, padding=28):
     return Bounds(bounds.left + inset, bounds.top + inset, bounds.right - inset, bounds.bottom - inset)
 
 
-def _image(source, bounds, component_options):
+def _check_component_options(component_options):
     reserved = {"width", "height", "position", "anchor", "fit", "trim"} & component_options.keys()
     if reserved:
         raise TypeError(f"Surface bounds reserve geometry options: {', '.join(sorted(reserved))}")
+
+
+def _image(source, bounds, component_options):
+    _check_component_options(component_options)
     return Image.from_source(
         source,
         width=bounds.width,
@@ -83,6 +89,22 @@ def card_surface(bounds, *, fill="#FFFFFF", radius=44, shadow=None, **component_
     opacity, masks, and z-index apply without a new renderer path.
     """
     _check_bounds(bounds)
+    if isinstance(fill, (LinearGradient, RadialGradient)):
+        from ._surface_raster import _allocation, gradient_card
+
+        _check_component_options(component_options)
+        _allocation(bounds.width, bounds.height)
+        radius = finite(radius, "card radius", 0)
+        if shadow is not None:
+            if not isinstance(shadow, ShadowStyle):
+                raise TypeError("shadow must be a ShadowStyle or None")
+            if shadow.blur > 4096 or any(abs(v) > 4096 for v in shadow.offset):
+                raise ValueError("Gradient shadow exceeds the allocation budget")
+        card_content_bounds(bounds, shadow=shadow, padding=0)
+        with closing(gradient_card(bounds, fill, radius, shadow, _shadow_padding(shadow))) as source:
+            return _image(source, bounds, component_options)
+    if not isinstance(fill, str):
+        raise TypeError("Surface fill must be a color string, LinearGradient or RadialGradient")
     color = ImageColor.getcolor(fill, "RGBA")
     radius = finite(radius, "card radius", 0)
     face = card_content_bounds(bounds, shadow=shadow, padding=0)
@@ -100,12 +122,21 @@ def card_surface(bounds, *, fill="#FFFFFF", radius=44, shadow=None, **component_
         layer = PILImage.new("RGBA", size)
         dx, dy = (value * _RASTER_SCALE for value in shadow.offset)
         shifted = (box[0] + dx, box[1] + dy, box[2] + dx, box[3] + dy)
-        ImageDraw.Draw(layer).rounded_rectangle(
-            shifted, radius=corner, fill=ImageColor.getcolor(shadow.color, "RGBA")
-        )
+        ImageDraw.Draw(layer).rounded_rectangle(shifted, radius=corner, fill=ImageColor.getcolor(shadow.color, "RGBA"))
         source.alpha_composite(layer.filter(ImageFilter.GaussianBlur(shadow.blur * _RASTER_SCALE)))
     ImageDraw.Draw(source).rounded_rectangle(box, radius=corner, fill=color)
     return _image(source, bounds, component_options)
+
+
+def gradient_surface(bounds, *, fill, **component_options):
+    """Return a rectangular 2x gradient Image, with no rounded corners or shadow.
+
+    Paint is static, premultiplied encoded-sRGB, and bounded to 8,388,608 source
+    pixels / a 192 MiB working-set estimate. Reuse through ordinary Image motion.
+    """
+    if not isinstance(fill, (LinearGradient, RadialGradient)):
+        raise TypeError("gradient_surface fill must be LinearGradient or RadialGradient")
+    return card_surface(bounds, fill=fill, radius=0, shadow=None, **component_options)
 
 
 def dot_grid(bounds, *, color="#B7B3AE55", spacing=28, radius=1, **component_options):

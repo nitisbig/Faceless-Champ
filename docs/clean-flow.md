@@ -46,3 +46,8 @@ sprite caches replay those pixels. Opacity, masks, transforms, and image reveal
 effects remain available. Fill, blur, and dot spacing are fixed pixels: construct
 a new surface when changing these values. Core components have explicit animation
 timing; the kit's clean-flow theme supplies automatic entrance and outro defaults.
+
+`card_surface(fill=LinearGradient(...))` and `RadialGradient(...)` add static
+gradient faces while retaining the same allocated bounds and `ShadowStyle` API.
+`gradient_surface(...)` makes a rectangular backdrop. See [gradient surfaces](premium-effects.md)
+for stop/alpha semantics, allocation limits and the light/dark comparison preview.
