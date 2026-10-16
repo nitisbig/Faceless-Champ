@@ -25,7 +25,7 @@ def main():
         "--render",
         dest="render",
         action="store_true",
-        help="Render all authored content (14.96-second opening)",
+        help=f"Render the complete {DURATION:.2f}-second lesson",
     )
     mode.add_argument("--frame", type=float, metavar="TIME")
     mode.add_argument("--range", nargs=2, type=float, metavar=("START", "END"))
@@ -62,7 +62,8 @@ def main():
         output = args.output or ROOT / "output" / f"frame-{args.frame:06.3f}.png"
         save_frame(scene, args.frame, output, size=(width, height), overwrite=args.overwrite)
     else:
-        output = args.output or ROOT / "output" / "opening.mp4"
+        filename = "hello-world-full.mp4" if args.render else f"excerpt-{args.range[0]:06.3f}-{args.range[1]:06.3f}.mp4"
+        output = args.output or ROOT / "output" / filename
         start, end = args.range or (0, DURATION)
         with ExportProgress() as progress:
             render(
