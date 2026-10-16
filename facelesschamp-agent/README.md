@@ -47,6 +47,12 @@ limits and the five-stage authoring loop.
 
 ## Production contract
 
+Coding tutorials with no custom design/instructions receive the approved,
+editable [coding tutorial template](docs/coding-template.md). Each project gets
+`templates/coding-tutorial/style.json`; custom direction bypasses this fallback.
+Generated renderers accept `--fps` and `--quality low|high|4k` independently of
+preview/full duration, preserving project profile configuration.
+
 `agent-plan.json` contains a versioned `VideoPlan`: brief, story beats, scene purposes,
 timing, asset declarations and design. `fc-agent schema` returns its JSON Schema.
 Python in the normal kit project remains executable authoring. Start `build(ctx)`

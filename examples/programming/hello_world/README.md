@@ -1,4 +1,4 @@
-# Hello World — premium opening draft
+# Hello World — approved premium coding design
 
 A 14.96-second source-clock introduction using CodingChamp, OSChamp, FlowChamp,
 clean-flow surfaces, and analytical spring motion. The complete lesson is not yet
@@ -20,6 +20,8 @@ Use the repository virtual environment's Python if dependencies are not installe
 in your system Python. Install the core `coding` extra for syntax highlighting.
 
 For focused review, use `--frame 12.5` or `--range 9.79 14.96`.
+Quality values are `--quality low` (720p), `high` (1080p), and `4k` (2160p).
+Combine with `--fps 60`; neither option changes the selected source range.
 `--width 960 --height 540 --fps 30` produces a smaller review export.
 Use `--output PATH` and `--overwrite` explicitly when replacing an existing file.
 Inputs and default outputs resolve relative to this example, so the script also
@@ -30,6 +32,13 @@ The supplied audio and both SRT files remain unchanged. Audio starts at master z
 and the opening stops at 14.96s. Subtitle files guide timing; captions are not shown.
 Outputs are authored, and playback never executes the displayed Python.
 
-Design parameters remain named constants in `scene.py` during iteration. This draft
-has structural checks only: `media_rendered: false`, `full_export_verified: false`.
-Render and review before approving the design or saving an agent design preset.
+The user approved this design on 2026-10-16. Reusable helpers and defaults now live
+in the kit's separate coding tutorial package. Edit the local
+[style.json](templates/coding-tutorial/style.json) to change background, accent,
+editor colors, font sizes, layout and springs; builds reload it each time.
+Lesson content and timing stay in `scene.py`. fc-agent uses this template only
+when no custom design or instructions are supplied.
+
+No new render was produced for the extraction. Agent media evidence remains
+`media_rendered: false`, `full_export_verified: false`; user design approval is
+recorded separately from encoded-media verification.

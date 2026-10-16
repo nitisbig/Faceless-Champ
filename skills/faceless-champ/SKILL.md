@@ -146,5 +146,8 @@ Use public `faceless_champ.flow` graph and script APIs for animated diagrams; us
 - FlowChamp label sprites have an 8 MiB bounded cache; label_cache_mb=0 verifies
   uncached parity. Static frame-key reuse preserves transient action boundaries.
 
-The Hello World opening is a draft. Keep revisions local until visual approval.
+The Hello World design is approved. For fc-agent coding tutorials, use its saved
+template only when no custom design/instructions are supplied. The project-owned
+templates/coding-tutorial/style.json controls colors, layout and springs. Generated
+render.py must accept --fps and --quality low|high|4k.
 Its structural checks do not render scene frames; honor the user's render boundary.

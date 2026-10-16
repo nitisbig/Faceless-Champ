@@ -47,3 +47,9 @@ labels. Inspect at the intended viewing size, including portrait layout.
 For data, put units, scope and a concise source or illustrative label on screen.
 Core bounding boxes are conservative: intended overlays and background panels can
 intersect. Judge geometry findings using the rendered image and the scene's purpose.
+
+For coding tutorials without custom design or instructions, use the approved
+coding-tutorial pack returned by plan. The project copy has editable style.json
+and TEMPLATE.md. Custom design or instructions bypass this fallback. Read the
+guide before authoring; keep source/audio/timing lesson-local, and use
+load_coding_tutorial(ctx.root) plus template.group(..., bounds=bounds).

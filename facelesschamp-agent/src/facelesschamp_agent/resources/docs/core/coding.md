@@ -126,6 +126,10 @@ then animate it with `design.terminal_in(window)` / `design.terminal_out(window)
 The caller schedules typing, output publication, visibility and durations; these
 helpers never run code or add audio. Existing editor/playground defaults are unchanged.
 
-The current `examples/programming/hello_world/README.md` in the source checkout
-uses these public helpers. Its composition remains local pending visual approval.
+The current the approved coding reference in the source checkout
+uses these public helpers. Its lesson content and timing remain local. Reusable template data lives in the kit.
 In Kit projects, return a fresh complete hierarchy from a `Segment.add_core` factory.
+
+For default agent coding tutorials, see the approved template collection in the source checkout.
+The kit exposes CodingTutorialStyle and CodingTutorialTemplate; each agent project
+gets editable style.json data. Custom design/instructions bypass automatic selection.

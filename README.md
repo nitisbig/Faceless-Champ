@@ -20,7 +20,8 @@ ordinary playback reuses prepared assets.
 
 The [premium collection](examples/README.md) is the default scene reference for
 agents. Its first entry is the [Hello World opening](examples/programming/hello_world/README.md),
-a 14.96-second draft using CodingChamp, OSChamp, FlowChamp, clean-flow and spring motion.
+a 14.96-second opening with an approved design using CodingChamp, OSChamp,
+FlowChamp, clean-flow and spring motion.
 
 ```bash
 python3 examples/programming/hello_world/render.py --check
@@ -28,9 +29,10 @@ python3 examples/programming/hello_world/render.py --render
 ```
 
 The first command checks construction, narration placement, input checksums and
-sampled geometry. The second explicitly renders 1080p/60. This draft has not been
-rendered or visually approved. Previous standalone demos and training data were
-removed; package starter templates and reusable library assets remain available.
+sampled geometry. The second explicitly renders 1080p/60. The user approved its
+design; the agent has not verified a full export. Previous standalone demos and
+training data were removed; package starters and reusable library assets remain.
+See the [approved template collection](templates/README.md) for editable defaults.
 
 ## Authoring layers
 

@@ -27,6 +27,8 @@ __all__ = [
     "StoryPlan",
     "VideoBrief",
     "VideoPlan",
+    "install_coding_tutorial",
+    "load_coding_tutorial",
     "plan_project",
     "read_project_context",
     "select_scenes",
@@ -34,6 +36,10 @@ __all__ = [
 
 
 def __getattr__(name):
+    if name in {"load_coding_tutorial", "install_coding_tutorial"}:
+        from . import templates
+
+        return getattr(templates, name)
     if name == "read_project_context":
         from .context import read_project_context
 

@@ -9,11 +9,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[2]
-sys.path[:0] = [str(REPO / "src"), str(ROOT)]
+sys.path[:0] = [str(REPO / "src"), str(REPO / "facelesschamp-kit/src"), str(ROOT)]
 
 from scene import DURATION, build_scene, check_scene
 
-from faceless_champ import render, save_frame
+from faceless_champ import ExportSettings, render, save_frame
 
 
 def main():
@@ -24,19 +24,25 @@ def main():
     mode.add_argument("--frame", type=float, metavar="TIME")
     mode.add_argument("--range", nargs=2, type=float, metavar=("START", "END"))
     parser.add_argument("--output", type=Path)
-    parser.add_argument("--fps", type=int, choices=(24, 30, 60), default=60)
-    parser.add_argument("--width", type=int, default=1920)
-    parser.add_argument("--height", type=int, default=1080)
+    parser.add_argument("--fps", type=float, default=60)
+    parser.add_argument("--quality", choices=("low", "high", "4k"), default="high")
+    parser.add_argument("--width", type=int)
+    parser.add_argument("--height", type=int)
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
-    if (
-        args.width < 2
-        or args.height < 2
-        or args.width % 2
-        or args.height % 2
-        or abs(args.width / args.height - 16 / 9) > 0.002
-    ):
-        parser.error("Use positive, even 16:9 dimensions")
+    settings = ExportSettings(
+        quality={"low": "ql", "high": "qh", "4k": "qk"}[args.quality],
+        fps=args.fps,
+        width=args.width,
+        height=args.height,
+        antialias=2,
+    )
+    try:
+        from faceless_champ import Canvas
+
+        width, height = settings.dimensions(Canvas(1920, 1080))
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.frame is not None and not 0 <= args.frame < DURATION:
         parser.error(f"--frame must be in [0, {DURATION})")
     if args.range and not 0 <= args.range[0] < args.range[1] <= DURATION:
@@ -48,20 +54,16 @@ def main():
     scene = build_scene()
     if args.frame is not None:
         output = args.output or ROOT / "output" / f"frame-{args.frame:06.3f}.png"
-        save_frame(scene, args.frame, output, size=(args.width, args.height), overwrite=args.overwrite)
+        save_frame(scene, args.frame, output, size=(width, height), overwrite=args.overwrite)
     else:
         output = args.output or ROOT / "output" / "opening.mp4"
         start, end = args.range or (0, DURATION)
         render(
             scene,
             output,
-            width=args.width,
-            height=args.height,
-            fps=args.fps,
+            settings=settings,
             start_time=start,
             end_time=end,
-            antialias=2,
-            crf=18,
             overwrite=args.overwrite,
         )
     print(output)

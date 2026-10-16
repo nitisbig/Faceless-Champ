@@ -96,6 +96,9 @@ def main(argv=None):
     commands["preview"].add_argument("--start", type=float)
     commands["preview"].add_argument("--end", type=float)
     commands["preview"].add_argument("--scene")
+    for name in ("preview", "render"):
+        commands[name].add_argument("--fps", type=float)
+        commands[name].add_argument("--quality", choices=("low", "high", "4k"))
     try:
         args = parser.parse_args(argv)
         command = args.command
@@ -146,10 +149,14 @@ def main(argv=None):
             if command == "frame":
                 result = project.frame(args.time, args.output)
             elif command == "preview":
-                result = project.preview(args.output, start=args.start, end=args.end, scene=args.scene)
+                result = project.preview(
+                    args.output, start=args.start, end=args.end, scene=args.scene, fps=args.fps, quality=args.quality
+                )
             elif command == "review":
                 result = project.review(json.loads(args.file.read_text()))
-            elif command in {"storyboard", "render", "verify"}:
+            elif command == "render":
+                result = project.render(args.output, fps=args.fps, quality=args.quality)
+            elif command in {"storyboard", "verify"}:
                 result = getattr(project, command)(args.output)
             elif command == "audit-layout":
                 result = project.audit_layout(detailed=args.full)

@@ -127,8 +127,8 @@ function projectCards() {
   }).join('');
 }
 function projects() {
-  return intro('Premium references', 'A fresh collection.<br><em>Designed through review.</em>', 'The Hello World opening is the first premium scene draft. It combines the current CodingChamp, OSChamp, FlowChamp, clean-flow and Spring APIs.') +
-    `<div class="toolbar"><div class="filter-group" aria-label="Project category">${['All','Code & interfaces'].map(c=>`<button class="filter" data-project-category="${c}" aria-pressed="${c===projectCategory}">${c}</button>`).join('')}</div><span class="filter-count" id="project-result-count" role="status"></span></div><div class="project-grid" id="project-grid">${projectCards()}</div><p class="project-caveat">Structural checks do not establish visual quality. This scene has not been rendered or approved; the illustrations above are atlas schematics.</p>` +
+  return intro('Premium references', 'A fresh collection.<br><em>Designed through review.</em>', 'The Hello World opening supplies the first approved premium design. It combines the current CodingChamp, OSChamp, FlowChamp, clean-flow and Spring APIs.') +
+    `<div class="toolbar"><div class="filter-group" aria-label="Project category">${['All','Code & interfaces'].map(c=>`<button class="filter" data-project-category="${c}" aria-pressed="${c===projectCategory}">${c}</button>`).join('')}</div><span class="filter-count" id="project-result-count" role="status"></span></div><div class="project-grid" id="project-grid">${projectCards()}</div><p class="project-caveat">Structural checks do not establish visual quality. Its design is approved by the user; full export is unverified by the agent. The illustrations above are atlas schematics.</p>` +
     `<div class="note-panel"><h3>Current collection</h3><p>Previous training projects, guide-video lessons and standalone demos were retired. Library starter templates and reusable assets remain available.</p>${sourceLink('examples/README.md','Premium reference index')}</div>`;
 }
 

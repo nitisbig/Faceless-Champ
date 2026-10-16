@@ -18,6 +18,8 @@ from facelesschamp_kit.diagnostics import KitError
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true", help="Render the complete final profile")
+    parser.add_argument("--fps", type=float, help="Override frame rate without changing project profiles")
+    parser.add_argument("--quality", choices=("low", "high", "4k"), help="720p, 1080p or 2160p; independent of duration")
     parser.add_argument("--start", type=float, default=0, help="Preview source start in seconds")
     parser.add_argument("--duration", type=float, default=10, help="Preview length, at most 10 seconds")
     parser.add_argument("--output", type=Path, help="Output path; relative paths are relative to this project")
@@ -25,6 +27,7 @@ def main(argv=None):
     root = Path(__file__).resolve().parent
     try:
         project = AgentProject(root)
+        options = {key: value for key, value in {"fps": args.fps, "quality": args.quality}.items() if value is not None}
         validation = project.validate()
         layout = project.audit_layout()
         if layout["status"] != "passed":
@@ -35,7 +38,7 @@ def main(argv=None):
         if not output.is_absolute():
             output = root / output
         if args.full:
-            result = project.render(output)
+            result = project.render(output, **options)
             verification = result["verification"]
         else:
             import math
@@ -45,7 +48,7 @@ def main(argv=None):
             if not 0 < args.duration <= 10 or not 0 <= args.start < project.plan.brief.duration:
                 raise AgentError("RANGE", "Preview requires a valid start and 0 < duration <= 10")
             end = min(project.plan.brief.duration, args.start + args.duration)
-            result = project.preview(output, start=args.start, end=end)
+            result = project.preview(output, start=args.start, end=end, **options)
             verification = project.verify(output)
         passed = verification.get("status") == "passed"
         print(json.dumps({

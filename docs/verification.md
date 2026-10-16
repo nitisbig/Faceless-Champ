@@ -4,7 +4,7 @@ Previous standalone examples, training projects, generated previews and their
 evidence were retired on 2026-10-16. Earlier media claims do not apply to the
 current collection. Library APIs and starter templates remain available.
 
-The current premium reference is the Hello World opening draft. It is checked
+The current premium reference is the Hello World opening with user design approval. It is checked
 structurally without rendering. `media_rendered: false` and
 `full_export_verified: false`; visual approval remains pending.
 
@@ -28,4 +28,12 @@ and inspect fresh artifacts before recording new media verification claims.
 The final scene font adjustment was followed by both opening-specific tests.
 Package tests may create their own temporary renderer fixtures; the new opening
 was never rendered, sampled as a scene image, or exported. Its visual quality and
-encoded audio/video remain unverified. Draft design data has not been promoted.
+encoded audio/video remain unverified. The approved design promotion is recorded in the coding template verification guide.
+
+## Approved coding tutorial design
+
+The user approved the design and requested it as the conditional fc-agent coding
+tutorial default. Reusable style/components now live in the kit; project-owned
+JSON styles remain editable. See [template verification](../facelesschamp-agent/docs/coding-template-verification.md)
+for package, fallback, export-control, parity and installed-wheel checks. No new
+opening render was produced during promotion.

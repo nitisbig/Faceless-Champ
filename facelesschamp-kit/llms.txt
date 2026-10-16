@@ -142,6 +142,19 @@ Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffo
 ## Premium scene references
 
 Use the [current collection](../examples/README.md) as the default reference. The Hello World
-opening is a draft with structural checks only. Previous standalone demo data and
+opening has user design approval; encoded media remains unverified. Previous standalone demo data and
 preview artifacts were retired. Keep library starter templates available; do not
-claim draft styling is approved or a full export has been verified.
+claim a full export has been verified.
+
+## Approved coding tutorial fallback
+
+For coding tutorials without custom design/instructions, fc-agent selects the
+approved coding-tutorial pack. Custom design, instructions and project constraints
+take priority; untouched scaffold defaults are not custom direction. The project
+copy is templates/coding-tutorial/style.json. Edit colors, sizes, insets and spring
+tuning there; the planner preserves edits and builds reload them. Reusable helpers
+live in facelesschamp_kit.tutorials.coding. Carry design.template into the plan
+when selected, and load_coding_tutorial(project_root) when authoring scenes.
+Use template.group(..., bounds=bounds) for kit placement. Generated render.py
+accepts --fps and --quality low|high|4k independently of duration.
+[Template guide](../templates/README.md).

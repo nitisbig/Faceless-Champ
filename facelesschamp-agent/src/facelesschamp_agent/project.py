@@ -3,6 +3,7 @@
 import hashlib
 import importlib
 import json
+import math
 import shutil
 import tempfile
 import uuid
@@ -18,6 +19,8 @@ from facelesschamp_kit.themes import THEMES
 from .errors import AgentError
 from .media import run_tool, verify_media
 from .models import QualityReport, ReviewSubmission, VideoPlan
+
+EXPORT_QUALITIES = {"low": "ql", "high": "qh", "4k": "qk"}
 
 
 def _hash(record):
@@ -76,7 +79,17 @@ class AgentProject:
         paths = [a.path for a in plan.brief.assets]
         paths += [p for p in (plan.brief.narration.audio, plan.brief.narration.subtitles, plan.design.font) if p]
         paths += [s.content["prepared"] for s in plan.scenes if s.recipe == "code-result"]
+        if plan.design.template == "coding-tutorial":
+            paths.append("templates/coding-tutorial/style.json")
         return {p: _file_identity(self.root / p) for p in paths}
+
+    def _design(self, plan):
+        if plan.design.template != "coding-tutorial":
+            return plan.design
+        from .templates import load_coding_tutorial
+
+        palette = {**load_coding_tutorial(self.root).style.palette, **plan.design.palette}
+        return plan.design.model_copy(update={"palette": palette})
 
     def _fingerprint(self, compiled, plan):
         # Review submissions are workflow evidence, not video source. Excluding
@@ -174,7 +187,7 @@ class AgentProject:
         Call from ordinary ``build(ctx)`` Python. This never executes preparation.
         """
         plan = self.plan
-        design = plan.design
+        design = self._design(plan)
         base_theme = THEMES[design.theme]
         typography = {}
         if design.font:
@@ -254,12 +267,13 @@ class AgentProject:
         if (compiled.composition.canvas.width, compiled.composition.canvas.height) != expected_size:
             raise AgentError("PLAN_FORMAT", "Kit canvas and planned format differ")
         theme = compiled.report["theme"]
+        design = self._design(plan)
         for name in ("body_size", "minimum_font_size", "heading_size", "spacing", "motion_duration"):
-            if theme[name] != getattr(plan.design, name):
+            if theme[name] != getattr(design, name):
                 raise AgentError(
                     "PLAN_DESIGN", "Compiled design differs from plan; use AgentProject.new_video(ctx)", property=name
                 )
-        if theme["name"] != plan.design.theme or any(theme[k] != v for k, v in plan.design.palette.items()):
+        if theme["name"] != design.theme or any(theme[k] != v for k, v in design.palette.items()):
             raise AgentError("PLAN_DESIGN", "Compiled palette/theme differs from plan")
         narration = compiled.report.get("narration")
         if bool(narration) != bool(plan.brief.narration.audio):
@@ -424,11 +438,22 @@ class AgentProject:
                         )
         return self._record("storyboard", fingerprint, artifacts=artifacts, layouts=layouts, diagnostics=findings)
 
-    def _render(self, start, end, profile, output, *, operation):
+    def _render(self, start, end, profile, output, *, operation, fps=None, quality=None):
+        if fps is not None and (
+            isinstance(fps, bool) or not isinstance(fps, (int, float)) or not math.isfinite(fps) or fps <= 0
+        ):
+            raise AgentError("EXPORT_FPS", "FPS must be finite and positive")
+        if quality is not None and (not isinstance(quality, str) or quality not in EXPORT_QUALITIES):
+            raise AgentError("EXPORT_QUALITY", "Choose low, high or 4k")
         compiled, plan, fingerprint = self._build()
         if not 0 <= start < end <= compiled.duration:
             raise AgentError("RANGE", "Expected 0 <= start < end <= duration")
         settings = self.kit.settings(compiled, profile)
+        if fps is not None:
+            settings = replace(settings, fps=fps)
+        if quality is not None:
+            settings = replace(settings, quality=EXPORT_QUALITIES[quality], width=None, height=None)
+        settings.dimensions(compiled.composition.canvas)
         path = self._output(output, operation, ".mp4")
         render(compiled.composition, path, settings=settings, start_time=start, end_time=end)
         width, height = settings.dimensions(compiled.composition.canvas)
@@ -448,7 +473,7 @@ class AgentProject:
             status="exported",
         )
 
-    def preview(self, output=None, *, start=None, end=None, scene=None):
+    def preview(self, output=None, *, start=None, end=None, scene=None, fps=None, quality=None):
         plan = self.plan
         if scene is not None:
             if start is not None or end is not None:
@@ -460,9 +485,11 @@ class AgentProject:
         if (start is None) != (end is None):
             raise AgentError("RANGE", "Specify both start and end")
         if start is not None:
-            return self._render(start, end, "preview", output, operation="preview")
+            return self._render(start, end, "preview", output, operation="preview", fps=fps, quality=quality)
         if output is not None:
-            return self._render(0, min(10, plan.brief.duration), "preview", output, operation="preview")
+            return self._render(
+                0, min(10, plan.brief.duration), "preview", output, operation="preview", fps=fps, quality=quality
+            )
         centers = {s.start for s in plan.scenes}
         centers |= {s.start + e.at for s in plan.scenes for e in s.key_events}
         ranges = []
@@ -472,11 +499,15 @@ class AgentProject:
                 ranges[-1][1] = max(ranges[-1][1], high)
             else:
                 ranges.append([low, high])
-        records = [self._render(a, b, "preview", None, operation="preview") for a, b in ranges]
+        records = [
+            self._render(a, b, "preview", None, operation="preview", fps=fps, quality=quality) for a, b in ranges
+        ]
         return {"operation": "preview-set", "records": records}
 
-    def render(self, output=None):
-        result = self._render(0, self.plan.brief.duration, "final", output, operation="render")
+    def render(self, output=None, *, fps=None, quality=None):
+        result = self._render(
+            0, self.plan.brief.duration, "final", output, operation="render", fps=fps, quality=quality
+        )
         result["verification"] = self.verify(result["artifacts"][0]["path"])
         return result
 

@@ -51,6 +51,7 @@ class VideoBrief(Record):
 
 
 class DesignSpec(Record):
+    template: Literal["coding-tutorial"] | None = None
     theme: Literal["midnight", "light", "whiteboard", "clean-flow"] = "midnight"
     rationale: Text = "High contrast with a restrained accent and readable labels"
     font: Text | None = None

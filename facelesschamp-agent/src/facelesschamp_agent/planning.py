@@ -15,8 +15,9 @@ from .context import read_project_context
 from .errors import AgentError
 from .models import BeatSelection, DesignSpec, SelectionPlan
 from .registry import CapabilityRegistry
+from .templates import TEMPLATE_ID, coding_template_guidance, default_coding_template, load_coding_tutorial
 
-PLANNING_VERSION = 2
+PLANNING_VERSION = 3
 _PROJECT_CONFIG_LIMIT = 2 * 1024 * 1024
 _CACHE_LIMIT = 64 * 1024 * 1024
 
@@ -299,6 +300,20 @@ def _prepare_request(
         if isinstance(project_design.get(key), dict) and isinstance((design or {}).get(key), dict):
             merged_design[key] = {**project_design[key], **design[key]}
     selected_design = DesignSpec.model_validate(merged_design)
+    use_template = default_coding_template(
+        root=root,
+        prompt=prompt,
+        context=context,
+        instructions=instructions,
+        design=design,
+        project_design=project_design,
+        constraints=constraints,
+        format=format,
+    )
+    selected_design.template = TEMPLATE_ID if use_template else None
+    if use_template:
+        selected_design.theme = "clean-flow"
+    template = coding_template_guidance(load_coding_tutorial(root).style) if use_template else None
     return {
         "prompt": prompt,
         "instructions": instructions,
@@ -310,6 +325,7 @@ def _prepare_request(
         "project_constraints": constraints,
         "project_config": config_source,
         "project_warnings": project_warnings,
+        "template": template,
     }
 
 
@@ -424,6 +440,24 @@ def _build_selection(context, registry, manifest, request):
             evidence = [item.replace("Narration contains:", "Brief/context contains:") for item in evidence]
         query = f"{intent} {narration} {direction_hint} {supplement_hint}"
         candidates = registry.recommend(query, limit=candidate_limit)
+        if request["template"] and intent == "code":
+            template_id = "facelesschamp_kit.CodingTutorialTemplate"
+            options = registry.search(template_id, compact=True, limit=12)
+            template_candidate = next((candidate for candidate in options if candidate["id"] == template_id), None)
+            if template_candidate:
+                candidates = [
+                    {
+                        **template_candidate,
+                        "score": None,
+                        "reasons": ["Approved coding tutorial default; no custom design/instructions"],
+                    }
+                ] + [candidate for candidate in candidates if candidate["id"] != template_id]
+        elif not request["template"]:
+            candidates = [
+                candidate
+                for candidate in candidates
+                if not candidate["id"].endswith((".CodingTutorialStyle", ".CodingTutorialTemplate"))
+            ]
         if recipe:
             recipe_candidates = registry.search(recipe, kind="recipe", compact=True)
             chosen = next((r for r in recipe_candidates if r["id"] == f"recipe:{recipe}"), None)
@@ -503,6 +537,18 @@ def _build_selection(context, registry, manifest, request):
         "Scene selection is a retrieval draft. The external agent must interpret, author, inspect and repair it."
     )
     guidelines = {**deepcopy(PREMIUM_GUIDELINES), "project_constraints": request["project_constraints"]}
+    if request["template"]:
+        guidelines["template"] = request["template"]
+        guidelines["text"] = request["template"]["text"]
+        for beat in scenes:
+            beat.required_inputs.append(
+                "Use the selected coding-tutorial design pack; supply lesson-specific code and output"
+            )
+            beat.composition = (
+                "Use the approved coding-tutorial editor/terminal composition and visual assets. "
+                "Read templates/coding-tutorial/TEMPLATE.md; choose helpers that explain this beat. "
+                "No external headings or captions; maintain uniform whole-window transforms and measured safe bounds."
+            )
     sources = [*context["sources"], *context.get("assets", [])]
     if request["project_config"] and not any(source["path"] == "agent-plan.json" for source in sources):
         sources.append(request["project_config"])
@@ -572,7 +618,7 @@ def _implementation_digest():
     try:
         sources = {
             name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
-            for name in ("planning.py", "models.py", "registry.py", "context.py")
+            for name in ("planning.py", "models.py", "registry.py", "context.py", "templates.py")
         }
     except OSError as exc:
         raise AgentError(
@@ -594,7 +640,15 @@ def plan_project(root=".", *, paths=None, max_chars=24000, **request):
     root = Path(root).resolve()
     context = read_project_context(root, paths=paths, max_chars=max_chars)
     registry = request.pop("registry", None) or CapabilityRegistry()
-    request = _prepare_request(root, context, **request)
+    original_request = request
+    request = _prepare_request(root, context, **original_request)
+    template = None
+    if request["template"]:
+        from .templates import install_coding_tutorial
+
+        template = install_coding_tutorial(root)
+        context = read_project_context(root, paths=paths, max_chars=max_chars)
+        request = _prepare_request(root, context, **original_request)
     manifest = registry.manifest()
     key = _hash(
         {
@@ -642,6 +696,7 @@ def plan_project(root=".", *, paths=None, max_chars=24000, **request):
         "timing": plan.timing,
         "design": plan.design.model_dump(mode="json"),
         "instructions": plan.instructions,
+        "template": template,
         "beats": [
             {
                 "id": b.scene_id,

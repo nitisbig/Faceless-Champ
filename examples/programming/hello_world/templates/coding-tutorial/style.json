@@ -1,0 +1,23 @@
+{
+  "background": "#E8E6E2",
+  "accent": "#FF5A20",
+  "python_blue": "#3776AB",
+  "python_yellow": "#FFD343",
+  "editor_background": "#14161A",
+  "editor_chrome": "#1F2329",
+  "foreground": "#F5F5F5",
+  "muted": "#A6A7AD",
+  "connector": "#BDB8B1",
+  "inset_x": 96,
+  "inset_y": 108,
+  "editor_scale": 0.64,
+  "code_size": 54,
+  "terminal_size": 32,
+  "shrink_duration": 0.8,
+  "restore_duration": 0.9,
+  "terminal_entrance_duration": 0.6,
+  "terminal_exit_duration": 0.45,
+  "spring_stiffness": 180,
+  "window_damping": 27,
+  "icon_damping": 23
+}

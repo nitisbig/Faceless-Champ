@@ -16,6 +16,16 @@ Follow the user's explicit design, scene, motion and delivery instructions first
 Project constraints come next; the premium defaults fill only unspecified choices.
 Do not add titles, captions, cards or effects that contradict custom direction.
 
+For landscape coding tutorials, use the approved `coding-tutorial` design only
+when no custom design or instructions were provided. Pass all custom prose design
+instructions through `--instructions` or `--design`; never call the fallback pack
+to replace those instructions. Read the returned template guide when selected.
+The editable copy lives in PROJECT/templates/coding-tutorial/. Keep lesson code,
+narration and cue timing separate from style and component helpers. Carry
+`design.template` into the authored plan only when this design was selected.
+Use `load_coding_tutorial(ctx.root)` for fresh components and
+`template.group(..., bounds=bounds)` for safe kit placement. Style edits reload.
+
 Use this five-stage loop when creating or improving a narrated project:
 
 1. Run `fc-agent --project PROJECT plan --prompt "USER REQUEST"`, passing custom
@@ -46,6 +56,8 @@ Use this five-stage loop when creating or improving a narrated project:
    `python PROJECT/render.py` for an audited, verified short preview, inspect
    encoded frames, and deliver the script and preview. `--full` is available for
    an explicitly requested full export. Report visual/editorial review separately.
+   Renderers accept `--fps` and `--quality low|high|4k`; these override export
+   settings without changing the selected preview/full length.
 
 The planner supplies a retrieval draft, not semantic understanding or a quality
 verdict. You supply that reasoning, scene code and visual repairs. Never hand the

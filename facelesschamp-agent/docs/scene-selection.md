@@ -132,3 +132,11 @@ project.entrypoint()
 SelectionPlan and BeatSelection have JSON schemas through `fc-agent schema`.
 QualityReport reports layout_validation independently of structural/media and
 external visual/editorial review. Full-export evidence remains false for previews.
+
+## Default coding tutorial design
+
+A coding tutorial with no custom direction selects the approved coding-tutorial
+pack and copies an editable templates/coding-tutorial/ folder. Custom design or
+instructions bypass it. See [template selection and editing](coding-template.md).
+Generated render.py accepts --fps and --quality low|high|4k for either preview
+or explicit --full delivery, without rewriting project profiles.

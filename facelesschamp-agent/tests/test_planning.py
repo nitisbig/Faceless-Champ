@@ -357,15 +357,18 @@ def test_cache_identity_includes_budgets_config_and_algorithm(tmp_path, registry
 def test_implementation_identity_hashes_actual_planner_and_model_bytes(tmp_path, monkeypatch):
     from facelesschamp_agent import planning
 
-    for name in ("planning.py", "models.py", "registry.py", "context.py"):
+    for name in ("planning.py", "models.py", "registry.py", "context.py", "templates.py"):
         (tmp_path / name).write_text("# Initial installed source\n")
     monkeypatch.setattr(planning, "__file__", str(tmp_path / "planning.py"))
     initial = planning._implementation_digest()
     (tmp_path / "models.py").write_text("# Updated validation semantics\n")
     model_changed = planning._implementation_digest()
     assert model_changed != initial
+    (tmp_path / "templates.py").write_text("# Updated template selection semantics\n")
+    template_changed = planning._implementation_digest()
+    assert template_changed != model_changed
     (tmp_path / "planning.py").write_text("# Updated scene selection semantics\n")
-    assert planning._implementation_digest() != model_changed
+    assert planning._implementation_digest() != template_changed
 
 
 def test_generator_instructions_survive_validation_and_cache(tmp_path, registry):

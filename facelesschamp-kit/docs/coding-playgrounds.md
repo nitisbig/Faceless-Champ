@@ -1,5 +1,11 @@
 # Coding playground projects
 
+For authored tutorials without checkpoint execution, `CodingTutorialStyle` and
+`CodingTutorialTemplate` expose the approved clean-flow coding design. Its separate
+`tutorials/coding/` package contains JSON style defaults and component helpers.
+The [agent template guide](../../facelesschamp-agent/docs/coding-template.md)
+describes default-only selection, editable project copies and kit grouping.
+
 Install `facelesschamp-kit[playground]`. For web preparation, separately install the
 browser with `python -m playwright install chromium`.
 
