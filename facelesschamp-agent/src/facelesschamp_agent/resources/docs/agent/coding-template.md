@@ -79,3 +79,20 @@ fc-agent --project my-video preview -o output/review.mp4 --fps 48 --quality low
 Quality does not select the full film; `--full` does that. Overrides are used in
 verification expectations and never rewrite facelesschamp.toml. Without overrides,
 the preview/final profile remains in force. `entrypoint` preserves custom renderers.
+
+Generated renderers and the fc-agent preview/render commands show a frame progress
+bar, elapsed time and estimated time remaining on stderr, keeping stdout JSON
+parseable. ETA uses observed export throughput; Finalizing covers the encoder's
+last work after all frames have been sent. Success appears after export returns.
+`--full` exports the complete authored timeline, including every scene.
+
+For Python integrations, pass `progress(completed_frames, total_frames)` to
+`AgentProject.preview()` or `render()`. The core `ExportProgress` context manager
+provides the same terminal display without adding a progress dependency:
+
+```python
+from faceless_champ import ExportProgress
+
+with ExportProgress() as progress:
+    project.render(progress=progress, fps=60, quality="high")
+```

@@ -66,6 +66,7 @@ from .layout import Bounds, Group
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
 from .narration import CueScene
 from .preview import StoryboardSample, render_storyboard, save_frame
+from .progress import ExportProgress
 from .renderer import PillowRenderer, Renderer
 from .spring import Spring
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
@@ -95,6 +96,7 @@ __all__ = [
     "EarthMap",
     "Ellipse",
     "Equation",
+    "ExportProgress",
     "ExportSettings",
     "FadeIn",
     "FadeOut",

@@ -17,7 +17,10 @@ EXAMPLE = Path(__file__).resolve().parents[1] / "examples/programming/hello_worl
 @pytest.mark.parametrize(
     ("quality", "dimensions"), [("low", (1280, 720)), ("high", (1920, 1080)), ("4k", (3840, 2160))]
 )
-def test_example_renderer_applies_fps_and_quality_without_rendering(tmp_path, monkeypatch, quality, dimensions):
+@pytest.mark.parametrize("mode", ["--full", "--render"])
+def test_example_renderer_applies_fps_and_quality_without_rendering(
+    tmp_path, monkeypatch, capsys, quality, dimensions, mode
+):
     import faceless_champ
 
     captured = []
@@ -30,17 +33,28 @@ def test_example_renderer_applies_fps_and_quality_without_rendering(tmp_path, mo
             build_scene=lambda: SimpleNamespace(canvas=Canvas(1920, 1080)),
         ),
     )
-    monkeypatch.setattr(faceless_champ, "render", lambda scene, output, **kwargs: captured.append((scene, kwargs)))
+
+    def fake_render(scene, output, **kwargs):
+        captured.append((scene, kwargs))
+        kwargs["progress"](0, 2)
+        kwargs["progress"](1, 2)
+        kwargs["progress"](2, 2)
+
+    monkeypatch.setattr(faceless_champ, "render", fake_render)
     output = tmp_path / "opening.mp4"
     monkeypatch.setattr(
         sys,
         "argv",
-        [str(EXAMPLE / "render.py"), "--render", "--quality", quality, "--fps", "48", "--output", str(output)],
+        [str(EXAMPLE / "render.py"), mode, "--quality", quality, "--fps", "48", "--output", str(output)],
     )
     runpy.run_path(str(EXAMPLE / "render.py"))["main"]()
     scene, options = captured[0]
     assert options["settings"].dimensions(scene.canvas) == dimensions
     assert options["settings"].fps == 48 and options["end_time"] == 14.96
+    assert options["start_time"] == 0
+    feedback = capsys.readouterr()
+    assert "Exported" in feedback.err and "ETA" in feedback.err
+    assert feedback.out.strip() == str(output)
     assert not output.exists()
 
 

@@ -58,6 +58,8 @@ Use this five-stage loop when creating or improving a narrated project:
    an explicitly requested full export. Report visual/editorial review separately.
    Renderers accept `--fps` and `--quality low|high|4k`; these override export
    settings without changing the selected preview/full length.
+   Video exports show frame progress, elapsed time and ETA on stderr. Preserve
+   that feedback and keep stdout available for the structured result.
 
 The planner supplies a retrieval draft, not semantic understanding or a quality
 verdict. You supply that reasoning, scene code and visual repairs. Never hand the

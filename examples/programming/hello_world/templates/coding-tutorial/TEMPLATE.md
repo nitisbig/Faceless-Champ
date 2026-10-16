@@ -39,5 +39,7 @@ shadow clearance. Spring applies to transforms; fades/reveals use ordinary easin
 Output is authored unless explicitly prepared checkpoints are required. Never
 execute displayed source during playback. Attach supplied narration once at zero.
 
-Generated render.py supports `--fps` and `--quality low|high|4k`, independently
-of preview/full duration. Honor requests to deliver source without rendering.
+Generated render.py supports `--full` for the complete authored video, plus
+`--fps` and `--quality low|high|4k` independently of preview/full duration.
+Video exports include frame progress, elapsed time and ETA on stderr; stdout
+retains the structured report. Honor requests to deliver source without rendering.

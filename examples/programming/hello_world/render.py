@@ -13,14 +13,20 @@ sys.path[:0] = [str(REPO / "src"), str(REPO / "facelesschamp-kit/src"), str(ROOT
 
 from scene import DURATION, build_scene, check_scene
 
-from faceless_champ import ExportSettings, render, save_frame
+from faceless_champ import ExportProgress, ExportSettings, render, save_frame
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true")
-    mode.add_argument("--render", action="store_true", help="Render the complete 14.96-second opening")
+    mode.add_argument(
+        "--full",
+        "--render",
+        dest="render",
+        action="store_true",
+        help="Render all authored content (14.96-second opening)",
+    )
     mode.add_argument("--frame", type=float, metavar="TIME")
     mode.add_argument("--range", nargs=2, type=float, metavar=("START", "END"))
     parser.add_argument("--output", type=Path)
@@ -58,14 +64,16 @@ def main():
     else:
         output = args.output or ROOT / "output" / "opening.mp4"
         start, end = args.range or (0, DURATION)
-        render(
-            scene,
-            output,
-            settings=settings,
-            start_time=start,
-            end_time=end,
-            overwrite=args.overwrite,
-        )
+        with ExportProgress() as progress:
+            render(
+                scene,
+                output,
+                settings=settings,
+                start_time=start,
+                end_time=end,
+                overwrite=args.overwrite,
+                progress=progress,
+            )
     print(output)
 
 

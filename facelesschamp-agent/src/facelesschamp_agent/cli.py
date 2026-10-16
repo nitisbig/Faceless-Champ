@@ -8,6 +8,7 @@ from dataclasses import asdict
 from importlib.resources import as_file, files
 from pathlib import Path
 
+from faceless_champ import ExportProgress
 from facelesschamp_kit.cli import doctor
 from facelesschamp_kit.diagnostics import KitError
 from facelesschamp_kit.recipes import recipe_specs
@@ -149,13 +150,21 @@ def main(argv=None):
             if command == "frame":
                 result = project.frame(args.time, args.output)
             elif command == "preview":
-                result = project.preview(
-                    args.output, start=args.start, end=args.end, scene=args.scene, fps=args.fps, quality=args.quality
-                )
+                with ExportProgress() as progress:
+                    result = project.preview(
+                        args.output,
+                        start=args.start,
+                        end=args.end,
+                        scene=args.scene,
+                        fps=args.fps,
+                        quality=args.quality,
+                        progress=progress,
+                    )
             elif command == "review":
                 result = project.review(json.loads(args.file.read_text()))
             elif command == "render":
-                result = project.render(args.output, fps=args.fps, quality=args.quality)
+                with ExportProgress() as progress:
+                    result = project.render(args.output, fps=args.fps, quality=args.quality, progress=progress)
             elif command in {"storyboard", "verify"}:
                 result = getattr(project, command)(args.output)
             elif command == "audit-layout":

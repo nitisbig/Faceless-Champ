@@ -148,6 +148,9 @@ def test_generated_renderer_passes_fps_and_quality_without_modifying_profiles(tm
             return {"status": "passed"}
 
         def preview(self, path, **kwargs):
+            progress = kwargs.pop("progress")
+            progress(0, 10)
+            progress(10, 10)
             calls.append(kwargs)
             return {}
 
@@ -155,6 +158,9 @@ def test_generated_renderer_passes_fps_and_quality_without_modifying_profiles(tm
             return {"status": "passed"}
 
         def render(self, path, **kwargs):
+            progress = kwargs.pop("progress")
+            progress(0, 20)
+            progress(20, 20)
             calls.append(kwargs)
             return {"verification": {"status": "passed"}}
 
@@ -164,28 +170,45 @@ def test_generated_renderer_passes_fps_and_quality_without_modifying_profiles(tm
     assert calls[-1] == {"start": 0, "end": 10, "fps": 60, "quality": "high"}
     assert runner(["--full", "--fps", "24", "--quality", "4k"]) == 0
     assert calls[-1] == {"fps": 24, "quality": "4k"}
-    capsys.readouterr()
+    feedback = capsys.readouterr()
+    decoder = json.JSONDecoder()
+    preview, end = decoder.raw_decode(feedback.out)
+    full = json.loads(feedback.out[end:])
+    assert preview["delivery"] == "preview" and full["delivery"] == "full"
+    assert "20/20 frames" in feedback.err and "ETA" in feedback.err and "Exported" in feedback.err
 
 
 def test_export_overrides_replace_profile_dimensions_and_record_correct_expectations(project, monkeypatch):
     captured = []
+    reports = []
 
     def fake_render(composition, path, **kwargs):
         captured.append(kwargs["settings"])
+        kwargs["progress"](0, 60)
+        kwargs["progress"](60, 60)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(b"test video")
 
     monkeypatch.setattr("facelesschamp_agent.project.render", fake_render)
     before = deepcopy(project.kit.config)
-    result = project.preview(project.root / "output/overrides.mp4", start=0, end=1, fps=60, quality="4k")
+    result = project.preview(
+        project.root / "output/overrides.mp4",
+        start=0,
+        end=1,
+        fps=60,
+        quality="4k",
+        progress=lambda completed, total: reports.append((completed, total)),
+    )
     assert captured[0].width is None and captured[0].height is None
     assert result["expected"]["width"] == 3840 and result["expected"]["height"] == 2160
     assert result["expected"]["fps"] == 60 and result["source_range"] == [0, 1]
     assert project.kit.config == before
+    assert reports == [(0, 60), (60, 60)]
 
 
 @pytest.mark.parametrize(
-    "options", [{"fps": -1}, {"fps": float("nan")}, {"fps": True}, {"quality": "ultra"}, {"quality": []}]
+    "options",
+    [{"fps": -1}, {"fps": float("nan")}, {"fps": True}, {"quality": "ultra"}, {"quality": []}, {"progress": True}],
 )
 def test_invalid_export_overrides_fail_before_building(project, monkeypatch, options):
     monkeypatch.setattr(project, "_build", lambda: pytest.fail("Invalid options must fail before building"))

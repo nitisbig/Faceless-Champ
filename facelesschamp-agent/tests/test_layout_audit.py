@@ -257,7 +257,8 @@ def test_entrypoint_anchors_project_and_relative_outputs_when_invoked_elsewhere(
         def audit_layout(self):
             return {"status": "passed"}
 
-        def preview(self, path, *, start, end):
+        def preview(self, path, *, start, end, progress):
+            assert callable(progress)
             called.append(("preview", path, start, end))
             return {"artifacts": [{"path": str(path)}]}
 

@@ -438,13 +438,15 @@ class AgentProject:
                         )
         return self._record("storyboard", fingerprint, artifacts=artifacts, layouts=layouts, diagnostics=findings)
 
-    def _render(self, start, end, profile, output, *, operation, fps=None, quality=None):
+    def _render(self, start, end, profile, output, *, operation, fps=None, quality=None, progress=None):
         if fps is not None and (
             isinstance(fps, bool) or not isinstance(fps, (int, float)) or not math.isfinite(fps) or fps <= 0
         ):
             raise AgentError("EXPORT_FPS", "FPS must be finite and positive")
         if quality is not None and (not isinstance(quality, str) or quality not in EXPORT_QUALITIES):
             raise AgentError("EXPORT_QUALITY", "Choose low, high or 4k")
+        if progress is not None and not callable(progress):
+            raise AgentError("EXPORT_PROGRESS", "Progress must be callable")
         compiled, plan, fingerprint = self._build()
         if not 0 <= start < end <= compiled.duration:
             raise AgentError("RANGE", "Expected 0 <= start < end <= duration")
@@ -455,7 +457,7 @@ class AgentProject:
             settings = replace(settings, quality=EXPORT_QUALITIES[quality], width=None, height=None)
         settings.dimensions(compiled.composition.canvas)
         path = self._output(output, operation, ".mp4")
-        render(compiled.composition, path, settings=settings, start_time=start, end_time=end)
+        render(compiled.composition, path, settings=settings, start_time=start, end_time=end, progress=progress)
         width, height = settings.dimensions(compiled.composition.canvas)
         return self._record(
             operation,
@@ -473,7 +475,7 @@ class AgentProject:
             status="exported",
         )
 
-    def preview(self, output=None, *, start=None, end=None, scene=None, fps=None, quality=None):
+    def preview(self, output=None, *, start=None, end=None, scene=None, fps=None, quality=None, progress=None):
         plan = self.plan
         if scene is not None:
             if start is not None or end is not None:
@@ -485,10 +487,19 @@ class AgentProject:
         if (start is None) != (end is None):
             raise AgentError("RANGE", "Specify both start and end")
         if start is not None:
-            return self._render(start, end, "preview", output, operation="preview", fps=fps, quality=quality)
+            return self._render(
+                start, end, "preview", output, operation="preview", fps=fps, quality=quality, progress=progress
+            )
         if output is not None:
             return self._render(
-                0, min(10, plan.brief.duration), "preview", output, operation="preview", fps=fps, quality=quality
+                0,
+                min(10, plan.brief.duration),
+                "preview",
+                output,
+                operation="preview",
+                fps=fps,
+                quality=quality,
+                progress=progress,
             )
         centers = {s.start for s in plan.scenes}
         centers |= {s.start + e.at for s in plan.scenes for e in s.key_events}
@@ -500,13 +511,21 @@ class AgentProject:
             else:
                 ranges.append([low, high])
         records = [
-            self._render(a, b, "preview", None, operation="preview", fps=fps, quality=quality) for a, b in ranges
+            self._render(a, b, "preview", None, operation="preview", fps=fps, quality=quality, progress=progress)
+            for a, b in ranges
         ]
         return {"operation": "preview-set", "records": records}
 
-    def render(self, output=None, *, fps=None, quality=None):
+    def render(self, output=None, *, fps=None, quality=None, progress=None):
         result = self._render(
-            0, self.plan.brief.duration, "final", output, operation="render", fps=fps, quality=quality
+            0,
+            self.plan.brief.duration,
+            "final",
+            output,
+            operation="render",
+            fps=fps,
+            quality=quality,
+            progress=progress,
         )
         result["verification"] = self.verify(result["artifacts"][0]["path"])
         return result

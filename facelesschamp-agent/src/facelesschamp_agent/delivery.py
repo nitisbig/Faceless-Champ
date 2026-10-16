@@ -11,6 +11,7 @@ import json
 import uuid
 from pathlib import Path
 
+from faceless_champ import ExportProgress
 from facelesschamp_agent import AgentError, AgentProject
 from facelesschamp_kit.diagnostics import KitError
 
@@ -38,7 +39,8 @@ def main(argv=None):
         if not output.is_absolute():
             output = root / output
         if args.full:
-            result = project.render(output, **options)
+            with ExportProgress() as progress:
+                result = project.render(output, progress=progress, **options)
             verification = result["verification"]
         else:
             import math
@@ -48,7 +50,8 @@ def main(argv=None):
             if not 0 < args.duration <= 10 or not 0 <= args.start < project.plan.brief.duration:
                 raise AgentError("RANGE", "Preview requires a valid start and 0 < duration <= 10")
             end = min(project.plan.brief.duration, args.start + args.duration)
-            result = project.preview(output, start=args.start, end=end, **options)
+            with ExportProgress() as progress:
+                result = project.preview(output, start=args.start, end=end, progress=progress, **options)
             verification = project.verify(output)
         passed = verification.get("status") == "passed"
         print(json.dumps({
