@@ -1,0 +1,448 @@
+{
+  "checked_at": "2026-10-16T03:21:05.217774+00:00",
+  "mode": "offline file URL in installed headless Chromium",
+  "views": [
+    {
+      "view": "overview",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "architecture",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "features",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "motion",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "projects",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "timeline",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "repository",
+      "width": 1440,
+      "height": 1000,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "overview",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "architecture",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "features",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "motion",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "projects",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "timeline",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "repository",
+      "width": 1024,
+      "height": 800,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "overview",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "architecture",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "features",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "motion",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "projects",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "timeline",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "repository",
+      "width": 768,
+      "height": 1024,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "overview",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "architecture",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "features",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "motion",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "projects",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "timeline",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "repository",
+      "width": 601,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "overview",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "architecture",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "features",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "motion",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "projects",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "timeline",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "repository",
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "overview",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "architecture",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "features",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "motion",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "projects",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "timeline",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    },
+    {
+      "view": "repository",
+      "width": 320,
+      "height": 700,
+      "horizontal_overflow": false
+    }
+  ],
+  "checks": [
+    "Overview renders four source metrics",
+    "142 current root exports read from AST",
+    "15 projects read from source directories",
+    "11 recipes read from current catalog",
+    "11 starters read from current scaffold",
+    "25 unique curated capability families",
+    "Source and guide exist: scenes",
+    "Source and guide exist: layout",
+    "Source and guide exist: typography",
+    "Source and guide exist: images",
+    "Source and guide exist: narration",
+    "Source and guide exist: charts",
+    "Source and guide exist: maps",
+    "Source and guide exist: transforms",
+    "Source and guide exist: scheduling",
+    "Source and guide exist: masks",
+    "Source and guide exist: spring",
+    "Source and guide exist: coding",
+    "Source and guide exist: playground",
+    "Source and guide exist: web",
+    "Source and guide exist: os",
+    "Source and guide exist: chess",
+    "Source and guide exist: flow",
+    "Source and guide exist: arch",
+    "Source and guide exist: clean-flow",
+    "Source and guide exist: gradients",
+    "Source and guide exist: kit",
+    "Source and guide exist: recipes",
+    "Source and guide exist: agent",
+    "Source and guide exist: delivery",
+    "Source and guide exist: learning",
+    "Heading renders: overview at 1440px",
+    "No horizontal overflow: overview at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: architecture at 1440px",
+    "No horizontal overflow: architecture at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: features at 1440px",
+    "No horizontal overflow: features at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: motion at 1440px",
+    "No horizontal overflow: motion at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: projects at 1440px",
+    "No horizontal overflow: projects at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: timeline at 1440px",
+    "No horizontal overflow: timeline at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: repository at 1440px",
+    "No horizontal overflow: repository at 1440px ({'width': 1440, 'scroll': 1440})",
+    "Heading renders: overview at 1024px",
+    "No horizontal overflow: overview at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: architecture at 1024px",
+    "No horizontal overflow: architecture at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: features at 1024px",
+    "No horizontal overflow: features at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: motion at 1024px",
+    "No horizontal overflow: motion at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: projects at 1024px",
+    "No horizontal overflow: projects at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: timeline at 1024px",
+    "No horizontal overflow: timeline at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: repository at 1024px",
+    "No horizontal overflow: repository at 1024px ({'width': 1024, 'scroll': 1024})",
+    "Heading renders: overview at 768px",
+    "No horizontal overflow: overview at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: architecture at 768px",
+    "No horizontal overflow: architecture at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: features at 768px",
+    "No horizontal overflow: features at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: motion at 768px",
+    "No horizontal overflow: motion at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: projects at 768px",
+    "No horizontal overflow: projects at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: timeline at 768px",
+    "No horizontal overflow: timeline at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: repository at 768px",
+    "No horizontal overflow: repository at 768px ({'width': 768, 'scroll': 768})",
+    "Heading renders: overview at 601px",
+    "No horizontal overflow: overview at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: architecture at 601px",
+    "No horizontal overflow: architecture at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: features at 601px",
+    "No horizontal overflow: features at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: motion at 601px",
+    "No horizontal overflow: motion at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: projects at 601px",
+    "No horizontal overflow: projects at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: timeline at 601px",
+    "No horizontal overflow: timeline at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: repository at 601px",
+    "No horizontal overflow: repository at 601px ({'width': 601, 'scroll': 601})",
+    "Heading renders: overview at 390px",
+    "No horizontal overflow: overview at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: architecture at 390px",
+    "No horizontal overflow: architecture at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: features at 390px",
+    "No horizontal overflow: features at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: motion at 390px",
+    "No horizontal overflow: motion at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: projects at 390px",
+    "No horizontal overflow: projects at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: timeline at 390px",
+    "No horizontal overflow: timeline at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: repository at 390px",
+    "No horizontal overflow: repository at 390px ({'width': 390, 'scroll': 390})",
+    "Heading renders: overview at 320px",
+    "No horizontal overflow: overview at 320px ({'width': 320, 'scroll': 320})",
+    "Heading renders: architecture at 320px",
+    "No horizontal overflow: architecture at 320px ({'width': 320, 'scroll': 320})",
+    "Heading renders: features at 320px",
+    "No horizontal overflow: features at 320px ({'width': 320, 'scroll': 320})",
+    "Heading renders: motion at 320px",
+    "No horizontal overflow: motion at 320px ({'width': 320, 'scroll': 320})",
+    "Heading renders: projects at 320px",
+    "No horizontal overflow: projects at 320px ({'width': 320, 'scroll': 320})",
+    "Heading renders: timeline at 320px",
+    "No horizontal overflow: timeline at 320px ({'width': 320, 'scroll': 320})",
+    "Heading renders: repository at 320px",
+    "No horizontal overflow: repository at 320px ({'width': 320, 'scroll': 320})",
+    "Feature drawer opens: scenes",
+    "Feature drawer opens: layout",
+    "Feature drawer opens: typography",
+    "Feature drawer opens: images",
+    "Feature drawer opens: narration",
+    "Feature drawer opens: charts",
+    "Feature drawer opens: maps",
+    "Feature drawer opens: transforms",
+    "Feature drawer opens: scheduling",
+    "Feature drawer opens: masks",
+    "Feature drawer opens: spring",
+    "Feature drawer opens: coding",
+    "Feature drawer opens: playground",
+    "Feature drawer opens: web",
+    "Feature drawer opens: os",
+    "Feature drawer opens: chess",
+    "Feature drawer opens: flow",
+    "Feature drawer opens: arch",
+    "Feature drawer opens: clean-flow",
+    "Feature drawer opens: gradients",
+    "Feature drawer opens: kit",
+    "Feature drawer opens: recipes",
+    "Feature drawer opens: agent",
+    "Feature drawer opens: delivery",
+    "Feature drawer opens: learning",
+    "Feature category filter returns four Motion families",
+    "Feature search combines with category filter",
+    "Empty feature results are explained",
+    "Global search returns gradient feature",
+    "Keyboard search opens selected feature",
+    "Project gallery contains 15 compositions",
+    "Project category filter returns four systems/3D projects",
+    "Motion study scrubs: spring",
+    "Motion study scrubs: slide",
+    "Motion study scrubs: fade",
+    "Motion study scrubs: pop",
+    "Motion study scrubs: pulse",
+    "Motion study scrubs: rotate",
+    "Motion study scrubs: wipe",
+    "Motion study scrubs: typewriter",
+    "Motion study scrubs: stagger",
+    "Spring study seeks deterministically: gentle",
+    "Spring study seeks deterministically: critical",
+    "Spring study seeks deterministically: bouncy",
+    "Motion playback and pause work",
+    "Repository directories expand",
+    "Local link resolves: ../docs/premium-effects-verification.md",
+    "Local link resolves: ../training%20project/burj%20khalifa/README.md",
+    "Local link resolves: ../training%20project/burj%20khalifa/render.py",
+    "Local link resolves: ../training%20project/networking-explained/README.md",
+    "Local link resolves: ../training%20project/networking-explained/render.py",
+    "Local link resolves: ../training%20project/system-design-of-facebook/README.md",
+    "Local link resolves: ../training%20project/system-design-of-facebook/render.py",
+    "Local link resolves: ../training%20project/tiktok-system-design/README.md",
+    "Local link resolves: ../training%20project/tiktok-system-design/render.py",
+    "Local link resolves: ../examples/",
+    "Local link resolves: ../guide%20video/README.md",
+    "Local link resolves: ../docs/coding-playgrounds.md",
+    "Local link resolves: ../docs/architecture.md",
+    "Local link resolves: ../pyproject.toml",
+    "Local link resolves: ../facelesschamp-kit/pyproject.toml",
+    "Local link resolves: ../facelesschamp-agent/pyproject.toml",
+    "Local link resolves: ../project-map/README.md",
+    "Mobile navigation opens",
+    "Mobile navigation closes after selection",
+    "Reduced-motion preference disables smooth scrolling",
+    "Print view removes navigation chrome",
+    "No JavaScript runtime errors",
+    "No external requests; page works offline"
+  ],
+  "console_errors": [],
+  "external_requests": [],
+  "check_count": 184,
+  "status": "passed"
+}

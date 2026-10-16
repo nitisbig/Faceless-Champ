@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#20231f">
+  <meta name="description" content="An interactive, source-grounded map of the Faceless Champ engine, framework, agent, visual systems and development history.">
+  <title>Faceless Champ — Project Atlas</title>
+  <style>/* ATLAS_STYLES */</style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <aside class="sidebar" id="sidebar" aria-label="Project navigation">
+    <a class="brand" href="#overview"><span class="brand-symbol" aria-hidden="true">f<span>c</span></span><span>faceless champ<small>PROJECT ATLAS</small></span></a>
+    <div class="workspace"><span class="workspace-dot"></span> Your creative infrastructure <span class="workspace-arrow">↗</span></div>
+    <button class="search-trigger" type="button" data-search><span data-icon="search"></span>Find anything <kbd>⌘ K</kbd></button>
+    <div class="nav-label">THE BIG PICTURE</div>
+    <nav id="nav">
+      <a href="#overview" data-view="overview"><span data-icon="compass"></span>Overview<span class="nav-num">01</span></a>
+      <a href="#architecture" data-view="architecture"><span data-icon="layers"></span>Architecture<span class="nav-num">02</span></a>
+      <a href="#features" data-view="features"><span data-icon="grid"></span>Feature atlas<span class="nav-num" id="nav-feature-count"></span></a>
+      <a href="#motion" data-view="motion"><span data-icon="wave"></span>Motion lab<span class="nav-num">04</span></a>
+      <a href="#projects" data-view="projects"><span data-icon="film"></span>Project gallery<span class="nav-num" id="nav-project-count"></span></a>
+      <a href="#timeline" data-view="timeline"><span data-icon="clock"></span>Development timeline<span class="nav-num">06</span></a>
+      <a href="#repository" data-view="repository"><span data-icon="folder"></span>Repository map<span class="nav-num">07</span></a>
+    </nav>
+    <div class="sidebar-note"><span class="tiny-label">BUILT FOR</span><p>Developers.<br>AI authors.<br>Ideas that move.</p><div class="note-line"></div><span>Python → frames → video</span></div>
+    <footer class="sidebar-footer"><span class="status-dot"></span>Local source snapshot<small id="sidebar-date"></small></footer>
+  </aside>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="breadcrumb"><button type="button" class="icon-button menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="sidebar" aria-label="Open navigation"><span data-icon="menu"></span></button><span>Workspace</span><span class="slash">/</span><strong id="breadcrumb">Overview</strong></div>
+      <div class="topbar-right"><span class="snapshot-tag" id="snapshot-date"></span><button type="button" class="icon-button" data-search aria-label="Search the atlas"><span data-icon="search"></span></button><button type="button" class="text-button" id="print-button"><span data-icon="download"></span><span>Print view</span></button></div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="page-footer"><span>Faceless Champ <span class="footer-separator">/</span> A map of what you’ve built.</span><span id="footer-source"></span></footer>
+  </div>
+  <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="detail-title"><div id="detail-content"></div></dialog>
+  <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-label"><div class="search-dialog-head"><span data-icon="search"></span><label id="search-label" class="sr-only" for="global-search">Search features, projects and recipes</label><input id="global-search" autocomplete="off" placeholder="Search features, projects, recipes…"><button type="button" class="dialog-close" data-close="search-dialog" aria-label="Close search">Esc</button></div><div id="search-results" role="list" aria-live="polite"></div><div class="search-footer">Search the current project snapshot <span>↑ ↓ navigate · Enter open</span></div></dialog>
+  <script>/* ATLAS_DATA */</script>
+  <script>/* ATLAS_CATALOG */</script>
+  <script>/* ATLAS_APP */</script>
+</body>
+</html>

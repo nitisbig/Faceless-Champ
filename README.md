@@ -2,6 +2,11 @@
 
 Current source versions: **faceless-champ 0.1.5**, **facelesschamp-kit 0.1.0rc7**, and **facelesschamp-agent 0.1.0rc2** (local release candidates).
 
+Explore the **[interactive project atlas](project-map/index.html)** for the current
+architecture, feature inventory, motion studies, training projects and development
+timeline. Open the self-contained HTML directly in a browser;
+[refresh instructions](project-map/README.md) keep its source snapshot current.
+
 | Capability | Core guide | Kit guide |
 | --- | --- | --- |
 | Syntax-colored code and reveals | [CodingChamp](docs/coding.md) | [Editor and playground blocks](facelesschamp-kit/docs/coding-playgrounds.md) |
