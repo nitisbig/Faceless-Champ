@@ -147,7 +147,7 @@ def add_features(root, code, section, note, link, lesson):
     lesson('archchamp', 'ArchChamp technical 3D', 'Library fundamentals',
            'Explain geometry through named parts, camera motion, sections and dimensions.', [
         section('Explore an assembly', 'This original silent 12-second fixture shows transparent geometry, exploded parts and a moving section. PyVista is a required core dependency.',
-                code((root.parent / 'examples/archchamp.py').read_text(), filename='archchamp.py', target='build_scene')),
+                code((root.parent / 'docs/archchamp.md').read_text().split('```python\n', 1)[1].split('```', 1)[0], filename='archchamp.py', target='build_scene')),
         section('Choose a concept', 'Wireframe, topology, transparent/X-ray, clay, blueprint, point cloud, isometric, supplied heatmap/vector fields and voxel views share one viewport. Import local meshes or generate parametric geometry with Python. CAD modeling and simulation solving remain external.'),
         section('Animate and annotate', 'ArchScript schedules camera, named part, explosion, highlight and section actions. Labels and dimensions follow world or part-local anchors with explicit model units. Source offsets and random seeking preserve the authored clock.'),
         section('Compose and manage resources', 'Use normal scenes, groups, masks and composition. Renderer-owned offscreen sessions reuse actors; use a renderer context manager for manual frames.', link('Kit ArchCanvas →', 'kit.html#kit-archchamp')),
@@ -191,7 +191,7 @@ def add_features(root, code, section, note, link, lesson):
 
     lesson('kit-flowchamp', 'Flow diagrams', 'Framework fundamentals',
            'Fit scripted graphs into structured video layouts and narration windows.', [
-        section('Start or compose', 'fc-kit init my-flow --template flowchamp creates an editable recipe project. FlowCanvas inherits kit fonts and colors.', code((root.parent / 'facelesschamp-kit/examples/flowchamp.py').read_text(), filename='kit_flow.py', kind='kit', template='flowchamp')),
+        section('Start or compose', 'fc-kit init my-flow --template flowchamp creates an editable recipe project. FlowCanvas inherits kit fonts and colors.', code((root.parent / 'facelesschamp-kit/docs/flowchamp.md').read_text().split('```python\n', 1)[1].split('```', 1)[0], filename='kit_flow.py', kind='kit', template='flowchamp')),
         section('Target graph elements', 'Use the diagram handle for whole-viewport kit motion and stable FlowScript IDs for individual nodes/connections. FlowCanvas supports viewport and source_start; scripts must fit their placement lifetime.'),
         section('Time events to narration', 'Attach existing audio/SRT once and use Segment.cue_time(original_index) to translate original source cues into local FlowScript action times.'),
         section('Inspect timed diagnostics', 'Neutral outlines inherit Theme.muted; packets/highlights use accent. FLOW_BOUNDS, FLOW_OVERLAP, and FLOW_LABEL_OVERLAP warnings include segment, placement, script_time, and master source_time. Compiler samples action boundaries, midpoints, and excerpt endpoints.', link('Core graph authoring →', 'index.html#flowchamp')),

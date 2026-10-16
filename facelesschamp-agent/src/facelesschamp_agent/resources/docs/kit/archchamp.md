@@ -23,6 +23,15 @@ def build(ctx):
 
 `ArchCanvas` also accepts a structured design dictionary. Use `apply_recipe(segment,
 "arch-design", {"design": design})` for the same contract through an agent plan.
+For dictionary designs, a supplied non-`None` `script` or `camera`, and explicitly
+supplied `labels`, `dimensions`, or `units`, override the corresponding design
+fields. Omitted settings preserve the dictionary values and otherwise use the
+usual canvas defaults. Empty annotation sequences clear the design's annotations;
+`ArchScript()` clears its actions, and `units="model units"` resets its units.
+The dictionary's `style` keeps its existing precedence; the block's `style` or
+kit theme supplies the default when the dictionary has no style. Composing the
+block leaves the source dictionary and supplied objects unchanged.
+
 Mesh file sources in recipes must use registered assets, for example
 `{"id": "body", "mesh": {"asset": "building"}}`. Register `building` in
 `assets/manifest.json` with `{"type": "mesh", "path": "assets/building.vtp"}`.

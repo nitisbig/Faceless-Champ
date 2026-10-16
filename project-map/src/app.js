@@ -59,7 +59,7 @@ function overview() {
     ['Independent packages','3','core · kit · agent','layers'],
     ['Core root exports',count,'public names','code'],
     ['Project starters',SNAPSHOT.templates.length,`${SNAPSHOT.recipes.length} recipes`,'blocks'],
-    ['Training projects',SNAPSHOT.projects.length,'authored examples','film']
+    ['Premium references',SNAPSHOT.projects.length,'current scene drafts','film']
   ].map(([label,value,small,i]) => `<div class="stat"><div class="stat-top"><span>${label}</span>${icon(i)}</div><div class="stat-value">${value}<small>${small}</small></div></div>`).join('')}</div>` +
   sectionHead('The ecosystem at a glance', 'Three layers. One underlying rendering engine.', '<a class="text-button" href="#architecture">Explore architecture</a>') +
   `<div class="canvas"><div class="canvas-top"><span class="canvas-label">FACELESS CHAMP / SYSTEM MAP</span><div class="canvas-legend"><span><i class="legend-dot" style="background:var(--green)"></i>Plan</span><span><i class="legend-dot" style="background:var(--blue)"></i>Compose</span><span><i class="legend-dot" style="background:var(--orange)"></i>Render</span></div></div><div class="eco-canvas"><div class="flow-caption">Your video project / external AI author → public Python APIs</div><div class="package-flow">${[
@@ -77,7 +77,7 @@ function overview() {
 
 function architecture() {
   const layers = [
-    ['01','Project / external author','Your content and decisions','training project/','Story, research, supplied audio, source cues, custom scene content and artwork choices belong to the project. Authors can use the core directly or build through Kit and Agent.',['render.py','videos/main.py','agent-plan.json','facelesschamp.toml']],
+    ['01','Project / external author','Your content and decisions','examples/programming/','Story, research, supplied audio, source cues, custom scene content and artwork choices belong to the project. Authors can use the core directly or build through Kit and Agent.',['render.py','videos/main.py','agent-plan.json','facelesschamp.toml']],
     ['02','Agent','Plan, discover and review','facelesschamp-agent/','Structured plans, a capability registry, portable authoring instructions and evidence fingerprints support an external AI author. CLI outputs are structured JSON. The package delegates authoring to Kit.',['VideoPlan','AgentProject','fc-agent','ReviewSubmission']],
     ['03','Kit','Compose reusable videos','facelesschamp-kit/','Configuration, assets, themes, blocks, recipes and segment windows compile to a complete master Scene using public core methods. The framework has no second frame evaluator.',['Video','Segment','BuildContext','BlockBuild','CompiledVideo']],
     ['04','Core','Own timing and rendering','src/faceless_champ/','Components describe visuals. Scene snapshots and property tracks describe change. The renderer samples arbitrary times, rasterizes/composites frames, and hands them to the exporter.',['Scene','Animation','Spring','Group','PillowRenderer','render']]
@@ -127,10 +127,9 @@ function projectCards() {
   }).join('');
 }
 function projects() {
-  return intro('Applied work', 'The ideas you’ve<br><em>already put into practice.</em>', 'Fifteen training projects exercise the reusable APIs through narrated explainers, data stories, coding lessons, system diagrams and technical geometry.') +
-    `<div class="toolbar"><div class="filter-group" aria-label="Project category">${['All','Narrated explainers','Math & data','Code & interfaces','Systems & 3D','Design studies'].map(c=>`<button class="filter" data-project-category="${c}" aria-pressed="${c===projectCategory}">${c}</button>`).join('')}</div><span class="filter-count" id="project-result-count" role="status"></span></div><div class="project-grid" id="project-grid">${projectCards()}</div><p class="project-caveat">Durations and story descriptions come from the project notes. These are authored compositions; full-export verification varies by project. Illustrations above are atlas schematics, not screenshots of the rendered videos. Check each project’s verification record for media evidence.</p>` +
-    sectionHead('Focused showcases beyond the training gallery','Reusable API demonstrations and tooling.') +
-    `<div class="two-col"><div class="note-panel"><h3>Core API demonstrations</h3><p>Chart and map showcases, flags, groups, fitted text, coding workspaces, chess/PGN, OS tutorials, flow diagrams, technical 3D, motion graphics, Spring and premium surfaces.</p>${sourceLink('examples/','Explore examples/')}</div><div class="note-panel"><h3>The library’s own guide video</h3><p>A narrated authoring project demonstrates the broader library, including prepared CodingChamp scenes and source-clock visual timing. Its media evidence is recorded separately from the guide-site previews.</p>${sourceLink('guide video/README.md','Explore the guide video')}</div></div>`;
+  return intro('Premium references', 'A fresh collection.<br><em>Designed through review.</em>', 'The Hello World opening is the first premium scene draft. It combines the current CodingChamp, OSChamp, FlowChamp, clean-flow and Spring APIs.') +
+    `<div class="toolbar"><div class="filter-group" aria-label="Project category">${['All','Code & interfaces'].map(c=>`<button class="filter" data-project-category="${c}" aria-pressed="${c===projectCategory}">${c}</button>`).join('')}</div><span class="filter-count" id="project-result-count" role="status"></span></div><div class="project-grid" id="project-grid">${projectCards()}</div><p class="project-caveat">Structural checks do not establish visual quality. This scene has not been rendered or approved; the illustrations above are atlas schematics.</p>` +
+    `<div class="note-panel"><h3>Current collection</h3><p>Previous training projects, guide-video lessons and standalone demos were retired. Library starter templates and reusable assets remain available.</p>${sourceLink('examples/README.md','Premium reference index')}</div>`;
 }
 
 let motionType='spring', springVariant='bouncy', progress=0, playing=false, frameId=0;
@@ -178,7 +177,7 @@ function timeline() {
 }
 function repository() {
   return intro('Repository map', 'Know where<br><em>each part belongs.</em>', 'Source ownership, supporting resources and the three package manifests. Expand a directory to see what it contains and why it exists.') +
-    `<div class="repo-table">${REPOSITORY.map((r,i)=>`<details class="repo-row" ${i===0?'open':''}><summary>${icon(i<3?'folder':'layers')}<code>${r.path}</code><span>${r.role}</span></summary><div class="repo-detail"><p>${r.detail}</p>${(r.path==='training project/'?SNAPSHOT.projects.map(p=>p.id+'/'):r.children).map(c=>`<div class="repo-child">${escapeHTML(c)}</div>`).join('')}</div></details>`).join('')}</div>` +
+    `<div class="repo-table">${REPOSITORY.map((r,i)=>`<details class="repo-row" ${i===0?'open':''}><summary>${icon(i<3?'folder':'layers')}<code>${r.path}</code><span>${r.role}</span></summary><div class="repo-detail"><p>${r.detail}</p>${(r.path==='examples/programming/'?SNAPSHOT.projects.map(p=>p.id+'/'):r.children).map(c=>`<div class="repo-child">${escapeHTML(c)}</div>`).join('')}</div></details>`).join('')}</div>` +
     sectionHead('Three independent Python packages','Versions and dependencies read directly from pyproject.toml.') +
     `<div class="manifest-grid">${SNAPSHOT.packages.map(p=>`<article class="manifest"><h3>${p.name}</h3><span class="version">${p.version}</span><p>${p.label}<br>${p.modules} implementation modules · ${p.tests} test modules</p><ul>${p.dependencies.map(d=>`<li>${escapeHTML(d)}</li>`).join('')}</ul>${sourceLink((p.name==='faceless-champ'?'':p.name+'/')+'pyproject.toml','Package manifest')}</article>`).join('')}</div>` +
     `<div class="callout"><strong>Count definitions.</strong> Root exports count names listed in core __all__, including helpers and classes; web/OS submodule names are separate. Implementation modules exclude bundled resource and sample-asset copies. Test-module counts are file counts, not collected or passing test totals.</div>` +
@@ -187,7 +186,7 @@ function repository() {
     sectionHead('Explanation recipes',`${SNAPSHOT.recipes.length} structured patterns from the current recipe catalog.`) +
     `<div class="catalog-list">${SNAPSHOT.recipes.map(r=>`<div class="catalog-item" id="recipe-${r.id}"><code>${r.id}</code><p>${r.purpose}</p></div>`).join('')}</div>` +
     sectionHead('Keep the map current','The page is a portable snapshot with no server or external runtime dependency.') +
-    `<div class="note-panel"><h3>Refresh from the repository root</h3><div class="motion-code">python3 project-map/build.py</div><p style="margin-top:14px">This refreshes versions, public export names, module counts, starters, recipes, training-project inventory, Git history and actual Spring samples. Narrative descriptions and milestone summaries are curated in project-map/src/catalog.js and should be reviewed when capabilities change.</p>${sourceLink('project-map/README.md','Usage and refresh notes')}</div>`;
+    `<div class="note-panel"><h3>Refresh from the repository root</h3><div class="motion-code">python3 project-map/build.py</div><p style="margin-top:14px">This refreshes versions, public export names, module counts, starters, recipes, premium-reference inventory, Git history and actual Spring samples. Narrative descriptions and milestone summaries are curated in project-map/src/catalog.js and should be reviewed when capabilities change.</p>${sourceLink('project-map/README.md','Usage and refresh notes')}</div>`;
 }
 
 const VIEWS={overview:{title:'Overview',render:overview},architecture:{title:'Architecture',render:architecture},features:{title:'Feature atlas',render:features},motion:{title:'Motion lab',render:motion},projects:{title:'Project gallery',render:projects},timeline:{title:'Development timeline',render:timeline},repository:{title:'Repository map',render:repository}};
@@ -203,7 +202,7 @@ function renderView(){
   if(currentView==='motion'){progress=0;motionState();}
   window.scrollTo(0,0);
 }
-const SEARCH_RECORDS=[...FEATURES.map(f=>({title:f.name,sub:f.tagline,type:'Feature',icon:f.icon,id:f.id,keywords:[f.description,f.group,f.layer,...f.apis,...f.items].join(' ')})),...SNAPSHOT.projects.map(p=>({title:PROJECT_INFO[p.id]?.name||p.id,sub:PROJECT_INFO[p.id]?.family||'Training project',type:'Project',icon:'film',project:p,keywords:p.id+' '+(PROJECT_INFO[p.id]?.note||'')})),...SNAPSHOT.recipes.map(r=>({title:r.id,sub:r.purpose,type:'Recipe',icon:'recipe',recipe:r.id,keywords:r.purpose}))];
+const SEARCH_RECORDS=[...FEATURES.map(f=>({title:f.name,sub:f.tagline,type:'Feature',icon:f.icon,id:f.id,keywords:[f.description,f.group,f.layer,...f.apis,...f.items].join(' ')})),...SNAPSHOT.projects.map(p=>({title:PROJECT_INFO[p.id]?.name||p.id,sub:PROJECT_INFO[p.id]?.family||'Premium reference',type:'Project',icon:'film',project:p,keywords:p.id+' '+(PROJECT_INFO[p.id]?.note||'')})),...SNAPSHOT.recipes.map(r=>({title:r.id,sub:r.purpose,type:'Recipe',icon:'recipe',recipe:r.id,keywords:r.purpose}))];
 let searchMatches=[];
 function search(query=''){
   const q=query.toLowerCase().trim();searchMatches=SEARCH_RECORDS.filter(r=>[r.title,r.sub,r.keywords].join(' ').toLowerCase().includes(q)).slice(0,25);

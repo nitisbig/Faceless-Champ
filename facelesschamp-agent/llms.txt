@@ -19,3 +19,10 @@ See docs/verification.md for measured release evidence.
 ArchChamp is discoverable through the arch capability family and arch-design recipe. Plans accept mesh assets and structured geometry/actions/annotations. Dependency versions and geometry hashes participate in evidence fingerprints. No simulation solver, automatic dependency installation, or model fetching is provided.
 
 [ArchChamp planning](docs/archchamp.md).
+
+## Premium scene references
+
+Use the [current collection](../examples/README.md) as the default reference. The Hello World
+opening is a draft with structural checks only. Previous standalone demo data and
+preview artifacts were retired. Keep library starter templates available; do not
+claim draft styling is approved or a full export has been verified.

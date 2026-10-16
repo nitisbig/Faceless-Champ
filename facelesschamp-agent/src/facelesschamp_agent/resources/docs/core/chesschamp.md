@@ -49,7 +49,7 @@ construction; oversized labels or commentary fail before export.
 
 ## Required data.json
 
-See the complete [runnable example](../examples/chesschamp/data.json). A minimal document:
+A minimal document:
 
 ```json
 {
@@ -93,10 +93,6 @@ See the complete [runnable example](../examples/chesschamp/data.json). A minimal
 - Optional `narration: {"audio": "voiceover"}` is a **kit asset ID**. Core ChessChamp is
   visual only; core callers attach audio once with `scene.add_audio(path, start=0)`.
 
-Run `python examples/chesschamp/showcase.py -o output/chesschamp.mp4` for the sample.
-For a complete project scaffold and optional narration, see the
-[kit guide](../facelesschamp-kit/docs/chesschamp.md).
-
 ## Image artwork
 
 `ChessAssets.bundled()` loads the supplied `chessboard.png` and all twelve files
@@ -131,10 +127,7 @@ from faceless_champ import ChessScript
 
 script = ChessScript.from_pgn(
     Path("game.pgn").read_text(),
-    move_duration=0.45,
-    move_interval=0.7,
-    lead_in=1,
-    tail=2,
+    move_duration=0.45, move_interval=0.7, lead_in=1, tail=2,
 )
 Path("data.json").write_text(json.dumps(script.to_dict(), indent=2))
 ```
@@ -150,7 +143,4 @@ The generated data.json remains the rendering authority. Optional `result` accep
 `*`, `1-0`, `0-1`, or `1/2-1/2`; the result displays after the final move, including an
 agreed draw in a position that could otherwise continue.
 
-The [supplied Carlsen–Kasparov example](../examples/chesschamp/carlsen-kasparov/data.json)
-contains all 103 legal plies, lasts 74.85 seconds, and is silent. Its player names and
-notation reproduce the user's supplied example. See its README for the importer and
-kit rendering commands.
+For a complete project scaffold and optional narration, see the [kit guide](../facelesschamp-kit/docs/chesschamp.md).

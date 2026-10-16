@@ -113,5 +113,3 @@ Errors report action/selector/time or missing resource. Verify selectors and use
 fonts/assets. A browser startup error usually needs `python -m playwright install chromium`
 or the OS libraries recommended by Playwright. Browser and server resources close on failure;
 failed preparations are never published as completed assets.
-
-See `training project/web-video/README.md` for the supplied 30-second tour and preview commands.

@@ -1,8 +1,5 @@
 # Scene selection and preview delivery
 
-See [local verification results](scene-selection-verification.md) and the
-[runnable example](../examples/scene-selection/README.md).
-
 The agent layer now supplies a five-stage local workflow: ingest context, suggest
 beats, retrieve scene treatments, audit authored layouts, and deliver a runnable
 renderer with a verified short preview. An external authoring agent supplies

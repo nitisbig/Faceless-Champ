@@ -62,21 +62,6 @@ These are camera presets, not legal or exact ocean boundaries. Unknown targets r
 `ValueError` pointing to `supported_countries()`; countries missing from the source geometry
 are not silently replaced with points.
 
-## Showcase and checks
-
-```bash
-uv run --extra maps python examples/maps/render.py --preview
-uv run --extra maps python examples/maps/render.py --quality hd --fps 30 --stills
-uv run --extra maps python examples/maps/render.py --quality full-hd --fps 30 --overwrite
-uv run --extra maps pytest tests/test_maps.py
-```
-
-Outputs default to `media/maps`; `--output` selects another directory. The 18-second
-showcase covers world and Nepal outlines, satellite country/ocean zoom and rotation,
-and a full globe spin followed by country and ocean zooms. Export uses existing render progress.
-Projection uses 64-row strips and one cached decoded texture; output buffers depend on viewport
-size, never a zoom-enlarged global raster. Ordinary bounded scene-frame caching handles holds.
-
 ## Sources and reproducible asset preparation
 
 Country geometry: Natural Earth v5.1.2, 1:110m Admin 0 countries, obtained from the project's

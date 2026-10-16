@@ -135,8 +135,6 @@ They preserve all text, including transcript artifacts. Source times remain exac
 video frames sample those times at the requested frame rate, so a cue shorter than
 one frame may not appear in the video. Increase fps when those short cues matter.
 
-See `training project/good-math/scene/story.py` for the complete narrated example.
-
 ## Sequence and grid
 
 ```python
@@ -171,13 +169,7 @@ appropriate to that particular expression. The example's `SYMBOL_ROLES` in
 For readable variable fonts, pass `Text(font=path, font_weight=500)`. Rounded
 Polyline caps soften graph endpoints without blurring their geometry. Preview
 and export with `antialias=2` for smooth curves and type; raising antialias adds
-rendering work. The equation example uses CRF 18 for previews and 16 for final
-exports to preserve small symbols.
-
-```bash
-uv run --extra equations python 'training project/equation-render/render.py' --color-scheme midnight
-uv run --extra equations python 'training project/equation-render/render.py' --color-scheme paper --frames
-```
+rendering work. Select an explicit export CRF when preserving small symbols.
 
 ## Audio and imported assets
 
@@ -224,10 +216,8 @@ is included in the raised error. Exports are published only after FFmpeg succeed
 
 ## Validation workflow
 
-Run `uv run pytest -q` for unit and FFmpeg integration tests. Then run
-`uv run python examples/render_all.py` for three 720p showcase exports, preview
-frames, audio measurements, and short 1080p/4K checks. Inspect the previews and
-videos under `output/`; machine checks cannot establish aesthetic quality.
+Run the core, kit and agent package suites separately. Use scene construction and
+bounds checks first, then explicitly render and inspect requested media.
 
 ## Logos and in-memory images
 
@@ -252,17 +242,9 @@ Retain original colors by omitting `tint`. Do not pass URLs; download assets
 explicitly before authoring if needed. Keep image paths relative to the scene's
 file, rather than the process working directory.
 
-The 30-second `training project/ai-comapny-graph/render.py` example uses five
-provided logos, a white/terracotta palette, continuous time-revealed paths, and
-keyframed markers and counters. Its user counts and relative origins are expressly
-fictional. The persistent on-screen disclosure must remain when changing its
-illustrative values. Use `--preview`, `--frames`, or `--frame 15` for feedback.
-
 ## Motion graphics authoring
 
 Use [motion graphics](motion-graphics.md) for property animation, local masks,
 finite schedules, and progress indicators. Add complete groups before scheduling
 members. Use `Scene.at()` to overlap independent schedules; `Repeat(..., cycles=N)`
-requires a finite count. Check the evaluated box with `scene.bounds_at(target, t)`
-when geometry changes. Preview the self-contained `examples/motion_graphics/render.py`
-at 960×540 before increasing resolution or adding deep mask hierarchies.
+requires a finite count. Measure animated geometry with `scene.bounds_at(target, t)`.

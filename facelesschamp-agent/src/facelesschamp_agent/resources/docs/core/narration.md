@@ -6,17 +6,8 @@ chapters without repeatedly calculating offsets.
 
 ```python
 from faceless_champ import (
-    Canvas,
-    CueScene,
-    FadeIn,
-    Layer,
-    Scene,
-    Sequence,
-    SubtitleTrack,
-    Text,
-    StoryboardSample,
-    render_storyboard,
-    save_frame,
+    Canvas, CueScene, FadeIn, Layer, Scene, Sequence, SubtitleTrack, Text,
+    StoryboardSample, render_storyboard, save_frame,
 )
 
 track = SubtitleTrack.from_srt("cue-per-word.srt")
@@ -37,13 +28,8 @@ evidence.finish()
 
 video = Layer(Sequence(opening, evidence, canvas=canvas), audio, canvas=canvas)
 save_frame(video, boundary + 0.5, "output/evidence.png", size=(540, 810))
-render_storyboard(
-    video,
-    [StoryboardSample(1, "opening"), StoryboardSample(boundary + 1, "evidence")],
-    "output/storyboard",
-    size=(360, 540),
-    columns=2,
-)
+render_storyboard(video, [StoryboardSample(1, "opening"), StoryboardSample(boundary + 1, "evidence")],
+                  "output/storyboard", size=(360, 540), columns=2)
 ```
 
 Choose cues and durations that fit the supplied narration. Positions remain in
@@ -82,8 +68,3 @@ Both helpers validate the composition, require `0 <= time < node.duration`, use
 requested paths before writing. Neither exports video. Default width is 480 with
 height derived from the canvas, including portrait. Explicit size preserves aspect
 ratio. Labels fit cell width and use the bundled font. Supply a renderer to reuse caches.
-
-The [stock-analysis example](../training%20project/stock-analysis/README.md) demonstrates
-six chapters, image reservations, a dated revenue chart, conceptual diagrams,
-and a preview-first CLI. Project prompts and source figures are composition data;
-the timing, rendering, animation, and image fallback behavior belong to the library.

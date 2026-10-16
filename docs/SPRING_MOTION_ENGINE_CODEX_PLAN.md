@@ -1,3 +1,6 @@
+> Historical design proposal. Standalone demo data and media evidence were retired
+> during the premium reference reset. Current source, tests and API guides are authoritative.
+
 # FacelessChamp Premium Motion Engine — Spring Motion v1
 
 **Codex implementation brief** · Target repository: `nitisbig/Faceless-Champ` · Proposed feature: deterministic spring-based timeline easing.
@@ -118,7 +121,7 @@ Deliverable: `docs/plans/spring-motion-v1.md` (if appropriate for repository), b
 **Gate:** no mutation on failed schedule; compatible with all existing scheduling semantics.
 
 ### Phase 4 — Visual examples and documentation
-1. Create `examples/spring_motion/render.py` (or match existing examples conventions) rendering a compact 8–12 second spring showcase.
+1. Create `project-local-scene.py` (or match existing examples conventions) rendering a compact 8–12 second spring showcase.
 2. Include side-by-side `linear / smooth / gentle spring / snappy spring / bouncy spring`, with identical motion distances.
 3. Showcase text slide, card translate/scale, Group of cards, network node settling. Respect existing authoring/renderer APIs.
 4. Add a frame-sample storyboard and run a low-resolution preview first.

@@ -33,7 +33,3 @@ Callout text is fitted inside the viewport; use short phrases for legibility.
 No browser starts during `compose`, kit compilation, or export. Preparation is an explicit
 step in the project runner. Use core sparse captures for storyboards and source-time ranges
 for preview; prepare every frame needed by the eventual render before exporting.
-
-The complete example is in `training project/web-video`: its `main.py` combines kit blocks
-and core scheduling, while `render.py` owns preparation and export. No backend, live URL,
-API key, or narration is needed.

@@ -138,3 +138,10 @@ with explicit durations or original cue windows. [Whiteboard](docs/whiteboard.md
 Website example canvases are black; package and starter theme defaults remain configurable.
 
 Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffold with `fc-kit init my-design --template archchamp`. Register files as mesh assets; declare external tools in project pyproject.toml with uv add. Project.dependencies() and doctor check installed requirements without installation. See [ArchChamp](docs/archchamp.md).
+
+## Premium scene references
+
+Use the [current collection](../examples/README.md) as the default reference. The Hello World
+opening is a draft with structural checks only. Previous standalone demo data and
+preview artifacts were retired. Keep library starter templates available; do not
+claim draft styling is approved or a full export has been verified.

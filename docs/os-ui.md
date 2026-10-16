@@ -33,9 +33,6 @@ Save as `tutorial.py`, then run:
 faceless-champ render tutorial.py scene -o output/tutorial.mp4
 ```
 
-The complete core example is `examples/os_ui/render.py`. Import the UI APIs from
-`faceless_champ.os_ui`; they do not require an optional dependency extra.
-
 ## Virtual files
 
 `VirtualFileSystem(Folder(...))` validates unique IDs and sibling names. Define nested
@@ -131,13 +128,6 @@ This release includes one starter File/context menu, the documented settings pag
 and authored files. Spotlight, notifications, Control Center, terminal emulation,
 real filesystem imports, and live OS control are outside this release.
 
-## Reproduce media verification
-
-With both packages installed, run `examples/os_ui/verify.py --output output/os-ui --render`.
-It builds the generated starter, checks random access and transparent/portrait embedding,
-exports 1080p/30, completely decodes the video, extracts encoded samples, and checks
-five-second boundaries against the original timeline. Results are in `verification.json`.
-
-For environments with short process limits, render `--chunk 0` through `--chunk 6`
-into the same output directory, then use `--finish`. The ranges preserve source time;
-joining them produces the same 35-second, 1,050-frame tutorial without restarting actions.
+Import the UI APIs from `faceless_champ.os_ui`; no optional dependency is needed.
+The [premium opening draft](../examples/programming/hello_world/README.md) composes
+an isolated Finder window with CodingChamp and FlowChamp. It is not yet rendered.

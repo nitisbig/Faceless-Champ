@@ -1,0 +1,176 @@
+1
+00:00:00,070 --> 00:00:02,530
+Welcome! In this tutorial we're going to write
+
+2
+00:00:02,530 --> 00:00:05,250
+our very first Python program, and don't worry
+
+3
+00:00:05,250 --> 00:00:06,990
+if you've never written a single line of
+
+4
+00:00:06,990 --> 00:00:09,790
+code before. We'll start from the very beginning.
+
+5
+00:00:09,790 --> 00:00:12,530
+Our goal is simple. Make Python display the
+
+6
+00:00:12,530 --> 00:00:16,010
+message "Hello World on the Screen". First, open
+
+7
+00:00:16,010 --> 00:00:18,880
+your favorite code editor. We'll use Visual Studio
+
+8
+00:00:18,880 --> 00:00:21,950
+Code, but any Python editor will work. Create
+
+9
+00:00:21,950 --> 00:00:24,970
+a new file and name it "hello.py". The
+
+10
+00:00:24,970 --> 00:00:27,120
+.py extension tells us that this is a
+
+11
+00:00:27,120 --> 00:00:30,040
+Python source file. Now, inside the file, type
+
+12
+00:00:30,040 --> 00:00:33,040
+the following line of code. Print "Hello World".
+
+13
+00:00:33,040 --> 00:00:35,790
+That's it. You've just written your first Python
+
+14
+00:00:35,790 --> 00:00:38,480
+program. But before we run it, let's understand
+
+15
+00:00:38,480 --> 00:00:40,770
+what's happening here. The word "print" is a
+
+16
+00:00:40,770 --> 00:00:43,760
+built-in Python function. Its job is to display
+
+17
+00:00:43,760 --> 00:00:46,770
+information in the output. Next, we have parentheses.
+
+18
+00:00:46,770 --> 00:00:49,120
+These allow us to pass information into the
+
+19
+00:00:49,120 --> 00:00:52,620
+function. Inside the parentheses, we've written "Hello World"
+
+20
+00:00:52,620 --> 00:00:56,420
+surrounded by quotation marks. In Python, text enclosed
+
+21
+00:00:56,420 --> 00:00:58,830
+in quotation marks is called a string. The
+
+22
+00:00:58,830 --> 00:01:01,560
+quotation marks tell Python to treat "Hello World"
+
+23
+00:01:01,560 --> 00:01:04,160
+as text, rather than a variable or instruction.
+
+24
+00:01:04,160 --> 00:01:07,360
+Now, let's run our program. Save the file,
+
+25
+00:01:07,360 --> 00:01:11,790
+open your terminal and type "PythonHello.py". On some
+
+26
+00:01:11,790 --> 00:01:16,200
+systems, you'll need to use Python3Hello.py instead. Press
+
+27
+00:01:16,200 --> 00:01:19,130
+enter. And there it is, "Hello World", Python
+
+28
+00:01:19,130 --> 00:01:21,920
+executed our code, and printed the message directly
+
+29
+00:01:21,920 --> 00:01:25,280
+into the terminal. Let's try changing something. Replace
+
+30
+00:01:25,280 --> 00:01:28,420
+"Hello World" with "print". I'm learning Python. Run
+
+31
+00:01:28,420 --> 00:01:30,990
+the program again. Notice how the output changes
+
+32
+00:01:30,990 --> 00:01:34,960
+immediately. Now, here's something interesting. The print function
+
+33
+00:01:34,960 --> 00:01:37,110
+isn't limited to displaying text. We can also
+
+34
+00:01:37,110 --> 00:01:40,380
+use it to display numbers and perform calculations.
+
+35
+00:01:40,380 --> 00:01:45,100
+For example, type "print5+3". Run the program. Python
+
+36
+00:01:45,100 --> 00:01:48,120
+displays 8. Notice that we didn't use quotation
+
+37
+00:01:48,120 --> 00:01:50,730
+marks this time. That's because Python evaluates the
+
+38
+00:01:50,730 --> 00:01:53,840
+mathematical expression, instead of treating it as text.
+
+39
+00:01:53,840 --> 00:01:56,420
+And that's the basic idea behind programming. We
+
+40
+00:01:56,420 --> 00:02:00,890
+write instructions and the computer executes them. Congratulations.
+
+41
+00:02:00,890 --> 00:02:04,220
+You've written, executed, and modified your first Python
+
+42
+00:02:04,220 --> 00:02:07,600
+program. In the next tutorial, we'll explore variables
+
+43
+00:02:07,600 --> 00:02:10,510
+and learn how Python stores information. See you
+
+44
+00:02:10,510 --> 00:02:11,120
+there.
+

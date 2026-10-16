@@ -126,7 +126,3 @@ VTK 9.5+ can use EGL with runtime OpenGL/EGL libraries on headless Linux. ArchCh
 disables multisampling before depth peeling and uses Faceless Champ supersampling.
 Missing GL support requires fixing the host environment; dependencies are never
 installed by rendering. See [PyVista installation](https://docs.pyvista.org/getting-started/installation.html).
-
-Run `python examples/archchamp.py --preview --stills` for three original core
-fixtures and one silent 12-second preview. The field fixture is illustrative,
-not measured scientific evidence. No landmark assets, audio or full film are generated.

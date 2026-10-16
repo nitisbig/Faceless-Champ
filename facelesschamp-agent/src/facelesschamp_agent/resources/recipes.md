@@ -8,7 +8,7 @@ from facelesschamp_kit import apply_recipe
 handles = apply_recipe(segment, "process-flow", {"steps": ["Input", "Transform", "Output"]})
 ```
 
-Code/result consumes an explicitly prepared playground; rendering never executes checkpoints. Thumbnails and four-second motion previews are bundled under `resources/previews/`. They show illustrative data.
+Code/result consumes an explicitly prepared playground; rendering never executes checkpoints. Preview metadata is included only when the corresponding bundled resource exists. Previous preview media were retired; use the source checkout premium collection for current scene references.
 
 ## process-flow
 

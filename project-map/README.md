@@ -6,7 +6,7 @@ network connection or web server is needed. Source/documentation links point bac
 into this checkout. Keep the atlas in `project-map/` for those links to work.
 
 The seven views cover the ecosystem, architecture, feature catalog, motion
-studies, 15 training projects, Git milestones and repository/package structure.
+studies, premium scene drafts, Git milestones and repository/package structure.
 Search with Ctrl/Cmd+K, open feature details, filter projects/capabilities, scrub
 motion studies, and print the current view. Mobile navigation is available from
 the top-left menu.
@@ -18,7 +18,7 @@ python3 project-map/build.py
 ```
 
 The builder uses the standard library. It reads package manifests and Python ASTs,
-enumerates training-project READMEs, captures local Git history and samples the
+enumerates premium-reference READMEs, captures local Git history and samples the
 standalone Spring kernel. It does not execute authored scenes, prepare code/web
 assets, render video, run tests, or contact external services.
 
@@ -37,3 +37,6 @@ python3 -m http.server 8766 --bind 127.0.0.1
 ```
 
 Then open <http://127.0.0.1:8766/project-map/>.
+
+Previous demo data and media evidence were retired. The current Hello World opening
+is structurally checked only; rendering and visual approval remain pending.

@@ -233,8 +233,6 @@ self.play(FadeIn(diagram), run_time=0.5)
 self.play(diagram.animate.scale_to(1.2).rotate_to(10), dot.animate.opacity_to(0.6), run_time=1)
 ```
 
-See [examples/groups.py](../examples/groups.py) for a nested connected diagram.
-
 ## Country flags
 
 `Flag(country_code, width=120, height=80, ...)` loads one of the 254 bundled PNGs
@@ -263,8 +261,6 @@ self.play(flag.animate.move_to(1200, 540).scale_to(1.2), run_time=1)
 path = flag_path("US")
 codes = supported_flags()
 ```
-
-Render [examples/flags.py](../examples/flags.py) with the ordinary render CLI.
 
 ## Color schemes
 

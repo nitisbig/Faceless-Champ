@@ -233,8 +233,6 @@ self.play(FadeIn(diagram), run_time=0.5)
 self.play(diagram.animate.scale_to(1.2).rotate_to(10), dot.animate.opacity_to(0.6), run_time=1)
 ```
 
-See [examples/groups.py](../examples/groups.py) for a nested connected diagram.
-
 ## Country flags
 
 `Flag(country_code, width=120, height=80, ...)` loads one of the 254 bundled PNGs
@@ -263,8 +261,6 @@ self.play(flag.animate.move_to(1200, 540).scale_to(1.2), run_time=1)
 path = flag_path("US")
 codes = supported_flags()
 ```
-
-Render [examples/flags.py](../examples/flags.py) with the ordinary render CLI.
 
 ## Color schemes
 
@@ -361,7 +357,8 @@ Builder targets are absolute values. Chain different properties on the same buil
 Two concurrent animations cannot target the same component property. Subsequent
 `play()` calls interpolate from the previous target. Built-in easing functions are
 `linear`, `smooth`, `ease_in`, and `ease_out`; custom easing is a deterministic
-callable mapping `[0,1]` to `[0,1]` with endpoints zero and one. Presets select their
+callable of normalized progress with endpoints zero and one. `Spring` can overshoot
+between those endpoints for supported transform properties. Presets select their
 own easing. An explicit `play(rate_func=...)` overrides easing for every animation
 in that call; without it, each animation uses its own easing or falls back to smooth.
 
@@ -391,6 +388,41 @@ self.play(
     run_time=0.6,
 )
 ```
+
+### Spring
+
+`Spring(stiffness=180, damping=23, mass=1)` is a public, immutable easing callable:
+
+```python
+from faceless_champ import Spring
+
+self.play(icon.animate.move_to(700, 270).scale_to(1.1),
+          run_time=0.8, rate_func=Spring())
+```
+
+Constructor parameters must be finite real numbers in `[1e-6, 1e6]`, excluding
+booleans, with damping ratio `damping / (2*sqrt(stiffness*mass))` in `[0.02, 100]`.
+Ratios below, equal to, and above one select underdamped, critical, and overdamped
+responses. Calling it with finite real normalized progress returns exactly zero
+at/before zero and one at/after one. Interior progress may exceed one.
+
+The analytical zero-initial-velocity response is retimed to the animation's
+`run_time`; equal damping ratios have equal normalized shapes. It is independent
+of FPS and evaluation order. The left-hand terminal displacement and normalized
+speed tolerances are `1e-9` and `1e-7` respectively.
+
+Only `position`, `rotation`, `scale`, `scale_x`, and `scale_y` are supported.
+Every resolved segment must have finite interpolation and scales at least `0.001`
+throughout its continuous trajectory. Invalid tracks reject the entire play call
+or schedule before mutation. Canvas containment is the author's responsibility.
+Keep opacity/color/reveal and other bounded properties on independent conventional
+easings; an explicit play easing overrides per-animation easings.
+
+Relative values, per-segment keyframes, Groups, `Stagger`, `Succession`, and finite
+`Repeat` use the existing paths. Ping-pong retains spring reversal metadata and
+safety validation. No initial velocity, live retargeting, or preset registry is
+provided. See [Spring motion](motion-graphics.md#spring-motion) for mixed fades,
+parameter configurations, limitations, and runnable preview commands.
 
 ## Composition
 

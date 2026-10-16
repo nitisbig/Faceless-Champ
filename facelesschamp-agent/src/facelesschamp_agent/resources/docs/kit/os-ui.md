@@ -19,7 +19,6 @@ from faceless_champ.os_ui import OSScript
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import SettingsWindow
 
-
 def build(ctx):
     video = Video(ctx)
     script = OSScript().set_value("appearance:theme", "dark").wait(1)

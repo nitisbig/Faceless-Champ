@@ -1,5 +1,0 @@
-[project]
-name="agent-video"
-version="0.1.0"
-requires-python=">=3.12"
-dependencies=["facelesschamp-agent==0.1.0rc2"]

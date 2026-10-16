@@ -17,6 +17,7 @@
               "filename": "hello.py",
               "target": "Hello",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render hello.py Hello -o output/hello.mp4 -q ql"
             }
           ]
@@ -54,7 +55,7 @@
           ]
         }
       ],
-      "preview": "hello",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -130,10 +131,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Circle, Scene, Text, FadeIn\n\nscene = Scene(Canvas(1080, 1920, \"#000000\"))\nscene.add(Text(\"Made with Python\", font_size=72,\n               position=(540, 760), color=\"#edf2fc\"))\nscene.play(FadeIn(Circle(90, fill=\"#48e0cb\", stroke=None,\n                         position=(540, 1100))), run_time=1)\nscene.wait(1)\n",
+              "code": "from faceless_champ import Canvas, Circle, Scene, Text, FadeIn\n\nscene = Scene(Canvas(1080, 1920, \"#0b101b\"))\nscene.add(Text(\"Made with Python\", font_size=72,\n               position=(540, 760), color=\"#edf2fc\"))\nscene.play(FadeIn(Circle(90, fill=\"#48e0cb\", stroke=None,\n                         position=(540, 1100))), run_time=1)\nscene.wait(1)\n",
               "filename": "portrait.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render portrait.py scene -o output/portrait.mp4 -q ql"
             }
           ]
@@ -177,10 +179,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Scene, Text, Rectangle, Group, PopIn\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\ncard = Rectangle(width=900, height=360, corner_radius=28,\n                 fill=\"#172238\", stroke=\"#48e0cb\", stroke_width=3,\n                 position=(960, 540))\ntitle = Text(\"Build with Python\", font_size=72,\n             color=\"#edf2fc\", position=(960, 490))\nlabel = Text(\"Text. Shapes. A timeline.\", font_size=32,\n             color=\"#8996ad\", position=(960, 590))\nscene.play(PopIn(Group(card, title, label)), run_time=0.6)\nscene.wait(1.4)\n",
+              "code": "from faceless_champ import Canvas, Scene, Text, Rectangle, Group, PopIn\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\ncard = Rectangle(width=900, height=360, corner_radius=28,\n                 fill=\"#172238\", stroke=\"#48e0cb\", stroke_width=3,\n                 position=(960, 540))\ntitle = Text(\"Build with Python\", font_size=72,\n             color=\"#edf2fc\", position=(960, 490))\nlabel = Text(\"Text. Shapes. A timeline.\", font_size=32,\n             color=\"#8996ad\", position=(960, 590))\nscene.play(PopIn(Group(card, title, label)), run_time=0.6)\nscene.wait(1.4)\n",
               "filename": "text_shapes.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render text_shapes.py scene -o output/text_shapes.mp4 -q ql"
             }
           ]
@@ -218,7 +221,7 @@
           ]
         }
       ],
-      "preview": "text-shapes",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -235,10 +238,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Scene, Text, FadeIn, FadeOut\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\nfirst = Text(\"First, the question.\", font_size=72, position=(960, 460))\nsecond = Text(\"Then, the evidence.\", font_size=56, position=(960, 600))\nscene.play(FadeIn(first), run_time=0.5)\nwith scene.at(1.5):\n    scene.play(FadeIn(second), run_time=0.5)\nscene.wait_until(3)\nscene.play(FadeOut(first), FadeOut(second), run_time=0.5)\nscene.wait(0.5)\n",
+              "code": "from faceless_champ import Canvas, Scene, Text, FadeIn, FadeOut\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\nfirst = Text(\"First, the question.\", font_size=72, position=(960, 460))\nsecond = Text(\"Then, the evidence.\", font_size=56, position=(960, 600))\nscene.play(FadeIn(first), run_time=0.5)\nwith scene.at(1.5):\n    scene.play(FadeIn(second), run_time=0.5)\nscene.wait_until(3)\nscene.play(FadeOut(first), FadeOut(second), run_time=0.5)\nscene.wait(0.5)\n",
               "filename": "timing.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render timing.py scene -o output/timing.mp4 -q ql"
             }
           ]
@@ -271,10 +275,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Circle, Group, Text, Scene, FadeIn\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\ncards = []\nfor word in (\"Compose\", \"Animate\", \"Export\"):\n    dot = Circle(50, fill=\"#48e0cb\", stroke=None)\n    label = Text(word, font_size=36).next_to(dot, direction=\"down\", gap=24)\n    cards.append(Group(dot, label))\ndiagram = Group(*cards).arrange(direction=\"right\", gap=120).move_to(960, 540)\nscene.play(FadeIn(diagram), run_time=0.7)\nscene.play(diagram.animate.scale_to(1.15), run_time=0.8)\nscene.wait(0.5)\n",
+              "code": "from faceless_champ import Canvas, Circle, Group, Text, Scene, FadeIn\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\ncards = []\nfor word in (\"Compose\", \"Animate\", \"Export\"):\n    dot = Circle(50, fill=\"#48e0cb\", stroke=None)\n    label = Text(word, font_size=36).next_to(dot, direction=\"down\", gap=24)\n    cards.append(Group(dot, label))\ndiagram = Group(*cards).arrange(direction=\"right\", gap=120).move_to(960, 540)\nscene.play(FadeIn(diagram), run_time=0.7)\nscene.play(diagram.animate.scale_to(1.15), run_time=0.8)\nscene.wait(0.5)\n",
               "filename": "groups.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render groups.py scene -o output/groups.mp4 -q ql"
             }
           ]
@@ -307,10 +312,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from pathlib import Path\nfrom faceless_champ import Canvas, Scene, ImageSlot, FadeIn\n\nASSETS = Path(__file__).resolve().parent / \"assets\"\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\nimage = ImageSlot(ASSETS / \"photo.png\", width=1000, height=620,\n                  position=(960, 540), fit=\"cover\", mode=\"auto\")\nscene.play(FadeIn(image), run_time=0.5)\nscene.wait(1.5)\n",
+              "code": "from pathlib import Path\nfrom faceless_champ import Canvas, Scene, ImageSlot, FadeIn\n\nASSETS = Path(__file__).resolve().parent / \"assets\"\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\nimage = ImageSlot(ASSETS / \"photo.png\", width=1000, height=620,\n                  position=(960, 540), fit=\"cover\", mode=\"auto\")\nscene.play(FadeIn(image), run_time=0.5)\nscene.wait(1.5)\n",
               "filename": "images.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render images.py scene -o output/images.mp4 -q ql"
             }
           ]
@@ -359,10 +365,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Axis, BarChart, Canvas, ChartReveal, Scene, Text\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\nchart = BarChart(\n    [\"Q1\", \"Q2\", \"Q3\"], {\"Completed\": [3, 5, 4]},\n    width=1200, height=650, position=(960, 520),\n    title=\"Project milestones\", y_axis=Axis(limits=(0, 10)),\n)\nscene.add(Text(\"SYNTHETIC EXAMPLE DATA\", font_size=24,\n               color=\"#8996ad\", position=(960, 960)))\nscene.play(ChartReveal(chart), run_time=1)\nscene.play(chart.animate.data_to({\"Completed\": [5, 7, 9]}), run_time=1.5)\nscene.wait(0.5)\n",
+              "code": "from faceless_champ import Axis, BarChart, Canvas, ChartReveal, Scene, Text\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\nchart = BarChart(\n    [\"Q1\", \"Q2\", \"Q3\"], {\"Completed\": [3, 5, 4]},\n    width=1200, height=650, position=(960, 520),\n    title=\"Project milestones\", y_axis=Axis(limits=(0, 10)),\n)\nscene.add(Text(\"SYNTHETIC EXAMPLE DATA\", font_size=24,\n               color=\"#8996ad\", position=(960, 960)))\nscene.play(ChartReveal(chart), run_time=1)\nscene.play(chart.animate.data_to({\"Completed\": [5, 7, 9]}), run_time=1.5)\nscene.wait(0.5)\n",
               "filename": "charts.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render charts.py scene -o output/charts.mp4 -q ql"
             }
           ]
@@ -422,7 +429,7 @@
           ]
         }
       ],
-      "preview": "charts",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -481,10 +488,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Scene, Text, FadeIn, Sequence, Grid\n\ncanvas = Canvas(1920, 1080, \"#000000\")\ndef panel(word):\n    scene = Scene(canvas)\n    scene.play(FadeIn(Text(word, font_size=120,\n                            position=(960, 540))), run_time=0.5)\n    scene.wait(1.5)\n    return scene\n\nvideo = Sequence(\n    panel(\"One idea\"),\n    Grid(panel(\"A\"), panel(\"B\"), rows=1, columns=2,\n         gap=24, canvas=canvas),\n    panel(\"One video\"),\n    crossfade=0.3,\n)\n",
+              "code": "from faceless_champ import Canvas, Scene, Text, FadeIn, Sequence, Grid\n\ncanvas = Canvas(1920, 1080, \"#0b101b\")\ndef panel(word):\n    scene = Scene(canvas)\n    scene.play(FadeIn(Text(word, font_size=120,\n                            position=(960, 540))), run_time=0.5)\n    scene.wait(1.5)\n    return scene\n\nvideo = Sequence(\n    panel(\"One idea\"),\n    Grid(panel(\"A\"), panel(\"B\"), rows=1, columns=2,\n         gap=24, canvas=canvas),\n    panel(\"One video\"),\n    crossfade=0.3,\n)\n",
               "filename": "composition.py",
               "target": "video",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render composition.py video -o output/composition.mp4 -q ql"
             }
           ]
@@ -523,10 +531,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, CodeReveal, CodingChamp, Scene\n\nclass CodeDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1280, 720, \"#000000\"))\n\n    def construct(self):\n        panel = CodingChamp(\n            \"def square(x):\\n    return x * x\\n\\nprint(square(7))\",\n            language=\"python\", filename=\"square.py\", theme=\"midnight\",\n            width=1080, height=520, font_size=40, position=(640, 360),\n            reveal_mode=\"block\", block_ends=(2, 4), highlighted_lines=(2,),\n        )\n        self.play(CodeReveal(panel, end=.5), run_time=1)\n        self.wait(.5)\n        self.play(CodeReveal(panel, start=.5), run_time=1)\n        self.wait(1)\n",
+              "code": "from faceless_champ import Canvas, CodeReveal, CodingChamp, Scene\n\nclass CodeDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1280, 720, \"#080E1B\"))\n\n    def construct(self):\n        panel = CodingChamp(\n            \"def square(x):\\n    return x * x\\n\\nprint(square(7))\",\n            language=\"python\", filename=\"square.py\", theme=\"midnight\",\n            width=1080, height=520, font_size=40, position=(640, 360),\n            reveal_mode=\"block\", block_ends=(2, 4), highlighted_lines=(2,),\n        )\n        self.play(CodeReveal(panel, end=.5), run_time=1)\n        self.wait(.5)\n        self.play(CodeReveal(panel, start=.5), run_time=1)\n        self.wait(1)\n",
               "filename": "coding.py",
               "target": "CodeDemo",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render coding.py CodeDemo -o output/coding.mp4 -q ql"
             }
           ]
@@ -553,7 +562,7 @@
           ]
         }
       ],
-      "preview": "coding",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -570,10 +579,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "import argparse\nfrom faceless_champ import (\n    Canvas, CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas,\n    PlaygroundOutput, PlaygroundScript, PreparedPlayground, Scene,\n    ValueBinding, prepare_playground,\n)\n\nSOURCE = \"from faceless_champ.playground import (\\n    runtime as pg,\\n)\\nx = VALUE\\nanswer = x * x\\npg.emit('answer', answer)\\nprint(answer)\\n\"\n\ndef script():\n    return PlaygroundScript([\n        CodeCheckpoint(\"first\", {\"square.py\": SOURCE.replace(\"VALUE\", \"6\")},\n                       \"square.py\", \"square.py\", 0, 1, 1),\n        CodeCheckpoint(\"second\", {\"square.py\": SOURCE.replace(\"VALUE\", \"7\")},\n                       \"square.py\", \"square.py\", 2.5, 4, 4),\n    ], duration=6, mode=\"backend\",\n       items=[CanvasItem(\"answer\", \"variable\", \"Answer\")],\n       bindings=[ValueBinding(\"answer\", \"answer\")])\n\ndef build_scene(asset):\n    scene = Scene(Canvas(1280, 720, \"#000000\"))\n    scene.add(CodeEditor(asset.script, width=780, height=600,\n                         font_size=22, position=(420, 360)))\n    scene.add(PlaygroundCanvas(asset, width=400, height=380, position=(1050, 250)))\n    scene.add(PlaygroundOutput(asset, width=400, height=180, position=(1050, 570)))\n    scene.wait(asset.script.duration)\n    return scene\n\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--prepare\", action=\"store_true\",\n                        help=\"Execute trusted checkpoints explicitly\")\n    parser.add_argument(\"--cache\", default=\".playground-cache\")\n    parser.add_argument(\"--asset\", help=\"Prepared directory for browser-free replay\")\n    parser.add_argument(\"--output\", default=\"output/playground.mp4\")\n    parser.add_argument(\"--overwrite\", action=\"store_true\")\n    args = parser.parse_args()\n    if args.prepare:\n        asset = prepare_playground(script(), cache_dir=args.cache)\n        print(\"Prepared:\", asset.directory)\n    elif args.asset:\n        asset = PreparedPlayground(args.asset)\n    else:\n        parser.error(\"Use --prepare or --asset PATH\")\n    build_scene(asset).render(args.output, width=640, height=360, fps=15,\n                             antialias=1, overwrite=args.overwrite)\n\nif __name__ == \"__main__\":\n    main()\n",
+              "code": "import argparse\nfrom faceless_champ import (\n    Canvas, CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas,\n    PlaygroundOutput, PlaygroundScript, PreparedPlayground, Scene,\n    ValueBinding, prepare_playground,\n)\n\nSOURCE = \"from faceless_champ.playground import (\\n    runtime as pg,\\n)\\nx = VALUE\\nanswer = x * x\\npg.emit('answer', answer)\\nprint(answer)\\n\"\n\ndef script():\n    return PlaygroundScript([\n        CodeCheckpoint(\"first\", {\"square.py\": SOURCE.replace(\"VALUE\", \"6\")},\n                       \"square.py\", \"square.py\", 0, 1, 1),\n        CodeCheckpoint(\"second\", {\"square.py\": SOURCE.replace(\"VALUE\", \"7\")},\n                       \"square.py\", \"square.py\", 2.5, 4, 4),\n    ], duration=6, mode=\"backend\",\n       items=[CanvasItem(\"answer\", \"variable\", \"Answer\")],\n       bindings=[ValueBinding(\"answer\", \"answer\")])\n\ndef build_scene(asset):\n    scene = Scene(Canvas(1280, 720, \"#0B1020\"))\n    scene.add(CodeEditor(asset.script, width=780, height=600,\n                         font_size=22, position=(420, 360)))\n    scene.add(PlaygroundCanvas(asset, width=400, height=380, position=(1050, 250)))\n    scene.add(PlaygroundOutput(asset, width=400, height=180, position=(1050, 570)))\n    scene.wait(asset.script.duration)\n    return scene\n\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--prepare\", action=\"store_true\",\n                        help=\"Execute trusted checkpoints explicitly\")\n    parser.add_argument(\"--cache\", default=\".playground-cache\")\n    parser.add_argument(\"--asset\", help=\"Prepared directory for browser-free replay\")\n    parser.add_argument(\"--output\", default=\"output/playground.mp4\")\n    parser.add_argument(\"--overwrite\", action=\"store_true\")\n    args = parser.parse_args()\n    if args.prepare:\n        asset = prepare_playground(script(), cache_dir=args.cache)\n        print(\"Prepared:\", asset.directory)\n    elif args.asset:\n        asset = PreparedPlayground(args.asset)\n    else:\n        parser.error(\"Use --prepare or --asset PATH\")\n    build_scene(asset).render(args.output, width=640, height=360, fps=15,\n                             antialias=1, overwrite=args.overwrite)\n\nif __name__ == \"__main__\":\n    main()\n",
               "filename": "playground.py",
               "target": "build_scene",
               "kind": "core",
+              "downloadable": false,
               "command": "python playground.py --prepare --output output/playground.mp4",
               "preparation": "playground"
             }
@@ -628,7 +638,7 @@
           ]
         }
       ],
-      "preview": "playground",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -645,10 +655,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "\"\"\"Run: faceless-champ render examples/os_ui/render.py Tutorial -o output/os-ui.mp4\"\"\"\n\nfrom faceless_champ import Scene\nfrom faceless_champ.os_ui import File, Folder, OSClip, OSScript, VirtualFileSystem\n\n\nclass Tutorial(Scene):\n    def construct(self):\n        filesystem = VirtualFileSystem(\n            Folder(\n                \"home\",\n                \"Home\",\n                (\n                    Folder(\n                        \"documents\",\n                        \"Documents\",\n                        (\n                            File(\"notes\", \"Notes.txt\", \"Organize an idea.\\nPresent the process.\"),\n                            Folder(\"archive\", \"Archive\"),\n                        ),\n                    ),\n                ),\n            )\n        )\n        script = (\n            OSScript()\n            .wait(1)\n            .open_folder(\"documents\")\n            .rename(\"notes\", \"Launch Notes.txt\")\n            .drag(\"notes\", \"archive\")\n            .open_folder(\"archive\")\n            .preview(\"notes\")\n            .wait(1)\n            .window(\"preview\", \"close\")\n            .open_settings()\n            .set_value(\"appearance:theme\", \"dark\")\n            .open_settings(\"sound\")\n            .set_value(\"sound:volume\", 40)\n            .wait(1)\n        )\n        self.add(OSClip(filesystem, script, position=(960, 540)))\n        self.wait(script.duration)\n",
+              "code": "from faceless_champ import Scene\nfrom faceless_champ.os_ui import File, Folder, OSClip, OSScript, VirtualFileSystem\n\nfiles = VirtualFileSystem(Folder(\"home\", \"Home\", (\n    Folder(\"docs\", \"Documents\", (\n        File(\"notes\", \"Notes.txt\", \"A simple idea, clearly explained.\"),\n        Folder(\"archive\", \"Archive\"),\n    )),\n)))\nscript = (OSScript().open_folder(\"docs\")\n          .rename(\"notes\", \"Launch Notes.txt\")\n          .drag(\"notes\", \"archive\")\n          .open_settings(\"appearance\")\n          .set_value(\"appearance:theme\", \"dark\")\n          .wait(1))\nscene = Scene()\nscene.add(OSClip(files, script, position=(960, 540)))\nscene.wait(script.duration)\n",
               "filename": "os_ui.py",
               "target": "Tutorial",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render os_ui.py Tutorial -o output/os_ui.mp4 -q ql"
             }
           ]
@@ -702,10 +713,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, ChessChamp, ChessScript, ChessTheme, Scene\n\nclass ChessDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1280, 720, \"#000000\"))\n\n    def construct(self):\n        script = ChessScript.from_dict({\n            \"schema_version\": 1, \"duration\": 6,\n            \"players\": {\"white\": \"White\", \"black\": \"Black\"},\n            \"moves\": [\n                {\"at\": 1, \"duration\": .5, \"uci\": \"e2e4\"},\n                {\"at\": 2.5, \"duration\": .5, \"uci\": \"d7d5\"},\n                {\"at\": 4, \"duration\": .5, \"uci\": \"e4d5\"},\n            ],\n            \"annotations\": [\n                {\"type\": \"text\", \"at\": 0, \"duration\": 6,\n                 \"text\": \"e4 / d5 / exd5\"},\n                {\"type\": \"highlight\", \"at\": 3, \"duration\": 1,\n                 \"squares\": [\"e4\", \"d5\"]},\n            ],\n        })\n        self.add(ChessChamp(script, theme=ChessTheme(background=\"#000000\"), width=1280, height=720, position=(640, 360)))\n        self.wait(script.duration)\n",
+              "code": "from faceless_champ import Canvas, ChessChamp, ChessScript, ChessTheme, Scene\n\nclass ChessDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1280, 720, \"#171E1A\"))\n\n    def construct(self):\n        script = ChessScript.from_dict({\n            \"schema_version\": 1, \"duration\": 6,\n            \"players\": {\"white\": \"White\", \"black\": \"Black\"},\n            \"moves\": [\n                {\"at\": 1, \"duration\": .5, \"uci\": \"e2e4\"},\n                {\"at\": 2.5, \"duration\": .5, \"uci\": \"d7d5\"},\n                {\"at\": 4, \"duration\": .5, \"uci\": \"e4d5\"},\n            ],\n            \"annotations\": [\n                {\"type\": \"text\", \"at\": 0, \"duration\": 6,\n                 \"text\": \"e4 / d5 / exd5\"},\n                {\"type\": \"highlight\", \"at\": 3, \"duration\": 1,\n                 \"squares\": [\"e4\", \"d5\"]},\n            ],\n        })\n        self.add(ChessChamp(script, theme=ChessTheme(background=\"#000000\"), width=1280, height=720, position=(640, 360)))\n        self.wait(script.duration)\n",
               "filename": "chess.py",
               "target": "ChessDemo",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render chess.py ChessDemo -o output/chess.mp4 -q ql"
             }
           ]
@@ -732,7 +744,7 @@
           ]
         }
       ],
-      "preview": "chess",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -749,10 +761,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, FlowChamp, FlowTheme, Scene\nfrom faceless_champ.flow.examples import recipe\n\nclass FlowDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1200, 675, \"#000000\"))\n\n    def construct(self):\n        graph, script = recipe(\"system\")\n        diagram = FlowChamp(graph, script, width=1200, height=675,\n                            position=(600, 337.5),\n                            theme=FlowTheme(background=\"#000000\", stroke=\"#8996AD\"))\n        self.add(diagram)\n        self.wait(6)\n",
+              "code": "from faceless_champ import Canvas, FlowChamp, FlowTheme, Scene\nfrom faceless_champ.flow.examples import recipe\n\nclass FlowDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1200, 675, \"#0B1020\"))\n\n    def construct(self):\n        graph, script = recipe(\"system\")\n        diagram = FlowChamp(graph, script, width=1200, height=675,\n                            position=(600, 337.5),\n                            theme=FlowTheme(background=\"#000000\", stroke=\"#8996AD\"))\n        self.add(diagram)\n        self.wait(6)\n",
               "filename": "flow.py",
               "target": "FlowDemo",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render flow.py FlowDemo -o output/flow.mp4 -q ql"
             }
           ]
@@ -779,7 +792,7 @@
           ]
         }
       ],
-      "preview": "flow",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -796,10 +809,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "\"\"\"Three original, silent core fixtures. Only the assembly gets a motion preview.\"\"\"\n\nimport argparse\nfrom pathlib import Path\n\nimport numpy as np\nimport pyvista as pv\n\nfrom faceless_champ import (\n    ArchCamera,\n    ArchChamp,\n    ArchDimension,\n    ArchLabel,\n    ArchMesh,\n    ArchPart,\n    ArchScript,\n    ArchStyle,\n    Canvas,\n    Scene,\n    render,\n    save_frame,\n)\n\n\ndef build_scene():\n    \"\"\"An original mechanical housing: internal parts, explosion and moving section.\"\"\"\n    parts = [\n        ArchPart(\n            \"base\",\n            ArchMesh.from_data(pv.Cube(x_length=3, y_length=1.8, z_length=0.2)),\n            position=(0, 0, -0.65),\n            style=ArchStyle(color=\"#849ab1\"),\n        ),\n        ArchPart(\n            \"shell\",\n            ArchMesh.from_data(pv.Cube(x_length=2.8, y_length=1.6, z_length=1.1)),\n            style=ArchStyle(concept=\"transparent\", color=\"#63d3ff\"),\n        ),\n        ArchPart(\n            \"shaft\",\n            ArchMesh.from_data(pv.Cylinder(direction=(1, 0, 0), radius=0.28, height=2.3, resolution=32)),\n            style=ArchStyle(color=\"#ffbe69\"),\n        ),\n        ArchPart(\n            \"cover\",\n            ArchMesh.from_data(pv.Cube(x_length=2.8, y_length=1.6, z_length=0.12)),\n            position=(0, 0, 0.65),\n            explode_vector=(0, 0, 1),\n            style=ArchStyle(color=\"#c9d5e3\"),\n        ),\n    ]\n    script = (\n        ArchScript()\n        .orbit(-35, at=0, duration=2)\n        .explode(\"cover\", 0.85, at=2, duration=2)\n        .highlight(\"shaft\", \"#ffdd88\", at=4, duration=1)\n        .orbit(-25, at=4, duration=2)\n        .section(\"shell\", (0, 0, 0), (1, 0, 0), at=6, duration=3)\n        .explode(\"cover\", 0, at=9, duration=2)\n        .wait(1)\n    )\n    clip = ArchChamp(\n        parts,\n        script,\n        width=1600,\n        height=900,\n        position=(800, 450),\n        units=\"m\",\n        camera=ArchCamera(position=(7, -7, 5), focal_point=(0, 0, 0.3), zoom=1.25),\n        labels=[\n            ArchLabel(\"Removable cover\", (0, 0, 0), \"cover\", offset=(200, -100), font_size=40),\n            ArchLabel(\"Internal shaft\", (0, 0, 0), \"shaft\", offset=(-250, 30), font_size=40),\n        ],\n        dimensions=[ArchDimension((-1.5, -0.9, -0.1), (1.5, -0.9, -0.1), \"base\", offset=(0, 80), font_size=36)],\n    )\n    scene = Scene(Canvas(1600, 900, \"#000000\"))\n    scene.add(clip)\n    scene.wait(12)\n    return scene\n\n\ndef field_scene():\n    \"\"\"Illustrative point values and a supplied analytic vector field, no solver.\"\"\"\n    grid = pv.ImageData(dimensions=(8, 6, 5), spacing=(0.2, 0.2, 0.2))\n    grid[\"value\"] = grid.points[:, 0]\n    grid[\"flow\"] = np.tile([1.0, 0.2, 0.0], (grid.n_points, 1))\n    clip = ArchChamp(\n        ArchMesh.from_data(grid),\n        style=ArchStyle(concept=\"heatmap\", scalars=\"value\", vectors=\"flow\", clim=(0, 1.4)),\n        width=1600,\n        height=900,\n        position=(800, 450),\n    )\n    return Scene(Canvas(1600, 900, \"#000000\")).add(clip).wait(1)\n\n\ndef voxel_scene():\n    \"\"\"Voxelization of an original parametric surface.\"\"\"\n    mesh = ArchMesh.from_data(pv.ParametricEllipsoid(1.2, 0.8, 1))\n    clip = ArchChamp(\n        mesh,\n        style=ArchStyle(concept=\"voxel\", voxel_spacing=0.16, color=\"#c4a37a\"),\n        width=1600,\n        height=900,\n        position=(800, 450),\n    )\n    return Scene(Canvas(1600, 900, \"#000000\")).add(clip).wait(1)\n\n\nif __name__ == \"__main__\":\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--output\", type=Path, default=Path(\"output/archchamp\"))\n    parser.add_argument(\"--preview\", action=\"store_true\")\n    parser.add_argument(\"--stills\", action=\"store_true\")\n    parser.add_argument(\"--overwrite\", action=\"store_true\")\n    args = parser.parse_args()\n    node = build_scene()\n    if args.preview:\n        render(node, args.output / \"preview.mp4\", width=960, height=540, fps=12, antialias=2, overwrite=args.overwrite)\n    if args.stills:\n        for name, scene, time in (\n            (\"assembly\", node, 4.5),\n            (\"section\", node, 8.5),\n            (\"field\", field_scene(), 0),\n            (\"voxel\", voxel_scene(), 0),\n        ):\n            save_frame(scene, time, args.output / (name + \".png\"), size=(960, 540), overwrite=args.overwrite)\n",
+              "code": "import pyvista as pv\nfrom faceless_champ import (\n    ArchChamp, ArchMesh, ArchPart, ArchScript, ArchStyle, Canvas, Scene, render,\n)\n\nbody = ArchPart(\"body\", ArchMesh.from_data(pv.Cube()))\nscript = ArchScript().orbit(45, duration=2).wait(1)\nview = ArchChamp([body], script, style=ArchStyle(concept=\"wireframe\"),\n                 width=1600, height=900, position=(800, 450))\nscene = Scene(Canvas(1600, 900, \"#000000\")).add(view).wait(3)\nrender(scene, \"design.mp4\", width=960, height=540, fps=12)\n",
               "filename": "archchamp.py",
               "target": "build_scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render archchamp.py build_scene -o output/archchamp.mp4 -q ql"
             }
           ]
@@ -826,7 +840,7 @@
           ]
         }
       ],
-      "preview": "archchamp",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -869,6 +883,7 @@
               "filename": "html_video.py",
               "target": "build_scene",
               "kind": "core",
+              "downloadable": false,
               "command": "python html_video.py --prepare --output output/html-tour.mp4"
             }
           ]
@@ -907,10 +922,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Rectangle, Scene, Text\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\ncard = Rectangle(width=400, height=220, fill=\"#48e0cb\",\n                 stroke=\"#edf2fc\", stroke_width=2, position=(960, 540))\nscene.add(card)\nscene.play(\n    card.animate.fill_to(\"#708fff\").width_to(650).height_to(340)\n        .corner_radius_to(48).stroke_width_to(6).rotate_to(8),\n    run_time=2,\n)\nscene.wait(0.5)\n",
+              "code": "from faceless_champ import Canvas, Rectangle, Scene, Text\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\ncard = Rectangle(width=400, height=220, fill=\"#48e0cb\",\n                 stroke=\"#edf2fc\", stroke_width=2, position=(960, 540))\nscene.add(card)\nscene.play(\n    card.animate.fill_to(\"#708fff\").width_to(650).height_to(340)\n        .corner_radius_to(48).stroke_width_to(6).rotate_to(8),\n    run_time=2,\n)\nscene.wait(0.5)\n",
               "filename": "properties.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render properties.py scene -o output/properties.mp4 -q ql"
             }
           ]
@@ -931,7 +947,7 @@
           ]
         }
       ],
-      "preview": "properties",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -948,10 +964,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, Circle, Scene, Stagger, Succession, Repeat, PopIn\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\ndots = [Circle(50, fill=\"#48e0cb\", stroke=None,\n               position=(660 + i * 200, 540)) for i in range(4)]\nscene.play(Stagger(*(PopIn(dot) for dot in dots), lag=0.2, duration=0.5))\nscene.play(Stagger(*(\n    Succession(dot.animate.scale_to(1.5), dot.animate.scale_to(1), duration=0.4)\n    for dot in dots\n), lag=0.15))\nscene.play(Repeat(dots[0].animate.opacity_to(0.3),\n                  cycles=2, ping_pong=True, duration=0.4))\nscene.wait(0.5)\n",
+              "code": "from faceless_champ import Canvas, Circle, Scene, Stagger, Succession, Repeat, PopIn\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\ndots = [Circle(50, fill=\"#48e0cb\", stroke=None,\n               position=(660 + i * 200, 540)) for i in range(4)]\nscene.play(Stagger(*(PopIn(dot) for dot in dots), lag=0.2, duration=0.5))\nscene.play(Stagger(*(\n    Succession(dot.animate.scale_to(1.5), dot.animate.scale_to(1), duration=0.4)\n    for dot in dots\n), lag=0.15))\nscene.play(Repeat(dots[0].animate.opacity_to(0.3),\n                  cycles=2, ping_pong=True, duration=0.4))\nscene.wait(0.5)\n",
               "filename": "schedules.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render schedules.py scene -o output/schedules.mp4 -q ql"
             }
           ]
@@ -1011,10 +1028,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import Canvas, CircleMask, Group, Rectangle, Scene, Text, Wipe\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\ncard = Rectangle(width=700, height=400, fill=\"#708fff\", stroke=None,\n                 position=(960, 540))\nstripe = Rectangle(width=760, height=100, fill=\"#48e0cb\", stroke=None,\n                   rotation=-20, position=(960, 540))\nword = Text(\"REVEAL\", font_size=64, color=\"#0b101b\", position=(960, 540))\nvisual = Group(card, stripe, word, mask=CircleMask(230))\nscene.add(visual)\nscene.play(Wipe(visual, direction=\"right\"), run_time=1)\nscene.play(visual.animate.mask_to(width=620, height=380), run_time=1)\nscene.wait(0.5)\n",
+              "code": "from faceless_champ import Canvas, CircleMask, Group, Rectangle, Scene, Text, Wipe\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\ncard = Rectangle(width=700, height=400, fill=\"#708fff\", stroke=None,\n                 position=(960, 540))\nstripe = Rectangle(width=760, height=100, fill=\"#48e0cb\", stroke=None,\n                   rotation=-20, position=(960, 540))\nword = Text(\"REVEAL\", font_size=64, color=\"#0b101b\", position=(960, 540))\nvisual = Group(card, stripe, word, mask=CircleMask(230))\nscene.add(visual)\nscene.play(Wipe(visual, direction=\"right\"), run_time=1)\nscene.play(visual.animate.mask_to(width=620, height=380), run_time=1)\nscene.wait(0.5)\n",
               "filename": "masks.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render masks.py scene -o output/masks.mp4 -q ql"
             }
           ]
@@ -1035,7 +1053,7 @@
           ]
         }
       ],
-      "preview": "masks",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -1052,10 +1070,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from faceless_champ import (\n    Canvas, Scene, ProgressRing, ProgressBar, LoadingDots,\n    Countdown, Repeat, linear,\n)\n\nscene = Scene(Canvas(1920, 1080, \"#000000\"))\nring = ProgressRing(width=240, height=240, label=True, position=(650, 480))\ntimer = Countdown(4, font_size=120, position=(1250, 480))\nbar = ProgressBar(width=700, height=30, position=(960, 730))\ndots = LoadingDots(width=160, height=40, position=(960, 850))\nscene.add(ring, timer, bar, dots)\nwith scene.at(0):\n    scene.play(ring.animate.progress_to(1), timer.animate.value_to(0),\n               bar.animate.progress_to(1), run_time=4, rate_func=linear)\nwith scene.at(0):\n    scene.play(Repeat(dots.animate.progress_to(1), cycles=4, duration=1),\n               rate_func=linear)\nscene.wait_until(4.5)\n",
+              "code": "from faceless_champ import (\n    Canvas, Scene, ProgressRing, ProgressBar, LoadingDots,\n    Countdown, Repeat, linear,\n)\n\nscene = Scene(Canvas(1920, 1080, \"#0b101b\"))\nring = ProgressRing(width=240, height=240, label=True, position=(650, 480))\ntimer = Countdown(4, font_size=120, position=(1250, 480))\nbar = ProgressBar(width=700, height=30, position=(960, 730))\ndots = LoadingDots(width=160, height=40, position=(960, 850))\nscene.add(ring, timer, bar, dots)\nwith scene.at(0):\n    scene.play(ring.animate.progress_to(1), timer.animate.value_to(0),\n               bar.animate.progress_to(1), run_time=4, rate_func=linear)\nwith scene.at(0):\n    scene.play(Repeat(dots.animate.progress_to(1), cycles=4, duration=1),\n               rate_func=linear)\nscene.wait_until(4.5)\n",
               "filename": "indicators.py",
               "target": "scene",
               "kind": "core",
+              "downloadable": false,
               "command": "faceless-champ render indicators.py scene -o output/indicators.mp4 -q ql"
             }
           ]
@@ -1076,7 +1095,7 @@
           ]
         }
       ],
-      "preview": "indicators",
+      "preview": null,
       "guide": "core",
       "portrait": false
     },
@@ -1227,10 +1246,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import MetricCard, Comparison, StepList\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    video = Video(ctx)\n    with video.segment(\"hook\", duration=3) as segment:\n        card = segment.add(MetricCard(42, \"Reusable components\"), enter=\"pop\")\n        segment.play(card[\"value\"], lambda number: number.animate.value_to(100),\n                     at=1, duration=1)\n    with video.segment(\"comparison\", duration=4) as segment:\n        segment.add(Comparison(\"Repeated setup\", \"Shared building blocks\"),\n                    enter=\"fade\")\n    with video.segment(\"finish\", duration=3) as segment:\n        segment.add(StepList((\"Compose\", \"Preview\", \"Export\")), enter=\"stagger\")\n    return video\n",
+              "code": "from facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import MetricCard, Comparison, StepList\n\ndef build(ctx):\n    video = Video(ctx)\n    with video.segment(\"hook\", duration=3) as segment:\n        card = segment.add(MetricCard(42, \"Reusable components\"), enter=\"pop\")\n        segment.play(card[\"value\"], lambda number: number.animate.value_to(100),\n                     at=1, duration=1)\n    with video.segment(\"comparison\", duration=4) as segment:\n        segment.add(Comparison(\"Repeated setup\", \"Shared building blocks\"),\n                    enter=\"fade\")\n    with video.segment(\"finish\", duration=3) as segment:\n        segment.add(StepList((\"Compose\", \"Preview\", \"Export\")), enter=\"stagger\")\n    return video\n",
               "filename": "kit_main.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "silent",
               "placement": "Save as videos/main.py in a project created with --template silent."
@@ -1253,7 +1273,7 @@
           ]
         }
       ],
-      "preview": "kit",
+      "preview": null,
       "guide": "kit",
       "portrait": true
     },
@@ -1367,10 +1387,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import Heading, MetricCard\nfrom facelesschamp_kit.layouts import Stack\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    video = Video(ctx)\n    with video.segment(\"summary\", duration=4) as segment:\n        segment.add(Stack(\n            Heading(\"Make the idea visible\"),\n            MetricCard(3, \"Purposeful visual beats\"),\n            gap=40,\n        ), enter=\"stagger\")\n    return video\n",
+              "code": "from facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import Heading, MetricCard\nfrom facelesschamp_kit.layouts import Stack\n\ndef build(ctx):\n    video = Video(ctx)\n    with video.segment(\"summary\", duration=4) as segment:\n        segment.add(Stack(\n            Heading(\"Make the idea visible\"),\n            MetricCard(3, \"Purposeful visual beats\"),\n            gap=40,\n        ), enter=\"stagger\")\n    return video\n",
               "filename": "kit_blocks.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "silent",
               "placement": "Save as videos/main.py in a project created with --template silent."
@@ -1384,10 +1405,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom faceless_champ import Draw\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import FlowDiagram\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    video = Video(ctx)\n    segment = video.segment(\"workflow\", duration=5)\n    direction = \"horizontal\" if ctx.canvas.width > ctx.canvas.height else \"vertical\"\n    flow = segment.add(FlowDiagram((\"Input\", \"Transform\", \"Useful output\"), direction),\n                       at=0.5, duration=4, enter=\"fade\", enter_duration=0.4)\n    segment.play(flow[\"edge-0\"], Draw, at=1, duration=0.6)\n    segment.play(flow[\"node-1\"], lambda c: c.animate.scale_to(0.94), at=2, duration=0.5)\n    segment.play(flow[\"label-2\"], lambda c: c.animate.color_to(ctx.theme.accent), at=3, duration=0.5)\n    segment.play(flow, lambda c: c.animate.opacity_to(0), at=4, duration=0.5)\n    return video\n",
+              "code": "from faceless_champ import Draw\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import FlowDiagram\n\ndef build(ctx):\n    video = Video(ctx)\n    segment = video.segment(\"workflow\", duration=5)\n    direction = \"horizontal\" if ctx.canvas.width > ctx.canvas.height else \"vertical\"\n    flow = segment.add(FlowDiagram((\"Input\", \"Transform\", \"Useful output\"), direction),\n                       at=0.5, duration=4, enter=\"fade\", enter_duration=0.4)\n    segment.play(flow[\"edge-0\"], Draw, at=1, duration=0.6)\n    segment.play(flow[\"node-1\"], lambda c: c.animate.scale_to(0.94), at=2, duration=0.5)\n    segment.play(flow[\"label-2\"], lambda c: c.animate.color_to(ctx.theme.accent), at=3, duration=0.5)\n    segment.play(flow, lambda c: c.animate.opacity_to(0), at=4, duration=0.5)\n    return video\n",
               "filename": "kit_workflow.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "silent",
               "placement": "Save as videos/main.py in a project created with --template silent."
@@ -1473,10 +1495,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom dataclasses import dataclass\nfrom faceless_champ import Circle, Group, Text\nfrom facelesschamp_kit import BlockBuild, Video\n\n@dataclass(frozen=True)\nclass Badge:\n    label: str\n\n    def compose(self, ctx, bounds):\n        circle = Circle(90, fill=ctx.theme.accent, stroke=None,\n                        position=bounds.center)\n        label = Text(self.label, font_size=32, color=ctx.theme.background,\n                     position=bounds.center)\n        return BlockBuild(Group(circle, label),\n                          {\"circle\": circle, \"label\": label})\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    video = Video(ctx)\n    badge = Badge(\"REUSE\")\n    for name in (\"first\", \"second\"):\n        with video.segment(name, duration=3) as segment:\n            handle = segment.add(badge, enter=\"pop\")\n            segment.play(handle[\"circle\"],\n                         lambda circle: circle.animate.scale_to(1.15),\n                         at=1, duration=1)\n    return video\n",
+              "code": "from dataclasses import dataclass\nfrom faceless_champ import Circle, Group, Text\nfrom facelesschamp_kit import BlockBuild, Video\n\n@dataclass(frozen=True)\nclass Badge:\n    label: str\n\n    def compose(self, ctx, bounds):\n        circle = Circle(90, fill=ctx.theme.accent, stroke=None,\n                        position=bounds.center)\n        label = Text(self.label, font_size=32, color=ctx.theme.background,\n                     position=bounds.center)\n        return BlockBuild(Group(circle, label),\n                          {\"circle\": circle, \"label\": label})\n\ndef build(ctx):\n    video = Video(ctx)\n    badge = Badge(\"REUSE\")\n    for name in (\"first\", \"second\"):\n        with video.segment(name, duration=3) as segment:\n            handle = segment.add(badge, enter=\"pop\")\n            segment.play(handle[\"circle\"],\n                         lambda circle: circle.animate.scale_to(1.15),\n                         at=1, duration=1)\n    return video\n",
               "filename": "kit_custom.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "silent",
               "placement": "Save as videos/main.py in a project created with --template silent."
@@ -1656,10 +1679,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit.templates import silent\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    return silent(ctx, value=3, label=\"Steps from idea to video\")\n",
+              "code": "from facelesschamp_kit.templates import silent\n\n\ndef build(ctx):\n    return silent(ctx, value=3, label=\"Steps from idea to video\")\n",
               "filename": "kit_silent.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "silent",
               "placement": "Save as videos/main.py in a project created with --template silent."
@@ -1673,10 +1697,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit.templates import narrated\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    return narrated(\n        ctx,\n        audio=\"voiceover\",\n        subtitles=\"word_cues\",\n        markers={\"hook\": 1, \"comparison\": 2, \"finish\": 3},\n    )\n",
+              "code": "from facelesschamp_kit.templates import narrated\n\n\ndef build(ctx):\n    return narrated(\n        ctx,\n        audio=\"voiceover\",\n        subtitles=\"word_cues\",\n        markers={\"hook\": 1, \"comparison\": 2, \"finish\": 3},\n    )\n",
               "filename": "kit_narrated.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "narrated-short",
               "placement": "Save as videos/main.py in a project created with --template narrated-short."
@@ -1734,10 +1759,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\n\"\"\"Edit complete revisions below, then run fc-kit prepare.\"\"\"\n\nfrom faceless_champ import CanvasItem, CodeCheckpoint, EventBinding, PlaygroundScript, ValueBinding\n\nfrom facelesschamp_kit.templates import coding_playground\n\nSOURCE = \"\"\"import faceless_champ.playground.runtime as pg\n\nclass Car:\n    def __init__(self, color):\n        self.color = color\n        self.speed = 0\n\n    def accelerate(self, amount):\n        self.speed += amount\n\nred = Car(\"red\")\nblue = Car(\"blue\")\nred.accelerate(AMOUNT)\npg.emit(\"red\", vars(red))\npg.emit(\"blue\", vars(blue))\npg.event(\"accelerate\")\nprint(\"Red:\", red.speed, \"Blue:\", blue.speed)\n\"\"\"\n\n\ndef script():\n    return PlaygroundScript(\n        [\n            CodeCheckpoint(\"create\", {\"cars.py\": SOURCE.replace(\"AMOUNT\", \"0\")}, \"cars.py\", \"cars.py\", 0, 1, 1),\n            CodeCheckpoint(\"accelerate\", {\"cars.py\": SOURCE.replace(\"AMOUNT\", \"40\")}, \"cars.py\", \"cars.py\", 2.5, 4, 4),\n        ],\n        duration=6,\n        mode=\"concept\",\n        items=[\n            CanvasItem(\"red\", \"car\", \"red : Car\", color=\"#F07985\"),\n            CanvasItem(\"blue\", \"car\", \"blue : Car\", color=\"#76B4FF\"),\n        ],\n        bindings=[ValueBinding(\"red\", \"red\"), ValueBinding(\"blue\", \"blue\")],\n        events=[EventBinding(\"accelerate\", \"accelerate\", \"red\", 4.2, 0.8)],\n    )\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    return coding_playground(ctx, script())\n",
+              "code": "\"\"\"Edit complete revisions below, then run fc-kit prepare.\"\"\"\n\nfrom faceless_champ import CanvasItem, CodeCheckpoint, EventBinding, PlaygroundScript, ValueBinding\n\nfrom facelesschamp_kit.templates import coding_playground\n\nSOURCE = \"\"\"import faceless_champ.playground.runtime as pg\n\nclass Car:\n    def __init__(self, color):\n        self.color = color\n        self.speed = 0\n\n    def accelerate(self, amount):\n        self.speed += amount\n\nred = Car(\"red\")\nblue = Car(\"blue\")\nred.accelerate(AMOUNT)\npg.emit(\"red\", vars(red))\npg.emit(\"blue\", vars(blue))\npg.event(\"accelerate\")\nprint(\"Red:\", red.speed, \"Blue:\", blue.speed)\n\"\"\"\n\n\ndef script():\n    return PlaygroundScript(\n        [\n            CodeCheckpoint(\"create\", {\"cars.py\": SOURCE.replace(\"AMOUNT\", \"0\")}, \"cars.py\", \"cars.py\", 0, 1, 1),\n            CodeCheckpoint(\"accelerate\", {\"cars.py\": SOURCE.replace(\"AMOUNT\", \"40\")}, \"cars.py\", \"cars.py\", 2.5, 4, 4),\n        ],\n        duration=6,\n        mode=\"concept\",\n        items=[\n            CanvasItem(\"red\", \"car\", \"red : Car\", color=\"#F07985\"),\n            CanvasItem(\"blue\", \"car\", \"blue : Car\", color=\"#76B4FF\"),\n        ],\n        bindings=[ValueBinding(\"red\", \"red\"), ValueBinding(\"blue\", \"blue\")],\n        events=[EventBinding(\"accelerate\", \"accelerate\", \"red\", 4.2, 0.8)],\n    )\n\n\ndef build(ctx):\n    return coding_playground(ctx, script())\n",
               "filename": "kit_playground.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit prepare main\nfc-kit preview main -o output/preview.mp4",
               "template": "coding-concept",
               "placement": "Save as videos/main.py in a project created with --template coding-concept.",
@@ -1790,10 +1816,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    return chesschamp(ctx, data=\"data.json\")\n",
+              "code": "from facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    return chesschamp(ctx, data=\"data.json\")\n",
               "filename": "kit_chess.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "chesschamp",
               "placement": "Save as videos/main.py in a project created with --template chesschamp."
@@ -1829,10 +1856,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\n\"\"\"Editable FlowChamp starter: reveal, signals and context highlighting.\"\"\"\n\nfrom faceless_champ.flow.examples import recipe\n\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import FlowCanvas\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    # FlowCanvas uses ctx.theme.muted for structure and accent for packets/highlights.\n    video = Video(ctx)\n    portrait = ctx.canvas.height > ctx.canvas.width\n    viewport = (600, 1000) if portrait else (1200, 675)\n    graph, script = recipe(\"workflow\", portrait=portrait)\n    video.segment(\"flowchamp\", duration=6).add(FlowCanvas(graph, script, viewport=viewport))\n    return video\n",
+              "code": "from faceless_champ.flow.examples import recipe\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import FlowCanvas\n\n\ndef build(ctx):\n    graph, script = recipe(\"system\")\n    video = Video(ctx)\n    video.segment(\"architecture\", duration=6).add(\n        FlowCanvas(graph, script, viewport=(1200, 675))\n    )\n    return video\n",
               "filename": "kit_flow.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "flowchamp",
               "placement": "Save as videos/main.py in a project created with --template flowchamp."
@@ -1878,10 +1906,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.recipes import apply_recipe\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    video = Video(ctx)\n    with video.segment(\"assembly\", duration=6) as segment:\n        apply_recipe(segment, \"arch-design\", {\"design\": {\n            \"units\": \"m\",\n            \"parts\": [\n                {\"id\": \"base\", \"mesh\": {\"primitive\": \"cube\", \"params\": {\"x_length\": 2, \"y_length\": 1, \"z_length\": .4}}},\n                {\"id\": \"roof\", \"mesh\": {\"primitive\": \"cube\", \"params\": {\"x_length\": 2, \"y_length\": 1, \"z_length\": .15}},\n                 \"position\": [0, 0, .6], \"explode_vector\": [0, 0, .8]},\n            ],\n            \"script\": {\"actions\": [\n                {\"kind\": \"explode\", \"targets\": [\"roof\"], \"factor\": 1, \"at\": 1, \"duration\": 2},\n                {\"kind\": \"orbit\", \"degrees\": 45, \"at\": 3, \"duration\": 2}], \"duration\": 6},\n            \"dimensions\": [{\"start\": [-1, -.5, -.2], \"end\": [1, -.5, -.2], \"part\": \"base\"}],\n        }})\n    return video\n",
+              "code": "from facelesschamp_kit import Video\nfrom facelesschamp_kit.recipes import apply_recipe\n\n\ndef build(ctx):\n    video = Video(ctx)\n    with video.segment(\"assembly\", duration=6) as segment:\n        apply_recipe(segment, \"arch-design\", {\"design\": {\n            \"units\": \"m\",\n            \"parts\": [\n                {\"id\": \"base\", \"mesh\": {\"primitive\": \"cube\", \"params\": {\"x_length\": 2, \"y_length\": 1, \"z_length\": .4}}},\n                {\"id\": \"roof\", \"mesh\": {\"primitive\": \"cube\", \"params\": {\"x_length\": 2, \"y_length\": 1, \"z_length\": .15}},\n                 \"position\": [0, 0, .6], \"explode_vector\": [0, 0, .8]},\n            ],\n            \"script\": {\"actions\": [\n                {\"kind\": \"explode\", \"targets\": [\"roof\"], \"factor\": 1, \"at\": 1, \"duration\": 2},\n                {\"kind\": \"orbit\", \"degrees\": 45, \"at\": 3, \"duration\": 2}], \"duration\": 6},\n            \"dimensions\": [{\"start\": [-1, -.5, -.2], \"end\": [1, -.5, -.2], \"part\": \"base\"}],\n        }})\n    return video\n",
               "filename": "kit_archchamp.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "archchamp",
               "placement": "Save as videos/main.py in a project created with --template archchamp."
@@ -1938,10 +1967,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom facelesschamp_kit.blocks import (\n    WhiteboardArrow, WhiteboardCircle, WhiteboardDrawing,\n    WhiteboardLine, WhiteboardPath, WhiteboardRectangle,\n)\nfrom facelesschamp_kit.templates import WhiteboardScene, whiteboard_basic\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    return whiteboard_basic(\n        ctx,\n        theme=ctx.theme,\n        draw_fraction=0.7,\n        scenes=[\n            WhiteboardScene(\n                name=\"connect\",\n                duration=5,\n                drawing=WhiteboardDrawing(\n                    viewbox=(1400, 700),\n                    drawings=(\n                        WhiteboardCircle(center=(350, 350), radius=140, stroke_width=8),\n                        WhiteboardArrow(start=(540, 350), end=(860, 350),\n                                        color=\"#2563EB\", stroke_width=8),\n                        WhiteboardCircle(center=(1050, 350), radius=140, stroke_width=8),\n                    ),\n                ),\n            ),\n            WhiteboardScene(\n                name=\"progress\",\n                duration=5,\n                drawing=WhiteboardDrawing(\n                    viewbox=(1400, 700),\n                    drawings=(\n                        WhiteboardRectangle(x=200, y=120, width=1000, height=460,\n                                            stroke_width=8),\n                        WhiteboardLine(start=(300, 480), end=(1100, 480),\n                                       color=\"#64748B\", stroke_width=6),\n                        WhiteboardPath(points=((300, 440), (500, 400), (700, 320),\n                                               (900, 300), (1100, 200)),\n                                       color=\"#2563EB\", stroke_width=10),\n                    ),\n                ),\n            ),\n        ],\n    )\n",
+              "code": "from facelesschamp_kit.blocks import (\n    WhiteboardArrow, WhiteboardCircle, WhiteboardDrawing,\n    WhiteboardLine, WhiteboardPath, WhiteboardRectangle,\n)\nfrom facelesschamp_kit.templates import WhiteboardScene, whiteboard_basic\n\n\ndef build(ctx):\n    return whiteboard_basic(\n        ctx,\n        theme=ctx.theme,\n        draw_fraction=0.7,\n        scenes=[\n            WhiteboardScene(\n                name=\"connect\",\n                duration=5,\n                drawing=WhiteboardDrawing(\n                    viewbox=(1400, 700),\n                    drawings=(\n                        WhiteboardCircle(center=(350, 350), radius=140, stroke_width=8),\n                        WhiteboardArrow(start=(540, 350), end=(860, 350),\n                                        color=\"#2563EB\", stroke_width=8),\n                        WhiteboardCircle(center=(1050, 350), radius=140, stroke_width=8),\n                    ),\n                ),\n            ),\n            WhiteboardScene(\n                name=\"progress\",\n                duration=5,\n                drawing=WhiteboardDrawing(\n                    viewbox=(1400, 700),\n                    drawings=(\n                        WhiteboardRectangle(x=200, y=120, width=1000, height=460,\n                                            stroke_width=8),\n                        WhiteboardLine(start=(300, 480), end=(1100, 480),\n                                       color=\"#64748B\", stroke_width=6),\n                        WhiteboardPath(points=((300, 440), (500, 400), (700, 320),\n                                               (900, 300), (1100, 200)),\n                                       color=\"#2563EB\", stroke_width=10),\n                    ),\n                ),\n            ),\n        ],\n    )\n",
               "filename": "kit_whiteboard.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "whiteboard-basic",
               "placement": "Save as videos/main.py in a project created with --template whiteboard-basic."
@@ -2047,7 +2077,7 @@
           ]
         }
       ],
-      "preview": "whiteboard",
+      "preview": null,
       "guide": "kit",
       "portrait": false
     },
@@ -2079,6 +2109,7 @@
               "filename": "kit_web.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "template": "silent",
               "placement": "Use these helpers from your project after explicit core capture preparation."
             }
@@ -2090,8 +2121,8 @@
           "blocks": []
         },
         {
-          "title": "Try the supplied tour",
-          "text": "training project/web-video/render.py supports prepare, frame, storyboard, preview and render. Start with a sparse storyboard or short preview; full export is a separate explicit command.",
+          "title": "Scene references",
+          "text": "Use the premium reference index in the source checkout. Scene drafts require explicit rendering and visual review.",
           "blocks": []
         }
       ],
@@ -2123,10 +2154,11 @@
             {
               "type": "code",
               "language": "python",
-              "code": "from dataclasses import replace\nfrom faceless_champ import Canvas\nfrom faceless_champ.os_ui import OSScript\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import SettingsWindow\n\n\ndef build(ctx):\n    ctx.theme = replace(ctx.theme, background=\"#000000\", foreground=\"#F3F6FF\")\n    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, \"#000000\")\n    video = Video(ctx)\n    script = (OSScript().set_value('appearance:theme', 'dark')\n              .open_settings('sound').set_value('sound:volume', 35).wait(1))\n    with video.segment('settings', duration=script.duration) as segment:\n        segment.add(SettingsWindow(script=script))\n    return video\n",
+              "code": "from faceless_champ.os_ui import OSScript\nfrom facelesschamp_kit import Video\nfrom facelesschamp_kit.blocks import SettingsWindow\n\n\ndef build(ctx):\n    video = Video(ctx)\n    script = (OSScript().set_value('appearance:theme', 'dark')\n              .open_settings('sound').set_value('sound:volume', 35).wait(1))\n    with video.segment('settings', duration=script.duration) as segment:\n        segment.add(SettingsWindow(script=script))\n    return video\n",
               "filename": "kit_os_ui.py",
               "target": null,
               "kind": "kit",
+              "downloadable": false,
               "command": "fc-kit preview main -o output/preview.mp4",
               "template": "os-ui",
               "placement": "Save as videos/main.py in a project created with --template os-ui."

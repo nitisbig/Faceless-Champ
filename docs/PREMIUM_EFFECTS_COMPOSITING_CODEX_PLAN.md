@@ -1,3 +1,6 @@
+> Historical design proposal. Standalone demo data and media evidence were retired
+> during the premium reference reset. Current source, tests and API guides are authoritative.
+
 # FacelessChamp Premium Motion Engine — System 02: Effects & Compositing
 
 **Target repository:** `nitisbig/Faceless-Champ`
@@ -102,7 +105,7 @@ Expose a small, typed subset of animatable effect properties (e.g. glow intensit
 - Introduce `effects.py` for compositing descriptors when needed in 2B; avoid an abstract plugin architecture before it has real consumers.
 - Keep rendering details in short, testable renderer helpers rather than doubling the size of `renderer.py` with unrelated logic.
 - Add `tests/test_gradients.py`, `tests/test_effects.py`, `tests/test_effects_compositing.py` as relevant; adopt existing test naming conventions.
-- Add `examples/premium_effects/` with preview commands, sample outputs, and scripted fixed-time screenshots.
+- Add `project-local-scene.py/` with preview commands, sample outputs, and scripted fixed-time screenshots.
 - Document public APIs in `docs/motion-graphics.md`, `docs/clean-flow.md`, or a focused new effects page and update `README.md` succinctly.
 - Changes to kit themes or kit block APIs are opt-in and should wait until core APIs settle; preserve core/kit version compatibility.
 

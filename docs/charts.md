@@ -214,28 +214,3 @@ scene = Scene(Canvas(1280, 720, "#f2f0eb"))
 scene.add(chart, year)
 scene.play(chart.animate.data_to({"Alpha": 12, "Beta": 18, "New entrant": 6}), year.animate.value_to(2011), run_time=2)
 ```
-
-The [`company-growth` training project](../training%20project/company-growth/README.md)
-composes these public APIs into a 45-second light-mode video with a sourced offline
-data snapshot, ranking race, trend lines, and summary. Render it with:
-
-```bash
-uv run python 'training project/company-growth/render.py' --preview
-uv run python 'training project/company-growth/render.py' --frames
-```
-
-## Showcase
-
-Run from the repository root using the installed environment:
-
-```bash
-uv run python examples/charts/render.py --preview
-uv run python examples/charts/render.py --storyboard
-uv run python examples/charts/render.py --theme paper --frame 3.5
-uv run python examples/charts/render.py --theme ocean --output output/charts.mp4 --overwrite
-```
-
-The 36-second showcase covers every chart with a reveal and data transition.
-Preview renders at 640×360/12 fps; default video is 1280×720/24 fps. Storyboards
-include reveal, transition midpoint, and final frames for each chart. `--output`
-selects a video file, frame PNG, or storyboard directory according to mode.

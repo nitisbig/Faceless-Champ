@@ -23,15 +23,16 @@ The default core and kit imports work without Playwright installed.
 from faceless_champ import Canvas, Scene
 from faceless_champ.web import HtmlPage, WebScript, capture_html, HtmlClip
 
-page = HtmlPage("ui/index.html", viewport=(1440, 900), storage={"theme": "light"}, ready=("#prompt-input",))
+page = HtmlPage('ui/index.html', viewport=(1440, 900),
+                storage={'theme': 'light'}, ready=('#prompt-input',))
 script = WebScript(duration=12)
-script.move("#prompt-input", at=1, duration=0.5)
-script.click("#prompt-input", at=1.5)
-script.type("#prompt-input", "Explain async JavaScript", at=2, duration=2)
-script.click("#send", at=4.5)
-script.track(".composer")
-capture = capture_html(page, script, fps=30, cache_dir=".web-cache")
-scene = Scene(Canvas(1920, 1080, "#101827"))
+script.move('#prompt-input', at=1, duration=.5)
+script.click('#prompt-input', at=1.5)
+script.type('#prompt-input', 'Explain async JavaScript', at=2, duration=2)
+script.click('#send', at=4.5)
+script.track('.composer')
+capture = capture_html(page, script, fps=30, cache_dir='.web-cache')
+scene = Scene(Canvas(1920, 1080, '#101827'))
 scene.add(HtmlClip(capture, width=1440, height=900, position=(960, 540)))
 scene.wait(12)
 # Export explicitly when ready:
@@ -112,5 +113,3 @@ Errors report action/selector/time or missing resource. Verify selectors and use
 fonts/assets. A browser startup error usually needs `python -m playwright install chromium`
 or the OS libraries recommended by Playwright. Browser and server resources close on failure;
 failed preparations are never published as completed assets.
-
-See `training project/web-video/README.md` for the supplied 30-second tour and preview commands.

@@ -73,16 +73,13 @@ Tokenization and geometry are prepared once per component. `PillowRenderer(code_
 bounds the cached full editor/ink layers; intermediate reveal frames are not retained there.
 Set `code_cache_mb=0` and `frame_cache_mb=0` to disable both code and held-frame caches.
 
-See `examples/coding/showcase.py` for staged blocks and `training project/coding-video`
-for a complete narrated tutorial with export controls. Existing `Text`/`Typewriter` APIs are unchanged.
-
 ## Saved clean-flow workspace design
 
-`CodeWorkspaceDesign.named("clean-flow")` preserves the approved fullscreen editor
-and terminal design from `training project/python-functions`. It contains no lesson
-text, narration, or execution. The editor fills its bounds while typing; the whole
-window scales uniformly to 64% and moves left before the terminal appears. On a
-1920×1080 canvas the run layout has a 48px outer margin and 32px window gap.
+`CodeWorkspaceDesign.named("clean-flow")` provides reusable editor and terminal
+geometry, chrome and motion helpers. It contains no lesson content or execution.
+The editor scales uniformly to 64% for the terminal arrangement. At 1920×1080,
+the saved layout uses a 48px outer margin and a 32px window gap. Whole-window
+transforms include the code, chrome, highlights and shadow.
 
 The saved timings are 0.8s to shrink, 0.6s for terminal entrance, 0.45s for terminal
 exit, and 0.9s to restore the editor. The monotonic `design.fluid` easing settles
@@ -129,7 +126,6 @@ then animate it with `design.terminal_in(window)` / `design.terminal_out(window)
 The caller schedules typing, output publication, visibility and durations; these
 helpers never run code or add audio. Existing editor/playground defaults are unchanged.
 
-See `examples/coding/workspace.py` for a complete silent example. In Kit projects,
-use `Segment.add_core` with a factory returning a fresh window hierarchy. A full-screen
-window's shadow extends outside its face bounds; allocate shadow clearance or keep
-the full-screen composition at the core Scene level, as the reference tutorial does.
+The current [premium opening draft](../examples/programming/hello_world/README.md)
+uses these public helpers. Its composition remains local pending visual approval.
+In Kit projects, return a fresh complete hierarchy from a `Segment.add_core` factory.

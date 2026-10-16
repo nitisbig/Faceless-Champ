@@ -8,6 +8,25 @@ import pytest
 from facelesschamp_agent import AgentError, CapabilityRegistry
 
 
+def test_recipe_preview_metadata_only_advertises_existing_resources(tmp_path, monkeypatch):
+    from facelesschamp_kit.recipes import recipe_specs
+
+    import facelesschamp_agent.registry as registry_module
+
+    monkeypatch.setattr(registry_module, "files", lambda package: tmp_path)
+    registry = CapabilityRegistry()
+    for spec in recipe_specs():
+        record = registry.describe(f"recipe:{spec.id}")
+        assert "thumbnail" not in record and "motion_preview" not in record
+    spec = recipe_specs()[0]
+    poster = tmp_path / "resources/previews" / f"{spec.id}.png"
+    poster.parent.mkdir(parents=True)
+    poster.touch()
+    record = CapabilityRegistry().describe(f"recipe:{spec.id}")
+    assert record["thumbnail"] == str(poster)
+    assert "motion_preview" not in record
+
+
 def test_catalog_is_identical_in_fresh_api_and_cli_processes():
     environment = {**os.environ, "PYTHONPATH": os.pathsep.join(sys.path)}
     suffix = (

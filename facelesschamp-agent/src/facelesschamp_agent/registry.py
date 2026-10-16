@@ -394,12 +394,14 @@ class CapabilityRegistry:
                 "dependencies": ["PyVista/VTK (required)"] if spec.id == "arch-design" else [],
                 "preparation": "explicit" if spec.id == "code-result" else "none",
                 "documentation": "recipes.md",
-                "thumbnail": f"previews/{spec.id}.png",
-                "motion_preview": f"previews/{spec.id}.mp4",
                 "parameters": list(spec.fields),
                 "example": asdict(spec)["example"],
                 "example_kind": "apply_recipe content",
             }
+            for key, extension in (("thumbnail", "png"), ("motion_preview", "mp4")):
+                relative = f"previews/{spec.id}.{extension}"
+                if files("facelesschamp_agent").joinpath("resources", relative).is_file():
+                    self._entries[f"recipe:{spec.id}"][key] = relative
         self._index = {}
         for record in self._entries.values():
             fields = []

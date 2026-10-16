@@ -10,31 +10,18 @@ No host desktop, browser, network connection, or macOS installation is needed.
 from faceless_champ import Scene
 from faceless_champ.os_ui import File, Folder, OSClip, OSScript, VirtualFileSystem
 
-files = VirtualFileSystem(
-    Folder(
-        "home",
-        "Home",
-        (
-            Folder(
-                "docs",
-                "Documents",
-                (
-                    File("notes", "Notes.txt", "A simple idea, clearly explained."),
-                    Folder("archive", "Archive"),
-                ),
-            ),
-        ),
-    )
-)
-script = (
-    OSScript()
-    .open_folder("docs")
-    .rename("notes", "Launch Notes.txt")
-    .drag("notes", "archive")
-    .open_settings("appearance")
-    .set_value("appearance:theme", "dark")
-    .wait(1)
-)
+files = VirtualFileSystem(Folder("home", "Home", (
+    Folder("docs", "Documents", (
+        File("notes", "Notes.txt", "A simple idea, clearly explained."),
+        Folder("archive", "Archive"),
+    )),
+)))
+script = (OSScript().open_folder("docs")
+          .rename("notes", "Launch Notes.txt")
+          .drag("notes", "archive")
+          .open_settings("appearance")
+          .set_value("appearance:theme", "dark")
+          .wait(1))
 scene = Scene()
 scene.add(OSClip(files, script, position=(960, 540)))
 scene.wait(script.duration)
@@ -45,9 +32,6 @@ Save as `tutorial.py`, then run:
 ```bash
 faceless-champ render tutorial.py scene -o output/tutorial.mp4
 ```
-
-The complete core example is `examples/os_ui/render.py`. Import the UI APIs from
-`faceless_champ.os_ui`; they do not require an optional dependency extra.
 
 ## Virtual files
 
@@ -144,13 +128,6 @@ This release includes one starter File/context menu, the documented settings pag
 and authored files. Spotlight, notifications, Control Center, terminal emulation,
 real filesystem imports, and live OS control are outside this release.
 
-## Reproduce media verification
-
-With both packages installed, run `examples/os_ui/verify.py --output output/os-ui --render`.
-It builds the generated starter, checks random access and transparent/portrait embedding,
-exports 1080p/30, completely decodes the video, extracts encoded samples, and checks
-five-second boundaries against the original timeline. Results are in `verification.json`.
-
-For environments with short process limits, render `--chunk 0` through `--chunk 6`
-into the same output directory, then use `--finish`. The ranges preserve source time;
-joining them produces the same 35-second, 1,050-frame tutorial without restarting actions.
+Import the UI APIs from `faceless_champ.os_ui`; no optional dependency is needed.
+The `examples/programming/hello_world/README.md` in the source checkout composes
+an isolated Finder window with CodingChamp and FlowChamp. It is not yet rendered.

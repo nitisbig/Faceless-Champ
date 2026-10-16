@@ -68,8 +68,3 @@ Both helpers validate the composition, require `0 <= time < node.duration`, use
 requested paths before writing. Neither exports video. Default width is 480 with
 height derived from the canvas, including portrait. Explicit size preserves aspect
 ratio. Labels fit cell width and use the bundled font. Supply a renderer to reuse caches.
-
-The [stock-analysis example](../training%20project/stock-analysis/README.md) demonstrates
-six chapters, image reservations, a dated revenue chart, conceptual diagrams,
-and a preview-first CLI. Project prompts and source figures are composition data;
-the timing, rendering, animation, and image fallback behavior belong to the library.

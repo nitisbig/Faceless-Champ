@@ -341,13 +341,27 @@ def test_scaffold_narration_is_runnable_and_labeled(tmp_path):
     assert all(a["checksum"] for a in report["assets"])
 
 
-def test_custom_example(tmp_path):
-    import runpy
-    from pathlib import Path
+def test_custom_block_reuse_composes_fresh_children(tmp_path):
+    from dataclasses import dataclass
 
-    factory = runpy.run_path(str(Path(__file__).parents[1] / "examples/custom_block.py"))["build"]
-    result = factory(BuildContext(tmp_path)).compile()
+    from facelesschamp_kit.blocks import BlockBuild
+
+    @dataclass
+    class FixtureBlock:
+        def compose(self, ctx, bounds):
+            circle = Circle(30, position=bounds.center, fill=ctx.theme.accent)
+            return BlockBuild(circle, {"circle": circle})
+
+    video = Video(BuildContext(tmp_path))
+    block = FixtureBlock()
+    for name in ("first", "second"):
+        segment = video.segment(name, duration=3)
+        handle = segment.add(block)
+        segment.play(handle["circle"], lambda circle: circle.animate.rotate_to(20), at=1, duration=1)
+    result = video.compile()
     assert result.duration == 6
+    assert len(result.composition.entries) == 2
+    assert result.composition.entries[0].component is not result.composition.entries[1].component
 
 
 def test_entrance_preserves_later_fade_target(ctx):

@@ -76,8 +76,3 @@ The core now renders the framed board and twelve downloaded PNG pieces by defaul
 Use `ChessAssets(directory, board_grid=...)` in `ChessBoard(..., assets=...)`, or put
 `assets.directory` and `assets.board_grid` in data.json for another local set. Paths
 in JSON resolve from the JSON file's directory. Reports fingerprint the artwork.
-
-`ChessScript.from_pgn(text, move_duration=.45, move_interval=.7)` converts SAN/PGN
-mainline notation to timed moves; `script.to_dict()` writes the required data.json.
-The supplied silent game project is in `examples/chesschamp/carlsen-kasparov` at the
-core repository root. It renders all 103 plies and the declared draw with no audio.

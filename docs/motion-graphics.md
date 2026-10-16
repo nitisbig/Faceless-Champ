@@ -7,8 +7,7 @@ Their paint/shadow parameters remain fixed while existing transform, opacity,
 mask and Spring tracks animate the component or its group.
 
 All APIs below are public imports from `faceless_champ` and rasterize with Pillow.
-The package also requires PyVista for ArchChamp. See `examples/motion_graphics/render.py` for a complete 18-second,
-960×540, 24 fps showcase.
+The package also requires PyVista for ArchChamp.
 
 ## Animated properties
 
@@ -188,57 +187,6 @@ There is no FPS setting on the spring itself. v1 excludes initial velocity,
 retargeting, velocity handoff, coupled constraints, automatic duration selection,
 GPU-specific rendering, and the other Premium Motion subsystems.
 
-### Render the spring showcase
-
-The self-contained [example](../examples/spring_motion/render.py) creates a silent
-10-second sequence: equal-distance comparisons (0–4s), text/card/group transforms
-(4–7s), and staggered network nodes (7–10s). Every shot has a terminal hold. It
-requires only the existing installed package, Pillow, and FFmpeg, with no external
-assets, font downloads, audio, or network access.
-
-```bash
-.venv/bin/python examples/spring_motion/render.py --check
-.venv/bin/python examples/spring_motion/render.py --storyboard-only
-.venv/bin/python examples/spring_motion/render.py
-# To regenerate both artifacts in one invocation:
-.venv/bin/python examples/spring_motion/render.py --frames --overwrite
-# Optional higher-resolution export after reviewing the preview:
-.venv/bin/python examples/spring_motion/render.py --quality high --output output/spring_motion/showcase.mp4
-```
-
-The default MP4 is `output/spring_motion/preview.mp4` (960×540, 30 fps). The
-12-frame contact sheet is `output/spring_motion/storyboard/storyboard.png`.
-`--quality high` selects 1920×1080 with 2× antialiasing; `--output` selects the
-destination. Existing outputs are protected unless `--overwrite` is supplied.
-`--check` samples conservative bounds at 301 times per shot; it is a layout
-regression check, not the spring's continuous scale-safety proof. See the
-[verification record](spring-motion-verification.md) for inspected output
-and the scope of completed checks.
-
-### Reproduce release checks
-
-```bash
-.venv/bin/python examples/spring_motion/verify.py --output output/spring_motion/phase5/fps-verification.json
-.venv/bin/python examples/spring_motion/benchmark.py --output output/spring_motion/phase5/benchmark.json
-```
-
-The verifier compares exact timeline states and source pixels at 17 matching
-absolute timestamps after complete 24/30/60-fps seek workloads. It covers all
-three damping regimes, forward/reverse/shuffled access, Groups, independent fades,
-nested schedules, ping-pong, and both disabled/enabled frame caching. It samples
-the shared timeline directly; it does not create three encoded exports.
-
-The benchmark separates constructor, authoring, and easing costs from warmed CPU
-rendering. Seven interleaved trials compare repeated static-frame reuse, smooth
-translation, and spring translation with matching sprites and track counts.
-Memory is measured in separate subprocesses: Linux process peak RSS includes native
-Pillow buffers and imports, while `tracemalloc` measures Python allocations only.
-Run it without competing renders for useful local timing comparisons. Detailed
-results and release limitations are in the [verification record](spring-motion-verification.md).
-An identical-trajectory control precomputes spring samples to distinguish easing
-evaluation cost from differences in curve geometry. Raw trials are retained;
-results describe the local CPU workload rather than a universal overhead limit.
-
 ## Scheduling
 
 ```python
@@ -364,14 +312,3 @@ Indicators never run their own wall clock. Countdown accepts Number formatting,
 font, color and fixed-width options; `value_to` rejects negative values. A loading
 loop must be scheduled with a finite cycle count. No indicator frame sprites are
 retained, and arbitrary out-of-order sampling produces the same image.
-
-## Reproduce the showcase
-
-```bash
-.venv/bin/python examples/motion_graphics/render.py --frames
-.venv/bin/python examples/motion_graphics/render.py
-# Add --overwrite when intentionally replacing a previous render.
-```
-
-Output: `output/motion_graphics/showcase.mp4`; six representative PNGs are written
-beside it with `--frames`. No external artwork, fonts, audio, or network access is required.

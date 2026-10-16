@@ -31,24 +31,17 @@ wheels/
 *.mpg
 *.wmv
 media/
-# Keep reusable sound effects shipped with the library/examples.
+# Keep reusable library sound effects.
 !assets/sfx/**/*.wav
 
 output/
 **/output/
 **/image/
 **/images/
-# Keep the stock-analysis image folder while ignoring supplied/generated artwork.
-!training project/stock-analysis/image/
-training project/stock-analysis/image/*
-!training project/stock-analysis/image/.gitkeep
 .pytest_cache/
 .ruff_cache/
 
-# Map showcase previews
-/media/maps/
-
-# Track the guide site and its verified preview assets.
+# Track the generated API guide site.
 !website/dist/
 !website/dist/**
 
@@ -59,6 +52,3 @@ training project/stock-analysis/image/*
 .playground-cache/
 .fc-kit/
 .fc-agent/
-
-# Small verified discovery previews shipped by the agent package.
-!facelesschamp-agent/src/facelesschamp_agent/resources/previews/*.mp4

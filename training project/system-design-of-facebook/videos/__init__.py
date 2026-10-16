@@ -1,1 +1,0 @@
-"""Silent Facebook architecture study."""

@@ -41,19 +41,3 @@ ctx.theme = replace(ctx.theme, font="assets/custom.ttf", font_weight=None, headi
 ```
 
 Theme tokens are per-build and immutable. Existing themes retain their colors, fonts, panel rendering and motion defaults.
-
-## Silent feature tour
-
-See [`training project/clean-flow`](../../training%20project/clean-flow/README.md). Its seven connected scenes cover assets, OS, prepared coding, real local HTML capture, charts, maps, ArchChamp, chess, equations, whiteboard, FlowChamp, masks and indicators in exactly 60 seconds without audio or captions.
-
-```bash
-cd "training project/clean-flow"
-python3 render.py --prepare
-python3 render.py --check
-python3 render.py --storyboard
-python3 render.py                 # 0–6s at 960×540, 15 FPS
-python3 render.py --range 23.5 24.5
-python3 render.py --full --quality high --fps 30
-```
-
-Only `--prepare` runs checkpoints or launches capture. Other modes require prepared assets and replay them. Supplying `--quality` changes resolution without selecting the full export; `--full` does that explicitly. Full-export verification is pending until a complete minute has actually been rendered and checked.

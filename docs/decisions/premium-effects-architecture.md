@@ -1,3 +1,6 @@
+> Architecture reference. Prior baseline images and media evidence were retired
+> during the premium reference reset; use current source and tests for behavior.
+
 # ADR: Premium effects and compositing
 
 Status: **approved; Phase 0 audit complete**. Phase 2A implementation was
@@ -321,64 +324,6 @@ with continuous bounds/cache review. Neither entire style-object interpolation
 nor expanded Spring property support follows from this ADR. No 2B/2C/2D work is
 authorized by Phase 0 or by a later approval of 2A alone.
 
-## Measured pre-change baseline
-
-Evidence: [raw measurements and source hashes](premium-effects-baseline/baseline.json),
-[capture/benchmark reproduction](premium-effects-baseline/reproduce.md).
-
-![Six existing-renderer baseline frames](premium-effects-baseline/contact-sheet.png)
-
-Six RGBA PNGs at 960x540, AA1, t=0.77 seconds show flat/light/dark cards, a
-Spring group, a rotated nonuniform masked group with opacity, and a transparent
-chart on a shadow card. The sheet and each frame were visually inspected: smooth
-card corners, expected masks/transforms, readable labels, and no viewport clipping
-in these fixtures. The masked ellipse has visible AA1 edge aliasing; AA2/AA4 edge
-checks are required for the new feature. These are **pre-change solids**, not
-gradient previews.
-
-* Core: **1278 passed, 2 skipped**, 139.97 seconds. Skips are the existing
-  opt-in Chromium integrations (`FC_WEB_BROWSER_TESTS=1`).
-* Kit: **255 passed**, 72.06 seconds; agent: **41 passed**, 61.34 seconds, run as
-  separate suites to avoid same-named module collection collisions.
-* `ruff check src tests examples`: passed.
-* `ruff format --check src tests examples`: existing failures in
-  `examples/chesschamp/showcase.py`, `src/faceless_champ/layout.py`,
-  `src/faceless_champ/surfaces.py`, and `tests/test_surfaces.py`; 114 already
-  formatted. No automatic formatting was applied.
-* **576 exact raw-RGBA hash comparisons passed**, six scenes, times
-  `[0,.1,.37,.77,1,2]`, forward/reverse/shuffled/repeated, scene-frame cache 0/64
-  MiB, and shared timestamps after 24/30/60-FPS source-sampling workloads. This
-  check used 480x270/AA1; it is not three encoded FPS exports.
-* Existing renderer emitted a complete silent **2.000-second, 960x540, 30-FPS,
-  60-frame H.264/yuv420p preview**, 21,980 bytes. FFprobe and complete FFmpeg
-  decode passed; a decoded frame was visually inspected. Local artifact:
-  `output/premium_effects/phase0/baseline-spring.mp4`.
-* A 3840x2160/AA1 shadow-card smoke frame was rendered and visually inspected
-  (1.495 seconds including scene construction). This is one simple scene, not a
-  4K benchmark, masked stress test or full export.
-
-CPU timings and RSS below were measured in isolated workers after the test suites
-finished. Each worker uses six two-child groups, AA1, 3 warmup frames, five trials of 12 changing-time
-frames, then 24 identical holds. Scene construction/cold frames are separate.
-Timing excludes FFmpeg and tests; RSS includes interpreter, imports and native
-Pillow allocations. The plain and baked-surface modes have different pixel
-footprints and are workload baselines, not matched geometry cost attribution.
-
-| Workload | Size / AA | Moving median ms/frame (trial range) | Hold ms/frame | Peak process RSS MiB | Retained image/sprite/frame MiB |
-| --- | --- | --- | --- | --- | --- |
-| plain_motion | 960x540 / 1 | 7.42 (6.35–10.44) | 1.32 | 39.88 | 2.65 |
-| surface_motion | 960x540 / 1 | 9.67 (9.36–9.79) | 1.22 | 42.31 | 4.04 |
-| masked_affine | 960x540 / 1 | 380.87 (334.70–626.24) | 1.27 | 50.42 | 4.04 |
-| plain_motion | 1920x1080 / 1 | 20.52 (19.94–34.24) | 6.39 | 59.50 | 10.60 |
-| surface_motion | 1920x1080 / 1 | 29.00 (28.35–29.57) | 3.83 | 64.81 | 13.73 |
-| masked_affine | 1920x1080 / 1 | 1427.81 (1397.27–1796.44) | 4.04 | 96.68 | 13.73 |
-
-All six workers verified zero retained entries/bytes in the inspected image, sprite,
-scene-frame, equation, caption and code caches after `close()`. These measurements
-do not bound unrelated font/backend allocations. Cold frames, construction time,
-RSS before/after close and exact cache bytes are in the raw JSON. No 1080p/AA2
-throughput or GPU performance claim is made.
-
 ## Diff-sized Phase 2A execution list
 
 These four milestones were approved together by the user's request to complete
@@ -396,7 +341,7 @@ additional milestone approval is required within that authorized phase:
    source/frame hashes and no rerasterization during motion. Existing ShadowStyle
    and content-bounds math stay in place. No `effects.py` in this phase.
 3. **A3 — integration and visual evidence.** Add a small
-   `examples/premium_effects/render.py` with short preview as default, fixed-time
+   a local surface composition with short preview as default, fixed-time
    screenshots and a flat/linear/radial by light/dark 3x2 sheet. Exercise Spring,
    transparent charts, masks, nested opacity, nonuniform rotation, z-order and
    GIF/HTML sibling clocks using local prepared fixtures. Update a focused effects

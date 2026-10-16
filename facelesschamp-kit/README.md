@@ -14,11 +14,6 @@ fc-kit preview main -o output/preview.mp4
 
 Preparation executes trusted authored code. Ordinary build, validation, inspection, and rendering replay prepared assets. Run `prepare` again after changing sources, bindings, input, timing, or preparation settings; `--refresh` forces re-execution.
 
-Workflow authoring now includes `FlowDiagram`, cue-to-local timing via
-`segment.cue_time()`, and delayed/finite placements via `segment.add(at=..., duration=...)`.
-TextPanel fits compact cards; ImageCard reserves labeled core ImageSlot boxes.
-See [API](docs/api.md), [catalog](docs/catalog.md), and [workflow example](examples/workflow.py).
-
 A structured Python video framework built on the independent **faceless-champ** engine.
 Version **0.1.0rc7** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
 
@@ -82,19 +77,10 @@ with video.segment("comparison", window=voice.between("comparison", "recap")) as
 
 The built-ins support portrait `shorts` and `landscape` design canvases, with `midnight`, `light`, `whiteboard`, and `clean-flow` themes. Export profiles scale the selected canvas; switching format rebuilds layout. Text wraps, then shrinks, and fails if it cannot fit at the theme minimum.
 
-[Clean-flow](docs/clean-flow.md) combines a warm gray dot-grid canvas, rounded white shadowed cards, bold packaged DM Sans, charcoal editors, and orange accents. Selecting it enables smooth staggered entrances and outros automatically. `enter=None` or `exit=None` disables a placement side; existing themes keep their previous behavior. A silent 60-second feature tour and preview-first `render.py` live in [training project/clean-flow](../training%20project/clean-flow/README.md).
-
 Create a whiteboard video with `fc-kit init my-board --template whiteboard-basic`, or import
 `whiteboard_basic` and `WhiteboardScene` from `facelesschamp_kit.templates`. Ordered paths, lines, arrows, rectangles,
 and circles draw sequentially, hold, then clear between scenes. Recipes support explicit durations and original narration
 cue windows. The returned `Video` remains editable. See the [whiteboard guide](docs/whiteboard.md) for examples and timing.
-
-- [API and project configuration](docs/api.md)
-- [Block catalog and visual examples](docs/catalog.md)
-- [Whiteboard template and drawing recipes](docs/whiteboard.md)
-- [Architecture and extension contract](docs/architecture.md)
-- [Verification and known limits](docs/verification.md)
-- [Custom block example](examples/custom_block.py)
 
 Install `facelesschamp-kit[maps]` or `[equations]` to forward the engine extras. Use explicit Python imports for custom blocks and templates. The current minor-line compatibility range is `faceless-champ>=0.1.5,<0.2.0`; only versions actually tested are claimed in verification records.
 
@@ -137,9 +123,7 @@ Prepare checkpoints explicitly, then render without executing code. See the [Cod
 
 `FlowCanvas` fits scripted diagrams into kit layouts. Start with `fc-kit init my-flow --template flowchamp`; see [FlowChamp](docs/flowchamp.md).
 
-FlowCanvas inherits neutral strokes from the theme's muted role. Timed layout warnings
-include segment/placement scope and master source times. See the cue-synchronized
-[TikTok-like example](../training%20project/tiktok-system-design/README.md) for a complete
-composition with a short preview as its default export.
-
 Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffold with `fc-kit init my-design --template archchamp`. Register files as mesh assets; declare external tools in project pyproject.toml with uv add. Project.dependencies() and doctor check installed requirements without installation. See [ArchChamp](docs/archchamp.md).
+
+Use the [premium collection](../examples/README.md) for current scene references.
+Reusable package starter templates remain available; draft styling awaits approval.

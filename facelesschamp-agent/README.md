@@ -100,7 +100,8 @@ python facelesschamp-agent/scripts/release_evidence.py --output output/agent-rel
 
 The release script prepares a deterministic code fixture, renders every recipe,
 creates contact sheets, and exports three complete examples. See `docs/verification.md`
-for actual results; executing the script does not perform subjective review.
+for current verification status. It creates fresh artifacts only when explicitly run
+and does not perform subjective review.
 The bundled `benchmarks.json` has 24 prompts and a result schema for external-agent
 runs. No human-level quality or model-comparison result is claimed by this release.
 
@@ -109,3 +110,7 @@ MCP, model runners, TTS, artwork generation, and automatic research are outside 
 ArchChamp is discoverable through the arch capability family and arch-design recipe. Plans accept mesh assets and structured geometry/actions/annotations. Dependency versions and geometry hashes participate in evidence fingerprints. No simulation solver, automatic dependency installation, or model fetching is provided.
 
 See [ArchChamp structured plans and model assets](docs/archchamp.md).
+
+Current scene references are in the [premium collection](../examples/README.md).
+The Hello World opening remains a draft; prior bundled recipe previews were retired.
+Discovery omits thumbnail/motion-preview fields when those resources are absent.

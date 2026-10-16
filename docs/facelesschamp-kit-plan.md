@@ -1,3 +1,6 @@
+> Historical design proposal. Standalone demo data and media evidence were retired
+> during the premium reference reset. Current source, tests and API guides are authoritative.
+
 # facelesschamp-kit: architecture and implementation plan
 
 Status: v0.1.0rc1 implemented as an independent local repository at
@@ -6,9 +9,9 @@ Date: 2026-10-06.
 
 This document preserves the original design proposal. The implemented API,
 installation instructions, and verification evidence are maintained in the
-[kit README](../../facelesschamp-kit/README.md),
-[API reference](../../facelesschamp-kit/docs/api.md), and
-[verification report](../../facelesschamp-kit/docs/verification.md).
+[kit README](../facelesschamp-kit/README.md),
+[API reference](../facelesschamp-kit/docs/api.md), and
+[verification report](../facelesschamp-kit/docs/verification.md).
 Some proposed examples below differ from the shipped API; use those references
 for runnable code. Public publication and project licensing remain pending.
 

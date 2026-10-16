@@ -52,12 +52,6 @@ Core `FlowEdge(label_position=0.5, label_offset=(0, 0))` also works inside
 offset them in viewport design pixels. The compiler's label diagnostics use the
 adjusted geometry. Defaults preserve existing placement.
 
-For narration, attach audio/SRT once with `video.narration(...)`, create cue-bounded
-segments, and use `segment.cue_time(original_index)` for FlowScript action times.
-Keep source rounding overlaps with `overlap_tolerance=0.001` where appropriate.
-The [TikTok example](../../training%20project/tiktok-system-design/README.md) provides
-an editable, label-only landscape composition and a preview-default root renderer.
-
 ## Approved networking design
 
 Select `FlowCanvas(..., design="networking")` for the approved soft networking
@@ -115,3 +109,7 @@ itself to move or fade both layers together. Ordinary placements retain the whol
 `diagram` handle. Target graph IDs through `FlowScript`.
 The core [saved design guide](../../docs/flowchamp.md#saved-networking-design)
 documents connection layering, native `capsule` markers, and fluid motion.
+
+For narration, attach audio/SRT once with `video.narration(...)`, create cue-bounded
+segments, and use `segment.cue_time(original_index)` for FlowScript action times.
+Preserve source rounding overlaps with `overlap_tolerance=0.001` where appropriate.

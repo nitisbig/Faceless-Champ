@@ -1,8 +1,13 @@
 # Motion graphics
 
+Static gradient cards and backdrops are ordinary Image components. Use
+`GradientStop`, `LinearGradient`, `RadialGradient`, `card_surface` and
+`gradient_surface`; see [gradient surfaces and shadows](premium-effects.md).
+Their paint/shadow parameters remain fixed while existing transform, opacity,
+mask and Spring tracks animate the component or its group.
+
 All APIs below are public imports from `faceless_champ` and rasterize with Pillow.
-The package also requires PyVista for ArchChamp. See `examples/motion_graphics/render.py` for a complete 18-second,
-960×540, 24 fps showcase.
+The package also requires PyVista for ArchChamp.
 
 ## Animated properties
 
@@ -51,6 +56,136 @@ shear. Top-left anchoring keeps the existing unrotated anchor-box convention.
 animated geometry and ancestor transforms. Masks, opacity and lifetimes do not
 shrink this reserved layout box. Render states never mutate source objects or
 scene snapshots. Intermediate style/geometry sprites are not cached.
+
+## Spring motion
+
+`Spring` is an immutable, analytical easing callable for the existing animation
+tracks. It works with Text, shapes, cards, Groups, and fixed visual viewports
+through their ordinary transforms, using the CPU Pillow renderer.
+
+```python
+from faceless_champ import Canvas, Rectangle, Scene, Spring
+
+scene = Scene(Canvas(960, 540, "#101722"))
+card = Rectangle(width=160, height=100, fill="#58dfc1",
+                 position=(220, 270), scale=0.8)
+scene.add(card)
+scene.play(
+    card.animate.move_to(700, 270).scale_to(1).rotate_to(4),
+    run_time=0.8,
+    rate_func=Spring(stiffness=180, damping=23, mass=1),
+)
+scene.wait(0.3)  # Hold the final state so it appears in the encoded video.
+```
+
+### Parameters and time
+
+| Argument | Default | Meaning |
+| --- | --- | --- |
+| `stiffness` | `180` | Restoring coefficient, k |
+| `damping` | `23` | Dissipation coefficient, c |
+| `mass` | `1` | Inertial coefficient, m |
+
+Each argument must be a finite real number in `[1e-6, 1e6]`. Booleans, strings,
+complex numbers, zero, and negative values are rejected. The derived damping ratio
+`zeta = c / (2 * sqrt(k * m))` must lie in `[0.02, 100]`:
+
+- Below 1: **underdamped**, with overshoot and diminishing oscillation.
+- Exactly 1: **critically damped**, with a monotone approach.
+- Above 1: **overdamped**, also monotone, using distinct real decay rates.
+
+The response solves `m*x'' + c*x' + k*(x - 1) = 0` from `x(0)=0`, `x'(0)=0`.
+Construction derives and caches a settling horizon; `spring(u)` samples the
+closed-form response over that horizon for normalized progress `u`. No numerical
+integration, frame stepping, or extra dependency is involved. Finite samples at
+or below 0 return exactly 0; at or above 1 they return exactly 1. Nonfinite or
+non-real progress is rejected. At the left-hand terminal limit, displacement error
+is at most `1e-9` of the segment's travel and speed is at most `1e-7` in normalized
+progress units. These are relative tolerances, not pixel or seconds tolerances.
+
+**Use `run_time` to control on-screen duration.** The constructor coefficients
+describe a response that is retimed to settle within that duration; they do not
+describe a continuously running real-time simulation. Equal damping ratios produce
+equal normalized shapes within floating-point tolerance. Increasing stiffness
+while preserving the damping ratio does not make the same-duration track faster.
+The default `Scene.play()` duration remains one second. Explicit animation
+durations must be at least `1e-6` seconds, with a finite, representable end later
+than their start. Schedule `duration`, delay, and explicit `run_time` keep their
+existing meanings.
+
+### Supported properties and safety
+
+| Spring property | Behavior |
+| --- | --- |
+| `position` | Both coordinates can overshoot; no automatic canvas containment. |
+| `rotation` | Numeric degrees can overshoot; no shortest-angle wrapping. |
+| `scale`, `scale_x`, `scale_y` | Allowed only when every resolved segment is certified to stay at least `0.001`. |
+
+Validation checks continuous analytical progress bounds and finite interpolation
+arithmetic before publishing any part of a play call or schedule. Shrinking scales
+can cross zero during overshoot even when both endpoints are positive. Such tracks
+are rejected; reduce overshoot or choose safer endpoints. Conservative floating-point
+bounds can reject an endpoint very close to the minimum. Reversed spring tracks
+receive the corresponding reversed bounds. Nothing is silently clamped.
+
+Spring is rejected for opacity, color, reveal/draw/progress, numeric values,
+width/height/radius/stroke width, clipping, masks, chart data, map domain fields,
+and other custom properties, including no-op tracks and nonoscillatory springs.
+Animating a chart's **position** is supported; springing its data values is not.
+Mixed transform/fade presets such as `SlideIn`, `PopIn`, and `ZoomIn` contain
+unsupported tracks, so applying a Spring to the entire preset is rejected.
+
+Keep a fade on its own conventional easing, for example in this separate scene:
+
+```python
+from faceless_champ import Animation, FadeIn
+
+fade_scene = Scene(Canvas(960, 540, "#101722"))
+fading_card = Rectangle(width=160, height=100, position=(220, 270))
+fade_scene.add(fading_card)
+fade_scene.play(
+    Animation(fading_card, {"position": (700, 270)}, rate_func=Spring()),
+    FadeIn(fading_card),
+    run_time=0.8,
+)
+# FadeIn keeps its conventional easing. An explicit play(rate_func=Spring())
+# would override both animations and reject the opacity track.
+# Use Scene.at() for independent fade and motion durations.
+```
+
+`Animation(..., rate_func=Spring(...))`, relative transforms, and keyframes use
+the same validation. Each keyframe segment restarts its easing; velocities are not
+handed off across waypoints. `Stagger`, `Succession`, and
+finite `Repeat` work normally, including time-scaled schedules. Ping-pong reverses
+both the keyframes and the spring trajectory; two traversals return to the initial
+state. Forward repeats restart their captured values and may jump at the boundary.
+
+Scale certification covers local animated properties. It does not certify global
+pixel bounds, arbitrary ancestor matrix magnitudes, or collisions. Reserve space
+for overshoot and inspect `scene.bounds_at(component, time)` and preview frames.
+Use the Spring instance directly: wrapping it in a lambda makes it an ordinary
+custom easing callable without spring-specific validation or reversal metadata.
+
+### Example configurations and limitations
+
+The showcase uses these explicit configurations, all with `stiffness=100, mass=1`:
+
+| Example label | Damping | Damping ratio | Regime |
+| --- | --- | --- | --- |
+| Gentle spring | `20` | `1` | Critical |
+| Snappy spring | `25` | `1.25` | Overdamped |
+| Bouncy spring | `10` | `0.5` | Underdamped, about 16.3% first overshoot |
+
+These names describe the rendered comparison, not built-in presets or a physical
+speed ordering. There is no `Spring.preset()` API. The default `Spring()` remains
+`(180, 23, 1)`.
+
+Sampling the same absolute timestamp at 24, 30, or 60 fps produces the same
+timeline state, regardless of sample order. FPS selects export timestamps and
+raster/encoding quality may differ; fewer frames can miss a short overshoot.
+There is no FPS setting on the spring itself. v1 excludes initial velocity,
+retargeting, velocity handoff, coupled constraints, automatic duration selection,
+GPU-specific rendering, and the other Premium Motion subsystems.
 
 ## Scheduling
 
@@ -177,14 +312,3 @@ Indicators never run their own wall clock. Countdown accepts Number formatting,
 font, color and fixed-width options; `value_to` rejects negative values. A loading
 loop must be scheduled with a finite cycle count. No indicator frame sprites are
 retained, and arbitrary out-of-order sampling produces the same image.
-
-## Reproduce the showcase
-
-```bash
-.venv/bin/python examples/motion_graphics/render.py --frames
-.venv/bin/python examples/motion_graphics/render.py
-# Add --overwrite when intentionally replacing a previous render.
-```
-
-Output: `output/motion_graphics/showcase.mp4`; six representative PNGs are written
-beside it with `--frames`. No external artwork, fonts, audio, or network access is required.

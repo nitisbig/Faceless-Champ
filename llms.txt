@@ -89,7 +89,7 @@ Pass chrome-free content; construct all children before Scene.add. Use code_boun
 editor_full/editor_split/terminal_bounds; editor_motion(window,running=bool) animates
 the root, editor_corners(...) supplies matching face/header animations. terminal_in/out
 animate a terminal window; caller schedules visibility, typing, stdout and durations.
-[API](docs/coding.md), [staged example](examples/coding/showcase.py).
+[API](docs/coding.md).
 
 ## Prepared coding playgrounds
 
@@ -190,3 +190,10 @@ Website downloadable examples use black canvases; this does not change library d
 ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK is required; core imports remain lazy. See [ArchChamp](docs/archchamp.md).
 
 Public 3D imports: ArchMesh, ArchPart, ArchStyle, ArchCamera, ArchScript, ArchLabel, ArchDimension, ArchChamp, ArchDataError. ArchMesh snapshots geometry; ArchChamp.state_at/project_at/diagnostics_at support inspection. Close directly owned PillowRenderer sessions with a context manager.
+
+## Premium scene references
+
+Use the [current collection](examples/README.md) as the default reference. The Hello World
+opening is a draft with structural checks only. Previous standalone demo data and
+preview artifacts were retired. Keep library starter templates available; do not
+claim draft styling is approved or a full export has been verified.

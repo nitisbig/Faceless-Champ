@@ -1,36 +1,24 @@
-"""Generate the guide and downloadable examples from one content source."""
-import json
+"""Generate API guides with inline snippets; premium scenes live in the source collection."""
 import hashlib
+import json
+import re
 import textwrap
 import tomllib
-import re
-from feature_content import HTML, add_features
 from pathlib import Path
+
+from feature_content import HTML, add_features
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
-EXAMPLES = DIST / 'examples'
-EXAMPLES.mkdir(parents=True, exist_ok=True)
 lessons = []
 CORE_VERSION = tomllib.loads((ROOT.parent / 'pyproject.toml').read_text())['project']['version']
 KIT_VERSION = tomllib.loads((ROOT.parent / 'facelesschamp-kit/pyproject.toml').read_text())['project']['version']
 
 def code(source, language='python', filename=None, target=None, kind='core', template='silent'):
     source = textwrap.dedent(source).strip() + '\n'
-    if filename and language == 'python':
-        # Downloaded examples reproduce the website's black preview canvases.
-        source = re.sub(r'Canvas\((\d+, \d+), ["\'][^"\']+["\']\)',
-                        r'Canvas(\1, "#000000")', source)
-        if kind == 'kit' and 'def build(ctx):\n' in source:
-            source = 'from dataclasses import replace\nfrom faceless_champ import Canvas\n' + source
-            source = source.replace('def build(ctx):\n',
-                'def build(ctx):\n'
-                '    ctx.theme = replace(ctx.theme, background="#000000", foreground="#F3F6FF")\n'
-                '    ctx.canvas = Canvas(ctx.canvas.width, ctx.canvas.height, "#000000")\n')
-    result = dict(type='code', language=language, code=source)
+    result = {'type': 'code', 'language': language, 'code': source}
     if filename:
-        (EXAMPLES / filename).write_text(source)
-        result.update(filename=filename, target=target, kind=kind)
+        result.update(filename=filename, target=target, kind=kind, downloadable=False)
         result['command'] = (f'faceless-champ render {filename} {target} -o output/{Path(filename).stem}.mp4 -q ql'
                              if kind == 'core' else 'fc-kit preview main -o output/preview.mp4')
         if kind == 'kit':
@@ -39,17 +27,17 @@ def code(source, language='python', filename=None, target=None, kind='core', tem
     return result
 
 def section(title, text, *blocks):
-    return dict(title=title, text=text, blocks=list(blocks))
+    return {'title': title, 'text': text, 'blocks': list(blocks)}
 
 def note(text):
-    return dict(type='note', text=text)
+    return {'type': 'note', 'text': text}
 
 def link(text, href):
-    return dict(type='link', text=text, href=href)
+    return {'type': 'link', 'text': text, 'href': href}
 
 def lesson(id, title, group, description, sections, preview=None, *, guide='core', portrait=False):
-    lessons.append(dict(id=id, title=title, group=group, description=description, sections=sections,
-                        preview=preview, guide=guide, portrait=portrait))
+    lessons.append({'id': id, 'title': title, 'group': group, 'description': description, 'sections': sections,
+                        'preview': None, 'guide': guide, 'portrait': portrait})
 
 hello = code('''
 from faceless_champ import Canvas, Scene, Text, Circle, Typewriter, FadeIn
@@ -213,7 +201,7 @@ scene.wait(0.5)
 ''', filename='charts.py', target='scene')
 lesson('charts-and-numbers', 'Charts & numbers', 'Library fundamentals', 'Reveal data, animate values, and keep axes meaningful throughout a transition.', [
 section('Animate a dataset', 'Charts are core components. Supply ordinary Python data, reveal it with ChartReveal, and update matching data shapes with data_to(). This example uses synthetic data, labeled on screen.', charts),
-section('Keep the domain stable', 'Most charts derive automatic limits once from the initial data. Supply Axis(limits=...) to cover every keyframe. Keep category order, series shape, and graph topology fixed when transitioning.', dict(type='table',headers=['Component','Input'],rows=[['BarChart','Categories + named value series'],['LineChart / ScatterPlot','Named sequences of (x, y) pairs'],['RankedBarChart','Name → value or None'],['Number','Value + format_spec / formatter'],['Heatmap / Histogram','Matrix / sample values'],['NetworkGraph / SankeyChart','Nodes and edges / weighted links']])),
+section('Keep the domain stable', 'Most charts derive automatic limits once from the initial data. Supply Axis(limits=...) to cover every keyframe. Keep category order, series shape, and graph topology fixed when transitioning.', {'type': 'table','headers': ['Component','Input'],'rows': [['BarChart','Categories + named value series'],['LineChart / ScatterPlot','Named sequences of (x, y) pairs'],['RankedBarChart','Name → value or None'],['Number','Value + format_spec / formatter'],['Heatmap / Histogram','Matrix / sample values'],['NetworkGraph / SankeyChart','Nodes and edges / weighted links']]}),
 section('Animate a counter', 'Add the number before animating it. A fixed width keeps its alignment stable as the number of digits changes.', code('''
 from faceless_champ import Number
 
@@ -376,7 +364,7 @@ def build(ctx):
     return video
 ''', filename='kit_workflow.py', kind='kit')),
 section('Reserve missing artwork', 'ImageCard uses a labeled ImageSlot box matching the real image dimensions. Auto loads present files, placeholder always forces a box, and required rejects missing assets. Existing corrupt files fail in auto and required modes. TextPanel shares measured core fitting and allocates title/body space for compact cards.'),
-section('Choose the right block', 'Built-in blocks expose named children for targeted motion. Pass variant="accent" or variant="muted" to Heading, TextPanel, or MetricCard.',dict(type='table',headers=['Block','Content','Named children'],rows=[['Heading','Text','text'],['TextPanel','Text + optional title','background, text, title'],['MetricCard','Value + label','background, value, label'],['ImageCard','Asset + label','background, image, label'],['Comparison','Left + right text','0, 1'],['StepList','Tuple of steps','0, 1, …'],['WhiteboardDrawing','Path and shape specifications','stroke-0, stroke-1, …']])),
+section('Choose the right block', 'Built-in blocks expose named children for targeted motion. Pass variant="accent" or variant="muted" to Heading, TextPanel, or MetricCard.',{'type': 'table','headers': ['Block','Content','Named children'],'rows': [['Heading','Text','text'],['TextPanel','Text + optional title','background, text, title'],['MetricCard','Value + label','background, value, label'],['ImageCard','Asset + label','background, image, label'],['Comparison','Left + right text','0, 1'],['StepList','Tuple of steps','0, 1, …'],['WhiteboardDrawing','Path and shape specifications','stroke-0, stroke-1, …']]}),
 section('Keep styling consistent', 'Set theme="midnight", theme="light", or theme="whiteboard" in facelesschamp.toml. Theme values flow into every built-in block. Explicit colors override variants; variants override theme defaults.')
 ], guide='kit')
 custom = code('''
@@ -481,7 +469,7 @@ scene.wait(0.5)
 ''',filename='schedules.py',target='scene')
 lesson('animation-schedules', 'Stagger, sequence & repeat', 'Motion graphics', 'Make complex motion readable by arranging small animations in time.', [
 section('Build a finite schedule', 'Stagger offsets children, Succession plays them in order, and Repeat traverses an animation a finite number of times. Nest them to compose a rhythm.',schedules),
-section('Understand natural duration', 'duration applies to direct Animation children. Nested schedules retain their own durations. scene.play(schedule) uses the schedule’s natural length; explicit run_time scales the complete schedule.',dict(type='table',headers=['Helper','Behavior'],rows=[['Stagger(..., lag=0.2)','Child i starts at i × lag'],['Succession(...)','Each child follows the previous child'],['Repeat(..., cycles=2, ping_pong=True)','One forward traversal, one reverse traversal']])),
+section('Understand natural duration', 'duration applies to direct Animation children. Nested schedules retain their own durations. scene.play(schedule) uses the schedule’s natural length; explicit run_time scales the complete schedule.',{'type': 'table','headers': ['Helper','Behavior'],'rows': [['Stagger(..., lag=0.2)','Child i starts at i × lag'],['Succession(...)','Each child follows the previous child'],['Repeat(..., cycles=2, ping_pong=True)','One forward traversal, one reverse traversal']]}),
 section('Repeat with continuity', 'cycles counts traversals. Two ping-pong cycles return to the initial state. Forward cycles restart their captured values; use a cyclic property or ping-pong when you want continuous motion.',note('Repeat is finite and expands tracks during authoring. Add components at time zero if they should be visible before their first scheduled track.'))
 ])
 masks = code('''
@@ -551,7 +539,7 @@ scene.render("output/final.mp4", width=1920, height=1080,
 section('Use the kit workflow', 'Structured kit projects have their own validation and export commands in the framework guide.', link('Kit preview and export →', 'kit.html#kit-preview-and-export'))
 ])
 lesson('troubleshooting', 'Troubleshooting', 'Ship your video', 'Resolve common authoring and export errors with small, specific checks.', [
-section('Common fixes', 'Most issues become clear in a small preview or a validation report.',dict(type='table',headers=['Symptom','Fix'],rows=[['FFmpeg / ffprobe missing','Install FFmpeg and check PATH.'],['Unknown encoder libx264','Use a build with the H.264 encoder.'],['Output already exists','Choose another path or use --overwrite.'],['Audio starts late','Use add_audio(..., start=0).'],['Animation overlap','Separate writes to the same property.'],['Invalid dimensions','Supply both even dimensions; preserve aspect ratio.'],['Final state is absent','Add wait() after the last animation.'],['Crossfade is too long','Shorten the fade or lengthen its children.']])),
+section('Common fixes', 'Most issues become clear in a small preview or a validation report.',{'type': 'table','headers': ['Symptom','Fix'],'rows': [['FFmpeg / ffprobe missing','Install FFmpeg and check PATH.'],['Unknown encoder libx264','Use a build with the H.264 encoder.'],['Output already exists','Choose another path or use --overwrite.'],['Audio starts late','Use add_audio(..., start=0).'],['Animation overlap','Separate writes to the same property.'],['Invalid dimensions','Supply both even dimensions; preserve aspect ratio.'],['Final state is absent','Add wait() after the last animation.'],['Crossfade is too long','Shorten the fade or lengthen its children.']]}),
 section('Bound the work', 'Use ql or a 960 × 540 excerpt at 15 fps with antialias=1. Rendering uses a CPU Pillow renderer and streams frames to FFmpeg. Higher resolution, frame rate, antialiasing, and deep masks increase rendering cost.'),
 section('Keep the current scope clear', 'The core currently exports MP4. GPU rendering, camera animation, video import, and graphical editing are future work.')
 ])
@@ -592,7 +580,7 @@ def build(ctx):
     )
 ''', filename='kit_narrated.py', kind='kit', template='narrated-short')
 lesson('templates', 'Template catalog', 'Templates', 'Choose a runnable starter, edit its Python factory, and turn it into your own video.', [
-section('Choose a starter', 'List the installed templates, then pick a fresh destination directory. init refuses to merge into an existing directory.', code('fc-kit list templates', 'bash'), dict(type='table', headers=['Template', 'Starting point', 'Defaults'], rows=[
+section('Choose a starter', 'List the installed templates, then pick a fresh destination directory. init refuses to merge into an existing directory.', code('fc-kit list templates', 'bash'), {'type': 'table', 'headers': ['Template', 'Starting point', 'Defaults'], 'rows': [
     ['silent', 'Ten-second metric, comparison, and steps', 'Shorts · midnight · no audio'],
     ['explainer-short', 'Alias of the silent scaffold', 'Same files and defaults as silent'],
     ['narrated-short', 'Thirty-second synthetic narration demo', 'Shorts · midnight · sentence SRT cues'],
@@ -604,7 +592,7 @@ section('Choose a starter', 'List the installed templates, then pick a fresh des
     ['coding-concept', 'Code and independent cars', 'Six seconds · prepare first'],
     ['coding-backend', 'Code, flows, and tensor data', 'Six seconds · prepare first'],
     ['coding-web', 'HTML/CSS/JS and real browser output', 'Six seconds · prepare + Chromium'],
-])),
+]}),
 section('Create an editable project', 'Choose one command below. Each creates videos/main.py, facelesschamp.toml, an asset manifest, and local component/data folders. Generated files belong to you; upgrading the package does not rewrite them.', code('''
 fc-kit init silent-video --template silent
 fc-kit init explainer-video --template explainer-short
@@ -673,13 +661,13 @@ fc-kit storyboard main -o output/storyboard
 fc-kit preview main -o output/preview.mp4
 ''', 'bash')),
 section('Build two drawing scenes', 'WhiteboardScene is an immutable recipe. Each scene has a unique name, a drawing, and either a positive duration or a narration cue window. This example uses no labels so the geometry carries the explanation.', whiteboard),
-section('Choose paths and shapes', 'Import these immutable specifications from facelesschamp_kit.blocks. Each accepts color=None and stroke_width=5. Shapes are outlines without fills; open lines and paths have rounded ends.', dict(type='table', headers=['Specification', 'Geometry'], rows=[
+section('Choose paths and shapes', 'Import these immutable specifications from facelesschamp_kit.blocks. Each accepts color=None and stroke_width=5. Shapes are outlines without fills; open lines and paths have rounded ends.', {'type': 'table', 'headers': ['Specification', 'Geometry'], 'rows': [
     ['WhiteboardPath(points, closed=False)', 'At least two distinct points; three for a closed outline'],
     ['WhiteboardLine(start, end)', 'A straight stroke'],
     ['WhiteboardArrow(start, end, tip_size=18)', 'A stroke and arrowhead'],
     ['WhiteboardRectangle(x, y, width, height)', 'Top-left corner and dimensions'],
     ['WhiteboardCircle(center, radius)', 'Center and radius'],
-])),
+]}),
 section('Fit the drawing to the canvas', 'WhiteboardDrawing(drawings, viewbox=(1000, 1000)) uses source coordinates from the top-left, with x right and y down. Keep all geometry inside the viewbox, including full circle outlines. Coordinates and dimensions must be finite, strokes positive, and arrowheads no longer than their line. The complete viewbox fits uniformly inside the safe area; changing formats preserves proportions and whitespace without rearranging the geometry.', code('''
 # Edit these existing entries in facelesschamp.toml:
 [videos.main]
@@ -748,7 +736,7 @@ fc-kit render main -o output/final.mp4
 ''', 'bash'), note('A successful still or short preview verifies that sample. Inspect representative frames and completely decode the final export before treating the full video as verified.')),
 ], guide='kit')
 lesson('kit-troubleshooting', 'Troubleshooting', 'Ship your video', 'Use diagnostics and short previews to resolve project, template, and export errors.', [
-section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Errors include the relevant project or segment context.', dict(type='table', headers=['Symptom', 'Fix'], rows=[
+section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Errors include the relevant project or segment context.', {'type': 'table', 'headers': ['Symptom', 'Fix'], 'rows': [
     ['FFmpeg / ffprobe / libx264 missing', 'Install FFmpeg and check PATH with fc-kit doctor.'],
     ['Destination already exists', 'Use a new directory; init does not merge projects.'],
     ['PLAYGROUND_UNPREPARED / changed lesson', 'Run fc-kit prepare main after editing sources, inputs, bindings, or settings.'],
@@ -764,7 +752,7 @@ section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Erro
     ['Whiteboard appears immediately', 'Use whiteboard_basic for animation; the standalone block displays the completed drawing.'],
     ['Wrong whiteboard colors', 'Select theme="whiteboard" in the project when passing theme=ctx.theme.'],
     ['Output already exists', 'Choose another path or explicitly add --overwrite.'],
-])),
+]}),
 section('Bound the work', 'Use a frame, a storyboard, and a short preview before raising resolution or frame rate. The kit uses the core CPU Pillow renderer and FFmpeg encoder.'),
 section('Keep the current scope clear', f'The framework is a local {KIT_VERSION} release candidate. It consumes local assets and bundled demonstration media; it neither generates speech nor downloads media.', link('Core rendering and animation guide →', 'index.html')),
 ], guide='kit')
@@ -807,10 +795,10 @@ lesson('html-walkthroughs', 'HTML walkthroughs', 'Framework fundamentals',
             link('Core capture guide →', 'index.html#html-to-video')),
     section('Reusable blocks', 'WebWalkthrough adds optional browser chrome, cursor and click effects. WebElement reuses a tracked selector crop in any layout.', web_kit),
     section('Focus and explain', 'Pass WebFocus, WebHighlight and WebCallout records to the block. All annotation times use the original capture clock. Cursor and highlights follow focus transforms. Each compose creates fresh components.'),
-    section('Try the supplied tour', 'training project/web-video/render.py supports prepare, frame, storyboard, preview and render. Start with a sparse storyboard or short preview; full export is a separate explicit command.'),
+    section('Scene references', 'Use the premium reference index in the source checkout. Scene drafts require explicit rendering and visual review.'),
 ], guide='kit')
 
-os_core = code((ROOT.parent / 'examples/os_ui/render.py').read_text(),
+os_core = code((ROOT.parent / 'docs/os-ui.md').read_text().split('```python\n', 1)[1].split('```', 1)[0],
                filename='os_ui.py', target='Tutorial')
 lesson('os-ui', 'OS UI rendering', 'Library fundamentals',
        'Build offline macOS-style tutorials with virtual files, settings and a cursor.', [
@@ -877,23 +865,23 @@ kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration'
 assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]
 guides = {
-    'core': dict(title='Faceless Champ Core Guide', label='Core library', file='index.html',
-                 version=CORE_VERSION, kind='PYTHON LIBRARY', home='hello-world',
-                 introduction='Create animated videos with Python scenes, components, and a precise timeline.'),
-    'kit': dict(title='facelesschamp-kit Guide', label='Kit framework', file='kit.html',
-                version=KIT_VERSION, kind='FRAMEWORK', home='framework-quickstart',
-                introduction='Build structured video projects with reusable blocks, editable templates, and narration cues.'),
+    'core': {'title': 'Faceless Champ Core Guide', 'label': 'Core library', 'file': 'index.html',
+                 'version': CORE_VERSION, 'kind': 'PYTHON LIBRARY', 'home': 'hello-world',
+                 'introduction': 'Create animated videos with Python scenes, components, and a precise timeline.'},
+    'kit': {'title': 'facelesschamp-kit Guide', 'label': 'Kit framework', 'file': 'kit.html',
+                'version': KIT_VERSION, 'kind': 'FRAMEWORK', 'home': 'framework-quickstart',
+                'introduction': 'Build structured video projects with reusable blocks, editable templates, and narration cues.'},
 }
-(DIST / 'content.json').write_text(json.dumps(dict(lessons=lessons, guides=guides), indent=2) + '\n')
+(DIST / 'content.json').write_text(json.dumps({'lessons': lessons, 'guides': guides}, indent=2) + '\n')
 print(f'Generated {len(core_lessons)} core and {len(kit_lessons)} kit chapters, '
-      f'with {len(list(EXAMPLES.glob("*.py")))} downloadable examples.')
+      'with inline API snippets and no legacy demo downloads.')
 
 # Keep non-JavaScript fallback labels in sync with generated metadata.
 for guide in guides.values():
     path = DIST / guide['file']
     html = path.read_text()
     html = re.sub(r'(<span id="guide-version">)[^<]+',
-                  lambda m: m[1] + guide['label'] + ' v' + guide['version'], html)
+                  lambda m, guide=guide: m[1] + guide['label'] + ' v' + guide['version'], html)
     css_digest = hashlib.sha256((DIST / 'styles.css').read_bytes()).hexdigest()[:12]
     html = re.sub(r'href="styles\.css(?:\?[^" ]*)?"',
                   f'href="styles.css?v={css_digest}"', html)

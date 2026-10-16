@@ -16,13 +16,9 @@ description: Author and render Python videos with Faceless Champ scenes, animati
   workflows. Named node-N, label-N, edge-N children support independent animation.
   ImageCard uses ImageSlot boxes labeled with the manifest filename. Compact
   TextPanel grids fit both title and body using measured allocations.
-- The programming-value example supplies six chapters, four images/ slots and
-  an outline written before scene code. Its render.py defaults to 0–12 seconds at
-  960×540/15 fps. Use --storyboard, --range, --scene and --frame for feedback;
-  --full is an explicit later action, not part of preview validation.
 
 Read [the API](../../docs/api.md) for supported constructors and
-[the examples](../../examples/showcase.py) for complete scenes. Use
+[the premium references](../../examples/README.md) for complete scenes. Use
 [the guide](../../docs/guide.md) when working with timing, sound, or nested layouts.
 
 - Subclass Scene and implement construct(); the CLI accepts the class name or a
@@ -61,8 +57,7 @@ Read [the API](../../docs/api.md) for supported constructors and
   See [chapter and preview contracts](../../docs/narration.md).
 - Use save_frame(node, source_time, path) and render_storyboard(node, samples,
   directory) for shared preview export. StoryboardSample(time, label) adds labels;
-  preview size preserves canvas aspect ratio, including portrait. The stock-analysis
-  example defaults to a short opening; full export requires its explicit --full flag.
+  preview size preserves canvas aspect ratio, including portrait.
 - Use Icon for tintable transparent PNGs and Arrow for drawable diagram spokes.
   FadeOut then remove() components when their lifetime ends. Use fresh instances
   when bringing a removed visual back. Animate each property chronologically.
@@ -90,9 +85,6 @@ Use --overwrite only when replacing the chosen output is intended.
 - Use `Polyline(draw_by="x")` with `Draw` and linear easing for horizontal time
   reveals; x coordinates must strictly increase and the path must be open. Render
   one continuous curve, not hundreds of tiny shapes that can produce seams.
-- The `training project/ai-comapny-graph` example has a root render.py with preview,
-  storyboard, single-frame, output, and overwrite options. Its data is fictional:
-  retain the visible disclaimer and never describe it as historical adoption.
 
 - Reserve missing artwork with ImageSlot(path, mode="auto", width=..., height=...).
   Auto loads existing files and draws labeled boxes for absent files; placeholder
@@ -110,11 +102,6 @@ Use --overwrite only when replacing the chosen output is intended.
 - Long narration uses bounded caption sprites via PillowRenderer(caption_cache_mb=32),
   separate from frame_cache_mb. Phrase layouts reuse measurements and held caption
   states reuse frames. Use zero budgets when checking cached/uncached parity.
-- The country-economy example defaults to a 960×540 / 15 fps opening preview and has
-  --image placeholder, --scene, --range, --frame, and --storyboard options. Its entire
-  narration requires explicit --all-preview. Start visual QA with a storyboard and
-  short clips. Its six numbered image prompts are in img-info.md; fonts and symbols
-  reuse licensed assets in the main checkout. Keep the financial examples illustrative.
 
 - Motion graphics: use fill_to/stroke_to/color_to, width_to/height_to,
   stroke_width_to/corner_radius_to, and scale_xy_to on supported components.
@@ -132,17 +119,16 @@ Use --overwrite only when replacing the chosen output is intended.
 - ProgressBar, ProgressRing, Gauge, LoadingDots and Checkmark animate via
   progress_to in [0,1]. Countdown is a nonnegative Number animated with value_to(0).
   LoadingDots has identical endpoints for finite Repeat loops. These components
-  never start implicit clocks. See docs/motion-graphics.md and the self-contained
-  examples/motion_graphics/render.py for timing and validation examples.
+  never start implicit clocks. See docs/motion-graphics.md and the current premium
+  collection for scene references.
 
 - Use CodingChamp for source-preserving syntax-highlighted editor panels; install the
   optional coding extra for language aliases, or choose language="text" for plain text.
   CodeReveal(panel, start=0, end=1) uses the panel's typewriter, word, or block reveal_mode.
   block_ends are increasing inclusive local line numbers including the last line.
   Keep code readable by selecting excerpts; overflow raises instead of wrapping code.
-  CodeTheme.named supplies midnight/ocean/paper. See docs/coding.md. The coding-video
-  training wrapper exports the full tutorial by default as explicitly requested;
-  use --range when validating excerpts and never infer full-export QA from them.
+  CodeTheme.named supplies midnight/ocean/paper/clean-flow. See docs/coding.md.
+  Use explicit source-time ranges for excerpts and report full-export QA separately.
 
 ### FlowChamp diagrams
 
@@ -159,6 +145,6 @@ Use public `faceless_champ.flow` graph and script APIs for animated diagrams; us
   in the output and use node sizes/ports/waypoints that leave space for labels.
 - FlowChamp label sprites have an 8 MiB bounded cache; label_cache_mb=0 verifies
   uncached parity. Static frame-key reuse preserves transient action boundaries.
-- The TikTok system-design project is content-only composition through Video,
-  FlowCanvas and public core primitives. Its root render.py defaults to a 0–12s,
-  960×540/15fps preview; --full is explicit. Keep reusable improvements in core/kit.
+
+The Hello World opening is a draft. Keep revisions local until visual approval.
+Its structural checks do not render scene frames; honor the user's render boundary.

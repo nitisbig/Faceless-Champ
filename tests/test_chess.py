@@ -300,16 +300,14 @@ def test_san_pgn_import_result_and_json_roundtrip():
     assert board.frame_image(6.6).tobytes() == board.frame_image(8).tobytes()
 
 
-def test_supplied_game_all_103_plies_match_notation():
-    from pathlib import Path
-
-    pgn = Path(__file__).parents[1] / "examples/chesschamp/carlsen-kasparov/game.pgn"
-    script = ChessScript.from_pgn(pgn.read_text())
-    supplied = ChessScript.from_json(pgn.with_name("data.json"))
-    assert script == supplied
-    assert len(script.moves) == 103 and script.moves[-1].after.san == "Bf2"
-    assert script.players == ("Magnus Carlsen", "Garry Kasparov")
-    assert len([m for m in script.moves if len(m.moving) == 2]) == 2
+def test_pgn_and_json_roundtrip_preserves_castling_and_metadata():
+    pgn = '[White "Fixture White"]\n[Black "Fixture Black"]\n[Result "1/2-1/2"]\n\n'
+    pgn += "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 1/2-1/2"
+    script = ChessScript.from_pgn(pgn)
+    assert ChessScript.from_dict(script.to_dict()) == script
+    assert len(script.moves) == 14 and script.moves[-1].after.san == "O-O"
+    assert len([move for move in script.moves if len(move.moving) == 2]) == 2
+    assert script.players == ("Fixture White", "Fixture Black")
     assert script.result == "1/2-1/2"
 
 

@@ -138,13 +138,6 @@ are available through `faceless_champ.flow.examples.recipe(family, portrait=Fals
 families are `workflow`, `system`, `network`, `idea-map`, `circuit`. Their recommended
 viewports are `(1200,675)` and `(600,1000)` respectively.
 
-Render complete 30-second showcases:
-
-```bash
-python examples/flowchamp/render.py --overwrite
-python examples/flowchamp/render.py --portrait --overwrite
-```
-
 V1 has no interactive editor, external diagram-language parser, electrical solver,
 automatic obstacle avoidance, or arbitrary embedded core components.
 
@@ -214,13 +207,6 @@ buffers are excluded from Python allocation measurements.
 and signal intervals retain exact times, and highlights change keys at both boundaries.
 All inspection methods remain independent of playback order and cache contents.
 
-The [TikTok-like narrated example](../training%20project/tiktok-system-design/README.md)
-uses `Video`, `Segment.cue_time`, `FlowCanvas`, and core primitives. Run its root
-`python3 render.py` for a 0–12 s, 960×540/15 FPS preview. It supports source-clock
-ranges, scene selection, frames, storyboards and checks. Full export requires
-`--full`; short previews do not verify the complete film.
-The core showcase also accepts `--clean` for this palette and hidden drawing tools.
-
 ## Saved networking design
 
 `FlowDesign.named("networking")` saves the approved Networking Explained visual
@@ -286,7 +272,3 @@ to add explicit neutral-color actions or extend the authored horizon to a desire
 scene length. Connections already retain their neutral base stroke without this
 step. Timings and lesson content remain authored
 by the caller. Select `tool="none"` on connection draws for the clean presentation.
-
-The [approved training scene](../training%20project/networking-explained/README.md)
-demonstrates the complete silent 120-second request journey. Its addresses and
-network exchanges are illustrative; the design does not simulate a network.

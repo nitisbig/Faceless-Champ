@@ -1,387 +1,67 @@
 # Faceless Champ
 
-Current source versions: **faceless-champ 0.1.5**, **facelesschamp-kit 0.1.0rc7**, and **facelesschamp-agent 0.1.0rc2** (local release candidates).
-
-Explore the **[interactive project atlas](project-map/index.html)** for the current
-architecture, feature inventory, motion studies, training projects and development
-timeline. Open the self-contained HTML directly in a browser;
-[refresh instructions](project-map/README.md) keep its source snapshot current.
-
-| Capability | Core guide | Kit guide |
-| --- | --- | --- |
-| Syntax-colored code and reveals | [CodingChamp](docs/coding.md) | [Editor and playground blocks](facelesschamp-kit/docs/coding-playgrounds.md) |
-| Prepared source edits and bound results | [Coding playgrounds](docs/coding-playgrounds.md) | [Preparation workflow](facelesschamp-kit/docs/coding-playgrounds.md) |
-| Local HTML capture and playback | [HTML to video](docs/html-to-video.md) | [Web blocks](facelesschamp-kit/docs/html-to-video.md) |
-| Virtual desktop, Finder, and settings | [OS UI](docs/os-ui.md) | [OS tutorials](facelesschamp-kit/docs/os-ui.md) |
-| Legal timed games, PGN, and artwork | [ChessChamp](docs/chesschamp.md) | [ChessBoard](facelesschamp-kit/docs/chesschamp.md) |
-| Technical 3D models, assemblies, sections and dimensions | [ArchChamp](docs/archchamp.md) | [ArchCanvas](facelesschamp-kit/docs/archchamp.md) |
-| Scripted graphs, routes, and signals | [FlowChamp](docs/flowchamp.md) | [FlowCanvas](facelesschamp-kit/docs/flowchamp.md) |
-| Clean-flow styling, shadows, and smooth reveals | [Surfaces and palette](docs/clean-flow.md) | [Theme and motion](facelesschamp-kit/docs/clean-flow.md) |
-| Analytical spring transforms | [Spring motion](docs/motion-graphics.md#spring-motion) | Core scene API |
-| Static linear/radial gradient cards and alpha-safe shadows | [Gradient surfaces](docs/premium-effects.md) | Core Image composition |
-
-Install only the capabilities you use from this repository:
-
-```bash
-python -m pip install -e '.[coding,chess,playground]' -e './facelesschamp-kit[playground,chess]'
-# Required only for web checkpoint/capture preparation:
-python -m playwright install chromium
-```
-
-The [local website](website/README.md) provides separate core and kit guides with runnable downloads and black-background previews. [llms.txt](llms.txt) and [kit llms.txt](facelesschamp-kit/llms.txt) provide compact agent instructions.
-
-The [Programming Value example](training%20project/programming-value/README.md)
-uses both packages to compose six chapters against 1,379 original word cues.
-Start with `python3 'training project/programming-value/render.py' --image placeholder`:
-it renders only a 12-second 960×540 preview. Artwork prompts and a storyboard mode
-support feedback before full export. Public additions include `fit_text`, kit
-`FlowDiagram`, cue-timed placement lifetimes, and consistent image reservations.
-
-A Python library for creating animated videos from text, shapes, images, and audio.
-Inspired by Manim's scene authoring model, built for general video components.
+A Python video engine for developers and AI agents. Compose deterministic scenes
+with components, measured layouts, animation timelines, local assets, narration,
+and FFmpeg exports.
 
 ## Install
 
-Python 3.12+ and FFmpeg/ffprobe are required. On Ubuntu:
+Python 3.12+ and FFmpeg/ffprobe are required. From this checkout:
 
 ```bash
-sudo apt install ffmpeg
-uv sync
+python -m pip install -e '.[coding]' -e ./facelesschamp-kit -e ./facelesschamp-agent
 ```
 
-For use in another environment, install from this checkout with `pip install .`.
-FFmpeg must include the `libx264` encoder. The Python package uses Pillow and bundles
-a DejaVu Sans font with its license; no system font setup is needed.
+Use optional extras for chess, maps, equations, web capture, and prepared playgrounds
+when those capabilities are needed. Browser/checkpoint preparation is explicit;
+ordinary playback reuses prepared assets.
 
-## Your first scene
+## Premium references
 
-Save this as `hello.py`:
-
-```python
-from faceless_champ import Scene, Text, Circle, Typewriter, FadeIn
-
-
-class Hello(Scene):
-    def construct(self):
-        title = Text("Hello, world!", font_size=100, position=(960, 400))
-        dot = Circle(60, fill="#48e0cb", stroke=None, position=(400, 700))
-        self.play(Typewriter(title), FadeIn(dot), run_time=1.5)
-        self.play(dot.animate.move_to(1520, 700), run_time=1)
-        self.wait(0.5)
-```
+The [premium collection](examples/README.md) is the default scene reference for
+agents. Its first entry is the [Hello World opening](examples/programming/hello_world/README.md),
+a 14.96-second draft using CodingChamp, OSChamp, FlowChamp, clean-flow and spring motion.
 
 ```bash
-uv run faceless-champ render hello.py Hello -o output/hello.mp4 -q ql
+python3 examples/programming/hello_world/render.py --check
+python3 examples/programming/hello_world/render.py --render
 ```
 
-Or render directly in Python:
+The first command checks construction, narration placement, input checksums and
+sampled geometry. The second explicitly renders 1080p/60. This draft has not been
+rendered or visually approved. Previous standalone demos and training data were
+removed; package starter templates and reusable library assets remain available.
 
-```python
-Hello().render("output/hello.mp4", quality="ql", overwrite=True)
-```
+## Authoring layers
 
-The default canvas is 1920×1080 design pixels. Exporting at 720p scales everything,
-including font sizes, strokes, and positions. Component anchors default to their
-center; canvas coordinates start at the top-left. Positive Y points down.
+- **Core:** scenes, components, interpolation, rendering, audio mixing and encoding.
+- **Kit:** projects, blocks, layouts, themes, asset resolution and narration windows.
+- **Agent:** capability discovery, plans, diagnostics and fingerprinted evidence.
 
-## Example videos
+Keep ownership flowing from project to kit to core. Scene content stays local;
+promote reusable design only after review and approval.
 
-All examples generate their own assets locally; no downloads or accounts are needed.
+## Guides
+
+- [Authoring guide](docs/guide.md) and [API reference](docs/api.md)
+- [CodingChamp and clean-flow workspace](docs/coding.md)
+- [OSChamp](docs/os-ui.md), [FlowChamp](docs/flowchamp.md), [ArchChamp](docs/archchamp.md)
+- [Motion and spring easing](docs/motion-graphics.md), [gradient surfaces](docs/premium-effects.md)
+- [Charts](docs/charts.md), [maps](docs/maps.md), [ChessChamp](docs/chesschamp.md)
+- [Narration](docs/narration.md), [HTML capture](docs/html-to-video.md), [prepared playgrounds](docs/coding-playgrounds.md)
+- [Kit](facelesschamp-kit/README.md), [agent](facelesschamp-agent/README.md), [local website](website/README.md)
+- [Project atlas](project-map/README.md)
+- [Agent core reference](llms.txt) and [kit reference](facelesschamp-kit/llms.txt)
+
+## Checks
+
+Run package suites separately:
 
 ```bash
-uv run faceless-champ render examples/showcase.py AnimatedTitle -o output/animated_title.mp4 -q ql
-uv run faceless-champ render examples/showcase.py media_sequence -o output/media_sequence.mp4 -q ql
-uv run faceless-champ render examples/showcase.py six_panel_canvas -o output/six_panel_canvas.mp4 -q ql
+python -m pytest tests -q
+python -m pytest facelesschamp-kit/tests -q
+python -m pytest facelesschamp-agent/tests -q
 ```
 
-Use `--overwrite` to replace existing outputs. To render all examples, extract preview
-frames, and check their media metadata and audio, run:
-
-```bash
-uv run python examples/render_all.py
-```
-
-## Narrated training project
-
-The [good-math project](training%20project/good-math/README.md) follows a supplied
-layout reference with serif text, outline icons, and simple diagram animations.
-Its 12 visual beats and word highlights use the original SRT timestamps.
-Downloaded fonts, icons, and licenses live in the shared `assets/` folders.
-
-```bash
-uv run python 'training project/good-math/render.py' --preview
-uv run python 'training project/good-math/render.py'
-```
-
-The library now includes `SubtitleTrack`, `Captions`, `Icon`, and `Arrow`, plus
-`Scene.at()`, `wait_until()`, and `remove()` for narration-driven authoring.
-The scene also demonstrates pop, slide, zoom, bounce, spin, pulse, shake, and wiggle
-presets alongside fades, drawing, typewriter reveals, and transform builders.
-See the [animation API](docs/api.md#scenes-and-animation) for reusable presets.
-
-## Animated equation training project
-
-The [equation-render project](training%20project/equation-render/README.md) presents
-ten useful equations in one minute: two 2×2 canvases followed by a 2×1 canvas.
-Each equation has a typeset formula, animated diagram, and example. Panels reveal
-one at a time, with crossfades between canvases and quiet sound effects.
-
-```bash
-uv sync --extra equations
-uv run --extra equations python 'training project/equation-render/render.py' --preview
-uv run --extra equations python 'training project/equation-render/render.py'
-```
-
-This example adds optional `Equation`/`Write` support, `Polyline` paths, rounded
-rectangles, padded grids with delayed starts, and transparent `Layer` compositions.
-Downloaded Google fonts and Material icons, their licenses, and original sound
-effects are stored in the shared `assets/` folders. MathText handles formulas
-without requiring a separate LaTeX installation.
-
-Choose `--color-scheme midnight`, `paper`, or `ocean` for coordinated equation,
-graph, and canvas colors. Formula symbols share colors with their graph quantities.
-The library exposes `ColorScheme`, `Equation(color_map=...)`, variable font
-`Text(font_weight=...)`, rounded Polyline caps, and `with_alpha()` for shaded areas.
-Unchanged scene frames are reused within a configurable memory budget, reducing
-the rendering work during held panels while preserving animation and caption timing.
-
-## Country-economy training project
-
-The [Country Economy example](training%20project/country-economy/README.md) matches
-14 finance chapters to an existing six-minute narration and 991 word cues. It
-uses numbered image slots, charts, diagrams, and highlighted phrase captions.
-
-```bash
-python3 'training project/country-economy/render.py' --image placeholder
-python3 'training project/country-economy/render.py' --image placeholder --storyboard
-python3 'training project/country-economy/render.py' --image placeholder --scene deficit
-```
-
-The default exports only the 16.7-second opening at 960×540 / 15 fps. Replace slots
-with `image/1.png` through `6.png` and use the default auto image mode. See the
-project's `img-info.md` for prompts. Reusable main-library additions are `ImageSlot`,
-explicit subtitle overlap tolerance, `render(start_time=..., end_time=...)`, and
-bounded caption caching with reusable phrase layouts.
-
-## Documentation
-
-- [Guide website](website/README.md): 21 chapters from Hello World through the framework and motion graphics, with copyable examples and rendered previews. Serve it with `python3 -m http.server 8765 --directory website/dist`.
-- [API reference](docs/api.md): components, scenes, animation, composition, and exports.
-- [Authoring guide](docs/guide.md): timing, grids, audio, fonts, and troubleshooting.
-- [Architecture](docs/architecture.md): extension points and renderer contracts.
-- [facelesschamp-kit proposal](docs/facelesschamp-kit-plan.md): framework architecture and phased implementation plan.
-- [Agent entry point](llms.txt) and [authoring skill](skills/faceless-champ/SKILL.md).
-- [Verification record](docs/verification.md): test and sample-render results.
-
-## Groups and measured layout
-
-Keep diagrams together with `Group`, including nested groups and independent member
-animations. Layout helpers measure text, image boxes, and shapes before placement:
-
-```python
-from faceless_champ import Circle, FadeIn, Group, Text
-
-dot = Circle(40, fill="#48e0cb", stroke=None)
-label = Text("Input", font_size=32).next_to(dot, direction="down", gap=20)
-diagram = Group(dot, label).move_to(960, 540)
-self.play(FadeIn(diagram))
-self.play(diagram.animate.scale_to(1.2).rotate_to(10), dot.animate.opacity_to(0.6))
-```
-
-Use `Group(...).arrange(direction="right", gap=40)` for consistent edge spacing,
-`component.align_to(other, edge="left")` for alignment, and `component.bounds`
-for measured design-pixel edges. Create groups and finish their initial layouts
-before adding them to a scene. See [the API](docs/api.md#groups-and-measured-layout)
-for coordinate and lifetime rules, and render the self-contained example:
-
-```bash
-uv run faceless-champ render examples/groups.py GroupedDiagram -o output/groups.mp4 -q ql
-```
-
-## Development
-
-```bash
-uv sync
-uv run pytest -q
-uv run ruff check src tests examples
-uv run ruff format --check src tests examples
-uv build
-```
-
-v0.1 exports MP4 using a CPU renderer. Camera animation, video
-import, graphical editing, and GPU rendering are future work. Linux is the verified
-platform. Animated GIFs are decoded and cached in memory; long or very large GIFs
-can consume substantial memory. Video frames are streamed rather than accumulated.
-
-### Data-driven charts
-
-Render and animate bar, line, scatter, histogram, heatmap, network, vector-field,
-Sankey, and pie charts directly from Python data. Charts support scientific axes,
-themes, reveal animations, and transitions between matching datasets, with no extra
-dependencies. See the [charting guide](docs/charts.md) and
-[renderable showcase](examples/charts/render.py).
-
-### Company-growth training project
-
-The [company-growth example](training%20project/company-growth/README.md) renders
-a 45-second light-mode video of the latest US top-ten public-company cohort from
-2010 to an October 2026 market-cap snapshot. Its scene imports the main library's
-`RankedBarChart` (animated ranks, stable colors, missing data, readable crossing
-labels) and `Number` (formatted live numeric animation). Chart fonts are cached
-within a fixed limit; dynamic chart and number sprites do not accumulate.
-
-```bash
-uv run python 'training project/company-growth/render.py' --preview --overwrite
-uv run python 'training project/company-growth/render.py' --frames
-uv run python 'training project/company-growth/render.py' --overwrite
-```
-
-The project's `render.py` supports preview, full-quality video, individual frames,
-storyboards, output paths, and overwrite controls. Source data and methodology are
-included for reproducible feedback.
-
-### Image sources and AI audience example
-
-Use `Image.from_source(path_or_bytes_or_pillow_image, trim=True, tint="#C15F3C")`
-to import and normalize logos. Existing `Image(path)` calls remain supported.
-`Polyline(draw_by="x")` reveals continuous time graphs along their horizontal axis.
-See [image source details](docs/api.md#importing-image-sources).
-
-```bash
-uv run python 'training project/ai-comapny-graph/render.py' --preview
-uv run python 'training project/ai-comapny-graph/render.py' --frames
-```
-
-This 30-second example uses five supplied logos and explicitly fictional user
-counts. Scene code lives under `scene/`; reusable behavior lives in the main library.
-
-## Maps
-
-`OutlineMap`, `SatelliteMap`, and `EarthMap` provide offline country outlines, satellite imagery,
-and a textured globe. Install the `maps` extra for rendering. Use `zoom_to()` and
-`animate.rotate()` for geographic animation. See [docs/maps.md](docs/maps.md) for API details and examples.
-
-## Country flags
-
-The 254 PNGs supplied in `assets/flags` are bundled with the library. Look up flags
-by country code, including codes such as `gb-eng`; uppercase and lowercase both work.
-`Flag` preserves the original colors and aspect ratio inside its image box.
-
-```python
-from faceless_champ import FadeIn, Flag, Image, flag_path, supported_flags
-
-flag = Flag("NP", width=180, height=120, position=(960, 540))
-self.play(FadeIn(flag))  # In a Scene.construct() method.
-image = Image(flag_path("us"))  # Obtain a PNG path for other image uses.
-codes = supported_flags()  # Sorted tuple of all available lowercase codes.
-```
-
-Flags work offline from any working directory and use ordinary image transforms
-and animations. No optional extra is required. See the [API reference](docs/api.md#country-flags).
-
-```bash
-uv run faceless-champ render examples/flags.py FlagsShowcase -o output/flags.mp4 -q ql
-```
-
-### Motion graphics
-
-Animate shape colors and geometry, text colors, and independent X/Y scales.
-Compose finite `Stagger`, `Succession`, and `Repeat` schedules; clip components or
-complete groups with local masks and directional `Wipe` reveals. Six reusable
-indicators include progress bars/rings, gauges, countdowns, loading dots and checkmarks.
-See the [API and timing guide](docs/motion-graphics.md) and
-[self-contained showcase](examples/motion_graphics/render.py).
-
-Use `Spring` for deterministic position, rotation, and safe scale motion through
-the same tracks and schedules:
-
-```python
-from faceless_champ import Spring
-
-scene.play(card.animate.move_to(700, 270).scale_to(1.1),
-           run_time=0.8, rate_func=Spring(stiffness=180, damping=23, mass=1))
-```
-
-Read the [spring guide](docs/motion-graphics.md#spring-motion) for damping regimes,
-duration semantics, supported properties, and independent fades. Run the silent
-10-second [showcase](examples/spring_motion/render.py) with
-`.venv/bin/python examples/spring_motion/render.py --frames` for a 960×540 preview
-and sampled storyboard; use `--check` for its layout audit.
-
-### Stock-analysis narration
-
-The [stock-analysis example](training%20project/stock-analysis/README.md) has six
-cue-synchronized finance scenes on a white 2:3 canvas, image placeholders, a dated
-revenue comparison, and a preview-first root `render.py`.
-
-```bash
-python3 'training project/stock-analysis/render.py' --image placeholder
-python3 'training project/stock-analysis/render.py' --storyboard --image placeholder
-```
-
-The default renders only the opening at 540×810 / 12 fps. New public `CueScene`
-chapter timing, `save_frame`, `StoryboardSample`, and `render_storyboard` APIs live
-in the main package. See [narration and preview contracts](docs/narration.md).
-
-## HTML to video
-
-Turn local HTML into timed scenes with the optional `web` extra. Script interactions,
-prepare frames, and compose `HtmlClip` alongside other components.
-See [the HTML-to-video guide](docs/html-to-video.md) and
-[the example tour](training%20project/web-video/README.md).
-
-### CodingChamp
-
-Render themed code editors with syntax highlighting and character, word, or block
-reveals using `CodingChamp`, `CodeTheme`, and `CodeReveal`. Install the optional
-`coding` extra for Pygments languages; plain text needs no extra dependency.
-See [the CodingChamp guide](docs/coding.md), [the staged example](examples/coding/showcase.py),
-and the cue-synchronized `training project/coding-video` tutorial.
-The approved fullscreen editor and fluid terminal transitions are saved as
-`CodeWorkspaceDesign.named("clean-flow")`; see the [workspace design](docs/coding.md#saved-clean-flow-workspace-design)
-and [reusable example](examples/coding/workspace.py).
-
-### OS UI rendering
-
-Render offline macOS-style desktops, Finder navigation, settings, and cursor actions.
-See [OS UI rendering](docs/os-ui.md) and `examples/os_ui/render.py`.
-
-### ChessChamp
-
-Render legal two-player chess tutorials from timed `data.json` with `ChessChamp`, `ChessScript`, and `ChessTheme`. Install `faceless-champ[chess]`; see [ChessChamp](docs/chesschamp.md) and [the runnable example](examples/chesschamp/showcase.py).
-
-## Coding playgrounds
-
-Animate source edits beside real web output, car/object illustrations, or backend/AI data.
-Prepare checkpoints explicitly, then render without executing code. See the [CodingChamp playground guide](docs/coding-playgrounds.md).
-
-### FlowChamp animated diagrams
-
-Use `FlowChamp`, `FlowGraph`, and `FlowScript` for workflows, system/network diagrams, idea maps, and circuit illustrations with animated wires, signals, highlights, and pencil reveals. Python and JSON authoring work offline. See [FlowChamp](docs/flowchamp.md).
-
-Neutral strokes, bounded label caching, static-state reuse and timed layout diagnostics
-support narrated architecture videos. The [TikTok-like example](training%20project/tiktok-system-design/README.md)
-uses core and kit; its root `python3 render.py` defaults to a short low-quality preview.
-
-The approved networking design is available as
-`FlowDesign.named("networking")`: rounded asset cards, protocol popups, fluid motion,
-and softly highlighted bound connections. Icons, DM Sans and the background ship
-with core for offline rendering. Use `FlowScript.signal(marker="capsule")` for
-rounded glossy packets, and the kit's `FlowCard`, `FlowPopup`, and `FlowBackdrop`
-for measured placements. See the [saved design guide](docs/flowchamp.md#saved-networking-design).
-
-```python
-from faceless_champ import Canvas, FlowDesign, Scene
-
-design = FlowDesign.named("networking")
-scene = Scene(Canvas(1920, 1080, design.palette["background"]))
-scene.add(design.backdrop())
-scene.add(design.node_card("Laptop", icon="laptop", position=(960, 540)))
-scene.wait(4)
-```
-
-## External-agent production layer
-
-[FacelessChamp Agent](facelesschamp-agent/README.md) adds validated video plans, offline capability discovery, reusable kit recipes, a portable authoring skill, JSON production commands, and fingerprinted media/review evidence. Its [scene-selection workflow](facelesschamp-agent/docs/scene-selection.md) ingests narration and supplements, suggests beats and treatments, discovers installed APIs/assets, audits layout and delivers render.py with a verified short preview. Custom direction overrides design defaults. External agents supply reasoning and author ordinary Python; no model provider is built in. See the [release verification](facelesschamp-agent/docs/verification.md) for earlier complete-export evidence.
-
-ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK is required; core imports remain lazy. See [ArchChamp](docs/archchamp.md).
+Structural checks, rendered-media verification, and visual approval are separate.
+See [verification status](docs/verification.md). No new example export is claimed.

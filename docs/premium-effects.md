@@ -131,31 +131,7 @@ The private raster stages use `ImageMath.lambda_eval` with callables, supported
 within the existing Pillow requirement; see Pillow's [10.3 release notes](https://pillow.readthedocs.io/en/stable/releasenotes/10.3.0.html).
 They do not evaluate user-provided expression strings.
 
-## Preview and validation commands
-
-From the repository root:
-
-```bash
-# Six-second silent preview, six fixed-time PNGs, and flat/linear/radial comparison.
-.venv/bin/python examples/premium_effects/render.py --frames --overwrite
-
-# Screenshots only; no encoding.
-.venv/bin/python examples/premium_effects/render.py --stills-only --overwrite
-
-# Matched old/new replay controls, construction time and native process RSS.
-.venv/bin/python examples/premium_effects/benchmark.py
-
-# Source-time determinism, short 24/30/60 exports, decode checks and repeated cleanup.
-.venv/bin/python examples/premium_effects/verify.py
-```
-
-Outputs default to `output/premium_effects/phase2a/`. The benchmark's historical
-control requires this Git checkout and its pinned baseline revision; ordinary
-surface generation, example rendering and installed-package use work offline
-without Git. The [Phase 2A verification report](premium-effects-verification.md)
-records actual runs and limitations.
-
-Gradients currently paint these surface helpers only. Shape/Text/Canvas/Chart/
-Flow/Arch fill schemas are unchanged; use a gradient Image behind their existing
-transparent viewports. Runtime drop shadow/glow/blur, backdrop glass, spread/inset
-shadows and animated effect parameters belong to later phases and are not added.
+Gradients paint surface helpers only. Shape/Text/Canvas/Chart/Flow/Arch fill
+schemas are unchanged; place gradient Images behind transparent viewports.
+Runtime blur/glow, backdrop glass, spread/inset shadows and animated effect
+parameters are outside this API.
