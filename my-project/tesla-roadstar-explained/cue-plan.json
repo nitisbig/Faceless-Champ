@@ -1,0 +1,655 @@
+{
+  "chapters": [
+    {
+      "chapter": 1,
+      "title": "THE IMPOSSIBLE MANEUVER",
+      "start": 0.0,
+      "end": 51.6
+    },
+    {
+      "chapter": 2,
+      "title": "ENGINEERING RECONSTRUCTION",
+      "start": 51.6,
+      "end": 100.92
+    },
+    {
+      "chapter": 3,
+      "title": "THE LIMIT OF GRIP",
+      "start": 100.92,
+      "end": 170.76
+    },
+    {
+      "chapter": 4,
+      "title": "PRESSURE BECOMES GRIP",
+      "start": 170.76,
+      "end": 268.88
+    },
+    {
+      "chapter": 5,
+      "title": "DRIVING UPSIDE DOWN",
+      "start": 268.88,
+      "end": 353.4
+    },
+    {
+      "chapter": 6,
+      "title": "MOMENTUM ON DEMAND",
+      "start": 353.4,
+      "end": 420.72
+    },
+    {
+      "chapter": 7,
+      "title": "A CONTROLLED HALF-ROLL",
+      "start": 420.72,
+      "end": 529.86
+    },
+    {
+      "chapter": 8,
+      "title": "SIX DEGREES OF FREEDOM",
+      "start": 529.86,
+      "end": 581.28
+    },
+    {
+      "chapter": 9,
+      "title": "THE MATHEMATICS OF LANDING",
+      "start": 581.28,
+      "end": 677.92
+    },
+    {
+      "chapter": 10,
+      "title": "THE COMPLETE PHYSICS",
+      "start": 677.92,
+      "end": 738.3
+    }
+  ],
+  "shots": [
+    {
+      "index": 0,
+      "chapter": 1,
+      "letter": "A",
+      "cue": 1,
+      "end_cue": 15,
+      "start": 0.0,
+      "end": 6.76,
+      "name": "Roadster reveal",
+      "id": "01A",
+      "narration": "On October 15, 2026, Tesla demonstrated something that appeared to defy the laws of physics.",
+      "equation_cues": []
+    },
+    {
+      "index": 1,
+      "chapter": 1,
+      "letter": "B",
+      "cue": 16,
+      "end_cue": 38,
+      "start": 6.76,
+      "end": 15.68,
+      "name": "Climb and inversion",
+      "id": "01B",
+      "narration": "A roadster accelerated toward a massive curved ramp, climbed almost vertically, continued driving while completely upside down, and then launched into the air.",
+      "equation_cues": []
+    },
+    {
+      "index": 2,
+      "chapter": 1,
+      "letter": "C",
+      "cue": 39,
+      "end_cue": 56,
+      "start": 15.68,
+      "end": 23.56,
+      "name": "Rotation and landing",
+      "id": "01C",
+      "narration": "But instead of falling uncontrollably, it rotated through 180 degrees, corrected its orientation, and landed on its wheels.",
+      "equation_cues": []
+    },
+    {
+      "index": 3,
+      "chapter": 1,
+      "letter": "D",
+      "cue": 57,
+      "end_cue": 134,
+      "start": 23.56,
+      "end": 51.6,
+      "name": "Three physical questions",
+      "id": "01D",
+      "narration": "Think about what this requires. How can a car remain attached to a surface when gravity is pulling it away? How can it rotate its entire body while airborne? And how can a vehicle weighing nearly two tons survive such a landing? To answer these questions, we're going to reconstruct the manoeuvre using mathematical equations, three-dimensional engineering models, and physics simulations, and we'll discover that this apparently impossible stunt is actually a combination of several well-understood physical principles.",
+      "equation_cues": []
+    },
+    {
+      "index": 4,
+      "chapter": 2,
+      "letter": "A",
+      "cue": 135,
+      "end_cue": 159,
+      "start": 51.6,
+      "end": 62.4,
+      "name": "Blueprint and assembly",
+      "id": "02A",
+      "narration": "Let's begin with the vehicle itself. Tesla's system combines electric motors, four powerful suction fans, deployable aerodynamic skirts, and a collection of compressed gas thrusters.",
+      "equation_cues": []
+    },
+    {
+      "index": 5,
+      "chapter": 2,
+      "letter": "B",
+      "cue": 160,
+      "end_cue": 183,
+      "start": 62.4,
+      "end": 69.76,
+      "name": "Fans versus thrusters",
+      "id": "02B",
+      "narration": "The fans control how strongly the car presses against a surface, the thrusters control its motion when the wheels can no longer provide support.",
+      "equation_cues": []
+    },
+    {
+      "index": 6,
+      "chapter": 2,
+      "letter": "C",
+      "cue": 184,
+      "end_cue": 224,
+      "start": 69.76,
+      "end": 86.5,
+      "name": "Mass and weight",
+      "id": "02C",
+      "narration": "For our calculations, let's assume a vehicle mass of 1700 kg, approximately the reported target mass of the roadster. The force of gravity acting on this mass is given by mass multiplied by gravitational acceleration, that gives us approximately 16,700 newtons.",
+      "equation_cues": [
+        193,
+        203,
+        217,
+        223
+      ]
+    },
+    {
+      "index": 7,
+      "chapter": 2,
+      "letter": "D",
+      "cue": 225,
+      "end_cue": 263,
+      "start": 86.5,
+      "end": 100.92,
+      "name": "Contact reaction",
+      "id": "02D",
+      "narration": "In ordinary driving, the road balances this downward force through its normal reaction, but during Tesla's manoeuvre, both the direction and magnitude of the contact forces change dramatically, and understanding that change is the key to the entire demonstration.",
+      "equation_cues": []
+    },
+    {
+      "index": 8,
+      "chapter": 3,
+      "letter": "A",
+      "cue": 264,
+      "end_cue": 323,
+      "start": 100.92,
+      "end": 121.64,
+      "name": "Resolve gravity",
+      "id": "03A",
+      "narration": "Consider an ordinary car travelling up an inclined road. Gravity acts vertically downward, but we can divide it into two components. The perpendicular component is mass times gravity times the cosine of the incline angle. The parallel component is mass times gravity times the sine of that angle. The parallel component is what pulls the car backward down the slope.",
+      "equation_cues": [
+        285,
+        300
+      ]
+    },
+    {
+      "index": 9,
+      "chapter": 3,
+      "letter": "B",
+      "cue": 324,
+      "end_cue": 353,
+      "start": 121.64,
+      "end": 132.96,
+      "name": "Tire contact",
+      "id": "03B",
+      "narration": "To overcome this force, the tyres must generate sufficient traction, but traction is limited by friction. A maximum friction force equals the coefficient of friction multiplied by the normal force.",
+      "equation_cues": [
+        338
+      ]
+    },
+    {
+      "index": 10,
+      "chapter": 3,
+      "letter": "C",
+      "cue": 354,
+      "end_cue": 393,
+      "start": 132.96,
+      "end": 146.16,
+      "name": "Derive the grip limit",
+      "id": "03C",
+      "narration": "Combining these equations gives us a simple condition. The tangent of the incline angle must not exceed the friction coefficient. If the friction coefficient is 1, the car can theoretically resist sliding on an incline of up to 45 degrees.",
+      "equation_cues": [
+        354,
+        362,
+        374
+      ]
+    },
+    {
+      "index": 11,
+      "chapter": 3,
+      "letter": "D",
+      "cue": 394,
+      "end_cue": 463,
+      "start": 146.16,
+      "end": 170.76,
+      "name": "The vertical limit",
+      "id": "03D",
+      "narration": "As the angle increases, gravity pulls more strongly down the slope, while the normal force decreases. At 90 degrees, the gravitational contribution to the normal force becomes 0. And without some additional mechanism, the tyres cannot generate the traction required to climb a vertical wall. Making the motors more powerful cannot solve this problem by itself. The car needs another source of normal force, and that's exactly what Tesla engineered.",
+      "equation_cues": []
+    },
+    {
+      "index": 12,
+      "chapter": 4,
+      "letter": "A",
+      "cue": 464,
+      "end_cue": 485,
+      "start": 170.76,
+      "end": 179.04,
+      "name": "Underbody fans",
+      "id": "04A",
+      "narration": "Beneath the roadster are four electrically powered suction fans. Tesla's engineers reported that these fans are rated at approximately 20 kilowatts each.",
+      "equation_cues": []
+    },
+    {
+      "index": 13,
+      "chapter": 4,
+      "letter": "B",
+      "cue": 486,
+      "end_cue": 541,
+      "start": 179.04,
+      "end": 197.52,
+      "name": "Pressure field",
+      "id": "04B",
+      "narration": "The fans remove air from beneath the vehicle, while deployable skirts help restrict the flow of surrounding air into the low pressure region. This creates a pressure difference between the two sides of the car. Higher atmospheric pressure pushes the vehicle toward the road. The resulting force equals the pressure difference multiplied by the effective area.",
+      "equation_cues": [
+        530
+      ]
+    },
+    {
+      "index": 14,
+      "chapter": 4,
+      "letter": "C",
+      "cue": 542,
+      "end_cue": 623,
+      "start": 197.52,
+      "end": 228.72,
+      "name": "Pressure calculation",
+      "id": "04C",
+      "narration": "Tesla claims its system can generate a suction force, equivalent to approximately twice the vehicle's weight. For our 1700 kilogram model, that's around 33,400 newtons. Now suppose the effective suction area is two square meters. Dividing the force by the area gives a required pressure difference of approximately 16.7 kilopascals. That's only about 16% of standard atmospheric pressure. So the system doesn't need to create a perfect vacuum. It simply needs to maintain a substantial pressure difference across a large enough surface.",
+      "equation_cues": [
+        554,
+        574,
+        577,
+        590
+      ]
+    },
+    {
+      "index": 15,
+      "chapter": 4,
+      "letter": "D",
+      "cue": 624,
+      "end_cue": 735,
+      "start": 228.72,
+      "end": 268.88,
+      "name": "Powered wall climb",
+      "id": "04D",
+      "narration": "Now look at how this changes tyre grip. On a straight incline, the normal force becomes the gravitational normal component, plus the suction force. At 90 degrees, gravity contributes nothing to this normal load, but the fans can still press the tyres against the wall. With a friction coefficient of one, our simulated car would have approximately 33,400 newtons of available traction. Gravity pulls it downward, with only 16,700 newtons. So in this idealised case, the available traction is twice the force needed to hold the car stationary. That's how the roadster can climb a nearly vertical surface. But what happens when the road curves beyond vertical and the car becomes inverted?",
+      "equation_cues": [
+        638,
+        681
+      ]
+    },
+    {
+      "index": 16,
+      "chapter": 5,
+      "letter": "A",
+      "cue": 736,
+      "end_cue": 788,
+      "start": 268.88,
+      "end": 285.52,
+      "name": "Static ceiling contact",
+      "id": "05A",
+      "narration": "At the top of an inverted road, gravity is no longer pressing the car against the surface. It's pulling the car away. If the car is stationary, suction must exceed its weight to maintain contact. With a suction force equal to twice the weight, the remaining contact force is approximately one vehicle weight.",
+      "equation_cues": [
+        761
+      ]
+    },
+    {
+      "index": 17,
+      "chapter": 5,
+      "letter": "B",
+      "cue": 789,
+      "end_cue": 827,
+      "start": 285.52,
+      "end": 301.16,
+      "name": "Curved motion",
+      "id": "05B",
+      "narration": "But the demonstration also involves a curved trajectory and curved motion introduces centripetal acceleration. Its magnitude equals velocity squared, divided by the local radius of curvature. Multiplying by mass gives the net inward force required to follow the curve.",
+      "equation_cues": [
+        801
+      ]
+    },
+    {
+      "index": 18,
+      "chapter": 5,
+      "letter": "C",
+      "cue": 828,
+      "end_cue": 881,
+      "start": 301.16,
+      "end": 321.4,
+      "name": "Radial force balance",
+      "id": "05C",
+      "narration": "Consider a simplified circular loop, with the car moving along its inside surface, at the very top, the inward direction points downward. The radial force equation combines the road's normal reaction, gravity, and suction. Rearranging it gives the normal force as suction plus mass times velocity squared divided by radius. Minus the vehicle's weight.",
+      "equation_cues": [
+        852,
+        862
+      ]
+    },
+    {
+      "index": 19,
+      "chapter": 5,
+      "letter": "D",
+      "cue": 882,
+      "end_cue": 962,
+      "start": 321.4,
+      "end": 353.4,
+      "name": "Curvature calculation",
+      "id": "05D",
+      "narration": "Let's assume a curved radius of 12 meters and a speed of 12 meters per second. The required centripetal force is approximately 20,400 newtons. Combining this with our assumed suction and gravitational forces gives a road contact reaction of about 37,000 newtons. This shows why the geometry matters. Contact force depends on suction, gravity, speed, and the local curvature of the road. And because centripetal acceleration scales with velocity squared, changing speed can dramatically alter the forces acting on the vehicle.",
+      "equation_cues": [
+        904,
+        922
+      ]
+    },
+    {
+      "index": 20,
+      "chapter": 6,
+      "letter": "A",
+      "cue": 963,
+      "end_cue": 1019,
+      "start": 353.4,
+      "end": 374.8,
+      "name": "Release and pressure vessels",
+      "id": "06A",
+      "narration": "Now the roadster reaches the end of the ramp as the vehicle separates from the surface. The road's contact force disappears. The car becomes a freely moving rigid body. Tesla solves the next problem using compressed gas thrusters developed with technology from SpaceX. The reported flight configuration contains 10 nozzles and approximately 250 kg of compressed gas.",
+      "equation_cues": []
+    },
+    {
+      "index": 21,
+      "chapter": 6,
+      "letter": "B",
+      "cue": 1020,
+      "end_cue": 1060,
+      "start": 374.8,
+      "end": 389.5,
+      "name": "Nozzle momentum",
+      "id": "06B",
+      "narration": "When pressurized gas escapes through a nozzle, it carries momentum in one direction. Conservation of momentum produces a reaction force in the opposite direction. The rocket thrust equation relates this force to gas mass flow, exhaust velocity, and nozzle exit pressure.",
+      "equation_cues": [
+        1044
+      ]
+    },
+    {
+      "index": 22,
+      "chapter": 6,
+      "letter": "C",
+      "cue": 1061,
+      "end_cue": 1099,
+      "start": 389.5,
+      "end": 404.56,
+      "name": "Thrust and mass flow",
+      "id": "06C",
+      "narration": "For a simplified model, thrust equals mass flow rate multiplied by an effective exhaust velocity. Suppose we want 20,000 newtons of force, with an effective exhaust velocity of 600 m/s. That requires approximately 33 kg of gas every second.",
+      "equation_cues": [
+        1061,
+        1079,
+        1094
+      ]
+    },
+    {
+      "index": 23,
+      "chapter": 6,
+      "letter": "D",
+      "cue": 1100,
+      "end_cue": 1142,
+      "start": 404.56,
+      "end": 420.72,
+      "name": "Finite gas budget",
+      "id": "06D",
+      "narration": "This explains why the thrusters can produce enormous forces, but only for short periods. The stored gas is finite, and pressure decreases as it is released. These systems are therefore particularly useful for rapid acceleration, trajectory corrections, and short bursts of rotational control.",
+      "equation_cues": []
+    },
+    {
+      "index": 24,
+      "chapter": 7,
+      "letter": "A",
+      "cue": 1143,
+      "end_cue": 1208,
+      "start": 420.72,
+      "end": 444.16,
+      "name": "Force versus torque",
+      "id": "07A",
+      "narration": "Now consider the car while it's upside down in mid-air. To land correctly, it must rotate approximately 180 degrees, but applying a force through the center of mass only accelerates the vehicle. To rotate it, we need torque. Torque is the cross product of the position vector and the applied force. For rotation around a principal axis, torque equals moment of inertia multiplied by angular acceleration.",
+      "equation_cues": [
+        1175,
+        1194
+      ]
+    },
+    {
+      "index": 25,
+      "chapter": 7,
+      "letter": "B",
+      "cue": 1209,
+      "end_cue": 1278,
+      "start": 444.16,
+      "end": 469.24,
+      "name": "Inertia and two phases",
+      "id": "07B",
+      "narration": "Let's model a role around the car's longitudinal axis. Assume its moment of inertia is 800 kg m2, and suppose we want to complete a half revolution in 1.6 seconds, beginning and ending with zero role velocity. We can divide the motion into two equal phases. During the first half, the thrusters accelerate the rotation. During the second half, they reverse the torque and reduce the angular velocity to zero.",
+      "equation_cues": [
+        1224,
+        1237
+      ]
+    },
+    {
+      "index": 26,
+      "chapter": 7,
+      "letter": "C",
+      "cue": 1279,
+      "end_cue": 1328,
+      "start": 469.24,
+      "end": 491.44,
+      "name": "Angular acceleration",
+      "id": "07C",
+      "narration": "For constant acceleration and deceleration, the required angular acceleration magnitude is four times the rotation angle, divided by the total time squared. Substituting pi radians and 1.6 seconds gives approximately 4.9 radians per second squared. Multiplying by the moment of inertia gives a torque requirement of roughly 3,900 Newton meters.",
+      "equation_cues": [
+        1289,
+        1309,
+        1326
+      ]
+    },
+    {
+      "index": 27,
+      "chapter": 7,
+      "letter": "D",
+      "cue": 1329,
+      "end_cue": 1429,
+      "start": 491.44,
+      "end": 529.86,
+      "name": "The torque couple",
+      "id": "07D",
+      "narration": "Now imagine two thrusters producing equal and opposite vertical forces on opposite sides of the chassis, with an effective separation of 1.5 meters, each thruster needs approximately 2,600 newtons to create the required couple. Their forces nearly cancel as a net vertical force, while their torques add. And by reversing that torque halfway through the manoeuvre, the car can reach an upright orientation with approximately zero angular velocity. The real manoeuvre is more complex, because pitch, roll and york can interact. In a complete simulation, we must use the vehicle's three-dimensional inertia tensor and calculate angular motion along all three axes,",
+      "equation_cues": [
+        1350,
+        1356
+      ]
+    },
+    {
+      "index": 28,
+      "chapter": 8,
+      "letter": "A",
+      "cue": 1430,
+      "end_cue": 1482,
+      "start": 529.86,
+      "end": 547.88,
+      "name": "Translational and angular state",
+      "id": "08A",
+      "narration": "but rotating the car is only part of the challenge. The system must also control the position and velocity of its centre of mass. Every thruster contributes a force, and depending on its location, a torque. The total force determines the car's linear acceleration. The total torque determines how its angular momentum changes.",
+      "equation_cues": [
+        1466,
+        1474
+      ]
+    },
+    {
+      "index": 29,
+      "chapter": 8,
+      "letter": "B",
+      "cue": 1483,
+      "end_cue": 1520,
+      "start": 547.88,
+      "end": 562.4,
+      "name": "The feedback loop",
+      "id": "08B",
+      "narration": "A flight controller must estimate the vehicle's current position, velocity, orientation, and angular velocity. It then calculates the force and torque needed to follow a desired trajectory. Finally, it determines which nozzles should fire, and for how long.",
+      "equation_cues": []
+    },
+    {
+      "index": 30,
+      "chapter": 8,
+      "letter": "C",
+      "cue": 1521,
+      "end_cue": 1551,
+      "start": 562.4,
+      "end": 574.2,
+      "name": "Control allocation",
+      "id": "08C",
+      "narration": "This process is called control allocation. Tesla has not published its exact control algorithms, but the underlying mathematics is similar to that used in spacecraft attitude control and robotic flight systems.",
+      "equation_cues": [
+        1521
+      ]
+    },
+    {
+      "index": 31,
+      "chapter": 8,
+      "letter": "D",
+      "cue": 1552,
+      "end_cue": 1570,
+      "start": 574.2,
+      "end": 581.28,
+      "name": "Landing alignment",
+      "id": "08D",
+      "narration": "The goal is to reach the ground with the correct orientation, a manageable descent velocity, and minimal unwanted rotation.",
+      "equation_cues": []
+    },
+    {
+      "index": 32,
+      "chapter": 9,
+      "letter": "A",
+      "cue": 1571,
+      "end_cue": 1632,
+      "start": 581.28,
+      "end": 605.84,
+      "name": "Free-fall experiment",
+      "id": "09A",
+      "narration": "Now imagine the roadster descending toward the ground, suppose it falls from rest through 20 metres, without any thruster assistance. Conservation of energy tells us that gravitational potential energy becomes kinetic energy, and resulting impact speed is the square root of twice gravitational acceleration multiplied by height. That gives approximately 19.8 metres per second, or more than 70 kilometres per hour downward.",
+      "equation_cues": [
+        1591,
+        1615
+      ]
+    },
+    {
+      "index": 33,
+      "chapter": 9,
+      "letter": "B",
+      "cue": 1633,
+      "end_cue": 1692,
+      "start": 605.84,
+      "end": 629.88,
+      "name": "Hovering is not braking",
+      "id": "09B",
+      "narration": "To avoid a destructive landing, the car must reduce that velocity. The vertical equation of motion is simple. Mass times vertical acceleration equals upward directed thrust minus gravitational weight. For our simulated vehicle, a thrust of 16.7 kN would balance gravity, but balancing gravity does not automatically stop a falling object. To actually slow its descent, thrust must exceed weight.",
+      "equation_cues": [
+        1647,
+        1688
+      ]
+    },
+    {
+      "index": 34,
+      "chapter": 9,
+      "letter": "C",
+      "cue": 1693,
+      "end_cue": 1754,
+      "start": 629.88,
+      "end": 651.76,
+      "name": "Braking distance",
+      "id": "09C",
+      "narration": "Now consider a simplified landing simulation. The vehicle begins falling from rest at 20 metres. We allow it to fall freely through the first 10 metres. This downward velocity reaches approximately 14 metres per second, then we activate the braking thrusters. To reduce that velocity to zero over the remaining 10 metres, the car needs a net upward acceleration of approximately 1g.",
+      "equation_cues": [
+        1734,
+        1754
+      ]
+    },
+    {
+      "index": 35,
+      "chapter": 9,
+      "letter": "D",
+      "cue": 1755,
+      "end_cue": 1823,
+      "start": 651.76,
+      "end": 677.92,
+      "name": "Controlled touchdown",
+      "id": "09D",
+      "narration": "The thrusters must therefore generate approximately twice the vehicle's weight, that's 33.4 kilonewtons of upward thrust. In this idealised scenario, the car could theoretically reduce its vertical speed to zero before touching the ground. The actual demonstration involved a different initial velocity, changing thrust directions, and a more complicated trajectory, but the principle is the same. The landing system must remove enough downward momentum before the wheels make contact.",
+      "equation_cues": [
+        1766
+      ]
+    },
+    {
+      "index": 36,
+      "chapter": 10,
+      "letter": "A",
+      "cue": 1824,
+      "end_cue": 1847,
+      "start": 677.92,
+      "end": 687.0,
+      "name": "One complete system",
+      "id": "10A",
+      "narration": "So did Tesla create a car that breaks the laws of physics? No. The demonstration combines several established physical principles in an extraordinary way.",
+      "equation_cues": []
+    },
+    {
+      "index": 37,
+      "chapter": 10,
+      "letter": "B",
+      "cue": 1848,
+      "end_cue": 1884,
+      "start": 687.0,
+      "end": 703.24,
+      "name": "Coordinated replay",
+      "id": "10B",
+      "narration": "Pressure differences create artificial grip. Friction transfers propulsion forces to the road. The triple acceleration governs the curved inverted trajectory. Compressed gas thrusters generate impulse and rotational torque, and carefully directed thrust reduces the car's landing velocity.",
+      "equation_cues": []
+    },
+    {
+      "index": 38,
+      "chapter": 10,
+      "letter": "C",
+      "cue": 1885,
+      "end_cue": 1943,
+      "start": 703.24,
+      "end": 726.24,
+      "name": "Physical limitations",
+      "id": "10C",
+      "narration": "But performing this manoeuvre once is not the same as making it safe, efficient, or practical for everyday transportation. The system still faces limitations in stored gas, pressure loss, fan ceiling, energy consumption, and flight control precision. We also don't yet have the complete engineering data required to independently reconstruct Tesla's exact trajectory, but the underlying physics is clear.",
+      "equation_cues": []
+    },
+    {
+      "index": 39,
+      "chapter": 10,
+      "letter": "D",
+      "cue": 1944,
+      "end_cue": 1975,
+      "start": 726.24,
+      "end": 738.3,
+      "name": "Mathematics brought to life",
+      "id": "10D",
+      "narration": "Tesla didn't escape gravity. It used pressure, momentum, and controlled forces to overcome the limitations of an ordinary car. And sometimes, what looks like impossible physics is simply mathematics brought to life.",
+      "equation_cues": []
+    }
+  ]
+}
