@@ -70,6 +70,17 @@ def transformed_box(box, world):
     )
 
 
+def component_ink_box(c, box):
+    from .procedural import ParticleField
+
+    if isinstance(c, ParticleField):
+        # Centers wrap inside the field, but the shader's quads include a
+        # one-design-pixel fringe for antialiasing beyond each particle radius.
+        pad = c.radius + 1
+        return Bounds(-c.width / 2 - pad, -c.height / 2 - pad, c.width / 2 + pad, c.height / 2 + pad)
+    return box
+
+
 def ink_box(entry, time, parent, raster):
     from .surfaces import _shadow_padding
 
@@ -90,6 +101,7 @@ def ink_box(entry, time, parent, raster):
             result = Bounds(result.left - pad, result.top - pad, result.right + pad, result.bottom + pad)
         return result
     effects = c.effects.evaluated(entry.state_at(time)) if c.effects is not None else None
+    box = component_ink_box(c, box)
     pad = _shadow_padding(c.drop_shadow) + (effects.padding if effects else 0)
     return transformed_box(Bounds(box.left - pad, box.top - pad, box.right + pad, box.bottom + pad), world)
 

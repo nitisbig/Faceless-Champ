@@ -309,6 +309,36 @@ def test_mask_allocations_follow_small_local_coverage_and_nested_transforms():
         assert renderer.working_bytes == 0
 
 
+@pytest.mark.parametrize("feature", ["effects", "procedural", "transition"])
+def test_delegated_composition_preserves_working_budget(native, feature):
+    from faceless_champ import DirectionalWipe, EffectStack, ProceduralBackground
+
+    def scene(size):
+        w, h = size
+        if feature == "procedural":
+            component = ProceduralBackground(width=w, height=h, position=(w / 2, h / 2))
+        else:
+            component = Rectangle(
+                width=20,
+                height=20,
+                position=(w / 2, h / 2),
+                effects=EffectStack() if feature == "effects" else None,
+            )
+        node = Scene(Canvas(w, h)).add(component).wait(1)
+        if feature == "transition":
+            node = Sequence(node, Scene(Canvas(w, h)).wait(1), crossfade=0.5, transition=DirectionalWipe())
+        return node
+
+    with SkiaRenderer(1, working_mb=1) as renderer:
+        for node in (Scene(Canvas(800, 600)).wait(1), scene((800, 600))):
+            with pytest.raises(ValueError, match="working_mb"):
+                renderer.frame(node, 0.75, (800, 600))
+        assert renderer.working_bytes == 0
+        # Reuse after failure still renders frames that fit the configured limit.
+        assert renderer.frame(scene((80, 60)), 0.75, (80, 60)).size == (80, 60)
+        assert renderer._effect_compositor.device.bytes == 0
+
+
 def test_specialist_viewports_reuse_resolution_through_animated_scale(native, monkeypatch):
     from faceless_champ import Component
 

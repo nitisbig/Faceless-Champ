@@ -108,12 +108,14 @@ class CPUDevice:
             return False
         from ._compositor import density
         from ._effects_cpu import background
+        from ._render_state import component_ink_box
 
         q = density(world)
-        size = max(1, math.ceil(c.width * q)), max(1, math.ceil(c.height * q))
+        box = component_ink_box(c, Bounds(-c.width / 2, -c.height / 2, c.width / 2, c.height / 2))
+        size = max(1, math.ceil(box.width * q)), max(1, math.ceil(box.height * q))
         guard_size(size)
-        with background(c, age, size) as sprite:
-            self.blit(target, sprite, Bounds(-c.width / 2, -c.height / 2, c.width / 2, c.height / 2), world, opacity)
+        with background(c, age, size, bounds=box) as sprite:
+            self.blit(target, sprite, box, world, opacity)
         return True
 
     def finish(self, target, size):

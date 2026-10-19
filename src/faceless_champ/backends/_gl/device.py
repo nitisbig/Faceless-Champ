@@ -358,6 +358,10 @@ class GLDevice:
             records = particle_data(c, age).tobytes()
             with self.ctx:
                 if self.particle_bytes < len(records):
+                    while self.pool and self.working_bytes + len(records) > self.options.working_mb * 1024**2:
+                        old = self.pool.pop(0)
+                        self.working_bytes -= old.cost
+                        old.release()
                     if self.working_bytes + len(records) > self.options.working_mb * 1024**2:
                         raise ValueError("Particle buffer exceeds working_mb")
                     if self.particle_vao is not None:

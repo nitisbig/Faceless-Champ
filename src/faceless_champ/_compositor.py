@@ -6,7 +6,7 @@ from PIL import Image, ImageChops, ImageDraw
 
 from ._composition_plan import composition_plan, fit
 from ._portable import guard_size
-from ._render_state import entry_geometry, ink_box, transformed_box
+from ._render_state import component_ink_box, entry_geometry, ink_box, transformed_box
 from .layout import Bounds, Group
 from .motion import IDENTITY
 from .surfaces import _shadow_padding
@@ -187,7 +187,7 @@ class Compositor:
                 max(b.bottom for b in boxes),
             )
         else:
-            ink = box
+            ink = component_ink_box(c, box)
         pad = (effects.padding if effects else 0) + _shadow_padding(c.drop_shadow) + 2 / q
         roi = Bounds(ink.left - pad, ink.top - pad, ink.right + pad, ink.bottom + pad)
         projected = transformed_box(roi, world)

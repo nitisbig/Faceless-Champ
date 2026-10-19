@@ -322,6 +322,54 @@ def test_particle_clock_is_independent_of_background_speed(gpu):
     assert field.frame_key(0.2) != field.frame_key(0.7)
 
 
+@pytest.mark.parametrize("isolation", ["leaf", "group", "nested_group"])
+@pytest.mark.parametrize("scale", [0.5, 1, 2])
+def test_particle_overhang_survives_noop_isolation(gpu, isolation, scale):
+    import numpy as np
+
+    def scene(isolated):
+        field = ParticleField(width=20, height=20, radius=25, count=10, position=(80, 80))
+        if isolation == "leaf":
+            field.effects = EffectStack() if isolated else None
+            field.scale = scale
+            root = field
+        else:
+            root = Group(field, scale=scale, effects=EffectStack() if isolated else None)
+            if isolation == "nested_group":
+                root = Group(root, effects=EffectStack() if isolated else None)
+        return Scene(Canvas(160, 160, "#00000000")).add(root).wait(1)
+
+    expected = np.asarray(gpu.frame(scene(False), 0.3, (160, 160)), dtype=int)
+    actual = np.asarray(gpu.frame(scene(True), 0.3, (160, 160)), dtype=int)
+    assert expected[..., 3].sum() > 0
+    assert abs(actual[..., 3] - expected[..., 3]).max() <= 1
+
+
+def test_particle_buffer_growth_reclaims_idle_targets(gpu):
+    scene = (
+        Scene(Canvas(80, 60, "#00000000"))
+        .add(ParticleField(width=80, height=60, position=(40, 30), count=10_000))
+        .wait(1)
+    )
+    options = GPUOptions(working_mb=1, frame_cache_mb=0)
+    with ModernGLRenderer(1, gpu=options) as fresh:
+        expected = fresh.frame(scene, 0.3, (80, 60)).tobytes()
+    with ModernGLRenderer(1, gpu=options) as reused:
+        reused.frame(Scene(Canvas(400, 200)).wait(1), 0, (400, 200))
+        assert reused.frame(scene, 0.3, (80, 60)).tobytes() == expected
+        assert reused.device.working_bytes + reused.device.particle_bytes <= 1024**2
+        assert reused.device.active_bytes == 0
+
+        # Live targets cannot be reclaimed to accommodate an oversized buffer.
+        too_large = (
+            Scene(Canvas(80, 60)).add(ParticleField(width=80, height=60, count=100_000, position=(40, 30))).wait(1)
+        )
+        with pytest.raises(ValueError, match="Particle buffer exceeds working_mb"):
+            reused.frame(too_large, 0.3, (80, 60))
+        assert reused.device.active_bytes == 0
+        assert reused.frame(scene, 0.3, (80, 60)).tobytes() == expected
+
+
 @pytest.mark.parametrize("component", [ProceduralBackground, ParticleField])
 def test_procedural_masks_are_checked_during_preflight(component, monkeypatch):
     from faceless_champ.backends import _native

@@ -154,7 +154,7 @@ def halos(source, stack, scale):
     return image(a)
 
 
-def background(component, age, size):
+def background(component, age, size, *, bounds):
     np = numpy()
     from .procedural import ParticleField, particle_data
 
@@ -164,7 +164,7 @@ def background(component, age, size):
         from PIL import ImageDraw
 
         out = Image.new("RGBA", size)
-        qx, qy = w / component.width, h / component.height
+        qx, qy = w / bounds.width, h / bounds.height
         r = component.radius * min(qx, qy)
         for x, y, opacity in particle_data(component, age):
             tile = Image.new("RGBA", (max(1, math.ceil(2 * r + 2)),) * 2)
@@ -172,7 +172,13 @@ def background(component, age, size):
                 (1, 1, 2 * r + 1, 2 * r + 1),
                 fill=(*tuple(round(v * 255) for v in color[:3]), round(color[3] * opacity * 255)),
             )
-            out.alpha_composite(tile, (round(x * qx - r - 1), round(y * qy - r - 1)))
+            out.alpha_composite(
+                tile,
+                (
+                    round((x - component.width / 2 - bounds.left) * qx - r - 1),
+                    round((y - component.height / 2 - bounds.top) * qy - r - 1),
+                ),
+            )
         return out
     x = (np.arange(w, dtype="f4")[None, :] + 0.5) / w
     y = (np.arange(h, dtype="f4")[:, None] + 0.5) / h

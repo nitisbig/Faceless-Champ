@@ -37,6 +37,7 @@ class SkiaRenderer:
         self.images = ByteCache(round(finite(native_cache_mb, "native_cache_mb", 0) * 1024**2))
         self.working_limit = round(finite(working_mb, "working_mb", 1) * 1024**2)
         self.working_bytes = 0
+        self._effect_compositor = None
         self.raster = PillowRasterAdapter(native_cache_mb, arch_session_limit)
         self.text = TextSession()
         self.raster.text_session = self.text
@@ -60,6 +61,9 @@ class SkiaRenderer:
         self.images.clear()
         self.text.close()
         self.raster.close()
+        if self._effect_compositor is not None:
+            self._effect_compositor.device.close()
+            self._effect_compositor = None
 
     def validate(self, node):
         if self._closed:
@@ -116,8 +120,13 @@ class SkiaRenderer:
 
         if needs_compositor(node):
             # The shared CPU reference uses existing Skia typography/path tiles.
-            self.raster.renderer.antialias = self.antialias
-            return self.raster.renderer.frame(node, time, size)
+            if self._effect_compositor is None:
+                from .._compositor import Compositor
+                from .._cpu_device import CPUDevice
+
+                device = CPUDevice(working_mb=self.working_limit / 1024**2)
+                self._effect_compositor = Compositor(device, self.raster, self.antialias)
+            return self._effect_compositor.frame(node, time, size)
         if not isinstance(node, Scene):
             return composition_frame(self, node, time, size)
         node.build()
