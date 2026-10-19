@@ -10,7 +10,16 @@ import uuid
 from dataclasses import replace
 from pathlib import Path
 
-from faceless_champ import Scene, StoryboardSample, SubtitleTrack, render, render_storyboard, save_frame
+from faceless_champ import (
+    Scene,
+    StoryboardSample,
+    SubtitleTrack,
+    create_renderer,
+    render,
+    render_storyboard,
+    rendering_identity,
+    save_frame,
+)
 from faceless_champ.audio import probe
 from facelesschamp_kit import Project, Video
 from facelesschamp_kit.assets import digest
@@ -207,6 +216,8 @@ class AgentProject:
             minimum_font_size=design.minimum_font_size,
             spacing=design.spacing,
             motion_duration=design.motion_duration,
+            text_engine=design.text_engine,
+            surface_mode=design.surface_mode,
         )
         context.canvas = replace(context.canvas, bg=context.theme.background)
         context.captions = design.captions
@@ -328,6 +339,10 @@ class AgentProject:
 
     def validate(self):
         compiled, plan, fingerprint = self._build()
+        for profile in ("preview", "final"):
+            settings = self.kit.settings(compiled, profile)
+            with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+                renderer.validate(compiled.composition)
         return self._record(
             "validate",
             fingerprint,
@@ -393,13 +408,16 @@ class AgentProject:
     def frame(self, time, output=None):
         compiled, _, fingerprint = self._build()
         path = self._output(output, "frame", ".png")
-        size = self.kit.settings(compiled, "preview").dimensions(compiled.composition.canvas)
-        save_frame(compiled.composition, time, path, size=size)
+        settings = self.kit.settings(compiled, "preview")
+        size = settings.dimensions(compiled.composition.canvas)
+        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+            save_frame(compiled.composition, time, path, size=size, renderer=renderer)
         return self._record(
             "frame",
             fingerprint,
             artifacts=[{"path": str(path), "kind": "frame", "source_time": time}],
             layout=compiled.layout_at(time),
+            rendering=rendering_identity(settings.backend),
         )
 
     def storyboard(self, output=None):
@@ -410,7 +428,9 @@ class AgentProject:
             StoryboardSample(t, " / ".join(s.id for s in plan.scenes if s.start <= t < s.start + s.duration))
             for t in times
         ]
-        sheet = render_storyboard(compiled.composition, samples, directory)
+        settings = self.kit.settings(compiled, "preview")
+        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+            sheet = render_storyboard(compiled.composition, samples, directory, renderer=renderer)
         frames = sorted((p for p in directory.glob("*.png") if p != sheet), key=lambda p: int(p.stem.split("-", 1)[0]))
         artifacts = [
             {"path": str(p), "kind": "frame", "source_time": time} for p, time in zip(frames, times, strict=True)
@@ -436,7 +456,14 @@ class AgentProject:
                                 "message": "Conservative bounds intersect; inspect whether overlap is intentional",
                             }
                         )
-        return self._record("storyboard", fingerprint, artifacts=artifacts, layouts=layouts, diagnostics=findings)
+        return self._record(
+            "storyboard",
+            fingerprint,
+            artifacts=artifacts,
+            layouts=layouts,
+            diagnostics=findings,
+            rendering=rendering_identity(settings.backend),
+        )
 
     def _render(self, start, end, profile, output, *, operation, fps=None, quality=None, progress=None):
         if fps is not None and (
@@ -471,6 +498,7 @@ class AgentProject:
                 "require_audio": bool(plan.brief.narration.audio),
             },
             profile=profile,
+            rendering=rendering_identity(settings.backend),
             source_range=[start, end],
             status="exported",
         )
@@ -580,6 +608,7 @@ class AgentProject:
             artifacts=artifacts,
             source_record=source["id"],
             verified_operation=source["operation"],
+            rendering=source.get("rendering", rendering_identity("pillow")),
             **result,
         )
 
@@ -593,9 +622,17 @@ class AgentProject:
         records = self._records(fingerprint)
         artifacts = {a["id"]: a for r in records for a in r["artifacts"]}
         wanted = set(submission.evidence_artifacts) | {f.evidence_artifact for f in submission.findings}
+        final_backend = self.kit.settings(compiled, "final").backend
+        evidence_backends = {
+            a["id"]: r.get("rendering", {}).get("backend", "pillow") for r in records for a in r["artifacts"]
+        }
         for identifier in wanted:
             if identifier not in artifacts or not self._intact(artifacts[identifier]):
                 raise AgentError("REVIEW_EVIDENCE", "Evidence is unknown, stale, or changed", artifact=identifier)
+            if evidence_backends.get(identifier) != final_backend:
+                raise AgentError(
+                    "REVIEW_BACKEND", "Review evidence must use the final output backend", artifact=identifier
+                )
         scenes = {s.id: s for s in plan.scenes}
         if set(submission.reviewed_scenes) - scenes.keys():
             raise AgentError("REVIEW_SCENE", "Unknown reviewed scene")
@@ -645,6 +682,7 @@ class AgentProject:
             report.draft_reasons.append("Placeholder artwork: " + ", ".join(sorted(set(missing))))
         report.draft = bool(report.draft_reasons)
         current = self._records(fingerprint)
+        final_backend = self.kit.settings(compiled, "final").backend
         artifacts = {a["id"]: a for r in current for a in r["artifacts"] if self._intact(a)}
         report.artifacts = list(artifacts.values())
         reviewed = {"visual": {}, "editorial": {}}
@@ -653,6 +691,8 @@ class AgentProject:
             if record["operation"] == "audit-layout":
                 report.layout_validation = record["status"]
             if record["operation"] == "verify" and all(self._intact(a) for a in record["artifacts"]):
+                if record.get("rendering", {}).get("backend", "pillow") != final_backend:
+                    continue
                 field = (
                     "full_export_media_verification"
                     if record["verified_operation"] == "render"

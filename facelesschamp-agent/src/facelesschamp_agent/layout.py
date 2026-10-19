@@ -263,7 +263,12 @@ def audit_layout(compiled, plan, *, times=None):
                         "Repair the element geometry and animation values before rendering.",
                     )
                     continue
-                if not _contains(canvas_box, box):
+                ink = (
+                    placement.get("ink_bounds", box)
+                    if identifier == placement["id"]
+                    else (placement.get("child_ink_bounds", {}).get(identifier.split("/", 1)[-1], box))
+                )
+                if not _contains(canvas_box, _box(ink)):
                     add(
                         "LAYOUT_CANVAS_OVERFLOW",
                         time,

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from PIL import Image as PILImage
 from PIL import ImageColor, ImageDraw, ImageFilter
 
-from .components import Image, finite
+from .components import Component, Image, finite
 from .gradients import LinearGradient, RadialGradient
 from .layout import Bounds
 
@@ -32,6 +32,31 @@ class ShadowStyle:
         if len(offset) != 2:
             raise ValueError("Shadow offset needs two coordinates")
         object.__setattr__(self, "offset", offset)
+
+
+class Surface(Component):
+    """Retained card/backdrop description. Layout includes shadow clearance.
+
+    Use the existing factories with render_mode='vector'. No pixels or native
+    handles are stored in this component; renderers own all raster caches.
+    """
+
+    def __init__(self, bounds, *, fill, radius=0, shadow=None, pattern=None, spacing=28, dot_radius=1, **options):
+        _check_bounds(bounds)
+        _check_component_options(options)
+        self.width, self.height = bounds.width, bounds.height
+        self.fill = fill
+        if not isinstance(fill, (str, LinearGradient, RadialGradient)):
+            raise TypeError("Surface fill must be a color or gradient")
+        if isinstance(fill, str):
+            ImageColor.getcolor(fill, "RGBA")
+        self.radius = finite(radius, "surface radius", 0)
+        card_content_bounds(bounds, shadow=shadow, padding=0)
+        if shadow and (shadow.blur > 4096 or any(abs(v) > 4096 for v in shadow.offset)):
+            raise ValueError("Surface shadow exceeds the allocation budget")
+        self.surface_shadow = shadow
+        self.pattern, self.spacing, self.dot_radius = pattern, spacing, dot_radius
+        super().__init__(position=bounds.center, **options)
 
 
 def _check_bounds(bounds):
@@ -80,7 +105,7 @@ def _image(source, bounds, component_options):
     )
 
 
-def card_surface(bounds, *, fill="#FFFFFF", radius=44, shadow=None, **component_options):
+def card_surface(bounds, *, fill="#FFFFFF", radius=44, shadow=None, render_mode="raster", **component_options):
     """Return an Image containing a rounded card and optional blurred shadow.
 
     ``bounds`` includes transparent shadow clearance, so the face is smaller
@@ -89,6 +114,10 @@ def card_surface(bounds, *, fill="#FFFFFF", radius=44, shadow=None, **component_
     opacity, masks, and z-index apply without a new renderer path.
     """
     _check_bounds(bounds)
+    if render_mode not in {"raster", "vector"}:
+        raise ValueError("render_mode must be raster or vector")
+    if render_mode == "vector":
+        return Surface(bounds, fill=fill, radius=radius, shadow=shadow, **component_options)
     if isinstance(fill, (LinearGradient, RadialGradient)):
         from ._surface_raster import _allocation, gradient_card
 
@@ -139,12 +168,16 @@ def gradient_surface(bounds, *, fill, **component_options):
     return card_surface(bounds, fill=fill, radius=0, shadow=None, **component_options)
 
 
-def dot_grid(bounds, *, color="#B7B3AE55", spacing=28, radius=1, **component_options):
+def dot_grid(bounds, *, color="#B7B3AE55", spacing=28, radius=1, render_mode="raster", **component_options):
     """Return a transparent, evenly spaced dot-grid Image for a backdrop."""
     _check_bounds(bounds)
-    color = ImageColor.getcolor(color, "RGBA")
     spacing = finite(spacing, "dot spacing", 1)
     radius = finite(radius, "dot radius", 0.001)
+    if render_mode not in {"raster", "vector"}:
+        raise ValueError("render_mode must be raster or vector")
+    if render_mode == "vector":
+        return Surface(bounds, fill=color, pattern="dots", spacing=spacing, dot_radius=radius, **component_options)
+    color = ImageColor.getcolor(color, "RGBA")
     size = (round(bounds.width * _RASTER_SCALE), round(bounds.height * _RASTER_SCALE))
     source = PILImage.new("RGBA", size)
     draw = ImageDraw.Draw(source)

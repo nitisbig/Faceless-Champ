@@ -35,11 +35,18 @@ class CodingTutorialStyle:
     spring_stiffness: float = 180
     window_damping: float = 27
     icon_damping: float = 23
+    surface_mode: str = "raster"
+    text_engine: str = "pillow"
 
     def __post_init__(self):
         try:
             for field in fields(self):
                 value = getattr(self, field.name)
+                if field.name in {"surface_mode", "text_engine"}:
+                    allowed = {"raster", "vector"} if field.name == "surface_mode" else {"pillow", "skia"}
+                    if value not in allowed:
+                        raise ValueError(f"{field.name} must be one of {sorted(allowed)}")
+                    continue
                 if field.type is str:
                     if not isinstance(value, str):
                         raise ValueError(f"{field.name} must be a color string")
@@ -104,4 +111,6 @@ class CodingTutorialStyle:
             restore_duration=self.restore_duration,
             terminal_entrance_duration=self.terminal_entrance_duration,
             terminal_exit_duration=self.terminal_exit_duration,
+            surface_mode=self.surface_mode,
+            text_engine=self.text_engine,
         )

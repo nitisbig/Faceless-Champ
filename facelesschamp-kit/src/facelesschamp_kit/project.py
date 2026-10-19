@@ -21,13 +21,15 @@ from faceless_champ import (
     ExportSettings,
     Grid,
     Layer,
-    PillowRenderer,
     Scene,
     Sequence,
     StoryboardSample,
+    create_renderer,
     render,
     render_storyboard,
+    rendering_identity,
     save_frame,
+    validate_composition,
 )
 from faceless_champ.audio import probe
 
@@ -102,7 +104,8 @@ class Project:
         self.root = self.config_path.parent
         if not self.config_path.is_file():
             raise KitError("CONFIG", "No facelesschamp.toml found; use --project PATH or fc-kit init")
-        self.config = tomllib.loads(self.config_path.read_text())
+        self._config_source = self.config_path.read_text()
+        self.config = tomllib.loads(self._config_source)
         fields(self.config, {"schema_version", "project", "videos", "profiles"}, "config")
         if self.config.get("schema_version") != 1:
             raise KitError("CONFIG_VERSION", "Expected schema_version = 1")
@@ -123,7 +126,11 @@ class Project:
             if not isinstance(settings.get("captions", False), bool):
                 raise KitError("CONFIG", "captions must be a boolean")
         for name, settings in self.config.get("profiles", {}).items():
-            fields(settings, {"width", "height", "fps", "crf", "preset", "antialias", "quality"}, f"profiles.{name}")
+            fields(
+                settings,
+                {"width", "height", "fps", "crf", "preset", "antialias", "quality", "backend"},
+                f"profiles.{name}",
+            )
 
     def dependencies(self):
         """Inspect declared project requirements without importing or installing them."""
@@ -134,6 +141,9 @@ class Project:
     def build(self, video_id="main", *, strict_assets=False, _preparing=False, _refresh=False):
         from .dependencies import check_dependencies
 
+        # Preserve explicit in-memory overrides unless the config file changed.
+        if self.config_path.read_text() != self._config_source:
+            self.__init__(self.config_path)
         dependency_rows = check_dependencies(self.root)
         try:
             settings = self.config["videos"][video_id]
@@ -226,10 +236,16 @@ class Project:
                 if p.suffix in {".py", ".toml", ".json", ".csv", ".srt", ".lock"}:
                     sources[str(p.relative_to(self.root))] = digest(p)
         result.report["sources"] = sources
+        result.report["render_backends"] = {
+            name: rendering_identity(
+                self.config.get("profiles", {}).get(name, {}).get("backend", "pillow"), result.composition
+            )
+            for name in sorted({"preview", "final", *self.config.get("profiles", {})})
+        }
         result.report["fingerprint"] = hashlib.sha256(json.dumps(result.report, sort_keys=True).encode()).hexdigest()
         if strict_assets and any(a["placeholder"] for a in result.report["assets"]):
             raise KitError("ASSET_PLACEHOLDER", "Supply missing media or explicitly allow placeholders", video=video_id)
-        PillowRenderer(1).validate(result.composition)
+        validate_composition(result.composition)
         if result.duration <= 0:
             raise KitError("EMPTY_VIDEO", "Video duration must be positive", video=video_id)
         return result
@@ -258,15 +274,19 @@ class Project:
     def validate(self, video_id="main", *, strict_assets=False):
         compiled = self.build(video_id, strict_assets=strict_assets)
         for profile in {"preview", "final", *self.config.get("profiles", {})}:
-            self.settings(compiled, profile)
+            settings = self.settings(compiled, profile)
+            with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+                renderer.validate(compiled.composition)
         return compiled.report
 
     @_arch_errors
     def frame(self, video_id, time, output, *, overwrite=False):
         compiled = self.build(video_id)
-        size = self.settings(compiled, "preview").dimensions(compiled.composition.canvas)
-        path = save_frame(compiled.composition, time, output, size=size, overwrite=overwrite)
-        self._report(compiled, "frame", path, {"source_time": time})
+        settings = self.settings(compiled, "preview")
+        size = settings.dimensions(compiled.composition.canvas)
+        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+            path = save_frame(compiled.composition, time, output, size=size, overwrite=overwrite, renderer=renderer)
+        self._report(compiled, "frame", path, {"source_time": time, "rendering": rendering_identity(settings.backend)})
         return path
 
     @_arch_errors
@@ -275,8 +295,10 @@ class Project:
         segments = compiled.report["segments"]
         samples = [StoryboardSample((s["start"] + s["end"]) / 2, s["id"]) for s in segments]
         samples = samples or [StoryboardSample(compiled.duration / 2, video_id)]
-        path = render_storyboard(compiled.composition, samples, output, overwrite=overwrite)
-        self._report(compiled, "storyboard", path, {})
+        settings = self.settings(compiled, "preview")
+        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+            path = render_storyboard(compiled.composition, samples, output, overwrite=overwrite, renderer=renderer)
+        self._report(compiled, "storyboard", path, {"rendering": rendering_identity(settings.backend)})
         return path
 
     @_arch_errors
@@ -317,6 +339,7 @@ class Project:
             {
                 "profile": profile,
                 "export_settings": asdict(settings),
+                "rendering": rendering_identity(settings.backend),
                 "source_range": [start, end],
                 "output_metadata": probe(path),
             },

@@ -16,6 +16,7 @@ from .animation import Animation, interpolate, relative_value, smooth
 from .audio import AudioClip
 from .components import Canvas, Component, finite
 from .layout import Group
+from .motion import style_value
 from .spring import _spring_progress_bounds
 from .subtitles import Captions
 
@@ -251,9 +252,7 @@ class Scene(Renderable):
             result = copy(entry.component)
             for key, value in entry.state_at(time).items():
                 if hasattr(result, key):
-                    setattr(
-                        result, key, tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} else value
-                    )
+                    setattr(result, key, style_value(key, value))
             if isinstance(result, Group):
                 result._children = tuple(evaluated(child) for child in entry.children)
             return result
@@ -265,6 +264,29 @@ class Scene(Renderable):
             wrapper._children = (result,)
             result = wrapper
         return result.bounds
+
+    def ink_bounds_at(self, component: Component, time: float):
+        """Conservative effect bounds, including leaf shadows and ancestors.
+
+        Logical bounds_at remains unchanged; masks do not shrink this ink box.
+        This read-only measurement opens no 3D/browser render sessions.
+        """
+        from ._render_state import entry_geometry, ink_box
+        from .backends._raster_adapter import PillowRasterAdapter
+
+        self.build()
+        time = finite(time, "time", 0)
+        if component not in self._objects:
+            raise ValueError("ink_bounds_at requires a component in the scene")
+        raster = PillowRasterAdapter()
+        try:
+            entry = self._objects[component]
+            parent = (1, 0, 0, 1, 0, 0)
+            for ancestor in reversed(tuple(entry.ancestors())):
+                parent, _ = entry_geometry(ancestor, time, parent, raster)
+            return ink_box(entry, time, parent, raster)
+        finally:
+            raster.close()
 
     def play(self, *animations, run_time=None, rate_func=None) -> Self:
         from .scheduling import Schedule, play_schedule

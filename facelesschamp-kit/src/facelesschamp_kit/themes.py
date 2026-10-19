@@ -35,9 +35,13 @@ class Theme:
     default_exit: str | None = None
     motion_distance: float = 24
     motion_stagger: float = 0.06
+    text_engine: str = "pillow"
+    surface_mode: str = "raster"
     code_theme: str = "midnight"
 
     def __post_init__(self):
+        if self.text_engine not in {"pillow", "skia"} or self.surface_mode not in {"raster", "vector"}:
+            raise KitError("THEME", "text_engine must be pillow/skia and surface_mode raster/vector")
         for name in ("heading_size", "body_size", "minimum_font_size", "motion_duration"):
             number(getattr(self, name), name, positive=True)
         for name in ("spacing", "radius"):

@@ -56,6 +56,10 @@ class CompiledVideo:
                 box = self.composition.bounds_at(component, time)
                 return {key: getattr(box, key) for key in ("left", "top", "right", "bottom")}
 
+            def ink(component):
+                box = self.composition.ink_bounds_at(component, time)
+                return {key: getattr(box, key) for key in ("left", "top", "right", "bottom")}
+
             rows.append(
                 {
                     "id": record["id"],
@@ -69,6 +73,9 @@ class CompiledVideo:
                     },
                 }
             )
+            if any(c.drop_shadow is not None for c in descendants(record["root"])):
+                rows[-1]["ink_bounds"] = ink(record["root"])
+                rows[-1]["child_ink_bounds"] = {name: ink(child) for name, child in record["children"].items()}
         return {"source_time": time, "conservative": True, "placements": rows}
 
 
@@ -108,6 +115,7 @@ def compile_video(video):
             spacing=ctx.theme.grid_spacing,
             radius=ctx.theme.grid_radius,
             z_index=-1_000_000,
+            render_mode=ctx.theme.surface_mode,
         )
         run = min(ctx.theme.motion_duration, duration / 2)
         with scene.at(0):

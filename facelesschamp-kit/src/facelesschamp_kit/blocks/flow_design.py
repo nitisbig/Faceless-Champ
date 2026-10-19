@@ -7,11 +7,18 @@ from faceless_champ.flow import FlowDesign
 from .base import BlockBuild
 
 
-def _design(value):
+def _design(value, context=None):
     if isinstance(value, FlowDesign):
         return value
     if isinstance(value, str):
-        return FlowDesign.named(value)
+        return FlowDesign.named(
+            value,
+            **(
+                {"surface_mode": context.theme.surface_mode, "text_engine": context.theme.text_engine}
+                if context
+                else {}
+            ),
+        )
     raise TypeError("design must be a FlowDesign or a registered design name")
 
 
@@ -41,7 +48,7 @@ class FlowCard:
     design: FlowDesign | str = "networking"
 
     def compose(self, context, bounds):
-        root = _design(self.design).node_card(
+        root = _design(self.design, context).node_card(
             self.label,
             icon=self.icon,
             position=bounds.center,
@@ -62,7 +69,7 @@ class FlowPopup:
     design: FlowDesign | str = "networking"
 
     def compose(self, context, bounds):
-        root = _design(self.design).popup(self.kind, self.value, bounds.center)
+        root = _design(self.design, context).popup(self.kind, self.value, bounds.center)
         _fit(root, bounds)
         return BlockBuild(root, root.parts)
 

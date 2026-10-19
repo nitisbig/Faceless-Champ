@@ -22,7 +22,7 @@ def visual_state(c):
     state = {"clip": (0, 0, 1, 1)}
     if isinstance(c, Shape):
         state.update(
-            fill=rgba(c.fill), stroke=rgba(c.stroke), width=c.width, height=c.height, stroke_width=c.stroke_width
+            fill=paint_state(c.fill), stroke=rgba(c.stroke), width=c.width, height=c.height, stroke_width=c.stroke_width
         )
         if hasattr(c, "corner_radius"):
             state["corner_radius"] = c.corner_radius
@@ -31,6 +31,17 @@ def visual_state(c):
     if c.mask is not None:
         state.update(mask_position=c.mask.position, mask_width=c.mask.width, mask_height=c.mask.height)
     return state
+
+
+def paint_state(value):
+    from .gradients import LinearGradient, RadialGradient
+
+    return value if isinstance(value, (LinearGradient, RadialGradient)) else rgba(value)
+
+
+def style_value(key, value):
+    """Restore evaluated style without interpreting immutable paints as tuples."""
+    return tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} and isinstance(value, tuple) else value
 
 
 IDENTITY = (1, 0, 0, 1, 0, 0)

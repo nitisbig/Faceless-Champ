@@ -50,7 +50,13 @@ class FlowDiagram:
                 position=box.center,
             )
             if ctx.theme.shadow:
-                card = card_surface(box, fill=ctx.theme.surface, radius=ctx.theme.radius, shadow=ctx.theme.shadow)
+                card = card_surface(
+                    box,
+                    fill=ctx.theme.surface,
+                    radius=ctx.theme.radius,
+                    shadow=ctx.theme.shadow,
+                    render_mode=ctx.theme.surface_mode,
+                )
                 box = card_content_bounds(box, shadow=ctx.theme.shadow, padding=0)
             label = fit_text(text, ctx, Bounds(box.left + 16, box.top + 16, box.right - 16, box.bottom - 16))
             node = Group(card, label)

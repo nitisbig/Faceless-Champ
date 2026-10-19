@@ -22,6 +22,8 @@ _PROJECT_CONFIG_LIMIT = 2 * 1024 * 1024
 _CACHE_LIMIT = 64 * 1024 * 1024
 
 PREMIUM_GUIDELINES = {
+    "rendering": "Pillow is the default. When Skia is selected, use native text/surfaces only explicitly, "
+    "check backend capabilities, and review evidence from the final backend.",
     "precedence": ["explicit user instructions", "project design and constraints", "defaults below"],
     "canvas": {"landscape": [1920, 1080], "shorts": [1080, 1920], "fps": 30},
     "composition": "One focal idea per beat; use measured safe bounds, alignment and negative space.",

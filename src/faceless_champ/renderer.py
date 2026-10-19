@@ -11,7 +11,7 @@ from itertools import pairwise
 from typing import Protocol
 
 from PIL import Image as PILImage
-from PIL import ImageChops, ImageColor, ImageDraw, ImageOps
+from PIL import ImageChops, ImageColor, ImageDraw, ImageFilter, ImageOps
 
 from .arch import ArchChamp
 from .charts import Chart
@@ -37,6 +37,7 @@ from .components import (
 from .flow import FlowChamp
 from .layout import Group, transform_point
 from .maps import Map, draw_map
+from .motion import style_value
 from .os_ui import OSClip
 from .playground.playback import PlaygroundView
 from .subtitles import Captions
@@ -50,6 +51,68 @@ class Renderer(Protocol):
     def frame(self, node: Renderable, time: float, size: tuple[int, int]) -> PILImage.Image: ...
 
 
+def create_renderer(backend="pillow", *, antialias=2, **options):
+    """Create an owned renderer. Optional backends are imported only on request."""
+    if backend == "pillow":
+        return PillowRenderer(antialias, **options)
+    if backend == "skia":
+        from .backends.skia import SkiaRenderer
+
+        return SkiaRenderer(antialias, **options)
+    raise ValueError("backend must be pillow or skia")
+
+
+def rendering_identity(backend="pillow", node=None):
+    """Portable render provenance without importing an optional native library."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    if backend not in {"pillow", "skia"}:
+        raise ValueError("backend must be pillow or skia")
+    packages = ("Pillow",) if backend == "pillow" else ("Pillow", "skia-python", "numpy")
+    versions = {}
+    for name in packages:
+        try:
+            versions[name] = version(name)
+        except PackageNotFoundError:
+            versions[name] = "unavailable"
+    identity = {"backend": backend, "versions": versions, "device": "cpu"}
+    if node is not None:
+        import hashlib
+        from pathlib import Path
+
+        from .surfaces import Surface
+
+        fonts, engines, surfaces = {}, set(), set()
+
+        def visit(current):
+            _ = current.duration
+            if isinstance(current, Scene):
+                for entry in current.entries:
+                    c = entry.component
+                    if isinstance(c, (Text, Captions)):
+                        path = Path(c.font or DEFAULT_FONT).resolve()
+                        if str(path) not in fonts:
+                            fonts[str(path)] = (
+                                hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else "missing"
+                            )
+                        engines.add(getattr(c, "text_engine", "pillow"))
+                    if isinstance(c, Surface):
+                        surfaces.add("vector")
+            else:
+                for child in current.children:
+                    visit(child)
+
+        visit(node)
+        identity.update(fonts=fonts, text_engines=sorted(engines), retained_surfaces=sorted(surfaces))
+    return identity
+
+
+def validate_composition(node):
+    """Validate authoring/assets without selecting or loading an optional backend."""
+    with PillowRenderer(1) as renderer:
+        renderer.validate(node, backend="structural")
+
+
 def managed_renderer(antialias=1):
     """Close renderers created by an export/preview helper, including failures."""
 
@@ -60,7 +123,8 @@ def managed_renderer(antialias=1):
                 return function(*args, **kwargs)
             settings = kwargs.get("settings")
             aa = settings.antialias if settings is not None else kwargs.get("antialias", antialias)
-            with PillowRenderer(aa) as renderer:
+            backend = settings.backend if settings is not None else kwargs.get("backend", "pillow")
+            with create_renderer(backend, antialias=aa) as renderer:
                 return function(*args, **{**kwargs, "renderer": renderer})
 
         return owned
@@ -184,7 +248,11 @@ class PillowRenderer:
             self._images[key] = (frames, durations)
         return self._images[key]
 
-    def validate(self, node: Renderable) -> None:
+    def validate(self, node: Renderable, *, backend="pillow") -> None:
+        from .gradients import LinearGradient, RadialGradient
+        from .paths import VectorPath
+        from .surfaces import Surface
+
         if not isinstance(node, (Scene, Sequence, Grid, Layer)):
             raise TypeError("Expected Scene, Sequence, Grid, or Layer")
         ImageColor.getcolor(node.canvas.bg, "RGBA")
@@ -195,11 +263,15 @@ class PillowRenderer:
                 from .coding import CodingChamp
                 from .indicators import ProgressBar
 
+                if c.mask is not None and c.mask.kind == "path" and backend == "pillow":
+                    raise ValueError("PathMask requires backend='skia'")
+                if isinstance(c, Group) and c.drop_shadow is not None:
+                    raise ValueError("Group shadows are not supported; attach a shadow to a surface or leaf")
                 if isinstance(c, CodingChamp):
                     continue
                 if isinstance(c, ProgressBar):
                     continue
-                if isinstance(c, Group):
+                if isinstance(c, (Group, Surface)):
                     continue
                 elif isinstance(c, Map):
                     draw_map(c, entry.initial, min(1, 64 / max(c.width, c.height)))
@@ -209,7 +281,15 @@ class PillowRenderer:
                     ImageColor.getcolor(c.color, "RGBA")
                     self._equation(c, 1)
                 elif isinstance(c, (Text, Captions)):
-                    self._font(c, round(c.font_size))
+                    if isinstance(c, Text) and c.text_engine == "skia":
+                        if backend == "pillow":
+                            raise ValueError("Native typography requires backend='skia'")
+                        if backend == "skia":
+                            from .backends._skia_text import text_size
+
+                            text_size(c, entry.initial)
+                    else:
+                        self._font(c, round(c.font_size))
                     ImageColor.getcolor(c.color, "RGBA")
                     if isinstance(c, Captions):
                         ImageColor.getcolor(c.highlight_color, "RGBA")
@@ -225,64 +305,29 @@ class PillowRenderer:
                     if isinstance(c, Icon):
                         ImageColor.getcolor(c.color, "RGBA")
                 elif isinstance(c, Shape):
+                    if isinstance(c, VectorPath) and not c.portable and backend == "pillow":
+                        raise ValueError("Compound paths and even_odd fill require backend='skia'")
                     for color in (c.fill, c.stroke):
-                        if color is not None:
+                        if color is not None and not isinstance(color, (LinearGradient, RadialGradient)):
                             ImageColor.getcolor(color, "RGBA")
                 else:
                     raise TypeError(f"Unsupported component: {type(c).__name__}")
         else:
             for child in node.children:
-                self.validate(child)
+                self.validate(child, backend=backend)
 
     def frame(self, node: Renderable, time: float, size: tuple[int, int]) -> PILImage.Image:
         if isinstance(node, Scene):
             node.build()
             return self._scene(node, time, size)
-        background = PILImage.new("RGBA", size, node.canvas.bg)
-        if isinstance(node, Sequence):
-            starts = node.starts
-            active = [i for i, (s, c) in enumerate(zip(starts, node.children)) if s <= time < s + c.duration]
-            if not active and time >= node.duration:
-                active = [len(node.children) - 1]
-            if not active:
-                return background
-            i = active[0]
-            first = self._fit(node.children[i], time - starts[i], size, node.canvas.bg)
-            if len(active) == 2:
-                j = active[1]
-                second = self._fit(node.children[j], time - starts[j], size, node.canvas.bg)
-                return PILImage.blend(first, second, min(1, (time - starts[j]) / node.crossfade))
-            return first
-        if isinstance(node, Grid):
-            sx, sy = size[0] / node.canvas.width, size[1] / node.canvas.height
-            top, right_pad, bottom_pad, left = node.padding
-            cw = (node.canvas.width - left - right_pad - node.gap * (node.columns - 1)) / node.columns
-            ch = (node.canvas.height - top - bottom_pad - node.gap * (node.rows - 1)) / node.rows
-            for i, (start, child) in enumerate(zip(node.start_times, node.children)):
-                if time < start:
-                    continue
-                col, row = i % node.columns, i // node.columns
-                x, y = round((left + col * (cw + node.gap)) * sx), round((top + row * (ch + node.gap)) * sy)
-                right = round((left + col * (cw + node.gap) + cw) * sx)
-                bottom = round((top + row * (ch + node.gap) + ch) * sy)
-                cell = self._fit(
-                    child, min(time - start, child.duration), (max(1, right - x), max(1, bottom - y)), node.canvas.bg
-                )
-                background.alpha_composite(cell, (x, y))
-            return background
-        if isinstance(node, Layer):
-            for child in node.children:
-                background.alpha_composite(self._fit(child, min(time, child.duration), size, "#00000000"))
-            return background
-        raise TypeError(f"Unsupported renderable: {type(node).__name__}")
+        from ._render_state import composition_frame
+
+        return composition_frame(self, node, time, size)
 
     def _fit(self, node, time, size, bg):
-        ratio = min(size[0] / node.canvas.width, size[1] / node.canvas.height)
-        fitted = (max(1, round(node.canvas.width * ratio)), max(1, round(node.canvas.height * ratio)))
-        frame = self.frame(node, time, fitted)
-        result = PILImage.new("RGBA", size, bg)
-        result.alpha_composite(frame, ((size[0] - fitted[0]) // 2, (size[1] - fitted[1]) // 2))
-        return result
+        from ._render_state import fit_frame
+
+        return fit_frame(self, node, time, size, bg)
 
     def _scene(self, scene, time, size):
         visible = []
@@ -329,6 +374,7 @@ class PillowRenderer:
         factor = min(big[0] / scene.canvas.width, big[1] / scene.canvas.height)
         enhanced = any(
             e.component.mask is not None
+            or e.component.drop_shadow is not None
             or e.state_at(time)["clip"] != (0, 0, 1, 1)
             or e.state_at(time)["scale_x"] != 1
             or e.state_at(time)["scale_y"] != 1
@@ -391,6 +437,8 @@ class PillowRenderer:
         def visit(entry, parent, inherited_opacity=1):
             c, state = entry.component, entry.state_at(time)
             layer = PILImage.new("RGBA", size)
+            if isinstance(c, Group) and c.drop_shadow is not None:
+                raise ValueError("Group shadows are not supported; attach a shadow to a surface or leaf")
             if time < entry.start or (entry.end is not None and time >= entry.end) or state["opacity"] <= 0:
                 return layer
             if isinstance(c, Group):
@@ -406,7 +454,7 @@ class PillowRenderer:
                                 setattr(
                                     view,
                                     key,
-                                    tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} else value,
+                                    style_value(key, value),
                                 )
                         if isinstance(view, Group):
                             view._children = tuple(evaluated(e) for e in child.children)
@@ -443,6 +491,8 @@ class PillowRenderer:
                 layer.putalpha(ImageChops.multiply(layer.getchannel("A"), mask))
 
             if c.mask is not None:
+                if c.mask.kind == "path":
+                    raise ValueError("PathMask requires backend='skia'")
                 mw, mh = state["mask_width"], state["mask_height"]
                 mx, my = state["mask_position"]
                 mx += local_center[0]
@@ -468,6 +518,28 @@ class PillowRenderer:
                         for x, y in ((l, t), (r, t), (r, b), (l, b))
                     ]
                 )
+            if c.drop_shadow is not None:
+                from ._portable import guard_size
+
+                guard_size(size)
+                shadow = c.drop_shadow
+                a, b, cc, d, _, _ = world
+                dx, dy = shadow.offset
+                offset = (a * dx + cc * dy, b * dx + d * dy)
+                alpha = layer.getchannel("A").filter(
+                    ImageFilter.GaussianBlur(shadow.blur * max(math.hypot(a, b), math.hypot(cc, d)))
+                )
+                alpha = alpha.transform(
+                    size,
+                    PILImage.Transform.AFFINE,
+                    (1, 0, -offset[0], 0, 1, -offset[1]),
+                    resample=PILImage.Resampling.BICUBIC,
+                )
+                color = ImageColor.getcolor(shadow.color, "RGBA")
+                cast = PILImage.new("RGBA", size, (*color[:3], 255))
+                cast.putalpha(alpha.point(lambda v: round(v * color[3] / 255)))
+                cast.alpha_composite(layer)
+                layer = cast
             opacity = inherited_opacity * state["opacity"]
             if not isinstance(c, Group) and opacity < 1:
                 layer.putalpha(layer.getchannel("A").point(lambda a: round(a * opacity)))
@@ -479,6 +551,32 @@ class PillowRenderer:
         return result
 
     def _sprite(self, c, state, factor, age):
+        from .gradients import LinearGradient, RadialGradient
+        from .paths import VectorPath
+        from .surfaces import Surface
+
+        if isinstance(c, Text) and c.text_engine == "skia":
+            raise ValueError("Native typography requires backend='skia'")
+        if isinstance(c, (Surface, VectorPath)) or (
+            isinstance(c, Shape) and isinstance(state["fill"], (LinearGradient, RadialGradient))
+        ):
+            from ._portable import shape_sprite, surface_sprite
+
+            static = state["draw"] == 1 and all(
+                state.get(k) == v
+                for k, v in c.state().items()
+                if k in {"fill", "stroke", "width", "height", "stroke_width"}
+            )
+            key = (c, factor, "retained")
+            if static and key in self._sprites:
+                return self._sprites[key]
+            sprite = surface_sprite(c, factor) if isinstance(c, Surface) else shape_sprite(c, state, factor)
+            if static:
+                self._sprites[key] = sprite
+            return sprite
+        return self._base_sprite(c, state, factor, age)
+
+    def _base_sprite(self, c, state, factor, age):
         from .coding import CodingChamp, draw_code
         from .indicators import ProgressBar, draw_indicator
 
@@ -512,7 +610,7 @@ class PillowRenderer:
             for key in ("fill", "stroke", "color", "width", "height", "stroke_width", "corner_radius"):
                 if key in state:
                     value = state[key]
-                    setattr(c, key, tuple(round(v) for v in value) if key in {"fill", "stroke", "color"} else value)
+                    setattr(c, key, style_value(key, value))
             if isinstance(c, Polyline):
                 c.points = tuple((x * c.width / original.width, y * c.height / original.height) for x, y in c.points)
         else:

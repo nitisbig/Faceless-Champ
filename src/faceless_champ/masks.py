@@ -12,6 +12,7 @@ class Mask:
     position: tuple = (0, 0)
     kind: str = "rectangle"
     points: tuple = ()
+    path: object = None
 
     def __post_init__(self):
         for key in ("width", "height"):
@@ -20,12 +21,27 @@ class Mask:
         if len(position) != 2:
             raise ValueError("mask position needs two coordinates")
         object.__setattr__(self, "position", position)
-        if self.kind not in {"rectangle", "ellipse", "polygon"}:
+        if self.kind not in {"rectangle", "ellipse", "polygon", "path"}:
             raise ValueError("Unsupported mask kind")
         points = tuple(tuple(finite(v, "mask point") for v in p) for p in self.points)
         if self.kind == "polygon" and (len(points) < 3 or any(len(p) != 2 for p in points)):
             raise ValueError("Polygon mask needs three normalized (x, y) points")
         object.__setattr__(self, "points", points)
+        if self.kind == "path":
+            from .paths import PathData
+
+            if not isinstance(self.path, PathData):
+                raise TypeError("PathMask needs PathData")
+            box = self.path.bounds
+            if box.left < 0 or box.top < 0 or box.right > 1 or box.bottom > 1:
+                raise ValueError("PathMask coordinates must be normalized to [0,1]")
+
+
+class PathMask(Mask):
+    """A normalized Bézier alpha mask; requires the Skia backend."""
+
+    def __init__(self, path, *, width, height, position=(0, 0)):
+        super().__init__(width, height, position, "path", path=path)
 
 
 class RectangleMask(Mask):

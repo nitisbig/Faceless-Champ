@@ -20,6 +20,13 @@ from facelesschamp_kit.recipes import recipe_specs
 from .errors import AgentError
 
 GUIDANCE = {
+    "skia": (
+        "premium graphics vector bezier gradients typography masks shadows native rendering",
+        "Use backend='skia' with antialias=1; native typography and retained surfaces are explicit opt-ins.",
+        "CPU raster only. Existing specialist clips remain raster adapters; native text and PathMask require Skia.",
+        "skia.md",
+        ("skia (optional; install facelesschamp-agent[skia])",),
+    ),
     "arch": (
         "architecture engineering scientific geometry mesh point cloud sections dimensions",
         "Use named parts, focused camera motion and sections to explain geometry.",
@@ -324,6 +331,8 @@ def _category(name, origin):
 
 
 def _family(name, origin):
+    if name in {"SkiaRenderer", "Surface", "VectorPath", "PathData", "PathMask", "create_renderer"}:
+        return "skia"
     if name in {"CodingPlayground", "coding_playground"}:
         return "playground"
     return next((key for key in GUIDANCE if key != "default" and key in origin.lower()), "default")

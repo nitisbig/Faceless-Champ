@@ -11,7 +11,7 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 
 from .components import finite
-from .renderer import PillowRenderer, managed_renderer
+from .renderer import PillowRenderer, Renderer, managed_renderer
 from .timeline import Renderable
 from .typography import load_font
 
@@ -50,7 +50,8 @@ def save_frame(
     output: str | Path,
     *,
     size: tuple[int, int] | None = None,
-    renderer: PillowRenderer | None = None,
+    renderer: Renderer | None = None,
+    backend: str = "pillow",
     overwrite: bool = False,
 ) -> Path:
     """Save one PNG at original composition time, respecting overwrite protection."""
@@ -76,7 +77,8 @@ def render_storyboard(
     *,
     size: tuple[int, int] | None = None,
     columns: int = 3,
-    renderer: PillowRenderer | None = None,
+    renderer: Renderer | None = None,
+    backend: str = "pillow",
     overwrite: bool = False,
 ) -> Path:
     """Save numbered source-time PNGs and storyboard.png, without rendering video.

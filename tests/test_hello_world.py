@@ -1,6 +1,7 @@
 """The premium opening can be checked without rendering scene frames."""
 
 import importlib.util
+import math
 import runpy
 import subprocess
 import sys
@@ -67,15 +68,16 @@ def test_opening_checks_preserve_inputs_and_never_render_frames(monkeypatch):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     report = module.check_scene()
-    assert report["duration"] == 14.96 and report["audio_tracks"] == 1
-    assert report["layout_samples"] == 898 and report["minimum_face_clearance_px"] >= 32
+    assert report["duration"] == module.DURATION and report["audio_tracks"] == 1
+    assert report["layout_samples"] == math.ceil(module.DURATION * 60)
+    assert report["minimum_face_clearance_px"] >= 32
     assert not report["media_rendered"] and not report["full_export_verified"]
 
 
 def test_runner_rejects_invalid_review_ranges_without_creating_outputs(tmp_path):
     output = tmp_path / "unexpected.mp4"
     result = subprocess.run(
-        [sys.executable, str(EXAMPLE / "render.py"), "--range", "14", "16", "--output", str(output)],
+        [sys.executable, str(EXAMPLE / "render.py"), "--range", "-1", "0", "--output", str(output)],
         cwd=tmp_path,
         capture_output=True,
         text=True,

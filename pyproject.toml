@@ -13,6 +13,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+skia = ["skia-python>=144.0.post2,<145", "numpy>=1.26,<3"]
 chess = ["chess>=1.11.2,<2"]
 coding = ["Pygments>=2.18,<3"]
 playground = ["Pygments>=2.18,<3", "playwright>=1.58,<2"]
@@ -37,4 +38,4 @@ testpaths = ["tests"]
 line-length = 120
 
 [tool.uv.build-backend]
-source-include = ["docs/**", "examples/**", "tests/**", "skills/**", "llms.txt", "uv.lock", "scripts/prepare_maps.py", "scripts/benchmark_flowchamp.py"]
+source-include = ["docs/**", "examples/**", "tests/**", "skills/**", "llms.txt", "uv.lock", "scripts/prepare_maps.py", "scripts/benchmark_flowchamp.py", "scripts/benchmark_renderers.py", "docker/**"]

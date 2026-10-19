@@ -24,6 +24,7 @@ from .animation import (
     linear,
     smooth,
 )
+from .backends.skia import SkiaRenderer
 from .charts import (
     Axis,
     BarChart,
@@ -64,13 +65,15 @@ from .flags import Flag, flag_path, supported_flags
 from .gradients import GradientStop, LinearGradient, RadialGradient
 from .layout import Bounds, Group
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
+from .masks import PathMask
 from .narration import CueScene
+from .paths import PathData, VectorPath
 from .preview import StoryboardSample, render_storyboard, save_frame
 from .progress import ExportProgress
-from .renderer import PillowRenderer, Renderer
+from .renderer import PillowRenderer, Renderer, create_renderer, rendering_identity, validate_composition
 from .spring import Spring
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
-from .surfaces import ShadowStyle, card_content_bounds, card_surface, dot_grid, gradient_surface
+from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
 from .timeline import Grid, Layer, Scene, Sequence
 from .typography import CLEAN_FLOW_FONT, fit_text
 
@@ -116,6 +119,8 @@ __all__ = [
     "NetworkGraph",
     "Number",
     "OutlineMap",
+    "PathData",
+    "PathMask",
     "PieChart",
     "PillowRenderer",
     "Polyline",
@@ -133,6 +138,7 @@ __all__ = [
     "Sequence",
     "ShadowStyle",
     "Shake",
+    "SkiaRenderer",
     "SlideIn",
     "SlideOut",
     "SpinIn",
@@ -141,16 +147,19 @@ __all__ = [
     "StoryboardSample",
     "SubtitleCue",
     "SubtitleTrack",
+    "Surface",
     "Text",
     "Triangle",
     "Typewriter",
     "VectorField",
+    "VectorPath",
     "Wiggle",
     "Write",
     "ZoomIn",
     "ZoomOut",
     "card_content_bounds",
     "card_surface",
+    "create_renderer",
     "dot_grid",
     "ease_in",
     "ease_out",
@@ -160,10 +169,12 @@ __all__ = [
     "linear",
     "render",
     "render_storyboard",
+    "rendering_identity",
     "save_frame",
     "smooth",
     "supported_countries",
     "supported_flags",
+    "validate_composition",
     "with_alpha",
 ]
 __version__ = "0.1.5"

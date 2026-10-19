@@ -50,6 +50,7 @@ class Component:
         scale_x: float = 1.0,
         scale_y: float = 1.0,
         mask=None,
+        shadow=None,
         rotation: float = 0.0,
         opacity: float = 1.0,
         z_index: float = 0,
@@ -68,6 +69,16 @@ class Component:
         if mask is not None and not isinstance(mask, Mask):
             raise TypeError("mask must be a Mask")
         self.mask = mask
+        if shadow is not None:
+            from .surfaces import ShadowStyle
+
+            if not isinstance(shadow, ShadowStyle):
+                raise TypeError("shadow must be a ShadowStyle")
+            if shadow.blur > 4096 or any(abs(v) > 4096 for v in shadow.offset):
+                raise ValueError("Shadow exceeds the allocation budget")
+        # CodeWindow already exposes .shadow as its visual child. Keep effect
+        # state separate so adding this option cannot overwrite that public API.
+        self.drop_shadow = shadow
         self.rotation = finite(rotation, "rotation")
         self.opacity = finite(opacity, "opacity", 0)
         if self.opacity > 1:
@@ -138,6 +149,7 @@ class Text(Component):
         align: str = "left",
         spacing: float = 8,
         font_weight: float | None = None,
+        text_engine: str = "pillow",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -150,6 +162,9 @@ class Text(Component):
         self.color, self.align = color, align
         self.spacing = finite(spacing, "spacing", 0)
         self.font_weight = None if font_weight is None else finite(font_weight, "font_weight", 1)
+        if text_engine not in {"pillow", "skia"}:
+            raise ValueError("text_engine must be pillow or skia")
+        self.text_engine = text_engine
 
 
 class Number(Text):

@@ -43,6 +43,7 @@ def fit_text(text, ctx, box, *, size=None, color=None, align="center", heading=F
             font_weight=theme.heading_weight if heading else theme.font_weight,
             color=color or theme.foreground,
             align=align,
+            text_engine=theme.text_engine,
         )
     except ValueError as exc:
         raise KitError("TEXT_FIT", str(exc)) from exc

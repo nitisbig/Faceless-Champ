@@ -16,6 +16,10 @@ Use optional extras for chess, maps, equations, web capture, and prepared playgr
 when those capabilities are needed. Browser/checkpoint preparation is explicit;
 ordinary playback reuses prepared assets.
 
+Optional [Skia rendering](docs/skia.md) adds native vectors, Bézier paths, shaped
+typography and retained gradient surfaces: install `faceless-champ[skia]`, select
+`backend="skia"`, and use `antialias=1`. Pillow remains the default.
+
 ## Premium references
 
 The [premium collection](examples/README.md) is the default scene reference for

@@ -32,7 +32,13 @@ def palette(ctx, variant, color):
 
 def panel(ctx, box):
     if ctx.theme.shadow is not None:
-        return card_surface(box, fill=ctx.theme.surface, radius=ctx.theme.radius, shadow=ctx.theme.shadow)
+        return card_surface(
+            box,
+            fill=ctx.theme.surface,
+            radius=ctx.theme.radius,
+            shadow=ctx.theme.shadow,
+            render_mode=ctx.theme.surface_mode,
+        )
     return Rectangle(
         width=max(1, box.width - 4),
         height=max(1, box.height - 4),

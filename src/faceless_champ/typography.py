@@ -19,6 +19,7 @@ def fit_text(
     color="white",
     align="center",
     spacing=8,
+    text_engine="pillow",
 ):
     """Wrap and shrink text into design-pixel bounds, returning an unowned Text.
 
@@ -48,6 +49,7 @@ def fit_text(
                 color=color,
                 align=align,
                 spacing=spacing,
+                text_engine=text_engine,
                 position=bounds.center,
             )
 

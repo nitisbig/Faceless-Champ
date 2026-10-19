@@ -25,8 +25,11 @@ class ExportSettings:
     crf: int = 18
     preset: str = "medium"
     antialias: int = 2
+    backend: str = "pillow"
 
     def dimensions(self, canvas: Canvas) -> tuple[int, int]:
+        if self.backend not in {"pillow", "skia"}:
+            raise ValueError("backend must be pillow or skia")
         presets = {"ql": 720, "720p": 720, "qh": 1080, "1080p": 1080, "qk": 2160, "4k": 2160}
         if self.antialias not in (1, 2, 3, 4):
             raise ValueError("antialias must be 1, 2, 3, or 4")

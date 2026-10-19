@@ -11,6 +11,7 @@ requires-python = ">=3.12"
 dependencies = ["faceless-champ>=0.1.5,<0.2.0", "packaging>=24"]
 
 [project.optional-dependencies]
+skia = ["faceless-champ[skia]>=0.1.5,<0.2.0"]
 coding = ["faceless-champ[coding]>=0.1.5,<0.2.0"]
 playground = ["faceless-champ[coding,web]>=0.1.5,<0.2.0"]
 chess = ["faceless-champ[chess]>=0.1.5,<0.2.0"]

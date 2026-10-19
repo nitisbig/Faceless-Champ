@@ -56,14 +56,34 @@ def _size(component, renderer):
     from .charts import Chart
     from .chess import ChessChamp
     from .coding import CodingChamp
+    from .components import Text
     from .flow import FlowChamp
+    from .gradients import LinearGradient, RadialGradient
     from .maps import Map
     from .os_ui import OSClip
+    from .paths import VectorPath
     from .playground.playback import PlaygroundView
     from .subtitles import Captions
+    from .surfaces import Surface
     from .web.clip import HtmlClip
 
-    if isinstance(component, (Image, Chart, Map, HtmlClip, OSClip, CodingChamp, ChessChamp, PlaygroundView, FlowChamp, ArchChamp)):
+    if not isinstance(component, Surface) and (
+        isinstance(component, VectorPath)
+        or isinstance(getattr(component, "fill", None), (LinearGradient, RadialGradient))
+    ):
+        pad = max(1, round(component.stroke_width))
+        return max(1, round(component.width)) + 2 * pad, max(1, round(component.height)) + 2 * pad
+
+    if isinstance(component, Surface):
+        return component.width, component.height
+    if isinstance(component, Text) and component.text_engine == "skia":
+        from .backends._skia_text import text_size
+
+        return text_size(component, component.state())
+
+    if isinstance(
+        component, (Image, Chart, Map, HtmlClip, OSClip, CodingChamp, ChessChamp, PlaygroundView, FlowChamp, ArchChamp)
+    ):
         return max(1, round(component.width)), max(1, round(component.height))
     if isinstance(component, Captions):
         sizes = [renderer._caption_sprite(component, 1, phrase[0].start).size for phrase in component.phrases]
@@ -104,7 +124,8 @@ def bounds(component: Component) -> Bounds:
         raise TypeError("bounds requires a Component")
     from .renderer import PillowRenderer
 
-    return _enclose(_points(component, PillowRenderer(1, frame_cache_mb=0, caption_cache_mb=0)))
+    with PillowRenderer(1, frame_cache_mb=0, caption_cache_mb=0) as renderer:
+        return _enclose(_points(component, renderer))
 
 
 def _target(other) -> Bounds:

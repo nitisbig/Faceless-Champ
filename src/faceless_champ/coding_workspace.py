@@ -45,7 +45,18 @@ class CodeWindow(Group):
     Construct the complete window before adding it or its children to a scene.
     """
 
-    def __init__(self, bounds, *, title="", theme="clean-flow", fullscreen=False, unit=1, children=()):
+    def __init__(
+        self,
+        bounds,
+        *,
+        title="",
+        theme="clean-flow",
+        fullscreen=False,
+        unit=1,
+        children=(),
+        surface_mode="raster",
+        text_engine="pillow",
+    ):
         if not isinstance(bounds, Bounds):
             raise TypeError("CodeWindow bounds must be Bounds")
         unit = _positive(unit, "unit")
@@ -85,7 +96,9 @@ class CodeWindow(Group):
             bounds.right + shadow_pad,
             bounds.bottom + shadow_pad,
         )
-        self.shadow = card_surface(allocation, fill="#00000000", radius=26 * unit, shadow=shadow_style)
+        self.shadow = card_surface(
+            allocation, fill="#00000000", radius=26 * unit, shadow=shadow_style, render_mode=surface_mode
+        )
         self.shadow.anchor = "top_left"
         self.shadow.position = (allocation.left, allocation.top)
         radius = 0 if fullscreen else 22 * unit
@@ -136,6 +149,7 @@ class CodeWindow(Group):
         title_top = (22 if fullscreen else 16) * unit
         self.heading = Text(
             str(title),
+            text_engine=text_engine,
             font=CLEAN_FLOW_FONT,
             font_weight=500,
             font_size=(30 if fullscreen else 26) * unit,
@@ -180,8 +194,12 @@ class CodeWorkspaceDesign:
     restore_duration: float = 0.9
     terminal_entrance_duration: float = 0.6
     terminal_exit_duration: float = 0.45
+    surface_mode: str = "raster"
+    text_engine: str = "pillow"
 
     def __post_init__(self):
+        if self.surface_mode not in {"raster", "vector"} or self.text_engine not in {"pillow", "skia"}:
+            raise ValueError("surface_mode must be raster/vector and text_engine pillow/skia")
         if not isinstance(self.bounds, Bounds):
             raise TypeError("workspace bounds must be Bounds")
         if self.bounds.width < 1 or self.bounds.height < 1:
@@ -251,7 +269,16 @@ class CodeWorkspaceDesign:
         return 1 - (1 - progress) ** 4 * (1 + 4 * progress)
 
     def window(self, box, title, *, children=(), fullscreen=False):
-        return CodeWindow(box, title=title, theme=self.theme, fullscreen=fullscreen, unit=self.unit, children=children)
+        return CodeWindow(
+            box,
+            title=title,
+            theme=self.theme,
+            fullscreen=fullscreen,
+            unit=self.unit,
+            children=children,
+            surface_mode=self.surface_mode,
+            text_engine=self.text_engine,
+        )
 
     def editor_motion(self, window, *, running):
         """Uniformly resize and position the complete editor window."""

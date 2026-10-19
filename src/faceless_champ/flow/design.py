@@ -142,8 +142,12 @@ class FlowDesign:
 
     name: str = "networking"
     font: str = CLEAN_FLOW_FONT
+    surface_mode: str = "raster"
+    text_engine: str = "pillow"
 
     def __post_init__(self):
+        if self.surface_mode not in {"raster", "vector"} or self.text_engine not in {"pillow", "skia"}:
+            raise ValueError("surface_mode must be raster/vector and text_engine pillow/skia")
         if self.name != "networking":
             raise ValueError("Unknown flow design; use networking")
         if not isinstance(self.font, (str, Path)) or not str(self.font):
@@ -194,6 +198,7 @@ class FlowDesign:
             font_weight=weight,
             color=color or self.palette["ink"],
             spacing=3,
+            text_engine=self.text_engine,
         )
 
     def _icon(self, name, center, size):
@@ -214,7 +219,9 @@ class FlowDesign:
         x, y = center
         top = y - height / 2
         allocated = _box(center, size, self.shadow_padding)
-        face = card_surface(allocated, fill=self.palette["surface"], radius=34, shadow=self.shadow)
+        face = card_surface(
+            allocated, fill=self.palette["surface"], radius=34, shadow=self.shadow, render_mode=self.surface_mode
+        )
         title_height = 70 if "\n" in label else 44
         title_y = top + (53 if "\n" in label else 37)
         title = self._label(
@@ -270,11 +277,21 @@ class FlowDesign:
         pill_width = max(84, 28 + len(kind) * 13)
         pill_center = (x - 81 + pill_width / 2, y - 39)
         named = {
-            "surface": card_surface(allocated, fill=self.palette["surface"], radius=36, shadow=self.shadow),
+            "surface": card_surface(
+                allocated, fill=self.palette["surface"], radius=36, shadow=self.shadow, render_mode=self.surface_mode
+            ),
             "icon": self._icon(icon, (x - 200, y - 1), (132, 122)),
             "kind": Group(
                 _rounded(pill_center, (pill_width, 32), pale, radius=16),
-                Text(kind, font=self.font, font_size=20, font_weight=650, color=color, position=pill_center),
+                Text(
+                    kind,
+                    font=self.font,
+                    font_size=20,
+                    font_weight=650,
+                    color=color,
+                    position=pill_center,
+                    text_engine=self.text_engine,
+                ),
             ),
             "value": self._label(value, (x + 64, y + 16), 344, 58, size=34, minimum=32, weight=600),
         }
@@ -290,6 +307,7 @@ class FlowDesign:
             fill=color,
             radius=9,
             shadow=ShadowStyle(color="#29477620", blur=3, offset=(0, 3)),
+            render_mode=self.surface_mode,
         )
         highlight = _rounded((x, y - 4), (18, 3), "#FFFFFFA6", radius=1.5)
         return FlowVisual({"surface": shadow, "highlight": highlight}, _box(center, (30, 18)))

@@ -206,7 +206,9 @@ def test_storyboard_timestamps_follow_numeric_frame_order(project, monkeypatch):
     monkeypatch.setattr(project, "sample_times", lambda: times)
     monkeypatch.setattr(
         "facelesschamp_agent.project.render_storyboard",
-        lambda composition, samples, directory: render_storyboard(composition, samples, directory, size=(80, 45)),
+        lambda composition, samples, directory, **kwargs: render_storyboard(
+            composition, samples, directory, size=(80, 45), **kwargs
+        ),
     )
     result = project.storyboard()
     frames = [a for a in result["artifacts"] if a["kind"] == "frame"]
