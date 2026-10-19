@@ -1,5 +1,46 @@
 # Verification
 
+## Current v1 typography and graph refinement
+
+Bounded review only, as requested:
+
+- Four key regression checks passed: equation cue placement, master audio at
+  zero, deterministic arbitrary-time rendering, and animated equation fades.
+  The two drawing-dependent checks were rerun after the final stroke refinement.
+- Four 1920×1080 frames at source 141, 462, 553 and 666 seconds were rendered
+  and visually inspected. Their sampled text bounds have no overlap or
+  outside-canvas findings. Evidence: `output/revision-v1-sharp/key-review.json`.
+- Source 139.6–141.6 seconds was exported at 1920×1080 / 30 fps: 60 frames,
+  2.000 seconds of H.264 video and AAC narration. Complete FFmpeg decode passed.
+  Encoded frames 10, 17 and 30 were inspected for the feathered equation reveal,
+  settled typography, and smooth, consistent graph strokes.
+- Source fingerprints, Ruff, formatting and `git diff --check` passed.
+- No full film, full-timeline layout audit, broad test suite or 4K export was run.
+  No new audio correlation check was run.
+
+Review clip: `output/revision-v1-sharp/reveal.mp4`.
+
+`full_export_verified: false`
+
+## Colab T4 sample — 2026-10-18
+
+The newly connected CLI account successfully allocated a T4. The initial worker
+exposed an inherited notebook-only Matplotlib backend; the worker now selects
+Agg before importing the scene. The failed job was repaired on the same VM.
+
+- `output/colab-test-4k-30fps.mp4`: 3.000 s, 3840×2160, constant 30 FPS, 90 frames.
+- Fixed-profile NVENC H.264 and AAC 48 kHz; narration starts at master zero.
+- Matching job ID, source/settings fingerprints, transfer byte count and SHA-256.
+- Complete remote and local decode; three complete audio windows show zero lag
+  and correlation above 0.999994.
+- Decoded frames at 0.5, 1.5 and 2.5 s inspected; car motion and scene present.
+- 53 Colab contract tests, Ruff, formatting and diff whitespace checks pass.
+- Owned T4 released after verified download; original narration and cues unchanged.
+
+Evidence: `output/colab-test-validation.json`, `output/colab-test-contact.png`
+and `media/colab/job-final.log`. This is a verified short sample;
+`full_export_verified: false` remains unchanged.
+
 ## Current v2
 
 Review scope was limited to two short low-quality motion excerpts and four

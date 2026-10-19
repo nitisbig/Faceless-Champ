@@ -26,10 +26,11 @@ from faceless_champ import (
 
 from . import DECODED_AUDIO_DURATION, END, FONT, ROOT
 from . import physics as p
-from .drawing import C, Painter
+from .drawing import C
 from .equations import BEATS, visible
 from .model import hook_state, make_view
 from .timing import CHAPTERS, shot_at
+from .v1_drawing import V1Painter
 
 DOCK = (35.88, 69.76, 108.28, 179.04, 275.82, 374.8, 431.88, 541.2, 589.12, 687)
 SPRING = Spring(stiffness=180, damping=28, mass=1)
@@ -286,7 +287,7 @@ class RoadsterRenderer:
         signature = (self.measuring, self.geometry, size, time)
         if signature == self.last_signature:
             return self.last_frame.copy()
-        paint = Painter(size, self.math, self.math_cache, measure_only=self.measuring, time=time)
+        paint = V1Painter(size, self.math, self.math_cache, measure_only=self.measuring, time=time)
         mode, age, origin = model_state(chapter, time)
         box = (0, 0, 1920, 1080)
         if time < 6.76:
@@ -401,14 +402,15 @@ class RoadsterRenderer:
                 anchor="mt",
             )
         beat = beats[-1]
-        reveal = p.smooth(p.progress(time, beat.time, beat.time + 0.45))
+        reveal = p.smooth(p.progress(time, beat.time, beat.time + 0.65))
         paint.equation(
             beat.expression,
-            (960, 925 + 10 * (1 - reveal) + 1.5 * sin(time * 1.7)),
+            (960, 925 + 14 * (1 - reveal)),
             size=86,
             width=1650,
             color=beat.color,
-            alpha=reveal,
+            alpha=min(1, reveal * 2),
+            reveal=reveal,
             tag=f"cue-{beat.cue}",
             anchor="mt",
         )

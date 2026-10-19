@@ -1,0 +1,4 @@
+interface:
+  display_name: "Colab GPU Video Render"
+  short_description: "4K video export with saved sessions and verified downloads"
+  default_prompt: "Use $colab-video-render to add the saved-session Colab T4 video export workflow with 4K/30 FPS, progress, recovery, and verified download."

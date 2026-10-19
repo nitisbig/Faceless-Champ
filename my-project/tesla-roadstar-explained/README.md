@@ -18,7 +18,21 @@ V2 has its own renderer and `output/v2/` directory. Only key scenes have been
 rendered and inspected; the complete film and 4K export remain unverified.
 See [V2-DESIGN.md](V2-DESIGN.md) for the research, visual decisions, and controls.
 
-## V1 — retained red/blue version
+## V1 — sharp typography and smooth plots
+
+`render.py` uses the refreshed v1 design: supersampled STIX equations and stronger
+sans-serif labels, bright cool blues/mint with warm coral/orange comparisons,
+and a 0.65-second feathered equation reveal that settles onto a fixed baseline.
+Graphs use antialiased vector strokes with consistent weight, quiet grids and
+one physical cursor per series. Analytical samples and discontinuities retain
+their original values; the decorative moving thick segments are removed.
+
+[View the two-second HD reveal](output/revision-v1-sharp/reveal.mp4) or inspect the
+[incline graph](output/revision-v1-sharp/frame-141.png),
+[roll graphs](output/revision-v1-sharp/frame-462.png),
+[inertia matrix](output/revision-v1-sharp/frame-553.png), and
+[landing graphs](output/revision-v1-sharp/frame-666.png).
+The v1 drawing treatment lives in `scene/v1_drawing.py`.
 
 The revised 12:18.300 film uses a true black stage, neon red trajectory lines
 and blue outlines. Larger engineering visuals share a consistent composition
@@ -33,6 +47,34 @@ and moving road pulses communicate motion. There are no cropped opening shots.
 The original narration and analytical source clock are preserved.
 
 ## Render from this project directory
+
+Exports default to **3840×2160 at 30 FPS**. To run `render.py` on a saved
+Colab T4, including automatic download, media verification and GPU release:
+
+```bash
+# Test three seconds through the same 4K/30 FPS Colab pipeline:
+python3 cola_render.py --test-seconds 3
+# Full export (cola_render.py also accepts this as its default action):
+python3 render.py --colab
+# Equivalent explicit settings:
+python3 render.py --colab --fps 30 --quality4k
+# Recover the saved job without allocating a duplicate VM:
+python3 render.py --colab --resume --fps 30 --quality 4k
+python3 colab_render.py --status
+python3 colab_render.py --download --stop-after-download
+```
+
+This exports the **v1 film from `render.py`** with the same Pillow/PyVista
+renderer. The T4 provides NVENC H.264 encoding; geometry, equations and Pillow
+compositing still consume CPU time. This adapter does not change the visual
+pipeline to Manim or substitute another renderer. See [COLAB.md](COLAB.md) for
+the fixed profile, dependencies, checkpoint recovery and verification details.
+The exporter has 53 passing local contract tests. A three-second Colab T4 sample
+passed on 2026-10-18: 3840×2160, 30 FPS, 90 frames, NVENC encoding, verified
+download/SHA-256, complete decode and source-audio alignment. Three decoded frames
+were inspected, and the GPU was released. A notebook-backend inheritance bug was
+fixed by explicitly using Matplotlib Agg. The full film remains unrendered.
+See `output/colab-test-4k-30fps.mp4` and `output/colab-test-validation.json`.
 
 ```bash
 # Fast review of the opening
@@ -51,7 +93,8 @@ The original narration and analytical source clock are preserved.
 `--fps` accepts **10, 15 or 30**. `--quality` accepts **low** (960×540, CRF 23,
 fast encoder), **high** (1920×1080, CRF 17) or **4k** (3840×2160, CRF 17).
 The old `1080p` spelling remains an alias for `high`. Frame rate defaults to 30.
-Previews and ranges default to low; full films and still frames default to 4K.
+Previews, ranges, full films and still frames default to 4K; pass `--quality low`
+explicitly for quick local reviews. `--quality4k` is an alias for `--quality 4k`.
 `--output PATH` selects the destination. Files include the selected quality and
 frame rate in their names. Existing outputs require `--overwrite`.
 
@@ -61,8 +104,8 @@ master zero and is trimmed together with the requested visual range.
 
 ## V1 review
 
-[Red/blue revision player and key frames](output/revision-red-blue/index.html) contains
-the small review requested for this edit. [verification.md](verification.md)
+[Earlier red/blue revision player and key frames](output/revision-red-blue/index.html)
+records the previous v1 design. [verification.md](verification.md)
 separates current sampled evidence from the previous design's verification.
 Earlier files in `output/revision-neon`, `output/previews`, `output/storyboard`
 and `output/frames` show previous designs. The complete revised film has not been rendered or audited.
