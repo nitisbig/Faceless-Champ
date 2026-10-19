@@ -51,6 +51,7 @@ class Component:
         scale_y: float = 1.0,
         mask=None,
         shadow=None,
+        effects=None,
         rotation: float = 0.0,
         opacity: float = 1.0,
         z_index: float = 0,
@@ -79,6 +80,9 @@ class Component:
         # CodeWindow already exposes .shadow as its visual child. Keep effect
         # state separate so adding this option cannot overwrite that public API.
         self.drop_shadow = shadow
+        from .effects import effect_stack
+
+        self.effects = effect_stack(effects)
         self.rotation = finite(rotation, "rotation")
         self.opacity = finite(opacity, "opacity", 0)
         if self.opacity > 1:
@@ -126,6 +130,7 @@ class Component:
         from .motion import visual_state
 
         return {
+            **(self.effects.state() if self.effects is not None else {}),
             **visual_state(self),
             "scale_x": self.scale_x,
             "scale_y": self.scale_y,

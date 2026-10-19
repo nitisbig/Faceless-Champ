@@ -69,6 +69,7 @@ def main(argv=None):
         command.add_argument("--project", default=argparse.SUPPRESS)
         commands[name] = command
     commands["init"].add_argument("destination")
+    commands["doctor"].add_argument("--gpu", action="store_true", help="Explicitly probe headless OpenGL")
     commands["capabilities"].add_argument("query", nargs="?", default="")
     commands["capabilities"].add_argument("--limit", type=int)
     commands["capabilities"].add_argument("--compact", action="store_true")
@@ -108,7 +109,7 @@ def main(argv=None):
         elif command == "doctor":
             from . import __version__
 
-            result = doctor(args.project)
+            result = doctor(args.project, gpu=args.gpu)
             result["agent"] = __version__
             result["registry"] = CapabilityRegistry().check()
         elif command == "capabilities":

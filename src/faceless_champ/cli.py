@@ -23,7 +23,7 @@ def main() -> int:
     command.add_argument("--crf", type=int, default=18)
     command.add_argument("--preset", default="medium")
     command.add_argument("--antialias", type=int, default=2)
-    command.add_argument("--backend", choices=("pillow", "skia"), default="pillow")
+    command.add_argument("--backend", choices=("pillow", "skia", "moderngl", "auto"), default="pillow")
     command.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
     try:

@@ -339,10 +339,12 @@ class AgentProject:
 
     def validate(self):
         compiled, plan, fingerprint = self._build()
+        profiles = {}
         for profile in ("preview", "final"):
             settings = self.kit.settings(compiled, profile)
-            with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+            with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
                 renderer.validate(compiled.composition)
+                profiles[profile] = rendering_identity(settings.backend, renderer=renderer)
         return self._record(
             "validate",
             fingerprint,
@@ -350,7 +352,25 @@ class AgentProject:
             duration=compiled.duration,
             diagnostics=compiled.report["diagnostics"],
             scene_count=len(plan.scenes),
+            profile_rendering=profiles,
         )
+
+    def _final_rendering(self, compiled):
+        settings = self.kit.settings(compiled, "final")
+        if settings.backend not in {"auto", "moderngl"}:
+            return rendering_identity(settings.backend)
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
+            renderer.validate(compiled.composition)
+            return rendering_identity(settings.backend, renderer=renderer)
+
+    @staticmethod
+    def _same_rendering(actual, expected):
+        if actual.get("backend", "pillow") != expected["backend"]:
+            return False
+        if expected["backend"] == "moderngl":
+            keys = ("shader_hash", "color_pipeline", "driver", "renderer")
+            return all(actual.get(key) == expected.get(key) for key in keys)
+        return True
 
     def audit_layout(self, *, detailed=False):
         """Audit public layout geometry at boundaries, actions and motion samples."""
@@ -410,14 +430,14 @@ class AgentProject:
         path = self._output(output, "frame", ".png")
         settings = self.kit.settings(compiled, "preview")
         size = settings.dimensions(compiled.composition.canvas)
-        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
             save_frame(compiled.composition, time, path, size=size, renderer=renderer)
         return self._record(
             "frame",
             fingerprint,
             artifacts=[{"path": str(path), "kind": "frame", "source_time": time}],
             layout=compiled.layout_at(time),
-            rendering=rendering_identity(settings.backend),
+            rendering=rendering_identity(settings.backend, renderer=renderer),
         )
 
     def storyboard(self, output=None):
@@ -429,7 +449,7 @@ class AgentProject:
             for t in times
         ]
         settings = self.kit.settings(compiled, "preview")
-        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
             sheet = render_storyboard(compiled.composition, samples, directory, renderer=renderer)
         frames = sorted((p for p in directory.glob("*.png") if p != sheet), key=lambda p: int(p.stem.split("-", 1)[0]))
         artifacts = [
@@ -462,7 +482,7 @@ class AgentProject:
             artifacts=artifacts,
             layouts=layouts,
             diagnostics=findings,
-            rendering=rendering_identity(settings.backend),
+            rendering=rendering_identity(settings.backend, renderer=renderer),
         )
 
     def _render(self, start, end, profile, output, *, operation, fps=None, quality=None, progress=None):
@@ -484,7 +504,16 @@ class AgentProject:
             settings = replace(settings, quality=EXPORT_QUALITIES[quality], width=None, height=None)
         settings.dimensions(compiled.composition.canvas)
         path = self._output(output, operation, ".mp4")
-        render(compiled.composition, path, settings=settings, start_time=start, end_time=end, progress=progress)
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
+            render(
+                compiled.composition,
+                path,
+                settings=settings,
+                start_time=start,
+                end_time=end,
+                progress=progress,
+                renderer=renderer,
+            )
         width, height = settings.dimensions(compiled.composition.canvas)
         return self._record(
             operation,
@@ -498,7 +527,7 @@ class AgentProject:
                 "require_audio": bool(plan.brief.narration.audio),
             },
             profile=profile,
-            rendering=rendering_identity(settings.backend),
+            rendering=rendering_identity(settings.backend, renderer=renderer),
             source_range=[start, end],
             status="exported",
         )
@@ -622,14 +651,14 @@ class AgentProject:
         records = self._records(fingerprint)
         artifacts = {a["id"]: a for r in records for a in r["artifacts"]}
         wanted = set(submission.evidence_artifacts) | {f.evidence_artifact for f in submission.findings}
-        final_backend = self.kit.settings(compiled, "final").backend
+        final_rendering = self._final_rendering(compiled)
         evidence_backends = {
-            a["id"]: r.get("rendering", {}).get("backend", "pillow") for r in records for a in r["artifacts"]
+            a["id"]: r.get("rendering", {"backend": "pillow"}) for r in records for a in r["artifacts"]
         }
         for identifier in wanted:
             if identifier not in artifacts or not self._intact(artifacts[identifier]):
                 raise AgentError("REVIEW_EVIDENCE", "Evidence is unknown, stale, or changed", artifact=identifier)
-            if evidence_backends.get(identifier) != final_backend:
+            if not self._same_rendering(evidence_backends.get(identifier, {}), final_rendering):
                 raise AgentError(
                     "REVIEW_BACKEND", "Review evidence must use the final output backend", artifact=identifier
                 )
@@ -682,8 +711,11 @@ class AgentProject:
             report.draft_reasons.append("Placeholder artwork: " + ", ".join(sorted(set(missing))))
         report.draft = bool(report.draft_reasons)
         current = self._records(fingerprint)
-        final_backend = self.kit.settings(compiled, "final").backend
+        final_rendering = self._final_rendering(compiled)
         artifacts = {a["id"]: a for r in current for a in r["artifacts"] if self._intact(a)}
+        artifact_rendering = {
+            a["id"]: r.get("rendering", {"backend": "pillow"}) for r in current for a in r["artifacts"]
+        }
         report.artifacts = list(artifacts.values())
         reviewed = {"visual": {}, "editorial": {}}
         latest_full = next((r["id"] for r in reversed(current) if r["operation"] == "render"), None)
@@ -691,7 +723,7 @@ class AgentProject:
             if record["operation"] == "audit-layout":
                 report.layout_validation = record["status"]
             if record["operation"] == "verify" and all(self._intact(a) for a in record["artifacts"]):
-                if record.get("rendering", {}).get("backend", "pillow") != final_backend:
+                if not self._same_rendering(record.get("rendering", {"backend": "pillow"}), final_rendering):
                     continue
                 field = (
                     "full_export_media_verification"
@@ -705,7 +737,9 @@ class AgentProject:
             if record["operation"] == "review":
                 review = ReviewSubmission.model_validate(record["submission"])
                 evidence = set(review.evidence_artifacts) | {f.evidence_artifact for f in review.findings}
-                if all(a in artifacts for a in evidence):
+                if all(
+                    a in artifacts and self._same_rendering(artifact_rendering[a], final_rendering) for a in evidence
+                ):
                     for scene in review.reviewed_scenes:
                         reviewed[review.kind][scene] = review
         for kind, rows in reviewed.items():

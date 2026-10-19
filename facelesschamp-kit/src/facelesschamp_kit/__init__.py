@@ -1,6 +1,7 @@
 """Structured authoring over the independent faceless-champ video engine."""
 
 from .blocks import Block, BlockBuild
+from .blocks.effects import EffectBlock, ParticleBackdrop, ProceduralBackdrop
 from .compiler import CompiledVideo
 from .context import BuildContext
 from .diagnostics import KitError
@@ -15,3 +16,4 @@ __all__ = ["Block", "BlockBuild", "BuildContext", "CompiledVideo", "KitError", "
 __all__ += ["RecipeEvent", "RecipeSpec", "apply_recipe", "recipe_specs", "validate_recipe"]
 __all__ += ["CLEAN_FLOW", "Theme"]
 __all__ += ["CodingTutorialStyle", "CodingTutorialTemplate"]
+__all__ += ["EffectBlock", "ParticleBackdrop", "ProceduralBackdrop"]

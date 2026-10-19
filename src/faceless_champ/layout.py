@@ -67,6 +67,9 @@ def _size(component, renderer):
     from .surfaces import Surface
     from .web.clip import HtmlClip
 
+    if getattr(component, "_procedural", False):
+        return component.width, component.height
+
     if not isinstance(component, Surface) and (
         isinstance(component, VectorPath)
         or isinstance(getattr(component, "fill", None), (LinearGradient, RadialGradient))

@@ -53,22 +53,41 @@ class Renderer(Protocol):
 
 def create_renderer(backend="pillow", *, antialias=2, **options):
     """Create an owned renderer. Optional backends are imported only on request."""
+    gpu = options.pop("gpu", None)
     if backend == "pillow":
         return PillowRenderer(antialias, **options)
     if backend == "skia":
         from .backends.skia import SkiaRenderer
 
         return SkiaRenderer(antialias, **options)
-    raise ValueError("backend must be pillow or skia")
+    if backend == "moderngl":
+        from .backends.moderngl import ModernGLRenderer
+
+        return ModernGLRenderer(antialias, gpu=gpu, **options)
+    if backend == "auto":
+        from .backends._auto import AutoRenderer
+
+        return AutoRenderer(antialias, gpu=gpu, **options)
+    raise ValueError("backend must be pillow, skia, moderngl or auto")
 
 
-def rendering_identity(backend="pillow", node=None):
+def rendering_identity(backend="pillow", node=None, *, renderer=None):
     """Portable render provenance without importing an optional native library."""
     from importlib.metadata import PackageNotFoundError, version
 
-    if backend not in {"pillow", "skia"}:
-        raise ValueError("backend must be pillow or skia")
-    packages = ("Pillow",) if backend == "pillow" else ("Pillow", "skia-python", "numpy")
+    if backend not in {"pillow", "skia", "moderngl", "auto"}:
+        raise ValueError("backend must be pillow, skia, moderngl or auto")
+    requested = backend
+    runtime = getattr(renderer, "identity", None)
+    if runtime is not None:
+        backend = runtime.get("backend", backend)
+    packages = (
+        ("Pillow",)
+        if backend == "pillow"
+        else ("Pillow", "skia-python", "numpy")
+        if backend == "skia"
+        else ("Pillow", "moderngl", "glcontext", "numpy")
+    )
     versions = {}
     for name in packages:
         try:
@@ -76,6 +95,12 @@ def rendering_identity(backend="pillow", node=None):
         except PackageNotFoundError:
             versions[name] = "unavailable"
     identity = {"backend": backend, "versions": versions, "device": "cpu"}
+    if runtime is not None:
+        identity.update(runtime)
+    elif backend in {"moderngl", "auto"}:
+        identity.update(device="unresolved", resolved=False)
+    if requested in {"moderngl", "auto"}:
+        identity["requested_backend"] = requested
     if node is not None:
         import hashlib
         from pathlib import Path
@@ -124,7 +149,8 @@ def managed_renderer(antialias=1):
             settings = kwargs.get("settings")
             aa = settings.antialias if settings is not None else kwargs.get("antialias", antialias)
             backend = settings.backend if settings is not None else kwargs.get("backend", "pillow")
-            with create_renderer(backend, antialias=aa) as renderer:
+            gpu = settings.gpu if settings is not None else kwargs.get("gpu")
+            with create_renderer(backend, antialias=aa, gpu=gpu) as renderer:
                 return function(*args, **{**kwargs, "renderer": renderer})
 
         return owned
@@ -165,8 +191,14 @@ class PillowRenderer:
             raise ValueError("arch_session_limit must be a positive integer")
         self._arch_session_limit = arch_session_limit
         self._arch_sessions = OrderedDict()
+        self._effect_session = None
 
     def close(self):
+        if self._effect_session is not None:
+            device, raster, _ = self._effect_session
+            raster.close()
+            device.close()
+            self._effect_session = None
         for session in self._arch_sessions.values():
             session.close()
         self._arch_sessions.clear()
@@ -255,6 +287,12 @@ class PillowRenderer:
 
         if not isinstance(node, (Scene, Sequence, Grid, Layer)):
             raise TypeError("Expected Scene, Sequence, Grid, or Layer")
+        if backend != "structural" and (
+            getattr(node, "effects", None) is not None or getattr(node, "transition", None) is not None
+        ):
+            from ._effects_cpu import numpy
+
+            numpy()
         ImageColor.getcolor(node.canvas.bg, "RGBA")
         _ = node.duration
         if isinstance(node, Scene):
@@ -263,10 +301,26 @@ class PillowRenderer:
                 from .coding import CodingChamp
                 from .indicators import ProgressBar
 
+                if c.effects is not None and backend != "structural":
+                    from ._effects_cpu import numpy
+
+                    numpy()
                 if c.mask is not None and c.mask.kind == "path" and backend == "pillow":
                     raise ValueError("PathMask requires backend='skia'")
+                if backend not in {"structural", "pillow"} and (
+                    (c.mask is not None and c.mask.kind == "path") or (isinstance(c, VectorPath) and not c.portable)
+                ):
+                    from .backends._native import load_skia
+
+                    load_skia()
                 if isinstance(c, Group) and c.drop_shadow is not None:
                     raise ValueError("Group shadows are not supported; attach a shadow to a surface or leaf")
+                if getattr(c, "_procedural", False):
+                    if backend != "structural":
+                        from ._effects_cpu import numpy
+
+                        numpy()
+                    continue
                 if isinstance(c, CodingChamp):
                     continue
                 if isinstance(c, ProgressBar):
@@ -317,6 +371,17 @@ class PillowRenderer:
                 self.validate(child, backend=backend)
 
     def frame(self, node: Renderable, time: float, size: tuple[int, int]) -> PILImage.Image:
+        from .effects import needs_compositor
+
+        if needs_compositor(node):
+            if self._effect_session is None:
+                from ._compositor import Compositor
+                from ._cpu_device import CPUDevice
+                from .backends._raster_adapter import PillowRasterAdapter
+
+                device, raster = CPUDevice(), PillowRasterAdapter()
+                self._effect_session = device, raster, Compositor(device, raster, self.antialias)
+            return self._effect_session[2].frame(node, time, size)
         if isinstance(node, Scene):
             node.build()
             return self._scene(node, time, size)

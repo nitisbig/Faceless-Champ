@@ -112,6 +112,12 @@ class SkiaRenderer:
         if len(size) != 2:
             raise ValueError("Frame size needs width and height")
         guard_size(size)
+        from ..effects import needs_compositor
+
+        if needs_compositor(node):
+            # The shared CPU reference uses existing Skia typography/path tiles.
+            self.raster.renderer.antialias = self.antialias
+            return self.raster.renderer.frame(node, time, size)
         if not isinstance(node, Scene):
             return composition_frame(self, node, time, size)
         node.build()

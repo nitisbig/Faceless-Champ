@@ -120,3 +120,7 @@ See [ArchChamp structured plans and model assets](docs/archchamp.md).
 Current scene references are in the [premium collection](../examples/README.md).
 The Hello World opening remains a draft; prior bundled recipe previews were retired.
 Discovery omits thumbnail/motion-preview fields when those resources are absent.
+
+## GPU capability discovery
+
+Install `facelesschamp-agent[gpu]` for the optional ModernGL backend. GPU effects and Kit wrappers appear in the offline public API catalog; discovery opens no GL context. `fc-agent doctor --gpu --json` explicitly probes the device. Profiles remain authoritative, and evidence records actual fallback/device/shader provenance. Native mesh rendering and custom GLSL are subsequent releases. See [ModernGL](../docs/moderngl.md).

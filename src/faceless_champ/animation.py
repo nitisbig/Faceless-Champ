@@ -53,6 +53,14 @@ class AnimationBuilder(Animation):
 
         return self._to("fill", rgba(color))
 
+    def effect_to(self, name, **parameters) -> Self:
+        """Animate numeric parameters of an effect already attached to the component."""
+        if not parameters:
+            raise ValueError("effect_to needs at least one parameter")
+        for key, value in parameters.items():
+            self._to(f"effect.{name}.{key}", value)
+        return self
+
     def stroke_to(self, color) -> Self:
         from .motion import rgba
 

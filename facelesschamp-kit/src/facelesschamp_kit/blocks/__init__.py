@@ -9,6 +9,7 @@ from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
 from .chess import ChessBoard
 from .coding import CodeEditor, CodingPlayground
+from .effects import EffectBlock, ParticleBackdrop, ProceduralBackdrop
 from .flow import FlowDiagram
 from .flow_canvas import FlowCanvas
 from .flow_design import FlowBackdrop, FlowCard, FlowPopup
@@ -212,6 +213,7 @@ __all__ = [
     "CodeEditor",
     "CodingPlayground",
     "Comparison",
+    "EffectBlock",
     "FinderWindow",
     "FlowBackdrop",
     "FlowCanvas",
@@ -222,6 +224,8 @@ __all__ = [
     "ImageCard",
     "MetricCard",
     "OSWalkthrough",
+    "ParticleBackdrop",
+    "ProceduralBackdrop",
     "SettingsWindow",
     "StepList",
     "TextPanel",

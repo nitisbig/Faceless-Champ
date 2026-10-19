@@ -310,7 +310,9 @@ class Scene(Renderable):
                 raise TypeError("play requires nonempty animations")
             if not isinstance(animation.component, Component):
                 raise TypeError("Animation requires a Component")
-            if isinstance(animation.component, Group) and set(animation.targets) - {
+            if isinstance(animation.component, Group) and {
+                k for k in animation.targets if not k.startswith("effect.")
+            } - {
                 "position",
                 "scale",
                 "rotation",
@@ -500,7 +502,11 @@ def _validate_spring_track(track: Track) -> None:
 
 
 def _validate_animated_value(key: str, value) -> None:
-    if key == "clip":
+    if key.startswith("effect."):
+        from .effects import validate_effect_value
+
+        validate_effect_value(key, value)
+    elif key == "clip":
         if not isinstance(value, tuple) or len(value) != 4 or any(not 0 <= finite(v, key) <= 1 for v in value):
             raise ValueError("clip requires four normalized coordinates")
         if value[0] > value[2] or value[1] > value[3]:
@@ -540,12 +546,19 @@ def _validate_animated_value(key: str, value) -> None:
 
 
 class Sequence(Renderable):
-    def __init__(self, *children: Renderable, crossfade: float = 0.0, canvas: Canvas | None = None) -> None:
+    def __init__(
+        self, *children: Renderable, crossfade: float = 0.0, canvas: Canvas | None = None, transition=None
+    ) -> None:
         if not children:
             raise ValueError("Sequence requires children")
         self.children = list(children)
         self.canvas = canvas or children[0].canvas
         self.crossfade = finite(crossfade, "crossfade", 0)
+        from .transitions import transition as validate_transition
+
+        self.transition = validate_transition(transition)
+        if transition is not None and not self.crossfade:
+            raise ValueError("A transition requires a positive crossfade overlap")
 
     @property
     def starts(self) -> list[float]:
@@ -613,11 +626,14 @@ class Layer(Renderable):
     children hold their final frame, as they do in a Grid.
     """
 
-    def __init__(self, *children: Renderable, canvas: Canvas | None = None) -> None:
+    def __init__(self, *children: Renderable, canvas: Canvas | None = None, effects=None) -> None:
         if not children:
             raise ValueError("Layer requires children")
         self.children = list(children)
         self.canvas = canvas or children[0].canvas
+        from .effects import effect_stack
+
+        self.effects = effect_stack(effects)
 
     @property
     def duration(self) -> float:

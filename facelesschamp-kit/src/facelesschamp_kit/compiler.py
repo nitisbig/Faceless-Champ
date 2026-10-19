@@ -73,7 +73,7 @@ class CompiledVideo:
                     },
                 }
             )
-            if any(c.drop_shadow is not None for c in descendants(record["root"])):
+            if any(c.drop_shadow is not None or c.effects is not None for c in descendants(record["root"])):
                 rows[-1]["ink_bounds"] = ink(record["root"])
                 rows[-1]["child_ink_bounds"] = {name: ink(child) for name, child in record["children"].items()}
         return {"source_time": time, "conservative": True, "placements": rows}

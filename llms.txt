@@ -213,3 +213,5 @@ when selected, and load_coding_tutorial(project_root) when authoring scenes.
 Use template.group(..., bounds=bounds) for kit placement. Generated render.py
 accepts --fps and --quality low|high|4k independently of duration.
 [Template guide](templates/README.md).
+
+Optional GPU compositing/effects: docs/moderngl.md (faceless-champ[gpu], backend=moderngl or auto). Verification: docs/moderngl-verification.md.

@@ -77,70 +77,50 @@ def ink_box(entry, time, parent, raster):
     world, box = entry_geometry(entry, time, parent, raster)
     if isinstance(c, Group):
         boxes = [ink_box(child, time, world, raster) for child in entry.children]
-        return Bounds(
+        result = Bounds(
             min(b.left for b in boxes),
             min(b.top for b in boxes),
             max(b.right for b in boxes),
             max(b.bottom for b in boxes),
         )
-    pad = _shadow_padding(c.drop_shadow)
+        if c.effects is not None:
+            from ._compositor import density
+
+            pad = c.effects.evaluated(entry.state_at(time)).padding * density(world)
+            result = Bounds(result.left - pad, result.top - pad, result.right + pad, result.bottom + pad)
+        return result
+    effects = c.effects.evaluated(entry.state_at(time)) if c.effects is not None else None
+    pad = _shadow_padding(c.drop_shadow) + (effects.padding if effects else 0)
     return transformed_box(Bounds(box.left - pad, box.top - pad, box.right + pad, box.bottom + pad), world)
 
 
 def composition_frame(renderer, node, time, size):
-    """Preserve existing fitting, straight-RGBA crossfade and source-clock rules."""
-    from .timeline import Grid, Layer, Sequence
+    """Legacy pixel operations driven by the shared source-clock composition plan."""
+    from ._composition_plan import composition_plan
+    from .timeline import Sequence
 
+    parts, progress = composition_plan(node, time, size)
     background = Image.new("RGBA", size, node.canvas.bg)
     if isinstance(node, Sequence):
-        starts = node.starts
-        active = [i for i, (s, c) in enumerate(zip(starts, node.children)) if s <= time < s + c.duration]
-        if not active and time >= node.duration:
-            active = [len(node.children) - 1]
-        if not active:
+        if not parts:
             return background
-        i = active[0]
-        first = fit_frame(renderer, node.children[i], time - starts[i], size, node.canvas.bg)
-        if len(active) == 2:
-            j = active[1]
-            second = fit_frame(renderer, node.children[j], time - starts[j], size, node.canvas.bg)
-            return Image.blend(first, second, min(1, (time - starts[j]) / node.crossfade))
+        first = fit_frame(renderer, parts[0].node, parts[0].time, size, parts[0].background)
+        if progress is not None:
+            second = fit_frame(renderer, parts[1].node, parts[1].time, size, parts[1].background)
+            return Image.blend(first, second, progress)
         return first
-    if isinstance(node, Grid):
-        sx, sy = size[0] / node.canvas.width, size[1] / node.canvas.height
-        top, right_pad, bottom_pad, left = node.padding
-        cw = (node.canvas.width - left - right_pad - node.gap * (node.columns - 1)) / node.columns
-        ch = (node.canvas.height - top - bottom_pad - node.gap * (node.rows - 1)) / node.rows
-        for i, (start, child) in enumerate(zip(node.start_times, node.children)):
-            if time < start:
-                continue
-            col, row = i % node.columns, i // node.columns
-            x, y = round((left + col * (cw + node.gap)) * sx), round((top + row * (ch + node.gap)) * sy)
-            right, bottom = (
-                round((left + col * (cw + node.gap) + cw) * sx),
-                round((top + row * (ch + node.gap) + ch) * sy),
-            )
-            cell = fit_frame(
-                renderer,
-                child,
-                min(time - start, child.duration),
-                (max(1, right - x), max(1, bottom - y)),
-                node.canvas.bg,
-            )
-            background.alpha_composite(cell, (x, y))
-        return background
-    if isinstance(node, Layer):
-        for child in node.children:
-            background.alpha_composite(fit_frame(renderer, child, min(time, child.duration), size, "#00000000"))
-        return background
-    raise TypeError(f"Unsupported renderable: {type(node).__name__}")
+    for p in parts:
+        x, y, w, h = p.viewport
+        background.alpha_composite(fit_frame(renderer, p.node, p.time, (w, h), p.background), (x, y))
+    return background
 
 
 def fit_frame(renderer, node, time, size, bg):
-    ratio = min(size[0] / node.canvas.width, size[1] / node.canvas.height)
-    fitted = (max(1, round(node.canvas.width * ratio)), max(1, round(node.canvas.height * ratio)))
+    from ._composition_plan import fit
+
+    fitted, position = fit(node.canvas, size)
     result = Image.new("RGBA", size, bg)
-    result.alpha_composite(renderer.frame(node, time, fitted), ((size[0] - fitted[0]) // 2, (size[1] - fitted[1]) // 2))
+    result.alpha_composite(renderer.frame(node, time, fitted), position)
     return result
 
 

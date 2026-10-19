@@ -47,17 +47,48 @@ def _preserve_float_environment():
 
 
 class PillowRasterAdapter:
-    def __init__(self, limit_mb=64, arch_session_limit=4):
+    def __init__(self, limit_mb=64, arch_session_limit=4, *, isolate_arch=False):
         self.renderer = PillowRenderer(
             1, frame_cache_mb=0, caption_cache_mb=16, code_cache_mb=16, arch_session_limit=arch_session_limit
         )
         self.limit = round(limit_mb * 1024**2)
         self.text_session = None
+        self._owns_text = False
+        self.isolate_arch = isolate_arch
+        self._arch_worker = None
+
+    def renderer_age_key(self, c, age):
+        from ..components import Image
+        from ..subtitles import Captions
+
+        if hasattr(c, "frame_key"):
+            return c.frame_key(age)
+        if isinstance(c, Captions):
+            return self.renderer._caption_state(c, age)
+        if isinstance(c, Image):
+            frames, durations = self.renderer._image(c)
+            if len(frames) > 1:
+                clock = age % sum(durations)
+                for i, duration in enumerate(durations):
+                    if clock < duration:
+                        return i
+                    clock -= duration
+        return None
 
     def sprite(self, c, state, factor, age):
         from ..arch import ArchChamp
+        from ..components import Text
+        from ..paths import VectorPath
 
-        if isinstance(c, ArchChamp):
+        if (isinstance(c, Text) and c.text_engine == "skia") or (isinstance(c, VectorPath) and not c.portable):
+            result = self._native_sprite(c, state, factor)
+        elif isinstance(c, ArchChamp) and self.isolate_arch:
+            if self._arch_worker is None:
+                from ._arch_worker import ArchWorker
+
+                self._arch_worker = ArchWorker()
+            result = self._arch_worker.sprite(c, state, factor, age)
+        elif isinstance(c, ArchChamp):
             with _preserve_float_environment():
                 result = self.renderer._sprite(c, state, factor, age)
         else:
@@ -79,6 +110,36 @@ class PillowRasterAdapter:
             self.renderer._fonts.pop(next(iter(self.renderer._fonts)))
         return result
 
+    def _native_sprite(self, c, state, factor):
+        import math
+
+        from .._portable import guard_size
+        from ..components import Text
+        from ._native import image_to_pillow, load_skia
+        from ._skia_paint import draw_shape
+
+        s = load_skia()
+        if isinstance(c, Text):
+            if self.text_session is None:
+                from ._skia_text import TextSession
+
+                self.text_session, self._owns_text = TextSession(), True
+            width, height = self.text_session.layout(c, state)[0]
+        else:
+            sw = max(1, round(state["stroke_width"]))
+            width, height = math.ceil(state["width"]) + 2 * sw, math.ceil(state["height"]) + 2 * sw
+        size = max(1, math.ceil(width * factor)), max(1, math.ceil(height * factor))
+        guard_size(size)
+        surface = s.Surface(*size)
+        canvas = surface.getCanvas()
+        canvas.scale(factor, factor)
+        if isinstance(c, Text):
+            self.text_session.paint(canvas, c, state)
+        else:
+            canvas.translate(width / 2, height / 2)
+            draw_shape(s, canvas, c, state, 1)
+        return image_to_pillow(surface.makeImageSnapshot(), s)
+
     def native_text_size(self, c, state):
         if self.text_session is not None:
             return self.text_session.layout(c, state)[0]
@@ -88,3 +149,8 @@ class PillowRasterAdapter:
 
     def close(self):
         self.renderer.close()
+        if self._owns_text:
+            self.text_session.close()
+        if self._arch_worker is not None:
+            self._arch_worker.close()
+            self._arch_worker = None

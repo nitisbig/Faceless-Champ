@@ -71,3 +71,7 @@ python -m pytest facelesschamp-agent/tests -q
 
 Structural checks, rendered-media verification, and visual approval are separate.
 See [verification status](docs/verification.md). No new example export is claimed.
+
+## Optional ModernGL graphics
+
+Install `faceless-champ[gpu]` and select `backend="moderngl"` for headless GPU compositing, bloom/glow/blur, procedural backgrounds, particles and transitions. `backend="auto"` selects a compatible renderer without omitting effects. Pillow remains the default. See [ModernGL](docs/moderngl.md) and its [verification status](docs/moderngl-verification.md).

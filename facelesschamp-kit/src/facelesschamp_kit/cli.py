@@ -15,6 +15,9 @@ from .themes import THEMES
 
 CATALOG = {
     "blocks": [
+        "EffectBlock",
+        "ProceduralBackdrop",
+        "ParticleBackdrop",
         "ArchCanvas",
         "ChessBoard",
         "CodeEditor",
@@ -51,7 +54,7 @@ CATALOG = {
 }
 
 
-def doctor(root="."):
+def doctor(root=".", *, gpu=False):
     ffmpeg, ffprobe = shutil.which("ffmpeg"), shutil.which("ffprobe")
     encoder = False
     if ffmpeg:
@@ -87,13 +90,17 @@ def doctor(root="."):
 
     dependency_rows = dependencies(root)
     checks["project_dependencies"] = all(r["status"] not in {"missing", "incompatible"} for r in dependency_rows)
-    return {
+    result = {
         "dependencies": dependency_rows,
         "ok": all(checks.values()),
         "checks": checks,
         "optional": optional,
         "versions": {name: package_version(name) for name in ("faceless-champ", "facelesschamp-kit", "pyvista", "vtk")},
     }
+    from faceless_champ import renderer_capabilities
+
+    result["gpu"] = renderer_capabilities("moderngl", probe=gpu)
+    return result
 
 
 def main(argv=None):
@@ -104,7 +111,7 @@ def main(argv=None):
     init = sub.add_parser("init")
     init.add_argument("destination")
     init.add_argument("--template", default="silent")
-    sub.add_parser("doctor")
+    sub.add_parser("doctor").add_argument("--gpu", action="store_true", help="Explicitly probe headless OpenGL")
     listing = sub.add_parser("list")
     listing.add_argument("kind", choices=["videos", *CATALOG])
     for name in ("prepare", "validate", "inspect", "frame", "storyboard", "preview", "render"):
@@ -132,7 +139,7 @@ def main(argv=None):
         if args.command == "init":
             result = str(init_project(args.destination, args.template))
         elif args.command == "doctor":
-            result = doctor(args.project)
+            result = doctor(args.project, gpu=args.gpu)
         elif args.command == "list" and args.kind != "videos":
             result = CATALOG[args.kind]
         else:

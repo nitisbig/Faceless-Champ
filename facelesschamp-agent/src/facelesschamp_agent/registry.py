@@ -20,6 +20,13 @@ from facelesschamp_kit.recipes import recipe_specs
 from .errors import AgentError
 
 GUIDANCE = {
+    "gpu": (
+        "gpu moderngl cinematic bloom glow blur particles shaders procedural transitions lighting",
+        "Select moderngl explicitly or auto for capability-aware fallback; use antialias=1 in GPU profiles.",
+        "Hardware availability requires doctor --gpu. Built-ins have CPU equivalents; software EGL is not GPU evidence.",
+        "moderngl.md",
+        ("gpu (optional; install facelesschamp-agent[gpu])",),
+    ),
     "skia": (
         "premium graphics vector bezier gradients typography masks shadows native rendering",
         "Use backend='skia' with antialias=1; native typography and retained surfaces are explicit opt-ins.",
@@ -331,6 +338,27 @@ def _category(name, origin):
 
 
 def _family(name, origin):
+    if name in {
+        "ModernGLRenderer",
+        "GPUOptions",
+        "renderer_capabilities",
+        "EffectStack",
+        "GaussianBlur",
+        "OuterGlow",
+        "Bloom",
+        "Distortion",
+        "ChromaticAberration",
+        "LightSweep",
+        "ProceduralBackground",
+        "ParticleField",
+        "DirectionalWipe",
+        "LuminanceWipe",
+        "ZoomBlurTransition",
+        "EffectBlock",
+        "ProceduralBackdrop",
+        "ParticleBackdrop",
+    }:
+        return "gpu"
     if name in {"SkiaRenderer", "Surface", "VectorPath", "PathData", "PathMask", "create_renderer"}:
         return "skia"
     if name in {"CodingPlayground", "coding_playground"}:

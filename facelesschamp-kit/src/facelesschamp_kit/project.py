@@ -19,6 +19,7 @@ from faceless_champ import (
     ArchDataError,
     Canvas,
     ExportSettings,
+    GPUOptions,
     Grid,
     Layer,
     Scene,
@@ -128,7 +129,7 @@ class Project:
         for name, settings in self.config.get("profiles", {}).items():
             fields(
                 settings,
-                {"width", "height", "fps", "crf", "preset", "antialias", "quality", "backend"},
+                {"width", "height", "fps", "crf", "preset", "antialias", "quality", "backend", "gpu"},
                 f"profiles.{name}",
             )
 
@@ -267,6 +268,11 @@ class Project:
             "preset": "veryfast" if profile == "preview" else "medium",
         }
         values.update(self.config.get("profiles", {}).get(profile, {}))
+        if isinstance(values.get("gpu"), dict):
+            try:
+                values["gpu"] = GPUOptions(**values["gpu"])
+            except (TypeError, ValueError) as exc:
+                raise KitError("GPU_CONFIG", str(exc), path=f"profiles.{profile}.gpu") from exc
         settings = ExportSettings(**values)
         settings.dimensions(c)
         return settings
@@ -275,8 +281,11 @@ class Project:
         compiled = self.build(video_id, strict_assets=strict_assets)
         for profile in {"preview", "final", *self.config.get("profiles", {})}:
             settings = self.settings(compiled, profile)
-            with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+            with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
                 renderer.validate(compiled.composition)
+                compiled.report.setdefault("resolved_render_backends", {})[profile] = rendering_identity(
+                    settings.backend, renderer=renderer
+                )
         return compiled.report
 
     @_arch_errors
@@ -284,9 +293,14 @@ class Project:
         compiled = self.build(video_id)
         settings = self.settings(compiled, "preview")
         size = settings.dimensions(compiled.composition.canvas)
-        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
             path = save_frame(compiled.composition, time, output, size=size, overwrite=overwrite, renderer=renderer)
-        self._report(compiled, "frame", path, {"source_time": time, "rendering": rendering_identity(settings.backend)})
+        self._report(
+            compiled,
+            "frame",
+            path,
+            {"source_time": time, "rendering": rendering_identity(settings.backend, renderer=renderer)},
+        )
         return path
 
     @_arch_errors
@@ -296,9 +310,11 @@ class Project:
         samples = [StoryboardSample((s["start"] + s["end"]) / 2, s["id"]) for s in segments]
         samples = samples or [StoryboardSample(compiled.duration / 2, video_id)]
         settings = self.settings(compiled, "preview")
-        with create_renderer(settings.backend, antialias=settings.antialias) as renderer:
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
             path = render_storyboard(compiled.composition, samples, output, overwrite=overwrite, renderer=renderer)
-        self._report(compiled, "storyboard", path, {"rendering": rendering_identity(settings.backend)})
+        self._report(
+            compiled, "storyboard", path, {"rendering": rendering_identity(settings.backend, renderer=renderer)}
+        )
         return path
 
     @_arch_errors
@@ -329,9 +345,16 @@ class Project:
         elif start is None:
             start, end = 0, min(10, compiled.duration) if preview else compiled.duration
         settings = self.settings(compiled, profile)
-        path = render(
-            compiled.composition, output, settings=settings, start_time=start, end_time=end, overwrite=overwrite
-        )
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
+            path = render(
+                compiled.composition,
+                output,
+                settings=settings,
+                start_time=start,
+                end_time=end,
+                overwrite=overwrite,
+                renderer=renderer,
+            )
         self._report(
             compiled,
             "preview" if preview else "render",
@@ -339,7 +362,7 @@ class Project:
             {
                 "profile": profile,
                 "export_settings": asdict(settings),
-                "rendering": rendering_identity(settings.backend),
+                "rendering": rendering_identity(settings.backend, renderer=renderer),
                 "source_range": [start, end],
                 "output_metadata": probe(path),
             },

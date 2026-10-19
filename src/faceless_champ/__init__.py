@@ -24,6 +24,7 @@ from .animation import (
     linear,
     smooth,
 )
+from .backends.moderngl import ModernGLRenderer
 from .backends.skia import SkiaRenderer
 from .charts import (
     Axis,
@@ -60,8 +61,10 @@ from .components import (
     Text,
     Triangle,
 )
+from .effects import Bloom, ChromaticAberration, Distortion, EffectStack, GaussianBlur, LightSweep, OuterGlow
 from .export import ExportSettings, render
 from .flags import Flag, flag_path, supported_flags
+from .gpu import GPUOptions, renderer_capabilities
 from .gradients import GradientStop, LinearGradient, RadialGradient
 from .layout import Bounds, Group
 from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
@@ -69,12 +72,14 @@ from .masks import PathMask
 from .narration import CueScene
 from .paths import PathData, VectorPath
 from .preview import StoryboardSample, render_storyboard, save_frame
+from .procedural import ParticleField, ProceduralBackground
 from .progress import ExportProgress
 from .renderer import PillowRenderer, Renderer, create_renderer, rendering_identity, validate_composition
 from .spring import Spring
 from .subtitles import Captions, SubtitleCue, SubtitleTrack
 from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
 from .timeline import Grid, Layer, Scene, Sequence
+from .transitions import DirectionalWipe, LuminanceWipe, ZoomBlurTransition
 from .typography import CLEAN_FLOW_FONT, fit_text
 
 __all__ = [
@@ -84,6 +89,7 @@ __all__ = [
     "Arrow",
     "Axis",
     "BarChart",
+    "Bloom",
     "BounceIn",
     "Bounds",
     "Canvas",
@@ -91,12 +97,16 @@ __all__ = [
     "Chart",
     "ChartReveal",
     "ChartStyle",
+    "ChromaticAberration",
     "Circle",
     "ColorScheme",
     "Component",
     "CueScene",
+    "DirectionalWipe",
+    "Distortion",
     "Draw",
     "EarthMap",
+    "EffectStack",
     "Ellipse",
     "Equation",
     "ExportProgress",
@@ -104,6 +114,8 @@ __all__ = [
     "FadeIn",
     "FadeOut",
     "Flag",
+    "GPUOptions",
+    "GaussianBlur",
     "GradientStop",
     "Grid",
     "Group",
@@ -113,12 +125,17 @@ __all__ = [
     "Image",
     "ImageSlot",
     "Layer",
+    "LightSweep",
     "Line",
     "LineChart",
     "LinearGradient",
+    "LuminanceWipe",
+    "ModernGLRenderer",
     "NetworkGraph",
     "Number",
+    "OuterGlow",
     "OutlineMap",
+    "ParticleField",
     "PathData",
     "PathMask",
     "PieChart",
@@ -126,6 +143,7 @@ __all__ = [
     "Polyline",
     "PopIn",
     "PopOut",
+    "ProceduralBackground",
     "Pulse",
     "RadialGradient",
     "RankedBarChart",
@@ -155,6 +173,7 @@ __all__ = [
     "VectorPath",
     "Wiggle",
     "Write",
+    "ZoomBlurTransition",
     "ZoomIn",
     "ZoomOut",
     "card_content_bounds",
@@ -169,6 +188,7 @@ __all__ = [
     "linear",
     "render",
     "render_storyboard",
+    "renderer_capabilities",
     "rendering_identity",
     "save_frame",
     "smooth",

@@ -127,3 +127,7 @@ Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffo
 
 Use the [premium collection](../examples/README.md) for current scene references.
 Reusable package starter templates remain available; draft styling awaits approval.
+
+## Optional GPU graphics
+
+Install `facelesschamp-kit[gpu]` and set a profile backend to `moderngl` or `auto`. Nested `[profiles.final.gpu]` options configure resources. `EffectBlock`, `ProceduralBackdrop`, and `ParticleBackdrop` use public Core APIs. `fc-kit --json doctor --gpu` explicitly probes EGL; reports record the renderer actually used. See the Core [ModernGL guide](../docs/moderngl.md).
