@@ -565,7 +565,7 @@ class PillowRenderer:
             static = state["draw"] == 1 and all(
                 state.get(k) == v
                 for k, v in c.state().items()
-                if k in {"fill", "stroke", "width", "height", "stroke_width"}
+                if k in {"fill", "stroke", "width", "height", "stroke_width", "corner_radius"}
             )
             key = (c, factor, "retained")
             if static and key in self._sprites:

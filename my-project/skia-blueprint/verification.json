@@ -1,0 +1,34 @@
+{
+  "scene_duration_seconds": 60.0,
+  "canvas": [1920, 1080],
+  "background": "#000000",
+  "backend": "skia",
+  "native_python": true,
+  "skia_python": "144.0.post2",
+  "pyvista": "0.49.1",
+  "full_export_rendered": false,
+  "full_export_verified": false,
+  "representative_stills": [
+    "output/frame-16.png",
+    "output/frame-27.png",
+    "output/frame-52.png"
+  ],
+  "preview": {
+    "path": "output/preview.mp4",
+    "source_range_seconds": [24.0, 26.0],
+    "duration_seconds": 2.0,
+    "size": [1280, 720],
+    "fps": 12,
+    "frames": 24,
+    "full_decode_passed": true,
+    "encoded_key_frame_inspected": true
+  },
+  "checks": {
+    "focused_skia_arch_tests_passed": 3,
+    "float_environment_regressions_fail_with_guard_disabled": true,
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "git_diff_check": "passed",
+    "broad_test_suites_run": false
+  }
+}

@@ -85,6 +85,9 @@ Charts, maps, MathText equations, captions, CodingChamp, FlowChamp, browser/OS/
 chess/prepared clips, and ArchChamp use their existing raster producers. Their
 finished RGBA images are composited by Skia. FlowDesign and CodeWindow groups can
 opt into native surfaces/type; this does not rewrite specialist clip internals.
+The ArchChamp raster handoff preserves the caller's floating-point environment
+where the host exposes C99 environment functions. This prevents VTK capped
+clipping from disrupting subsequent native Skia curves or text on affected hosts.
 
 Masks clip a completed subtree once. Group opacity still multiplies each member;
 it is not applied once to the finished group image. Sibling stacking, inherited

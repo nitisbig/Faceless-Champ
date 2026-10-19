@@ -21,7 +21,7 @@ def evaluated(entry, time):
     return view
 
 
-def component_size(c, state, raster):
+def component_size(c, state, raster, age):
     from .surfaces import Surface
 
     if isinstance(c, Surface):
@@ -36,7 +36,7 @@ def component_size(c, state, raster):
         return raster.native_text_size(c, state)
     if not isinstance(c, Text) and hasattr(c, "width") and hasattr(c, "height"):
         return max(1, round(c.width)), max(1, round(c.height))
-    return raster.sprite(c, state, 1, 0).size
+    return raster.sprite(c, state, 1, age).size
 
 
 def entry_geometry(entry, time, parent, raster):
@@ -50,7 +50,7 @@ def entry_geometry(entry, time, parent, raster):
             max(b.bottom for b in boxes),
         )
         return multiply(parent, matrix(state, c._origin)), box
-    w, h = component_size(c, state, raster)
+    w, h = component_size(c, state, raster, max(0, time - entry.start))
     local = dict(state)
     if c.anchor == "top_left":
         local["position"] = (

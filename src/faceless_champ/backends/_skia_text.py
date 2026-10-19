@@ -57,7 +57,7 @@ class TextSession:
         full = c.format(state["value"]) if isinstance(c, Number) else c.text
         if len(full) > 65536:
             raise ValueError("Native text exceeds 65536 characters")
-        color = rgba(state.get("color", c.color))
+        color = tuple(round(channel) for channel in rgba(state.get("color", c.color)))
         key = (
             full,
             c.font,

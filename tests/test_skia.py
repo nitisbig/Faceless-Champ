@@ -97,6 +97,88 @@ def test_cache_random_seek_and_frame_copy(native):
     assert native.images.bytes == native.frames.bytes == native.working_bytes == 0
 
 
+def test_capped_arch_viewport_preserves_following_native_overlay(native):
+    import math
+
+    import numpy as np
+    import pyvista as pv
+
+    from faceless_champ import ArchCamera, ArchChamp, ArchMesh, ArchScript, Circle, Text
+
+    # A closed tube cut on y=0 exercises VTK's capped clipping and its tiny
+    # trigonometric coordinates. Its raster must not affect later native ink.
+    count = 72
+    points = [
+        (x, r * math.cos(a), r * math.sin(a))
+        for x, r in ((-48, 12), (-48, 26), (48, 26), (48, 12))
+        for a in np.linspace(0, math.tau, count, endpoint=False)
+    ]
+    faces = [
+        v
+        for j in range(4)
+        for k in range(count)
+        for v in (
+            4,
+            j * count + k,
+            j * count + (k + 1) % count,
+            ((j + 1) % 4) * count + (k + 1) % count,
+            ((j + 1) % 4) * count + k,
+        )
+    ]
+    mesh = pv.PolyData(points, faces).triangulate().compute_normals(auto_orient_normals=True)
+    view = ArchChamp(
+        ArchMesh.from_data(mesh),
+        ArchScript().section("model", (0, 0, 0), normal=(0, -1, 0), cap=True),
+        camera=ArchCamera(position=(210, -310, 205)),
+        width=140,
+        height=140,
+        position=(70, 80),
+    )
+    circle = Circle(34, position=(245, 64), fill=None, stroke="#75D9ED", stroke_width=2)
+    label = Text("Ø24", position=(245, 120), font_size=20, color="#75D9ED", text_engine="skia")
+    canvas = Canvas(320, 160, "#000000")
+    actual = native.frame(Scene(canvas).add(view, circle, label).wait(2), 1, (320, 160))
+    # Check the first draw: pre-rendering the overlay can hide the host defect
+    # by warming Skia's native path/text machinery before VTK runs.
+    circle_ink = np.asarray(actual.crop((200, 20, 290, 108)))
+    label_ink = np.asarray(actual.crop((210, 108, 280, 140)))
+    assert np.count_nonzero((circle_ink[:, :, 1] > 140) & (circle_ink[:, :, 2] > 140)) > 250
+    assert np.count_nonzero((label_ink[:, :, 1] > 140) & (label_ink[:, :, 2] > 140)) > 50
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_arch_float_environment_restores_after_raster(native, monkeypatch, fail):
+    import ctypes
+    import platform
+
+    from faceless_champ import ArchChamp, ArchMesh
+    from faceless_champ.backends._raster_adapter import _fenv_api
+
+    if sys.platform != "linux" or platform.machine() != "x86_64" or _fenv_api() is None:
+        pytest.skip("C99 x86 floating-point rounding constants required")
+    process = ctypes.CDLL(None)
+    original = process.fegetround()
+    downward = 0x400
+
+    def sprite(*args):
+        assert process.fesetround(downward) == 0
+        if fail:
+            raise RuntimeError("raster failure")
+        return PI.new("RGBA", (1, 1))
+
+    view = ArchChamp(ArchMesh.from_arrays([(-1, 0, 0), (1, 0, 0), (0, 1, 0)], faces=[[0, 1, 2]]))
+    monkeypatch.setattr(native.raster.renderer, "_sprite", sprite)
+    try:
+        if fail:
+            with pytest.raises(RuntimeError, match="raster failure"):
+                native.raster.sprite(view, view.state(), 1, 0)
+        else:
+            assert native.raster.sprite(view, view.state(), 1, 0).size == (1, 1)
+        assert process.fegetround() == original
+    finally:
+        process.fesetround(original)
+
+
 def test_native_style_tracks_can_start_transparent_and_gif_uses_introduction_clock(native):
     from io import BytesIO
 

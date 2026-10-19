@@ -123,6 +123,7 @@ class SkiaRenderer:
                     e.component,
                     e.start,
                     e.end,
+                    e.start <= time and (e.end is None or time < e.end),
                     tuple(e.state_at(time).items()),
                     self._age_key(e.component, max(0, time - e.start)),
                 )
