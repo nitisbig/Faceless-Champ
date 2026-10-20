@@ -26,7 +26,7 @@ render(scene, "design.mp4", width=960, height=540, fps=12)
 also accepts PyVista MultiBlock assemblies and preserves block names, including
 nested names separated by `/`. `ArchChamp.from_file` reads a complete assembly;
 `ArchMesh.from_file` reads a single dataset. STL, OBJ, PLY, VTP, VTU and VTM are
-covered. CAD interchange formats such as STEP need an external tessellation tool.
+covered. STEP and native build123d shapes use the optional CAD bridge; see [CAD and geometry](cad-geometry.md).
 
 `ArchMesh.from_arrays(points, faces=None, point_data=None, cell_data=None)` accepts
 XYZ coordinates and polygon index rows or VTK connectivity. `from_data` wraps

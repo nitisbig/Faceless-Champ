@@ -1,6 +1,7 @@
 """Validated, immutable geometry and presentation inputs for ArchChamp."""
 
 import hashlib
+import json
 import math
 from dataclasses import dataclass, fields
 from pathlib import Path
@@ -32,6 +33,10 @@ def text(value, name):
     if not isinstance(value, str) or not value.strip():
         raise ArchDataError(name, "expected nonempty text")
     return value
+
+
+def _format_dimension(distance, precision, units):
+    return f"{distance:.{precision}f} {units}"
 
 
 def color(value):
@@ -67,7 +72,7 @@ class ArchMesh:
             raise AttributeError("ArchMesh is immutable; create a new snapshot")
         object.__setattr__(self, name, value)
 
-    def __init__(self, dataset, *, source=None):
+    def __init__(self, dataset, *, source=None, provenance=None):
         import numpy as np
 
         pv = pyvista()
@@ -77,6 +82,14 @@ class ArchMesh:
             raise ArchDataError("mesh.points", "coordinates must be finite")
         self._dataset = dataset.copy(deep=True)
         self.source = str(source) if source else None
+        try:
+            self._provenance_json = json.dumps(
+                {} if provenance is None else provenance, sort_keys=True, allow_nan=False
+            )
+            if not isinstance(json.loads(self._provenance_json), dict):
+                raise TypeError("expected an object")
+        except (ValueError, TypeError) as exc:
+            raise ArchDataError("provenance", "expected finite JSON metadata") from exc
         h = hashlib.sha256(type(dataset).__name__.encode())
         arrays = [("points", self._dataset.points)]
         for name in ("cells", "celltypes", "faces", "lines", "verts", "strips", "dimensions", "spacing", "origin"):
@@ -97,10 +110,10 @@ class ArchMesh:
         self._sealed = True
 
     @classmethod
-    def from_data(cls, data):
+    def from_data(cls, data, *, provenance=None):
         """Wrap PyVista, VTK, XYZ NumPy, trimesh or meshio geometry, then copy it."""
         try:
-            return cls(pyvista().wrap(data))
+            return cls(pyvista().wrap(data), provenance=provenance)
         except ArchDataError:
             raise
         except (TypeError, ValueError, ImportError) as exc:
@@ -121,7 +134,7 @@ class ArchMesh:
             raise ArchDataError("mesh.file", str(exc)) from exc
 
     @classmethod
-    def from_arrays(cls, points, faces=None, *, point_data=None, cell_data=None):
+    def from_arrays(cls, points, faces=None, *, point_data=None, cell_data=None, provenance=None):
         import numpy as np
 
         points = np.asarray(points, dtype=float)
@@ -152,7 +165,12 @@ class ArchMesh:
                 if a.ndim == 0 or len(a) != size:
                     raise ArchDataError(name, "field length differs from point/cell count")
                 group[name] = a.copy()
-        return cls(mesh)
+        return cls(mesh, provenance=provenance)
+
+    @property
+    def provenance(self):
+        """Independent JSON metadata; never contains mutable native CAD objects."""
+        return json.loads(self._provenance_json)
 
     @property
     def dataset(self):

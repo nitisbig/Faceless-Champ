@@ -4,7 +4,7 @@ Optional CPU Skia backend: docs/skia.md. Pillow remains default. Explicit native
 text/surface opt-ins use existing animations/layouts; compare evidence only from
 the final backend. Example: examples/skia_showcase.py.
 
-> Python 3.12+ programmatic video authoring. Current source 0.1.5; Pillow frames and FFmpeg MP4. Core never imports kit.
+> Python 3.12+ programmatic video authoring. Current source 0.1.6; Pillow frames and FFmpeg MP4. Core never imports kit.
 
 ## Entry points
 
@@ -215,3 +215,9 @@ accepts --fps and --quality low|high|4k independently of duration.
 [Template guide](templates/README.md).
 
 Optional GPU compositing/effects: docs/moderngl.md (faceless-champ[gpu], backend=moderngl or auto). Verification: docs/moderngl-verification.md.
+
+## Optional CAD and geometry
+
+Build123d CAD preparation, Trimesh processing, analytic mechanisms and CAD-derived
+blueprints extend ArchChamp. Install the cad, geometry or geometry-advanced extra.
+See [CAD and geometry](docs/cad-geometry.md) for units, APIs and native/headless use.

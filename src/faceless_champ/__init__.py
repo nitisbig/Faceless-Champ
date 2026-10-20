@@ -197,7 +197,7 @@ __all__ = [
     "validate_composition",
     "with_alpha",
 ]
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
 from .masks import CircleMask, RectangleMask, ShapeMask, Wipe

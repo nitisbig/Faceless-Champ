@@ -28,6 +28,8 @@ PROPERTIES = {
     "orbit": "camera",
     "hide": "visible",
     "show": "visible",
+    "spin": "mechanical",
+    "slider_crank": "mechanical",
 }
 OPTIONS = {
     "move": {"position"},
@@ -41,6 +43,8 @@ OPTIONS = {
     "camera_to": {"camera"},
     "orbit": {"degrees"},
     "section": {"origin", "normal", "cap", "contour"},
+    "spin": {"degrees", "axis", "pivot"},
+    "slider_crank": {"crank_radius", "rod_length", "turns", "phase"},
 }
 
 
@@ -124,6 +128,55 @@ class ArchScript:
             "section", targets, origin=vector(origin, "origin"), normal=normal, cap=cap, contour=contour, **timing
         )
 
+    def spin(self, targets, degrees=360, *, axis=(0, 0, 1), pivot=(0, 0, 0), **timing):
+        """Rotate about an explicit local pivot/axis beneath the ordinary part transform."""
+        axis = vector(axis, "axis")
+        if not any(axis):
+            raise ArchDataError("axis", "must be nonzero")
+        return self._add(
+            "spin", targets, degrees=number(degrees, "degrees"), axis=axis, pivot=vector(pivot, "pivot"), **timing
+        )
+
+    def gear_pair(self, driver, driven, *, teeth=(24, 48), degrees=360, **timing):
+        """Schedule two local-Z spins with the external-gear tooth ratio atomically."""
+        if (
+            not isinstance(teeth, (list, tuple))
+            or len(teeth) != 2
+            or any(isinstance(n, bool) or not isinstance(n, int) or n < 1 for n in teeth)
+        ):
+            raise ArchDataError("teeth", "expected two positive integer tooth counts")
+        degrees = number(degrees, "degrees")
+        copy = deepcopy(self)
+        timing = dict(timing)
+        if timing.get("at") is None:
+            timing["at"] = copy.duration
+        copy.spin(driver, degrees, **timing)
+        copy.spin(driven, -degrees * teeth[0] / teeth[1], **timing)
+        self._actions = copy._actions
+        return self
+
+    def slider_crank(self, targets, *, crank_radius=10, rod_length=35, turns=1, phase=0, **timing):
+        """Animate crank/rod/piston IDs in that order, using canonical XY rest geometry.
+
+        Each action sets the absolute mechanism angle phase + 360*turns*progress.
+        Lengths and local pivot coordinates are in the rendered model's units.
+        """
+        from .mechanical import slider_crank_pose
+
+        targets = tuple(targets)
+        if len(targets) != 3:
+            raise ArchDataError("targets", "expected crank, rod and piston IDs")
+        slider_crank_pose(phase, crank_radius, rod_length)
+        return self._add(
+            "slider_crank",
+            targets,
+            crank_radius=number(crank_radius, "crank_radius"),
+            rod_length=number(rod_length, "rod_length"),
+            turns=number(turns, "turns"),
+            phase=number(phase, "phase"),
+            **timing,
+        )
+
     def to_dict(self):
         from dataclasses import asdict
 
@@ -159,6 +212,8 @@ class ArchScript:
             "camera_to",
             "orbit",
             "section",
+            "spin",
+            "slider_crank",
         }
         if not isinstance(data.get("actions", []), (list, tuple)):
             raise ArchDataError("actions", "expected array")

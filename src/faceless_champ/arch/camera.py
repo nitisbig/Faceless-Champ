@@ -41,6 +41,8 @@ def part_matrix(state):
     result = np.eye(4)
     result[:3, :3] = rz @ ry @ rx * state["scale"]
     result[:3, 3] = state["position"]
+    if "mechanical" in state:
+        result = result @ np.asarray(state["mechanical"])
     return result
 
 

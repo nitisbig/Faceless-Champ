@@ -14,6 +14,7 @@ class ArchSession:
         self.actors, self.meshes, self.contours = {}, {}, {}
         self.field_meshes = {}
         self._last_sections = {}
+        prepared = {}
         try:
             pv = pyvista()
             theme = pv.themes.Theme()
@@ -28,10 +29,23 @@ class ArchSession:
             self.plotter.enable_depth_peeling()
             for part in clip.parts:
                 style = part.style or clip.style
-                mesh = part.mesh.dataset
-                if style.concept == "topology":
+                key = (
+                    part.mesh.fingerprint,
+                    style.concept,
+                    style.voxel_spacing,
+                    style.smooth_shading,
+                    style.scalars,
+                    style.vectors,
+                    style.association,
+                    style.field_mode,
+                    part.mesh.provenance.get("generator") == "build123d",
+                )
+                mesh = prepared.get(key)
+                if mesh is None:
+                    mesh = part.mesh.dataset
+                if key not in prepared and style.concept == "topology":
                     mesh = mesh.extract_surface(algorithm="dataset_surface").triangulate()
-                elif style.concept == "voxel":
+                elif key not in prepared and style.concept == "voxel":
                     estimate = np.prod(
                         np.maximum(
                             1, np.ceil((np.array(mesh.bounds)[1::2] - np.array(mesh.bounds)[::2]) / style.voxel_spacing)
@@ -40,6 +54,7 @@ class ArchSession:
                     if estimate > 2_000_000:
                         raise ArchDataError("voxel_spacing", "voxel budget exceeded; increase spacing")
                     mesh = mesh.voxelize(spacing=style.voxel_spacing)
+                prepared[key] = mesh
                 self.meshes[part.id] = mesh
                 surface_style = (
                     "points"
@@ -64,6 +79,8 @@ class ArchSession:
                     options.update(
                         scalars=style.scalars, cmap=style.cmap, clim=style.clim, preference=style.association
                     )
+                if part.mesh.provenance.get("generator") == "build123d" and options["smooth_shading"]:
+                    options["split_sharp_edges"] = True
                 self.actors[part.id] = [self.plotter.add_mesh(mesh, **options)]
                 if style.vectors:
                     field = mesh.cell_data_to_point_data() if style.association == "cell" else mesh

@@ -75,3 +75,9 @@ See [verification status](docs/verification.md). No new example export is claime
 ## Optional ModernGL graphics
 
 Install `faceless-champ[gpu]` and select `backend="moderngl"` for headless GPU compositing, bloom/glow/blur, procedural backgrounds, particles and transitions. `backend="auto"` selects a compatible renderer without omitting effects. Pillow remains the default. See [ModernGL](docs/moderngl.md) and its [verification status](docs/moderngl-verification.md).
+
+## Optional CAD and geometry
+
+Build123d CAD preparation, Trimesh processing, analytic mechanisms and CAD-derived
+blueprints extend ArchChamp. Install the cad, geometry or geometry-advanced extra.
+See [CAD and geometry](docs/cad-geometry.md) for units, APIs and native/headless use.

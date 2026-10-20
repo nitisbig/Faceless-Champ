@@ -18,6 +18,7 @@ from .model import (
     ArchMesh,
     ArchPart,
     ArchStyle,
+    _format_dimension,
     construct,
     number,
     pyvista,
@@ -46,10 +47,19 @@ def validate_design(data, *, registered_only=False):
         "labels",
         "dimensions",
         "units",
+        "cad",
     }:
         raise ArchDataError("design", "unknown fields or expected an object")
-    parts = data.get("parts")
-    if not isinstance(parts, (list, tuple)) or not parts:
+    cad_source = "cad" in data
+    if cad_source:
+        from .cad import _unit_scale, _validate_source
+
+        if "parts" in data:
+            raise ArchDataError("design", "use parts or cad, not both")
+        _validate_source(data["cad"])
+        _unit_scale("mm", data.get("units", "mm"))
+    parts = data.get("parts", []) if cad_source else data.get("parts")
+    if not cad_source and (not isinstance(parts, (list, tuple)) or not parts):
         raise ArchDataError("parts", "expected named parts")
     ids = set()
     for p in parts:
@@ -111,11 +121,11 @@ def validate_design(data, *, registered_only=False):
             raise ArchDataError(key, "expected array")
         for raw in data.get(key, []):
             item = construct(cls, raw)
-            if item.part is not None and item.part not in ids:
+            if not cad_source and item.part is not None and item.part not in ids:
                 raise ArchDataError(key, "unknown anchor part")
     script = ArchScript.from_dict(data.get("script", {}))
     for a in script.actions:
-        if any(t not in (ids | {"camera"}) for t in a.targets):
+        if not cad_source and any(t not in (ids | {"camera"}) for t in a.targets):
             raise ArchDataError("targets", "unknown part")
         if a.kind not in {"camera_to", "orbit"} and "camera" in a.targets:
             raise ArchDataError("targets", "expected parts")
@@ -153,6 +163,9 @@ class ArchChamp(Component):
             raise ArchDataError("arch", "expected ArchStyle and ArchScript")
         self.width, self.height = number(width, "width", 1), number(height, "height", 1)
         self.units, self.font = text(units, "units"), font
+        prepared_units = {p.mesh.provenance.get("units") for p in self.parts} - {None}
+        if len(prepared_units) > 1 or (prepared_units and units != "model units" and units not in prepared_units):
+            raise ArchDataError("units", "prepared geometry units differ; convert geometry before labeling it")
         self.labels, self.dimensions = tuple(deepcopy(labels)), tuple(deepcopy(dimensions))
         self.duration = self.script.duration
         self.source_start = number(source_start, "source_start", 0)
@@ -206,6 +219,7 @@ class ArchChamp(Component):
                         {
                             "id": p.id,
                             "mesh": p.mesh.fingerprint,
+                            **({"provenance": p.mesh.provenance} if p.mesh.provenance else {}),
                             "position": p.position,
                             "rotation": p.rotation,
                             "scale": p.scale,
@@ -258,7 +272,7 @@ class ArchChamp(Component):
         return cls.from_data(pyvista().read(path), **kwargs)
 
     @classmethod
-    def from_dict(cls, data, *, mesh_resolver=None, **kwargs):
+    def from_dict(cls, data, *, mesh_resolver=None, cad_resolver=None, **kwargs):
         data = validate_design(data)
         parts = []
         pv = pyvista()
@@ -270,7 +284,11 @@ class ArchChamp(Component):
             "plane": pv.Plane,
             "torus": pv.ParametricTorus,
         }
-        for raw in data["parts"]:
+        if "cad" in data:
+            from .cad import _parts_from_source
+
+            parts = list(_parts_from_source(data["cad"], data.get("units", "mm"), cad_resolver))
+        for raw in data.get("parts", []):
             p = dict(raw)
             spec = p.pop("mesh")
             if "primitive" in spec:
@@ -290,7 +308,7 @@ class ArchChamp(Component):
             camera=construct(ArchCamera, data["camera"]) if "camera" in data else None,
             labels=[construct(ArchLabel, v) for v in data.get("labels", [])],
             dimensions=[construct(ArchDimension, v) for v in data.get("dimensions", [])],
-            units=data.get("units", "model units"),
+            units=data.get("units", "mm" if "cad" in data else "model units"),
             **kwargs,
         )
 
@@ -309,6 +327,14 @@ class ArchChamp(Component):
             for p in self.parts
         }
 
+    def geometry_record(self):
+        """Portable geometry and preparation identity for Kit/Agent evidence."""
+        result = {"fingerprint": self.fingerprint, "meshes": {p.id: p.mesh.fingerprint for p in self.parts}}
+        provenance = {p.id: p.mesh.provenance for p in self.parts if p.mesh.provenance}
+        if provenance:
+            result["provenance"] = provenance
+        return result
+
     def state_at(self, time):
         time = number(time, "time", 0)
         states, camera = self._initial(), self.camera
@@ -325,6 +351,20 @@ class ArchChamp(Component):
 
                 progress = smooth(progress)
             o = a.options
+
+            if a.kind in {"spin", "slider_crank"}:
+                import numpy as np
+
+                from .mechanical import _poses
+
+                for id, delta in zip(a.targets, _poses(a, progress)):
+                    combined = (
+                        delta
+                        if a.kind == "slider_crank"
+                        else np.asarray(states[id].get("mechanical", np.eye(4))) @ delta
+                    )
+                    states[id]["mechanical"] = tuple(tuple(float(v) for v in row) for row in combined)
+                continue
 
             def blend(old, new, progress=progress):
                 if isinstance(old, (tuple, list)):
@@ -396,6 +436,16 @@ class ArchChamp(Component):
                 s = self.state_at(time)["parts"][p.id]
                 centers.append(world(p.mesh._dataset.center, p.id, {p.id: s}))
                 radii.append(max(0.01, p.mesh._dataset.length / 2) * s["scale"])
+                # Cover the complete analytic trajectory, including extrema between
+                # action endpoints. Existing components keep their previous framing.
+                from .mechanical import _travel_bound
+
+                travel = sum(
+                    _travel_bound(a, a.targets.index(p.id), p.mesh._dataset.center)
+                    for a in self._actions
+                    if a.kind in {"spin", "slider_crank"} and p.id in a.targets
+                )
+                radii[-1] += travel * s["scale"]
         low = np.min([np.array(c) - r for c, r in zip(centers, radii)], axis=0)
         high = np.max([np.array(c) + r for c, r in zip(centers, radii)], axis=0)
         center = (low + high) / 2
@@ -449,7 +499,7 @@ class ArchChamp(Component):
                 a, b = world(dim.start, dim.part, state["parts"]), world(dim.end, dim.part, state["parts"])
                 distance = math.dist(a, b)
                 center = ((start[0] + end[0]) / 2 + dim.offset[0], (start[1] + end[1]) / 2 + dim.offset[1])
-                yield f"dimension-{i}", f"{distance:.{dim.precision}f} {self.units}", start, center, dim, end
+                yield f"dimension-{i}", _format_dimension(distance, dim.precision, self.units), start, center, dim, end
 
     def annotation_overlay(self, time, factor=1):
         image = Image.new("RGBA", (max(1, round(self.width * factor)), max(1, round(self.height * factor))))
