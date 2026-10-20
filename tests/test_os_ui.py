@@ -196,6 +196,37 @@ def test_scroll_long_names_and_target_visibility():
     assert clip.frame_image(0.6, 0.25).size == (480, 270)
 
 
+@pytest.mark.parametrize("view", ["list", "icons"])
+@pytest.mark.parametrize("rows", [0, 30, 150, 10000])
+def test_large_folder_scroll_renders_inside_track(view, rows, monkeypatch):
+    from faceless_champ.os_ui.drawing import Painter
+
+    fs = VirtualFileSystem(Folder("root", "Files", tuple(File(f"f{i}", f"File {i:03}.txt") for i in range(200))))
+    clip = OSClip(
+        fs,
+        OSScript().set_view(view, duration=0.1).scroll(rows, duration=0.1),
+        mode="finder",
+        width=1280,
+        height=800,
+        cursor=False,
+    )
+    original = Painter.rect
+    thumbs = []
+
+    def checked(painter, box, fill, radius=8, outline=None, width=1):
+        if radius == 3 and fill == painter.colors["muted"]:
+            _, top, _, bottom = box
+            track = clip.bounds_for("finder:content", 0.19)
+            assert track.top <= top <= bottom <= track.bottom
+            thumbs.append((top, bottom))
+        return original(painter, box, fill, radius, outline, width)
+
+    monkeypatch.setattr(Painter, "rect", checked)
+    for at in (0.19, 0.05, 0.15, 0.19):
+        assert clip.frame_image(at, 0.25).size == (320, 200)
+    assert thumbs
+
+
 def test_isolated_transparency_group_transform_and_excerpt_cache():
     fs = filesystem()
     script = OSScript().open_folder("docs").rename("note", "Readme.txt")

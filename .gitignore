@@ -33,6 +33,9 @@ wheels/
 media/
 # Keep reusable library sound effects.
 !assets/sfx/**/*.wav
+# Required, source-controlled demonstration narration (not generated output).
+!facelesschamp-kit/src/facelesschamp_kit/sample_assets/voiceover.wav
+!examples/programming/hello_world/audio.mp3
 
 output/
 **/output/

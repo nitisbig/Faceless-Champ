@@ -74,6 +74,18 @@
           "title": "Structural Validation",
           "type": "string"
         },
+        "layout_validation": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "passed",
+            "failed",
+            "unverified",
+            "not_applicable"
+          ],
+          "title": "Layout Validation",
+          "type": "string"
+        },
         "preview_media_verification": {
           "default": "pending",
           "enum": [

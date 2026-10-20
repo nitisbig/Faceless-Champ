@@ -138,6 +138,7 @@ class CodingChamp(Component):
         line_numbers=True,
         highlighted_lines=(),
         reveal_mode="typewriter",
+        reveal=1,
         block_ends=None,
         first_line=1,
         tab_size=4,
@@ -163,6 +164,7 @@ class CodingChamp(Component):
         self.font = str(font or MONO_FONT)
         self.filename, self.chrome, self.line_numbers = str(filename), bool(chrome), bool(line_numbers)
         self.reveal_mode, self.first_line, self.tab_size = reveal_mode, first_line, tab_size
+        self.reveal = reveal
         lines = code.splitlines(keepends=True) or [""]
         self.highlighted_lines = tuple(highlighted_lines)
         ends = tuple(block_ends) if block_ends is not None else tuple(range(1, len(lines) + 1))
@@ -185,6 +187,20 @@ class CodingChamp(Component):
         )
         self.tokens = self._tokenize()
         self._rows = self._layout(lines)
+
+    @property
+    def reveal(self):
+        return self._reveal
+
+    @reveal.setter
+    def reveal(self, value):
+        value = finite(value, "reveal", 0)
+        if value > 1:
+            raise ValueError("reveal must be <= 1")
+        self._reveal = value
+
+    def state(self):
+        return {**super().state(), "reveal": self.reveal}
 
     def _tokenize(self):
         if self.language in {"text", "plain", "plaintext"}:

@@ -273,13 +273,19 @@ def _finder(p, s, boxes, x, y, w, h):
     p.text((x + 212, y + h - 28), "  ›  ".join(trail), size=16, color=c["muted"], max_width=w - 345)
     p.text((x + w - 110, y + h - 28), f"{len(listing(s))} items", size=16, color=c["muted"])
     # A proportional scrollbar communicates clipped content.
-    if len(listing(s)) > len([k for k in boxes if k.startswith("file:")]):
+    columns = max(1, int(content.width // 148)) if s["view"] == "icons" else 1
+    visible = max(1, int(content.height // (118 if s["view"] == "icons" else 48)))
+    rows = math.ceil(len(listing(s)) / columns)
+    if rows > visible:
+        thumb = min(content.height, max(20, content.height * visible / rows))
+        progress = min(1, max(0, s["scroll"] / (rows - visible)))
+        top = content.top + (content.height - thumb) * progress
         p.rect(
             (
                 x + w - 12,
-                content.top + s["scroll"] * 6,
+                top,
                 x + w - 7,
-                min(content.bottom, content.top + s["scroll"] * 6 + 55),
+                min(content.bottom, top + thumb),
             ),
             c["muted"],
             3,

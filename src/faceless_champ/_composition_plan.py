@@ -1,6 +1,7 @@
 """Pure composition timing and integer viewport allocation, shared by all engines."""
 
 from dataclasses import dataclass
+from math import nextafter
 
 
 @dataclass(frozen=True)
@@ -17,6 +18,24 @@ def fit(canvas, size):
     return fitted, ((size[0] - fitted[0]) // 2, (size[1] - fitted[1]) // 2)
 
 
+def _held_time(time, node):
+    from .timeline import Scene
+
+    duration = node.duration
+    if time < duration:
+        return time
+    if duration <= 0:
+        return 0
+    # Composite nodes resolve their own terminal children, so preserve their
+    # exact boundary until reaching a scene. Explicit terminal introductions
+    # retain the existing final-state contract (e.g. wait(1).add(component)).
+    if not isinstance(node, Scene) or any(entry.start == duration for entry in node.entries):
+        return duration
+    # Lifetimes are end-exclusive. Hold the visual left limit, not the state
+    # after terminal removals/caption expiry; leave audio on its own clock.
+    return nextafter(duration, -float("inf"))
+
+
 def composition_plan(node, time, size):
     from .timeline import Grid, Layer, Sequence
 
@@ -24,9 +43,18 @@ def composition_plan(node, time, size):
     if isinstance(node, Sequence):
         starts = node.starts
         active = [i for i, (s, c) in enumerate(zip(starts, node.children)) if s <= time < s + c.duration]
-        if not active and time >= node.duration:
+        holding = not active and time >= node.duration
+        if holding:
             active = [len(node.children) - 1]
-        parts = tuple(Placement(node.children[i], time - starts[i], full, node.canvas.bg) for i in active)
+        parts = tuple(
+            Placement(
+                node.children[i],
+                _held_time(time - starts[i], node.children[i]) if holding else time - starts[i],
+                full,
+                node.canvas.bg,
+            )
+            for i in active
+        )
         progress = min(1, (time - starts[active[1]]) / node.crossfade) if len(active) == 2 else None
         return parts, progress
     if isinstance(node, Grid):
@@ -43,10 +71,13 @@ def composition_plan(node, time, size):
             r, b = round((left + col * (cw + node.gap) + cw) * sx), round((top + row * (ch + node.gap) + ch) * sy)
             parts.append(
                 Placement(
-                    child, min(time - start, child.duration), (x, y, max(1, r - x), max(1, b - y)), node.canvas.bg
+                    child,
+                    _held_time(time - start, child),
+                    (x, y, max(1, r - x), max(1, b - y)),
+                    node.canvas.bg,
                 )
             )
         return tuple(parts), None
     if isinstance(node, Layer):
-        return tuple(Placement(c, min(time, c.duration), full, "#00000000") for c in node.children), None
+        return tuple(Placement(c, _held_time(time, c), full, "#00000000") for c in node.children), None
     raise TypeError(f"Unsupported renderable: {type(node).__name__}")

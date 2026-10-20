@@ -129,6 +129,7 @@ class MetricCard:
             value,
             font=ctx.theme.font,
             font_weight=ctx.theme.heading_weight,
+            text_engine=ctx.theme.text_engine,
             font_size=132,
             color=palette(ctx, self.variant, self.color),
             position=area.center,

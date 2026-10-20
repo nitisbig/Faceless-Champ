@@ -267,7 +267,10 @@ class Project:
             "antialias": 1 if profile == "preview" else 2,
             "preset": "veryfast" if profile == "preview" else "medium",
         }
-        values.update(self.config.get("profiles", {}).get(profile, {}))
+        overrides = self.config.get("profiles", {}).get(profile, {})
+        if "quality" in overrides and not ({"width", "height"} & overrides.keys()):
+            values.update(width=None, height=None)
+        values.update(overrides)
         if isinstance(values.get("gpu"), dict):
             try:
                 values["gpu"] = GPUOptions(**values["gpu"])

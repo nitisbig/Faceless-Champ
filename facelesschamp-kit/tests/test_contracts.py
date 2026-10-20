@@ -1,5 +1,6 @@
 import json
 import wave
+from importlib.resources import files
 
 import pytest
 from faceless_champ import Bounds, Canvas, Circle, PillowRenderer, Text
@@ -41,6 +42,20 @@ def test_timing_styles_and_lifetimes(ctx):
     assert scene.duration == 6
     assert [(e.start, e.end) for e in scene.entries] == [(0, 3), (3, 5)]
     assert scene.entries[0].end == scene.entries[1].start
+
+
+def test_compiled_final_placement_survives_composition_hold(ctx):
+    from faceless_champ import Layer, Scene
+
+    video = Video(ctx)
+    video.segment("one", duration=1).add_core(
+        lambda context, bounds: Circle(15, fill="red", stroke=None, position=bounds.center), enter=None, exit=None
+    )
+    composition = video.compile().composition
+    long = Scene(Canvas(ctx.canvas.width, ctx.canvas.height, "#00000000")).wait(2)
+    with PillowRenderer(1) as renderer:
+        node = Layer(composition, long)
+        assert renderer.frame(node, 0.75, (108, 192)).tobytes() == renderer.frame(node, 1.5, (108, 192)).tobytes()
 
 
 def test_independent_placements_and_builds(ctx):
@@ -177,6 +192,13 @@ def test_pack_resource_materialization(tmp_path, monkeypatch):
     (package / "data.bin").unlink()
     assert resolved.read_bytes() == b"packaged"
     assert digest(resolved) == registry.resolved["image:required"]["checksum"]
+
+
+def test_packaged_narration_fixture():
+    sample = files("facelesschamp_kit").joinpath("sample_assets/voiceover.wav")
+    with sample.open("rb") as stream, wave.open(stream) as audio:
+        assert audio.getnchannels() == 1
+        assert audio.getnframes() / audio.getframerate() == 30
 
 
 def test_narration_windows_tail_and_captions(ctx, tmp_path):
@@ -318,6 +340,22 @@ def test_bad_profile_aspect_and_unknown_profile(tmp_path):
         project.validate()
     with pytest.raises(KitError, match="PROFILE"):
         project.settings(project.build(), "missing")
+
+
+@pytest.mark.parametrize("profile", ["preview", "final", "custom"])
+@pytest.mark.parametrize("size", [(1080, 1920), (1920, 1080)])
+@pytest.mark.parametrize("quality,short", [("ql", 720), ("qh", 1080), ("qk", 2160), ("4k", 2160)])
+def test_quality_only_profile_derives_dimensions(tmp_path, profile, size, quality, short):
+    from types import SimpleNamespace
+
+    project = Project(init_project(tmp_path / "project"))
+    project.config["profiles"][profile] = {"quality": quality}
+    compiled = SimpleNamespace(composition=SimpleNamespace(canvas=Canvas(*size)))
+    settings = project.settings(compiled, profile)
+    expected = (short, short * 16 // 9) if size[0] < size[1] else (short * 16 // 9, short)
+    assert settings.dimensions(compiled.composition.canvas) == expected
+    project.config["profiles"][profile].update(width=size[0], height=size[1])
+    assert project.settings(compiled, profile).dimensions(compiled.composition.canvas) == size
 
 
 def test_named_children_must_belong_to_root(ctx):

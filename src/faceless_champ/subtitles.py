@@ -6,6 +6,7 @@ import re
 from bisect import bisect_right
 from collections.abc import Iterable
 from dataclasses import dataclass
+from itertools import accumulate
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +56,8 @@ class SubtitleTrack:
             if cue.start < previous.start or cue.start < previous.end - self.overlap_tolerance - 1e-9:
                 raise ValueError(f"Cues {previous.index} and {cue.index} overlap or are out of order")
         self._starts = tuple(cue.start for cue in self.cues)
+        self._ends = tuple(cue.end for cue in self.cues)
+        self._max_ends = tuple(accumulate(self._ends, max))
 
     @classmethod
     def from_srt(cls, path: str | Path, *, overlap_tolerance: float = 0.0) -> SubtitleTrack:
@@ -85,12 +88,10 @@ class SubtitleTrack:
         return self._by_index[index]
 
     def active_at(self, time: float) -> SubtitleCue | None:
-        """Use half-open intervals: start <= time < end; gaps return None."""
+        """Return the latest-starting active cue; half-open gaps return None."""
         time = finite(time, "subtitle time")
-        offset = bisect_right(self._starts, time) - 1
-        if offset >= 0 and time < self.cues[offset].end:
-            return self.cues[offset]
-        return None
+        offset = _active_offset(self._starts, self._ends, self._max_ends, time)
+        return self.cues[offset] if offset is not None else None
 
     def phrases(self, max_words: int = 7, max_duration: float = 3) -> tuple[tuple[SubtitleCue, ...], ...]:
         if not isinstance(max_words, int) or isinstance(max_words, bool) or max_words < 1:
@@ -146,10 +147,21 @@ class Captions(Component):
         self.color, self.highlight_color, self.future_color = color, highlight_color, future_color
         self.phrases = track.phrases(max_words, max_duration)
         self._phrase_starts = tuple(phrase[0].start for phrase in self.phrases)
+        self._phrase_ends = tuple(max(cue.end for cue in phrase) for phrase in self.phrases)
+        self._max_phrase_ends = tuple(accumulate(self._phrase_ends, max))
 
     def phrase_at(self, time: float) -> tuple[SubtitleCue, ...]:
         time = finite(time, "caption time")
-        offset = bisect_right(self._phrase_starts, time) - 1
-        if offset >= 0 and time < self.phrases[offset][-1].end:
-            return self.phrases[offset]
-        return ()
+        offset = _active_offset(self._phrase_starts, self._phrase_ends, self._max_phrase_ends, time)
+        return self.phrases[offset] if offset is not None else ()
+
+
+def _active_offset(starts, ends, max_ends, time):
+    offset = bisect_right(starts, time) - 1
+    # Usually the first candidate wins. Prefix maxima bound the backwards scan
+    # to potentially active overlaps, without scanning an entire expired track.
+    while offset >= 0 and max_ends[offset] > time:
+        if ends[offset] > time:
+            return offset
+        offset -= 1
+    return None

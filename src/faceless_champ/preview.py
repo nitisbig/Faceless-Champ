@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+import os
+import tempfile
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
@@ -43,6 +45,23 @@ def _sample_time(node: Renderable, time: float) -> float:
     return time
 
 
+def _save_png(frame, output, overwrite):
+    """Encode completely before atomically publishing on the destination filesystem."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        dir=output.parent, prefix=f".{output.name}-", suffix=".tmp", delete=False
+    ) as stream:
+        temporary = Path(stream.name)
+    try:
+        frame.save(temporary, format="PNG")
+        if overwrite:
+            os.replace(temporary, output)
+        else:
+            os.link(temporary, output)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 @managed_renderer(1)
 def save_frame(
     node: Renderable,
@@ -64,8 +83,7 @@ def save_frame(
     renderer = renderer or PillowRenderer(1)
     renderer.validate(node)
     frame = renderer.frame(node, time, size).convert("RGB")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    frame.save(output)
+    _save_png(frame, output, overwrite)
     return output
 
 
@@ -114,12 +132,12 @@ def render_storyboard(
     directory.mkdir(parents=True, exist_ok=True)
     for i, (sample, path) in enumerate(zip(samples, paths)):
         frame = renderer.frame(node, sample.time, size).convert("RGB")
-        frame.save(path)
+        _save_png(frame, path, overwrite)
         x, y = (i % columns) * size[0], (i // columns) * (size[1] + label_height)
         sheet.paste(frame, (x, y))
         label = f"{sample.time:.3f}s" + (f" / {sample.label}" if sample.label else "")
         while label and draw.textlength(label, font=font) > size[0] - 16:
             label = label[:-1]
         draw.text((x + 8, y + size[1] + 8), label, font=font, fill="#292724")
-    sheet.save(output)
+    _save_png(sheet, output, overwrite)
     return output

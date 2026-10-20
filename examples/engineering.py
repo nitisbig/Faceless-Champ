@@ -81,7 +81,7 @@ def build_scene():
     )
 
 
-if __name__ == "__main__":
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--backend", choices=["pillow", "skia", "moderngl"], default="pillow")
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("--start", type=float, default=0)
     parser.add_argument("--seconds", type=float, default=3)
     parser.add_argument("--output", type=Path, default=Path("output/engineering/preview.mp4"))
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     scene = build_scene()
     validate_composition(scene)
     if not args.check:
@@ -100,9 +100,14 @@ if __name__ == "__main__":
             args.output,
             backend=args.backend,
             width=args.width,
+            height=max(2, round(args.width / scene.canvas.aspect_ratio / 2) * 2),
             fps=args.fps,
             antialias=1,
             start_time=args.start,
             end_time=min(scene.duration, args.start + args.seconds),
             overwrite=True,
         )
+
+
+if __name__ == "__main__":
+    main()

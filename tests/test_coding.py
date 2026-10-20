@@ -53,6 +53,26 @@ def test_indentation_tabs_and_whitespace_are_fixed_during_reveal():
     assert p.bounds.width == 460
 
 
+@pytest.mark.parametrize("reveal", [0, 0.5, 1])
+def test_initial_reveal_is_snapshotted_and_default_remains_visible(reveal):
+    p = panel("abcd", reveal=reveal)
+    scene = Scene(Canvas(500, 280)).add(p).wait(1)
+    assert scene.entries[0].initial["reveal"] == reveal
+    assert p.visible_count(scene.entries[0].state_at(0.5)["reveal"]) == int(4 * reveal)
+    p.reveal = 1 - reveal
+    assert scene.entries[0].state_at(0.5)["reveal"] == reveal
+    assert panel().state()["reveal"] == 1
+
+
+@pytest.mark.parametrize("value", [-1, 1.1, float("nan"), float("inf")])
+def test_initial_reveal_rejects_invalid_values(value):
+    with pytest.raises(ValueError, match="reveal"):
+        panel(reveal=value)
+    p = panel()
+    with pytest.raises(ValueError, match="reveal"):
+        p.reveal = value
+
+
 def test_word_and_authored_block_boundaries():
     p = panel("  hello  world\n  again", reveal_mode="word")
     assert p.visible_count(0.32) == 0

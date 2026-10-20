@@ -8,18 +8,18 @@ version = "0.1.0rc7"
 description = "Structured video authoring with reusable Faceless Champ components"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["faceless-champ>=0.1.5,<0.2.0", "packaging>=24"]
+dependencies = ["faceless-champ>=0.1.6,<0.2.0", "packaging>=24"]
 
 [project.optional-dependencies]
-gpu = ["faceless-champ[gpu]>=0.1.5,<0.2.0"]
-effects = ["faceless-champ[effects]>=0.1.5,<0.2.0"]
-skia = ["faceless-champ[skia]>=0.1.5,<0.2.0"]
-coding = ["faceless-champ[coding]>=0.1.5,<0.2.0"]
-playground = ["faceless-champ[coding,web]>=0.1.5,<0.2.0"]
-chess = ["faceless-champ[chess]>=0.1.5,<0.2.0"]
-web = ["faceless-champ[web]>=0.1.5,<0.2.0"]
-maps = ["faceless-champ[maps]>=0.1.5,<0.2.0"]
-equations = ["faceless-champ[equations]>=0.1.5,<0.2.0"]
+gpu = ["faceless-champ[gpu]>=0.1.6,<0.2.0"]
+effects = ["faceless-champ[effects]>=0.1.6,<0.2.0"]
+skia = ["faceless-champ[skia]>=0.1.6,<0.2.0"]
+coding = ["faceless-champ[coding]>=0.1.6,<0.2.0"]
+playground = ["faceless-champ[coding,web]>=0.1.6,<0.2.0"]
+chess = ["faceless-champ[chess]>=0.1.6,<0.2.0"]
+web = ["faceless-champ[web]>=0.1.6,<0.2.0"]
+maps = ["faceless-champ[maps]>=0.1.6,<0.2.0"]
+equations = ["faceless-champ[equations]>=0.1.6,<0.2.0"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
 
 [project.scripts]

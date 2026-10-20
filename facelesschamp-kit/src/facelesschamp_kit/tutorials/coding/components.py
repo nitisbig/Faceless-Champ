@@ -98,8 +98,8 @@ class CodingTutorialTemplate:
             height=box.height,
             position=(box.left, box.top),
             anchor="top_left",
+            reveal=0,
         )
-        code.reveal = 0
         caret = Rectangle(
             width=3,
             height=46 * unit,
@@ -127,8 +127,8 @@ class CodingTutorialTemplate:
             height=100 * unit,
             position=(box.left + 24 * unit, box.top + 112 * unit),
             anchor="top_left",
+            reveal=0,
         )
-        code.reveal = 0
         window = design.window(box, title, children=(code,))
         window.position, window.scale, window.opacity = (box.center[0], box.center[1] + 20), 0.96, 0
         return window, code

@@ -45,6 +45,29 @@ def test_bundled_style_preserves_the_approved_design_and_fresh_hierarchies(monke
     assert not any(node.label for node in template.flow().graph.nodes)
 
 
+@pytest.mark.parametrize("kind", ["editor", "terminal"])
+def test_template_code_is_actually_hidden_before_typing(kind):
+    from faceless_champ import CodeReveal, Scene
+
+    template = CodingTutorialTemplate()
+
+    def window_for(source):
+        result = template.editor(source, language="text") if kind == "editor" else template.terminal(source)
+        window, code = result[:2]
+        window.opacity = 1
+        return window, code
+
+    window, code = window_for("Hello")
+    scene = Scene(template.canvas()).add(window).wait(1)
+    empty, _ = window_for("")
+    reference = Scene(template.canvas()).add(empty).wait(1)
+    with PillowRenderer(1) as renderer:
+        assert scene._objects[code].initial["reveal"] == 0
+        assert renderer.frame(scene, 0.5, (960, 540)).tobytes() == renderer.frame(reference, 0.5, (960, 540)).tobytes()
+        scene.play(CodeReveal(code), run_time=1)
+        assert renderer.frame(scene, 1.9, (960, 540)).tobytes() != renderer.frame(reference, 0.5, (960, 540)).tobytes()
+
+
 def test_editable_json_changes_the_whole_color_system_and_layout(tmp_path):
     path = tmp_path / "style.json"
     path.write_text(

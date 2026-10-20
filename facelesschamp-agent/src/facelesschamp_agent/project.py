@@ -68,6 +68,54 @@ def _package_identity(directory):
     )
 
 
+def _validate_evidence(record):
+    """Validate persisted fields before filtering or aggregating any history."""
+
+    def text_fields(value, names):
+        if not isinstance(value, dict) or any(not isinstance(value.get(k), str) or not value[k].strip() for k in names):
+            raise ValueError(f"Expected object with nonempty string fields: {', '.join(names)}")
+
+    text_fields(record, ("id", "operation", "fingerprint"))
+    artifacts = record.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise ValueError("artifacts must be a list")
+    for artifact in artifacts:
+        text_fields(artifact, ("id", "path", "checksum"))
+    if "rendering" in record and not isinstance(record["rendering"], dict):
+        raise ValueError("rendering must be an object")
+    operation = record["operation"]
+    statuses = {"pending", "passed", "failed", "unverified", "not_applicable"}
+    if operation == "review":
+        ReviewSubmission.model_validate(record.get("submission"))
+    elif operation == "audit-layout":
+        if record.get("status") not in statuses or not isinstance(record.get("findings"), list):
+            raise ValueError("audit-layout requires status and findings")
+        for finding in record["findings"]:
+            text_fields(finding, ("scene_id",))
+    elif operation == "verify":
+        text_fields(record, ("source_record", "verified_operation"))
+        alignment = record.get("narration_alignment")
+        if (
+            record.get("status") not in statuses
+            or record["verified_operation"] not in {"render", "preview"}
+            or not isinstance(alignment, dict)
+            or alignment.get("status") not in statuses
+        ):
+            raise ValueError("verify requires valid status, source operation and narration alignment")
+    elif operation in {"render", "preview"}:
+        span, expected = record.get("source_range"), record.get("expected")
+        if not artifacts or not isinstance(span, list) or len(span) != 2:
+            raise ValueError("render/preview requires an artifact and two source-range endpoints")
+        if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in span) or not 0 <= span[0] < span[1]:
+            raise ValueError("Invalid recorded source range")
+        if not isinstance(expected, dict) or not isinstance(expected.get("require_audio"), bool):
+            raise ValueError("expected must include the audio requirement")
+        for key in ("width", "height", "fps", "duration"):
+            value = expected.get(key)
+            if not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
+                raise ValueError(f"Invalid expected {key}")
+
+
 class AgentProject:
     def __init__(self, root="."):
         root = Path(root).resolve()
@@ -279,13 +327,36 @@ class AgentProject:
             raise AgentError("PLAN_FORMAT", "Kit canvas and planned format differ")
         theme = compiled.report["theme"]
         design = self._design(plan)
-        for name in ("body_size", "minimum_font_size", "heading_size", "spacing", "motion_duration"):
+        for name in (
+            "body_size",
+            "minimum_font_size",
+            "heading_size",
+            "spacing",
+            "motion_duration",
+            "text_engine",
+            "surface_mode",
+        ):
             if theme[name] != getattr(design, name):
                 raise AgentError(
                     "PLAN_DESIGN", "Compiled design differs from plan; use AgentProject.new_video(ctx)", property=name
                 )
         if theme["name"] != design.theme or any(theme[k] != v for k, v in design.palette.items()):
             raise AgentError("PLAN_DESIGN", "Compiled palette/theme differs from plan")
+        base = THEMES[design.theme]
+        typography = {
+            "font": str(self.root / design.font) if design.font else base.font,
+            "font_weight": None if design.font else base.font_weight,
+            "heading_weight": None if design.font else base.heading_weight,
+        }
+        for name, expected in typography.items():
+            actual = theme[name]
+            if name == "font":
+                actual = (self.root / actual).resolve() if actual else None
+                expected = (self.root / expected).resolve() if expected else None
+            if actual != expected:
+                raise AgentError("PLAN_DESIGN", "Compiled typography differs from plan", property=name)
+        if compiled.context.captions != design.captions:
+            raise AgentError("PLAN_DESIGN", "Compiled caption policy differs from plan", property="captions")
         narration = compiled.report.get("narration")
         if bool(narration) != bool(plan.brief.narration.audio):
             raise AgentError("PLAN_NARRATION", "Planned and attached master narration differ")
@@ -327,7 +398,17 @@ class AgentProject:
         records = []
         directory = self.state / "records"
         for path in sorted(directory.glob("*.json"), key=lambda p: p.stat().st_mtime_ns):
-            record = json.loads(path.read_text())
+            try:
+                record = json.loads(path.read_text())
+                _validate_evidence(record)
+            except (ValueError, TypeError, KeyError) as exc:
+                raise AgentError(
+                    "EVIDENCE_RECORD",
+                    "Invalid evidence record",
+                    path=str(path),
+                    detail=str(exc)[:2000],
+                    suggested_fix="Inspect this record and restore or correct it from trusted evidence; preserve the original file",
+                ) from exc
             if fingerprint is None or record["fingerprint"] == fingerprint:
                 records.append(record)
         return records

@@ -24,7 +24,7 @@ scene.wait(1)
 
 `CodingChamp(code, *, language="text", theme="midnight", width=1200, height=720,
 font_size=32, font=None, filename="", chrome=True, line_numbers=True,
-highlighted_lines=(), reveal_mode="typewriter", block_ends=None, first_line=1,
+highlighted_lines=(), reveal_mode="typewriter", reveal=1, block_ends=None, first_line=1,
 tab_size=4, padding=28, **component_options)` is a standard Component.
 It supports position, anchor, scale, rotation, opacity, groups and masks.
 `first_line` changes displayed numbering; highlighted lines and block ends always use
@@ -65,7 +65,10 @@ Unknown languages and missing optional dependencies raise explicit errors; selec
   and include the final line. A trailing newline does not add an extra blank group.
 
 `CodeReveal(panel, start=0, end=1)` uses linear, normalized progress. It leaves chrome
-and line numbers visible. Text starts fully visible when no reveal animation is authored.
+and line numbers visible. Text defaults to fully visible when no reveal animation is authored.
+Pass `reveal=0` (or set `panel.reveal` before adding it) to initialize hidden code;
+values in `[0, 1]` are snapshotted when the panel joins the scene. Later changes use
+`CodeReveal` or the timeline's normal reveal animation.
 To pause between blocks, animate 0→1/3, hold, then 1/3→2/3, and finally 2/3→1.
 Use ordinary `Scene.at`/`CueScene.at_cue` for narration timing. Effects have no implicit clock.
 

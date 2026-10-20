@@ -136,6 +136,25 @@ def test_small_overlaps_opt_in_preserve_source_and_latest_cue(tmp_path):
             SubtitleTrack.parse_srt(srt, overlap_tolerance=invalid)
 
 
+@pytest.mark.parametrize("punctuation", ["", "."])
+def test_nested_overlap_recovers_still_active_cue_and_phrase(punctuation):
+    track = SubtitleTrack(
+        [
+            SubtitleCue(1, 0, 1.001, "outer" + punctuation),
+            SubtitleCue(2, 1, 1.0005, "inner"),
+        ],
+        overlap_tolerance=0.001,
+    )
+    captions = Captions(track)
+    assert track.active_at(1) == track.cue(2)
+    for at in (1.00075, 0.5, 1.0005, 1.00075):
+        assert track.active_at(at) == track.cue(1)
+        assert track.cue(1) in captions.phrase_at(at)
+    assert track.active_at(1.001) is None
+    assert captions.phrase_at(1.001) == ()
+    assert track.cue(2).end == 1.0005
+
+
 def test_caption_cache_bounded_equivalent_and_reuses_held_frames():
     track = SubtitleTrack([SubtitleCue(i + 1, i / 2, (i + 1) / 2, f"word{i}.") for i in range(80)])
     scene = Scene(Canvas(320, 180, "white")).add(Captions(track, font_size=22, width=280, position=(160, 90)))
