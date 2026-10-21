@@ -81,14 +81,13 @@ def init_project(destination, template="silent"):
         "flowchamp",
         "archchamp",
         "os-ui",
-        "chesschamp",
         "coding-web",
         "coding-concept",
         "coding-backend",
     }:
         raise KitError(
             "TEMPLATE",
-            "Choose flowchamp, silent, explainer-short, narrated-short, whiteboard-basic, os-ui, chesschamp, coding-web, coding-concept, or coding-backend",
+            "Choose flowchamp, silent, explainer-short, narrated-short, whiteboard-basic, os-ui, coding-web, coding-concept, or coding-backend",
         )
     destination = Path(destination).resolve()
     if destination.exists():
@@ -102,16 +101,15 @@ def init_project(destination, template="silent"):
         (staging / "components/__init__.py").write_text("")
         whiteboard = template == "whiteboard-basic"
         os_ui = template == "os-ui"
-        chess = template == "chesschamp"
         coding = template.startswith("coding-")
         config = (
             CONFIG.replace('format = "shorts"', 'format = "landscape"').replace(
                 'theme = "midnight"', 'theme = "whiteboard"'
             )
-            if whiteboard or os_ui or chess or coding or template in {"flowchamp", "archchamp"}
+            if whiteboard or os_ui or coding or template in {"flowchamp", "archchamp"}
             else CONFIG
         )
-        if os_ui or chess or coding or template in {"flowchamp", "archchamp"}:
+        if os_ui or coding or template in {"flowchamp", "archchamp"}:
             config = config.replace('theme = "whiteboard"', 'theme = "midnight"')
         (staging / "facelesschamp.toml").write_text(config)
         narrated = template == "narrated-short"
@@ -122,13 +120,6 @@ def init_project(destination, template="silent"):
             if whiteboard or os_ui
             else (NARRATED if narrated else SILENT)
         )
-        if chess:
-            source = (
-                "from facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    return chesschamp(ctx)\n"
-            )
-            (staging / "data.json").write_text(
-                files("facelesschamp_kit").joinpath("sample_assets/chesschamp.json").read_text()
-            )
         if coding:
             source = (
                 files("facelesschamp_kit").joinpath("sample_assets/" + template.replace("-", "_") + ".py").read_text()
@@ -157,13 +148,11 @@ def init_project(destination, template="silent"):
         (staging / "assets/manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         (staging / "pyproject.toml").write_text(
             '[project]\nname = "my-video"\nversion = "0.1.0"\n'
-            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==0.1.0rc7"]\n'
+            'requires-python = ">=3.12"\ndependencies = ["facelesschamp-kit==2.0.0rc1"]\n'
         )
-        if chess:
+        if template == "archchamp":
             project_file = staging / "pyproject.toml"
-            project_file.write_text(
-                project_file.read_text().replace("facelesschamp-kit==", "facelesschamp-kit[chess]==")
-            )
+            project_file.write_text(project_file.read_text().replace("facelesschamp-kit==", "facelesschamp-kit[3d]=="))
         if coding:
             project_file = staging / "pyproject.toml"
             project_file.write_text(
@@ -179,12 +168,11 @@ def init_project(destination, template="silent"):
             if narrated
             else ""
         )
-        if chess:
+        if template == "archchamp":
             instructions = (
-                "Install `facelesschamp-kit[chess]`. Edit the required root data.json to author legal UCI moves, "
-                "absolute timing, player names, and text/arrow/highlight annotations. "
-                "Optional narration.audio names an audio asset in assets/manifest.json; subtitles are not required. "
-                "The chess rules dependency is GPL-3.0-or-later. See the ChessChamp guide for its data contract.\n\n"
+                "Install `facelesschamp-kit[3d]` (or run `uv sync` for this project's declared extra) "
+                "before building the ArchChamp starter. PyVista/VTK are optional native dependencies; "
+                "no substitute viewport is used when they are missing.\n\n"
             )
         if whiteboard:
             instructions = (

@@ -102,8 +102,12 @@ def test_capped_arch_viewport_preserves_following_native_overlay(native):
 
     import numpy as np
     import pyvista as pv
+    from facelesschamp_kit.engineering.clip import ArchChamp
+    from facelesschamp_kit.engineering.script import ArchScript
 
-    from faceless_champ import ArchCamera, ArchChamp, ArchMesh, ArchScript, Circle, Text
+    from faceless_champ import Circle, Text
+    from faceless_champ.integrations.pyvista.camera import ArchCamera
+    from faceless_champ.integrations.pyvista.model import ArchMesh
 
     # A closed tube cut on y=0 exercises VTK's capped clipping and its tiny
     # trigonometric coordinates. Its raster must not affect later native ink.
@@ -151,8 +155,10 @@ def test_arch_float_environment_restores_after_raster(native, monkeypatch, fail)
     import ctypes
     import platform
 
-    from faceless_champ import ArchChamp, ArchMesh
-    from faceless_champ.backends._raster_adapter import _fenv_api
+    from facelesschamp_kit.engineering.clip import ArchChamp
+
+    from faceless_champ.integrations.pyvista._environment import _fenv_api
+    from faceless_champ.integrations.pyvista.model import ArchMesh
 
     if sys.platform != "linux" or platform.machine() != "x86_64" or _fenv_api() is None:
         pytest.skip("C99 x86 floating-point rounding constants required")
@@ -164,16 +170,28 @@ def test_arch_float_environment_restores_after_raster(native, monkeypatch, fail)
         assert process.fesetround(downward) == 0
         if fail:
             raise RuntimeError("raster failure")
-        return PI.new("RGBA", (1, 1))
+        return PI.new("RGBA", (round(view.width), round(view.height)))
 
     view = ArchChamp(ArchMesh.from_arrays([(-1, 0, 0), (1, 0, 0), (0, 1, 0)], faces=[[0, 1, 2]]))
-    monkeypatch.setattr(native.raster.renderer, "_sprite", sprite)
+    from faceless_champ.integrations.pyvista import rendering
+
+    class Session:
+        def __init__(self, *args):
+            pass
+
+        def frame(self, age):
+            return sprite(age)
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(rendering, "ArchSession", Session)
     try:
         if fail:
             with pytest.raises(RuntimeError, match="raster failure"):
                 native.raster.sprite(view, view.state(), 1, 0)
         else:
-            assert native.raster.sprite(view, view.state(), 1, 0).size == (1, 1)
+            assert native.raster.sprite(view, view.state(), 1, 0).size == (round(view.width), round(view.height))
         assert process.fegetround() == original
     finally:
         process.fesetround(original)

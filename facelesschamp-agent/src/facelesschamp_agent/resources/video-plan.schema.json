@@ -1,0 +1,596 @@
+{
+  "$defs": {
+    "AssetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "kind": {
+          "default": "image",
+          "enum": [
+            "image",
+            "audio",
+            "subtitle",
+            "font",
+            "data",
+            "prepared",
+            "mesh"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "description": {
+          "default": "Supplied project asset",
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "source": {
+          "default": "",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "path"
+      ],
+      "title": "AssetInput",
+      "type": "object"
+    },
+    "DesignSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "text_engine": {
+          "default": "pillow",
+          "enum": [
+            "pillow",
+            "skia"
+          ],
+          "title": "Text Engine",
+          "type": "string"
+        },
+        "surface_mode": {
+          "default": "raster",
+          "enum": [
+            "raster",
+            "vector"
+          ],
+          "title": "Surface Mode",
+          "type": "string"
+        },
+        "template": {
+          "anyOf": [
+            {
+              "const": "coding-tutorial",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Template"
+        },
+        "theme": {
+          "default": "midnight",
+          "enum": [
+            "midnight",
+            "light",
+            "whiteboard",
+            "clean-flow"
+          ],
+          "title": "Theme",
+          "type": "string"
+        },
+        "rationale": {
+          "default": "High contrast with a restrained accent and readable labels",
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "font": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Font"
+        },
+        "palette": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Palette",
+          "type": "object"
+        },
+        "semantic_colors": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Semantic Colors",
+          "type": "object"
+        },
+        "body_size": {
+          "default": 44,
+          "exclusiveMinimum": 0,
+          "title": "Body Size",
+          "type": "number"
+        },
+        "minimum_font_size": {
+          "default": 24,
+          "exclusiveMinimum": 0,
+          "title": "Minimum Font Size",
+          "type": "number"
+        },
+        "heading_size": {
+          "default": 76,
+          "exclusiveMinimum": 0,
+          "title": "Heading Size",
+          "type": "number"
+        },
+        "spacing": {
+          "default": 28,
+          "minimum": 0,
+          "title": "Spacing",
+          "type": "number"
+        },
+        "motion_duration": {
+          "default": 0.6,
+          "exclusiveMinimum": 0,
+          "title": "Motion Duration",
+          "type": "number"
+        },
+        "motion": {
+          "default": "Reveal relationships progressively and emphasize the narrated subject",
+          "minLength": 1,
+          "title": "Motion",
+          "type": "string"
+        },
+        "captions": {
+          "default": false,
+          "title": "Captions",
+          "type": "boolean"
+        }
+      },
+      "title": "DesignSpec",
+      "type": "object"
+    },
+    "KeyEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "minimum": 0,
+          "title": "At",
+          "type": "number"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target"
+        },
+        "duration": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration",
+          "type": "number"
+        }
+      },
+      "required": [
+        "at",
+        "label"
+      ],
+      "title": "KeyEvent",
+      "type": "object"
+    },
+    "NarrationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "audio": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audio"
+        },
+        "subtitles": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subtitles"
+        },
+        "overlap_tolerance": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Overlap Tolerance",
+          "type": "number"
+        }
+      },
+      "title": "NarrationInput",
+      "type": "object"
+    },
+    "ScenePlan": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "purpose": {
+          "minLength": 1,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "number"
+        },
+        "duration": {
+          "exclusiveMinimum": 0,
+          "title": "Duration",
+          "type": "number"
+        },
+        "treatment": {
+          "default": "recipe",
+          "enum": [
+            "recipe",
+            "custom"
+          ],
+          "title": "Treatment",
+          "type": "string"
+        },
+        "recipe": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recipe"
+        },
+        "content": {
+          "additionalProperties": true,
+          "title": "Content",
+          "type": "object"
+        },
+        "visual_relationships": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Visual Relationships",
+          "type": "array"
+        },
+        "attention_sequence": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Attention Sequence",
+          "type": "array"
+        },
+        "key_events": {
+          "items": {
+            "$ref": "#/$defs/KeyEvent"
+          },
+          "title": "Key Events",
+          "type": "array"
+        },
+        "required_assets": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+            "type": "string"
+          },
+          "title": "Required Assets",
+          "type": "array"
+        },
+        "narration": {
+          "default": "",
+          "title": "Narration",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "illustrative": {
+          "default": false,
+          "title": "Illustrative",
+          "type": "boolean"
+        },
+        "capabilities": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "selection_rationale": {
+          "default": "",
+          "title": "Selection Rationale",
+          "type": "string"
+        },
+        "composition": {
+          "default": "",
+          "title": "Composition",
+          "type": "string"
+        },
+        "motion_plan": {
+          "default": "",
+          "title": "Motion Plan",
+          "type": "string"
+        },
+        "transition": {
+          "default": "",
+          "title": "Transition",
+          "type": "string"
+        },
+        "layout_strategy": {
+          "default": "",
+          "title": "Layout Strategy",
+          "type": "string"
+        },
+        "intentional_overlaps": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "minLength": 1,
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Intentional Overlaps",
+          "type": "array"
+        },
+        "allow_bleed": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Allow Bleed",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "purpose",
+        "start",
+        "duration"
+      ],
+      "title": "ScenePlan",
+      "type": "object"
+    },
+    "StoryBeat": {
+      "additionalProperties": false,
+      "properties": {
+        "scene_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "idea": {
+          "minLength": 1,
+          "title": "Idea",
+          "type": "string"
+        },
+        "purpose": {
+          "minLength": 1,
+          "title": "Purpose",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scene_id",
+        "idea",
+        "purpose"
+      ],
+      "title": "StoryBeat",
+      "type": "object"
+    },
+    "StoryPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "thesis": {
+          "minLength": 1,
+          "title": "Thesis",
+          "type": "string"
+        },
+        "beats": {
+          "items": {
+            "$ref": "#/$defs/StoryBeat"
+          },
+          "minItems": 1,
+          "title": "Beats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "thesis",
+        "beats"
+      ],
+      "title": "StoryPlan",
+      "type": "object"
+    },
+    "VideoBrief": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "audience": {
+          "default": "General audience",
+          "minLength": 1,
+          "title": "Audience",
+          "type": "string"
+        },
+        "intended_understanding": {
+          "minLength": 1,
+          "title": "Intended Understanding",
+          "type": "string"
+        },
+        "format": {
+          "default": "landscape",
+          "enum": [
+            "landscape",
+            "shorts"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "duration": {
+          "exclusiveMinimum": 0,
+          "title": "Duration",
+          "type": "number"
+        },
+        "delivery": {
+          "default": "full",
+          "enum": [
+            "full",
+            "preview"
+          ],
+          "title": "Delivery",
+          "type": "string"
+        },
+        "constraints": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "narration": {
+          "$ref": "#/$defs/NarrationInput"
+        },
+        "assets": {
+          "items": {
+            "$ref": "#/$defs/AssetInput"
+          },
+          "title": "Assets",
+          "type": "array"
+        },
+        "repair_limit": {
+          "default": 3,
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Repair Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "title",
+        "prompt",
+        "intended_understanding",
+        "duration"
+      ],
+      "title": "VideoBrief",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "video_id": {
+      "default": "main",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "title": "Video Id",
+      "type": "string"
+    },
+    "brief": {
+      "$ref": "#/$defs/VideoBrief"
+    },
+    "story": {
+      "$ref": "#/$defs/StoryPlan"
+    },
+    "scenes": {
+      "items": {
+        "$ref": "#/$defs/ScenePlan"
+      },
+      "minItems": 1,
+      "title": "Scenes",
+      "type": "array"
+    },
+    "design": {
+      "$ref": "#/$defs/DesignSpec"
+    }
+  },
+  "required": [
+    "brief",
+    "story",
+    "scenes"
+  ],
+  "title": "VideoPlan",
+  "type": "object"
+}

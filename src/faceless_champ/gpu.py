@@ -42,6 +42,7 @@ def renderer_capabilities(backend="moderngl", *, probe=False, gpu=None):
         "probed": False,
         "installed": all(v != "unavailable" for v in versions.values()) if backend != "auto" else True,
         "features": ["composition", "masks", "effects", "procedural", "particles", "transitions"],
+        "unsupported_features": ["native_text", "compound_paths", "path_masks"] if backend == "pillow" else [],
     }
     if probe and backend in {"moderngl", "auto"}:
         from .backends.moderngl import ModernGLRenderer

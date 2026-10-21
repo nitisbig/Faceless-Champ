@@ -1,7 +1,7 @@
 # OS UI tutorials
 
 The framework provides `OSWalkthrough`, `FinderWindow`, and `SettingsWindow` in
-`facelesschamp_kit.blocks`. They use the public core `faceless_champ.os_ui` API.
+`facelesschamp_kit.blocks`. They use the public core `facelesschamp_kit.desktop` API.
 
 ```bash
 fc-kit init my-tutorial --template os-ui
@@ -15,7 +15,7 @@ previews, drag-and-drop, trash/restore, settings, and window controls. Edit
 `videos/main.py`; the tree and script are ordinary Python data. No assets need downloading.
 
 ```python
-from faceless_champ.os_ui import OSScript
+from facelesschamp_kit.desktop import OSScript
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import SettingsWindow
 
@@ -44,5 +44,5 @@ A script's remaining duration must fit the authored placement. Overflow raises
 `MOTION_WINDOW`; a narration tail hold cannot make an overflowing script valid.
 Use a shorter script or an explicitly longer segment. Do not silently speed up actions.
 
-See the core [OS UI guide](../../docs/os-ui.md) for supported actions, stable target IDs,
+See the core [OS UI guide](../core/os-ui.md) for supported actions, stable target IDs,
 custom settings controls, timing, transparency, and simulated-system boundaries.

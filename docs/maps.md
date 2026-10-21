@@ -1,11 +1,12 @@
 # Offline maps
 
-Install with `pip install 'faceless-champ[maps]'` or use `uv run --extra maps`.
+Install with `pip install 'facelesschamp-kit[maps]'` or install the paired checkout with `uv pip install -e . -e ./facelesschamp-kit[maps]`.
 NumPy is loaded only when rendering maps; ordinary imports and other components do not require it.
 All map data ships inside the wheel. Rendering never downloads files or needs an API key.
 
 ```python
-from faceless_champ import Canvas, EarthMap, OutlineMap, SatelliteMap, Scene
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.maps import EarthMap, OutlineMap, SatelliteMap
 
 scene = Scene(Canvas(1280, 720))
 earth = EarthMap(width=650, height=650, position=(640, 360), longitude=20, latitude=15)

@@ -1,9 +1,8 @@
 """Editable FlowChamp starter: reveal, signals and context highlighting."""
 
-from faceless_champ.flow.examples import recipe
-
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import FlowCanvas
+from facelesschamp_kit.diagrams.examples import recipe
 
 
 def build(ctx):

@@ -47,7 +47,8 @@ def test_bundled_style_preserves_the_approved_design_and_fresh_hierarchies(monke
 
 @pytest.mark.parametrize("kind", ["editor", "terminal"])
 def test_template_code_is_actually_hidden_before_typing(kind):
-    from faceless_champ import CodeReveal, Scene
+    from facelesschamp_kit.coding import CodeReveal
+    from faceless_champ import Scene
 
     template = CodingTutorialTemplate()
 

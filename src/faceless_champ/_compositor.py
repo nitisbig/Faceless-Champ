@@ -4,19 +4,23 @@ import math
 
 from PIL import Image, ImageChops, ImageDraw
 
-from ._composition_plan import composition_plan, fit
 from ._portable import guard_size
-from ._render_state import component_ink_box, entry_geometry, ink_box, transformed_box
+from ._rendering.evaluate import (
+    component_ink_box,
+    composition_plan,
+    density,
+    entry_geometry,
+    evaluate_frame,
+    fit,
+    ink_box,
+    sprite_key,
+    transformed_box,
+)
+from ._rendering.execute import walk_frame
 from .layout import Bounds, Group
 from .motion import IDENTITY
 from .surfaces import _shadow_padding
 from .timeline import Scene, Sequence
-
-
-def density(world):
-    a, b, c, d, _, _ = world
-    trace, det = a * a + b * b + c * c + d * d, (a * d - b * c) ** 2
-    return max(0.001, math.sqrt((trace + math.sqrt(max(0, trace * trace - 4 * det))) / 2))
 
 
 def mask_image(c, state, box, roi, q, size):
@@ -105,11 +109,11 @@ class Compositor:
         d = self.device
         d.clear(target, node.canvas.bg)
         if isinstance(node, Scene):
-            node.build()
+            frame = evaluate_frame(node, time, geometry=False)
             q = min(target.size[0] / node.canvas.width, target.size[1] / node.canvas.height)
             self.raster_factor = q
-            for entry in sorted((e for e in node.entries if e.parent is None), key=lambda e: e.component.z_index):
-                self.visit(target, entry, time, (q, 0, 0, q, 0, 0), 1)
+            for _ in walk_frame(frame, self._paint_node, (target, (q, 0, 0, q, 0, 0), 1)):
+                pass
             return
         parts, progress = composition_plan(node, time, target.size)
         if progress is not None:
@@ -135,16 +139,7 @@ class Compositor:
         if d.component(target, c, state, box, world, opacity, age):
             return
         q = self.raster_factor if hasattr(c, "frame_key") else density(world)
-        key = (
-            c,
-            tuple(
-                (k, v)
-                for k, v in state.items()
-                if k not in {"position", "rotation", "scale", "scale_x", "scale_y", "opacity"}
-            ),
-            q,
-            self.raster.renderer_age_key(c, age),
-        )
+        key = sprite_key(c, state, q, age, self.raster.measurement)
         texture = getattr(d, "cached", lambda key: None)(key)
         if texture is None:
             guard_size((max(1, math.ceil(box.width * q)), max(1, math.ceil(box.height * q))))
@@ -156,27 +151,24 @@ class Compositor:
             if hasattr(d, "release_upload"):
                 d.release_upload(texture)
 
-    def visit(self, target, entry, time, parent, inherited):
-        c, state = entry.component, entry.state_at(time)
-        if time < entry.start or (entry.end is not None and time >= entry.end) or state["opacity"] <= 0:
-            return
+    def _paint_node(self, entry, draw_children, context):
+        target, parent, inherited = context
+        time = entry.time
+        c, state = entry.component, entry.state
         world, box = entry_geometry(entry, time, parent, self.raster)
         opacity, q = inherited * state["opacity"], density(world)
-        effects = c.effects.evaluated(state) if c.effects is not None else None
-        isolate = (
-            effects is not None or c.mask is not None or state["clip"] != (0, 0, 1, 1) or c.drop_shadow is not None
-        )
+        effects, isolate = entry.effects, entry.isolate
         if not isolate:
             if isinstance(c, Group):
-                for child in sorted(entry.children, key=lambda e: e.component.z_index):
-                    self.visit(target, child, time, world, opacity)
+                for _ in draw_children((target, world, opacity)):
+                    pass
             else:
-                self.leaf(target, c, state, box, world, opacity, max(0, time - entry.start))
+                self.leaf(target, c, state, box, world, opacity, entry.age)
             return
         if isinstance(c, Group):
             if c.drop_shadow:
                 raise ValueError("Group shadows are unsupported; use a surface or leaf")
-            children = [e for e in entry.children if e.start <= time and (e.end is None or time < e.end)]
+            children = [e for e in entry.children if e.visible]
             if not children:
                 return
             boxes = [ink_box(child, time, IDENTITY, self.raster) for child in children]
@@ -203,15 +195,15 @@ class Compositor:
         d = self.device
         with d.surface(size) as layer:
             if isinstance(c, Group):
-                for child in sorted(children, key=lambda e: e.component.z_index):
-                    self.visit(layer, child, time, local, opacity)
+                for _ in draw_children((layer, local, opacity), children):
+                    pass
             else:
-                self.leaf(layer, c, state, box, local, 1, max(0, time - entry.start))
+                self.leaf(layer, c, state, box, local, 1, entry.age)
             d.content(
                 layer,
                 effects,
                 q,
-                max(0, time - entry.start),
+                entry.age,
                 ((box.left - roi.left) * q, (box.top - roi.top) * q, box.width * q, box.height * q),
             )
             if c.mask is not None or state["clip"] != (0, 0, 1, 1):

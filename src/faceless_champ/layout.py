@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import Any, Self
 
-from .components import Component, Image, finite
+from .components import Component, finite
 
 
 @dataclass(frozen=True)
@@ -50,70 +50,12 @@ def transform_point(point, origin, state):
     )
 
 
-def _size(component, renderer):
-    # Fixed viewports need neither their assets nor optional map dependencies to lay out.
-    from .arch import ArchChamp
-    from .charts import Chart
-    from .chess import ChessChamp
-    from .coding import CodingChamp
-    from .components import Text
-    from .flow import FlowChamp
-    from .gradients import LinearGradient, RadialGradient
-    from .maps import Map
-    from .os_ui import OSClip
-    from .paths import VectorPath
-    from .playground.playback import PlaygroundView
-    from .subtitles import Captions
-    from .surfaces import Surface
-    from .web.clip import HtmlClip
-
-    if getattr(component, "_procedural", False):
-        return component.width, component.height
-
-    if not isinstance(component, Surface) and (
-        isinstance(component, VectorPath)
-        or isinstance(getattr(component, "fill", None), (LinearGradient, RadialGradient))
-    ):
-        pad = max(1, round(component.stroke_width))
-        return max(1, round(component.width)) + 2 * pad, max(1, round(component.height)) + 2 * pad
-
-    if isinstance(component, Surface):
-        return component.width, component.height
-    if isinstance(component, Text) and component.text_engine == "skia":
-        from .backends._skia_text import text_size
-
-        return text_size(component, component.state())
-
-    if isinstance(
-        component, (Image, Chart, Map, HtmlClip, OSClip, CodingChamp, ChessChamp, PlaygroundView, FlowChamp, ArchChamp)
-    ):
-        return max(1, round(component.width)), max(1, round(component.height))
-    if isinstance(component, Captions):
-        sizes = [renderer._caption_sprite(component, 1, phrase[0].start).size for phrase in component.phrases]
-        return max(w for w, _ in sizes), max(h for _, h in sizes)
-    return renderer._sprite(component, component.state(), 1, 0).size
+def _size(component, measurement):
+    return measurement.size(component, logical=True)
 
 
-def _points(component, renderer):
-    if isinstance(component, Group):
-        return [
-            transform_point(point, component._origin, component.state())
-            for child in component.children
-            for point in _points(child, renderer)
-        ]
-    w, h = _size(component, renderer)
-    state = component.state()
-    center = component.position
-    if component.anchor == "top_left":
-        center = (
-            center[0] + w * component.scale * component.scale_x / 2,
-            center[1] + h * component.scale * component.scale_y / 2,
-        )
-    state = {**state, "position": center}
-    return [
-        transform_point(point, (0, 0), state)
-        for point in ((-w / 2, -h / 2), (w / 2, -h / 2), (w / 2, h / 2), (-w / 2, h / 2))
-    ]
+def _points(component, measurement):
+    return tuple(measurement.points(component))
 
 
 def _enclose(points) -> Bounds:
@@ -125,10 +67,9 @@ def _enclose(points) -> Bounds:
 def bounds(component: Component) -> Bounds:
     if not isinstance(component, Component):
         raise TypeError("bounds requires a Component")
-    from .renderer import PillowRenderer
+    from ._rendering.measure import measurement_session
 
-    with PillowRenderer(1, frame_cache_mb=0, caption_cache_mb=0) as renderer:
-        return _enclose(_points(component, renderer))
+    return measurement_session().bounds(component)
 
 
 def _target(other) -> Bounds:
@@ -191,6 +132,23 @@ class Group(Component):
     Create groups before adding their members to a scene. Membership is immutable;
     use Scene.remove() for visibility. Child animations remain independently usable.
     """
+
+    def validate_animation(self, property, value):
+        if not property.startswith("effect.") and property not in {
+            "position",
+            "scale",
+            "rotation",
+            "opacity",
+            "scale_x",
+            "scale_y",
+            "mask_position",
+            "mask_width",
+            "mask_height",
+            "wipe",
+            "clip",
+        }:
+            raise ValueError("Groups support transforms, opacity, masks, and wipe animations")
+        super().validate_animation(property, value)
 
     def __init__(self, *children: Component, **kwargs: Any) -> None:
         if not children:

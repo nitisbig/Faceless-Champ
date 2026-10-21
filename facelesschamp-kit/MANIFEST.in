@@ -8,3 +8,7 @@ recursive-include src/facelesschamp_kit/sample_assets *
 recursive-include src/facelesschamp_kit/tutorials *.json *.md
 
 global-exclude *.py[cod]
+
+recursive-include src/facelesschamp_kit/maps/assets *
+recursive-include src/facelesschamp_kit/diagrams *.json
+recursive-include src/facelesschamp_kit/diagrams/assets *

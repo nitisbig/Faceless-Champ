@@ -1,10 +1,9 @@
 """Real Python results drive the flow, data, and tensor views."""
 
-from faceless_champ import CanvasItem, CodeCheckpoint, EventBinding, PlaygroundScript, ValueBinding
-
+from facelesschamp_kit.playground import CanvasItem, CodeCheckpoint, EventBinding, PlaygroundScript, ValueBinding
 from facelesschamp_kit.templates import coding_playground
 
-SOURCE = """import faceless_champ.playground.runtime as pg
+SOURCE = """import facelesschamp_kit.playground.runtime as pg
 
 request = [1, 2, 3]
 weights = [[1, 0, 1], [0, 1, 0]]

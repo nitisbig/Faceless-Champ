@@ -1,18 +1,22 @@
 # ArchChamp
 
 ArchChamp is a technical 3D viewport that composes with ordinary Faceless Champ
-scenes, groups, masks, transitions, Sequence, Grid and Layer. PyVista is a required
-dependency; install the library normally, or use `uv add pyvista` in an existing
-source environment. Rendering uses an offscreen VTK window and the existing
+scenes, groups, masks, transitions, Sequence, Grid and Layer. Install
+`faceless-champ[3d]`, `facelesschamp-kit[3d]`, or `facelesschamp-agent[3d]` for
+PyVista/VTK. From this checkout use `python -m pip install -e '.[3d]'`.
+The base engine now requires only Pillow; existing Arch projects must explicitly
+add the 3D extra when recreating their environment. PyVista is constrained to the
+tested 0.49 minor series (`>=0.49.1,<0.50`). Rendering uses an offscreen VTK window and the existing
 FFmpeg exporter. No browser, speech generation or remote model download is used.
 
 ## First design
 
 ```python
 import pyvista as pv
-from faceless_champ import (
-    ArchChamp, ArchMesh, ArchPart, ArchScript, ArchStyle, Canvas, Scene, render,
-)
+from facelesschamp_kit.engineering.clip import ArchChamp
+from faceless_champ.integrations.pyvista.model import ArchMesh, ArchPart, ArchStyle
+from facelesschamp_kit.engineering.script import ArchScript
+from faceless_champ import Canvas, Scene, render
 
 body = ArchPart("body", ArchMesh.from_data(pv.Cube()))
 script = ArchScript().orbit(45, duration=2).wait(1)
@@ -26,7 +30,7 @@ render(scene, "design.mp4", width=960, height=540, fps=12)
 also accepts PyVista MultiBlock assemblies and preserves block names, including
 nested names separated by `/`. `ArchChamp.from_file` reads a complete assembly;
 `ArchMesh.from_file` reads a single dataset. STL, OBJ, PLY, VTP, VTU and VTM are
-covered. CAD interchange formats such as STEP need an external tessellation tool.
+covered. STEP and native build123d shapes use the optional CAD bridge; see [CAD and geometry](cad-geometry.md).
 
 `ArchMesh.from_arrays(points, faces=None, point_data=None, cell_data=None)` accepts
 XYZ coordinates and polygon index rows or VTK connectivity. `from_data` wraps

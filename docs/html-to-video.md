@@ -9,7 +9,7 @@ the application must work without a backend or external requests.
 From the repository root:
 
 ```bash
-uv pip install -e '.[web]' -e './facelesschamp-kit[web]'
+uv pip install -e . -e './facelesschamp-kit[web]'
 .venv/bin/python -m playwright install chromium
 ```
 
@@ -21,7 +21,7 @@ The default core and kit imports work without Playwright installed.
 
 ```python
 from faceless_champ import Canvas, Scene
-from faceless_champ.web import HtmlPage, WebScript, capture_html, HtmlClip
+from facelesschamp_kit.web import HtmlPage, WebScript, capture_html, HtmlClip
 
 page = HtmlPage('ui/index.html', viewport=(1440, 900),
                 storage={'theme': 'light'}, ready=('#prompt-input',))

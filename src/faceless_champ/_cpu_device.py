@@ -36,7 +36,7 @@ class CPUDevice:
         return image
 
     def blit(self, target, source, box, world=IDENTITY, opacity=1):
-        from ._render_state import transformed_box
+        from ._rendering.evaluate import transformed_box
 
         if box.width <= 0 or box.height <= 0:
             return
@@ -106,9 +106,8 @@ class CPUDevice:
     def component(self, target, c, state, box, world, opacity, age):
         if not getattr(c, "_procedural", False):
             return False
-        from ._compositor import density
         from ._effects_cpu import background
-        from ._render_state import component_ink_box
+        from ._rendering.evaluate import component_ink_box, density
 
         q = density(world)
         box = component_ink_box(c, Bounds(-c.width / 2, -c.height / 2, c.width / 2, c.height / 2))

@@ -1,7 +1,7 @@
 # OS UI tutorials
 
 The framework provides `OSWalkthrough`, `FinderWindow`, and `SettingsWindow` in
-`facelesschamp_kit.blocks`. They use the public core `faceless_champ.os_ui` API.
+`facelesschamp_kit.blocks`. They use the public core `facelesschamp_kit.desktop` API.
 
 ```bash
 fc-kit init my-tutorial --template os-ui
@@ -15,7 +15,7 @@ previews, drag-and-drop, trash/restore, settings, and window controls. Edit
 `videos/main.py`; the tree and script are ordinary Python data. No assets need downloading.
 
 ```python
-from faceless_champ.os_ui import OSScript
+from facelesschamp_kit.desktop import OSScript
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import SettingsWindow
 

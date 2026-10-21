@@ -8,7 +8,7 @@ from dataclasses import asdict
 from importlib.resources import as_file, files
 from pathlib import Path
 
-from faceless_champ import ExportProgress
+from facelesschamp_kit import ExportProgress
 from facelesschamp_kit.cli import doctor
 from facelesschamp_kit.diagnostics import KitError
 from facelesschamp_kit.recipes import recipe_specs

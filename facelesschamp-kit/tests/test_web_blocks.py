@@ -1,7 +1,7 @@
 import json
 
 from faceless_champ import Canvas, PillowRenderer, Scene
-from faceless_champ.web import WebCapture
+from facelesschamp_kit.web import WebCapture
 from PIL import Image
 
 from facelesschamp_kit.blocks import WebElement, WebWalkthrough

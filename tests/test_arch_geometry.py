@@ -10,42 +10,25 @@ from copy import copy, deepcopy
 import numpy as np
 import pytest
 import pyvista as pv
+from facelesschamp_kit.engineering.clip import ArchChamp, validate_design
+from facelesschamp_kit.engineering.mechanisms import slider_crank_pose
+from facelesschamp_kit.engineering.script import ArchScript
 
-from faceless_champ.arch import (
-    ArchChamp,
-    ArchDataError,
-    ArchMesh,
-    ArchPart,
-    ArchScript,
-    TessellationOptions,
+from faceless_champ.integrations.build123d import TessellationOptions, mesh_from_cad, parts_from_cad, read_step
+from faceless_champ.integrations.pyvista.camera import part_matrix, world
+from faceless_champ.integrations.pyvista.model import ArchDataError, ArchMesh, ArchPart
+from faceless_champ.integrations.trimesh import (
     boolean_mesh,
     inspect_mesh,
-    mesh_from_cad,
-    parts_from_cad,
     parts_from_trimesh_scene,
-    read_step,
     repair_mesh,
     simplify_mesh,
-    slider_crank_pose,
     to_trimesh,
-    validate_design,
 )
-from faceless_champ.arch.camera import part_matrix, world
 
 
 def test_optional_imports_stay_lazy():
-    code = """
-import importlib.abc, sys
-class Block(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path=None, target=None):
-        if fullname.split('.')[0] in {'build123d','OCP','trimesh','scipy','manifold3d','fast_simplification'}:
-            raise AssertionError('optional import: '+fullname)
-sys.meta_path.insert(0, Block())
-import faceless_champ
-from faceless_champ.arch import validate_design, geometry_capabilities
-validate_design({'cad':{'preset':'slider_crank'},'units':'mm'})
-geometry_capabilities()
-"""
+    code = "\nimport importlib.abc, sys\nclass Block(importlib.abc.MetaPathFinder):\n    def find_spec(self, fullname, path=None, target=None):\n        if fullname.split('.')[0] in {'build123d','OCP','trimesh','scipy','manifold3d','fast_simplification'}:\n            raise AssertionError('optional import: '+fullname)\nsys.meta_path.insert(0, Block())\nimport faceless_champ\nfrom facelesschamp_kit.engineering import validate_design\nfrom faceless_champ.arch import geometry_capabilities\nvalidate_design({'cad':{'preset':'slider_crank'},'units':'mm'})\ngeometry_capabilities()\n"
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=os.environ, check=False)
     assert result.returncode == 0, result.stderr
 
@@ -143,7 +126,7 @@ def test_nested_cad_placements_and_shared_native_instances():
 
 def test_native_identity_cache_keeps_unrelated_parts_distinct():
     pytest.importorskip("build123d")
-    from faceless_champ.arch.cad_models import inline_engine
+    from facelesschamp_kit.engineering.models import inline_engine
 
     found = {p.id: p for p in parts_from_cad(inline_engine(cylinders=2))}
     assert found["cylinder-1/rod"].mesh.dataset.n_cells == found["cylinder-2/rod"].mesh.dataset.n_cells == 12
@@ -194,7 +177,7 @@ def test_cad_preset_snapshots_repeat_in_fresh_interpreters():
     code = """
 import json
 from faceless_champ.arch import parts_from_cad
-from faceless_champ.arch.cad_models import gear_pair
+from facelesschamp_kit.engineering.models import gear_pair
 shape = gear_pair(teeth=(24, 35))
 assert abs(shape.children[1].orientation.Z) < 1e-9
 parts = parts_from_cad(shape)
@@ -210,7 +193,7 @@ print(json.dumps([(p.id, p.mesh.fingerprint, p.position, p.rotation) for p in pa
 @pytest.mark.parametrize("name", ["spur_gear", "gear_pair", "piston", "slider_crank", "inline_engine", "portal_frame"])
 def test_cad_presets_are_valid_and_dimensioned(name):
     pytest.importorskip("build123d")
-    from faceless_champ.arch.cad_models import CAD_PRESETS, validate_preset
+    from facelesschamp_kit.engineering.models import CAD_PRESETS, validate_preset
 
     params = {"cylinders": 1} if name == "inline_engine" else {"bays": 1} if name == "portal_frame" else {}
     shape = CAD_PRESETS[name](**validate_preset(name, params))
@@ -329,8 +312,12 @@ def test_cad_cutaways_and_prepared_blueprints_keep_native_overlays(backend, monk
     bd = pytest.importorskip("build123d")
     if backend != "pillow":
         pytest.importorskip("skia" if backend == "skia" else "moderngl")
+    from facelesschamp_kit.engineering.annotations import ArchDimension
+    from facelesschamp_kit.engineering.blueprint import blueprint_from_cad
+
     from faceless_champ import Canvas, Scene, Text, create_renderer
-    from faceless_champ.arch import ArchCamera, ArchDimension, blueprint_from_cad, cad
+    from faceless_champ.arch import cad
+    from faceless_champ.integrations.pyvista.camera import ArchCamera
 
     shape = bd.Box(30, 20, 10) - bd.Cylinder(3, 30)
     mesh = mesh_from_cad(shape)
@@ -359,7 +346,7 @@ def test_cad_cutaways_and_prepared_blueprints_keep_native_overlays(backend, monk
 
 
 def test_render_sessions_share_base_mesh_but_keep_part_sections_independent():
-    from faceless_champ.arch.rendering import ArchSession
+    from faceless_champ.integrations.pyvista.rendering import ArchSession
 
     mesh = ArchMesh.from_data(pv.Sphere())
     view = ArchChamp(
@@ -373,8 +360,8 @@ def test_render_sessions_share_base_mesh_but_keep_part_sections_independent():
 
 
 def test_different_supplied_fields_do_not_share_prepared_dataset_state():
-    from faceless_champ.arch import ArchStyle
-    from faceless_champ.arch.rendering import ArchSession
+    from faceless_champ.integrations.pyvista.model import ArchStyle
+    from faceless_champ.integrations.pyvista.rendering import ArchSession
 
     data = pv.Sphere()
     data["a"] = data.points[:, 0]

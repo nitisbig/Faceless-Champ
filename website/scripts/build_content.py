@@ -2,8 +2,8 @@
 import hashlib
 import json
 import re
+import sys
 import textwrap
-import tomllib
 from pathlib import Path
 
 from feature_content import HTML, add_features
@@ -11,8 +11,13 @@ from feature_content import HTML, add_features
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
 lessons = []
-CORE_VERSION = tomllib.loads((ROOT.parent / 'pyproject.toml').read_text())['project']['version']
-KIT_VERSION = tomllib.loads((ROOT.parent / 'facelesschamp-kit/pyproject.toml').read_text())['project']['version']
+sys.path.insert(0, str(ROOT.parent / "scripts"))
+from sync_reference_docs import reference_metadata
+
+CAPABILITIES = reference_metadata()
+CORE_VERSION = CAPABILITIES["packages"]["faceless_champ"]["version"]
+KIT_VERSION = CAPABILITIES["packages"]["facelesschamp_kit"]["version"]
+(DIST / "capabilities.json").write_text(json.dumps(CAPABILITIES, indent=2, sort_keys=True) + "\n")
 
 def code(source, language='python', filename=None, target=None, kind='core', template='silent'):
     source = textwrap.dedent(source).strip() + '\n'
@@ -75,7 +80,7 @@ ffmpeg -version
 ffprobe -version
 faceless-champ --help
 ''', 'bash')),
-section('Optional capabilities', 'Charts, shapes, text, OS UI, and FlowChamp use Pillow. Equations need equations; maps need maps; highlighted code needs coding; chess rules need chess. web and playground enable explicit browser/checkpoint preparation. Install only what you use.', code('python -m pip install -e ".[coding,chess,playground,equations,maps]"\npython -m playwright install chromium', 'bash'), note('Chromium installation is explicit and needed only for browser preparation. Prepared playback does not launch a browser. language="text" works without Pygments.')),
+section('Optional capabilities', 'Charts, shapes, text, OS UI, and FlowChamp use Pillow. Equations need equations; maps need maps; highlighted code needs coding; web and playground enable explicit browser/checkpoint preparation. Install only what you use.', code('python -m pip install -e ".[equations]"\npython -m playwright install chromium', 'bash'), note('Chromium installation is explicit and needed only for browser preparation. Prepared playback does not launch a browser. language="text" works without Pygments.')),
 section('Two packages, two jobs', 'This guide covers faceless_champ: components, animation, timelines, and rendering. For structured projects, reusable blocks, and templates, use the framework guide.', link('Open the facelesschamp-kit guide →', 'kit.html'))
 ])
 canvas = code('''
@@ -184,21 +189,7 @@ scene.add_audio(ASSETS / "music.wav", start=0, trim_end=2,
                 volume=0.3, fade_in=0.2, fade_out=0.4)
 '''), note('Images and audio resolve from your scene file in these examples. Create a fresh renderer after replacing an asset.'))
 ])
-charts = code('''
-from faceless_champ import Axis, BarChart, Canvas, ChartReveal, Scene, Text
-
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
-chart = BarChart(
-    ["Q1", "Q2", "Q3"], {"Completed": [3, 5, 4]},
-    width=1200, height=650, position=(960, 520),
-    title="Project milestones", y_axis=Axis(limits=(0, 10)),
-)
-scene.add(Text("SYNTHETIC EXAMPLE DATA", font_size=24,
-               color="#8996ad", position=(960, 960)))
-scene.play(ChartReveal(chart), run_time=1)
-scene.play(chart.animate.data_to({"Completed": [5, 7, 9]}), run_time=1.5)
-scene.wait(0.5)
-''', filename='charts.py', target='scene')
+charts = code('\nfrom facelesschamp_kit.charts import Axis, BarChart, ChartReveal\nfrom faceless_champ import Canvas, Scene, Text\n\nscene = Scene(Canvas(1920, 1080, "#0b101b"))\nchart = BarChart(\n    ["Q1", "Q2", "Q3"], {"Completed": [3, 5, 4]},\n    width=1200, height=650, position=(960, 520),\n    title="Project milestones", y_axis=Axis(limits=(0, 10)),\n)\nscene.add(Text("SYNTHETIC EXAMPLE DATA", font_size=24,\n               color="#8996ad", position=(960, 960)))\nscene.play(ChartReveal(chart), run_time=1)\nscene.play(chart.animate.data_to({"Completed": [5, 7, 9]}), run_time=1.5)\nscene.wait(0.5)\n', filename='charts.py', target='scene')
 lesson('charts-and-numbers', 'Charts & numbers', 'Library fundamentals', 'Reveal data, animate values, and keep axes meaningful throughout a transition.', [
 section('Animate a dataset', 'Charts are core components. Supply ordinary Python data, reveal it with ChartReveal, and update matching data shapes with data_to(). This example uses synthetic data, labeled on screen.', charts),
 section('Keep the domain stable', 'Most charts derive automatic limits once from the initial data. Supply Axis(limits=...) to cover every keyframe. Keep category order, series shape, and graph topology fixed when transitioning.', {'type': 'table','headers': ['Component','Input'],'rows': [['BarChart','Categories + named value series'],['LineChart / ScatterPlot','Named sequences of (x, y) pairs'],['RankedBarChart','Name → value or None'],['Number','Value + format_spec / formatter'],['Heatmap / Histogram','Matrix / sample values'],['NetworkGraph / SankeyChart','Nodes and edges / weighted links']]}),
@@ -492,26 +483,7 @@ section('Clip a group', 'A group mask clips its complete subtree. Attach Rectang
 section('Move the reveal', 'Wipe(direction="right"|"left"|"down"|"up") reveals a normalized rectangular clip. It intersects the attached mask. mask_to() animates an existing mask’s local position and dimensions.'),
 section('Keep local coordinates clear', 'Masks are centered relative to a sprite center or group pivot. Ancestor transforms apply afterward. Masks affect rendered visibility; they do not reduce the reserved layout bounds.',note('Large canvases and deeply nested masked groups use additional temporary layers. Inspect a small preview before exporting at full resolution.'))
 ], 'masks')
-indicators = code('''
-from faceless_champ import (
-    Canvas, Scene, ProgressRing, ProgressBar, LoadingDots,
-    Countdown, Repeat, linear,
-)
-
-scene = Scene(Canvas(1920, 1080, "#0b101b"))
-ring = ProgressRing(width=240, height=240, label=True, position=(650, 480))
-timer = Countdown(4, font_size=120, position=(1250, 480))
-bar = ProgressBar(width=700, height=30, position=(960, 730))
-dots = LoadingDots(width=160, height=40, position=(960, 850))
-scene.add(ring, timer, bar, dots)
-with scene.at(0):
-    scene.play(ring.animate.progress_to(1), timer.animate.value_to(0),
-               bar.animate.progress_to(1), run_time=4, rate_func=linear)
-with scene.at(0):
-    scene.play(Repeat(dots.animate.progress_to(1), cycles=4, duration=1),
-               rate_func=linear)
-scene.wait_until(4.5)
-''',filename='indicators.py',target='scene')
+indicators = code('\nfrom faceless_champ import Canvas, Scene, ProgressRing, ProgressBar, LoadingDots, Countdown, Repeat, linear\n\nscene = Scene(Canvas(1920, 1080, "#0b101b"))\nring = ProgressRing(width=240, height=240, label=True, position=(650, 480))\ntimer = Countdown(4, font_size=120, position=(1250, 480))\nbar = ProgressBar(width=700, height=30, position=(960, 730))\ndots = LoadingDots(width=160, height=40, position=(960, 850))\nscene.add(ring, timer, bar, dots)\nwith scene.at(0):\n    scene.play(ring.animate.progress_to(1), timer.animate.value_to(0),\n               bar.animate.progress_to(1), run_time=4, rate_func=linear)\nwith scene.at(0):\n    scene.play(Repeat(dots.animate.progress_to(1), cycles=4, duration=1),\n               rate_func=linear)\nscene.wait_until(4.5)\n',filename='indicators.py',target='scene')
 lesson('progress-and-indicators', 'Progress & indicators', 'Motion graphics', 'Make waiting, completion, or change visible with explicitly timed motion.', [
 section('Tie progress to the timeline', 'Indicators have no independent wall clock. Animate progress_to() from 0 to 1, and animate a Countdown’s value toward zero.',indicators),
 section('Choose an indicator', 'ProgressBar fills a track, ProgressRing draws a clockwise ring, Gauge draws a semicircle, LoadingDots loops three dots, and Checkmark draws a completion mark. Countdown is a formatted nonnegative Number.'),
@@ -557,7 +529,7 @@ sudo apt install ffmpeg
 fc-kit doctor
 fc-kit list templates
 ''', 'bash')),
-section('Add optional capabilities', 'The core handles rendering; the kit handles projects, blocks, assets, and templates. Geometry-only whiteboards need no extra dependencies. For equations or maps, install the matching extras from the repository root.', code('python -m pip install -e ".[equations,maps]" -e "./facelesschamp-kit[equations,maps]"', 'bash'), link('Learn the core components and animations →', 'index.html')),
+section('Add optional capabilities', 'The core handles rendering; the kit handles projects, blocks, assets, and templates. Geometry-only whiteboards need no extra dependencies. Install Core equations or Kit maps explicitly.', code('python -m pip install -e ".[equations]" -e "./facelesschamp-kit[equations,maps]"', 'bash'), link('Learn the core components and animations →', 'index.html')),
 ], guide='kit')
 
 silent_template = code('''
@@ -586,7 +558,6 @@ section('Choose a starter', 'List the installed templates, then pick a fresh des
     ['narrated-short', 'Thirty-second synthetic narration demo', 'Shorts · midnight · sentence SRT cues'],
     ['whiteboard-basic', 'Two five-second drawing scenes', 'Landscape · whiteboard · no captions'],
     ['os-ui', 'Offline virtual desktop tutorial', 'Landscape · semantic actions'],
-    ['chesschamp', 'Legal timed game in data.json', 'Landscape · chess extra'],
     ['flowchamp', 'Scripted graph recipes', 'Adapts to canvas · no extra'],
     ['archchamp', 'Technical 3D assembly', 'Landscape · silent · PyVista'],
     ['coding-concept', 'Code and independent cars', 'Six seconds · prepare first'],
@@ -741,7 +712,6 @@ section('Common fixes', 'Start with fc-kit doctor and fc-kit validate main. Erro
     ['Destination already exists', 'Use a new directory; init does not merge projects.'],
     ['PLAYGROUND_UNPREPARED / changed lesson', 'Run fc-kit prepare main after editing sources, inputs, bindings, or settings.'],
     ['PLAYGROUND execution or timeout', 'Inspect checkpoint context; correct trusted code, output size, or preparation timeout.'],
-    ['Illegal chess move / invalid JSON', 'Check schema_version, starting FEN, UCI move order, and annotation times.'],
     ['FLOW_DATA / MOTION_WINDOW', 'Correct the field path or fit the script into its placement lifetime.'],
     ['FLOW_BOUNDS / FLOW_OVERLAP / FLOW_LABEL_OVERLAP', 'Inspect the reported source time and adjust graph layout or labels.'],
     ['TEXT_FIT / layout overflow', 'Shorten labels, enlarge bounds, or split the scene.'],
@@ -765,7 +735,7 @@ lesson('html-to-video', 'HTML to video', 'Media and composition',
     section('Install browser preparation', 'Browser installation is explicit; normal scene playback stays browser-free.',
             code('uv pip install -e ".[web]"\npython -m playwright install chromium', 'bash')),
     section('Author a local walkthrough', 'Times are source seconds. Track selectors before using element crops or focus.',
-            code("""from faceless_champ.web import HtmlPage, WebScript, capture_html
+            code("""from facelesschamp_kit.web import HtmlPage, WebScript, capture_html
 page = HtmlPage('ui.html', viewport=(1440, 900))
 script = WebScript(8).type('#prompt-input', 'Hello', at=1, duration=2)
 script.click('#send', at=3.5).track('.composer')
@@ -776,7 +746,7 @@ capture = capture_html(page, script, fps=30, cache_dir='.web-cache')""")),
             link('Kit walkthrough blocks →', 'kit.html#html-walkthroughs')),
 ])
 web_kit = code("""
-from faceless_champ.web import WebCapture, WebCallout
+from facelesschamp_kit.web import WebCapture, WebCallout
 from facelesschamp_kit.blocks import WebWalkthrough, WebElement
 
 def walkthrough(capture_directory):
@@ -815,7 +785,7 @@ lesson('os-ui', 'OS UI rendering', 'Library fundamentals',
             link('OS UI framework guide →', 'kit.html#os-ui-tutorials')),
 ])
 os_kit = code("""
-from faceless_champ.os_ui import OSScript
+from facelesschamp_kit.desktop import OSScript
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import SettingsWindow
 
@@ -846,7 +816,7 @@ core_by_id = {item['id']: item for item in lessons if item['guide'] == 'core'}
 core_order = ['hello-world', 'installation', 'scenes-and-canvas', 'text-and-shapes',
               'timeline-and-timing', 'groups-and-layout', 'images-and-audio', 'charts-and-numbers',
               'narration-and-cues', 'composition', 'codingchamp', 'coding-playgrounds', 'os-ui',
-              'chesschamp', 'flowchamp', 'archchamp', 'html-to-video', 'animated-properties',
+              'flowchamp', 'archchamp', 'html-to-video', 'animated-properties',
               'animation-schedules', 'masks-and-wipes', 'progress-and-indicators',
               'preview-and-export', 'troubleshooting']
 assert set(core_order) == set(core_by_id)
@@ -860,7 +830,7 @@ for item in lessons:
 # Keep chapter groups contiguous in the sidebar and reading order.
 kit_order = ['framework-quickstart', 'kit-installation', 'project-configuration',
              'blocks-and-themes', 'custom-blocks', 'framework-narration', 'templates',
-             'kit-coding-playgrounds', 'kit-chesschamp', 'kit-flowchamp', 'kit-archchamp',
+             'kit-coding-playgrounds', 'kit-flowchamp', 'kit-archchamp',
              'whiteboard-videos', 'html-walkthroughs', 'os-ui-tutorials', 'kit-preview-and-export', 'kit-troubleshooting']
 assert set(kit_order) == set(kit_lessons)
 lessons = core_lessons + [kit_lessons[key] for key in kit_order]

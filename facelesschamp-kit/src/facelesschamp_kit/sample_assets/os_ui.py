@@ -1,9 +1,8 @@
 """A complete offline tutorial. Replace the authored tree and script with your story."""
 
-from faceless_champ.os_ui import File, Folder, OSScript, VirtualFileSystem
-
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import OSWalkthrough
+from facelesschamp_kit.desktop import File, Folder, OSScript, VirtualFileSystem
 
 
 def tutorial():

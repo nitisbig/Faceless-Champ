@@ -7,10 +7,7 @@ masking them uses the existing renderer and timeline. No new dependency, live
 effect loop or browser/GPU context is involved.
 
 ```python
-from faceless_champ import (
-    Bounds, Canvas, GradientStop, LinearGradient, RadialGradient,
-    Scene, ShadowStyle, Spring, card_surface, gradient_surface,
-)
+from faceless_champ import Bounds, Canvas, GradientStop, LinearGradient, RadialGradient, Scene, ShadowStyle, Spring, card_surface, gradient_surface
 
 stops = (
     GradientStop(0, "#15182D"),

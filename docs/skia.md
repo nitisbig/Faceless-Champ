@@ -35,10 +35,7 @@ renderers are closed on success and failure.
 ## Geometry, paint and typography
 
 ```python
-from faceless_champ import (
-    Bounds, GradientStop, LinearGradient, PathData, VectorPath,
-    ShadowStyle, Text, card_surface, fit_text,
-)
+from faceless_champ import Bounds, GradientStop, LinearGradient, PathData, VectorPath, ShadowStyle, Text, card_surface, fit_text
 
 path = PathData().move_to(100, 200).cubic_to(220, 40, 350, 340, 500, 180)
 curve = VectorPath(path, stroke="#567CF4", stroke_width=4)

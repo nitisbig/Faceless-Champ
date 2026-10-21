@@ -39,6 +39,32 @@ class SubtitleCue:
             raise ValueError(f"Cue {self.index} must have text")
 
 
+def parse_srt_cues(text: str) -> tuple[SubtitleCue, ...]:
+    """Parse ordered raw cues, preserving source overlaps and multiline text.
+
+    Overlap policy belongs to SubtitleTrack; input byte/cue limits belong to the
+    calling application. Cue indices remain positive, unique source identifiers.
+    """
+    text = text.lstrip("\ufeff").replace("\r\n", "\n").replace("\r", "\n").strip()
+    cues = []
+    indices = set()
+    for block_number, block in enumerate(re.split(r"\n(?:[ \t]*\n)+", text), 1):
+        lines = block.splitlines()
+        try:
+            index = int(lines[0])
+            start, end = re.split(r"\s*-->\s*", lines[1])
+            cue = SubtitleCue(index, _timestamp(start.strip()), _timestamp(end.strip()), "\n".join(lines[2:]))
+            if index in indices:
+                raise ValueError("Subtitle cue indices must be unique")
+            if cues and cue.start < cues[-1].start:
+                raise ValueError("Cue start times must be in source order")
+            indices.add(index)
+            cues.append(cue)
+        except (ValueError, IndexError, OverflowError) as exc:
+            raise ValueError(f"Invalid SRT block {block_number}: {exc}") from exc
+    return tuple(cues)
+
+
 class SubtitleTrack:
     """Ordered cues, optionally tolerating small overlaps without retiming."""
 
@@ -65,19 +91,7 @@ class SubtitleTrack:
 
     @classmethod
     def parse_srt(cls, text: str, *, overlap_tolerance: float = 0.0) -> SubtitleTrack:
-        text = text.lstrip("\ufeff").replace("\r\n", "\n").replace("\r", "\n").strip()
-        cues = []
-        for block_number, block in enumerate(re.split(r"\n(?:[ \t]*\n)+", text), 1):
-            lines = block.splitlines()
-            try:
-                index = int(lines[0])
-                start, end = re.split(r"\s*-->\s*", lines[1])
-                cues.append(
-                    SubtitleCue(index, _timestamp(start.strip()), _timestamp(end.strip()), "\n".join(lines[2:]))
-                )
-            except (ValueError, IndexError) as exc:
-                raise ValueError(f"Invalid SRT block {block_number}: {exc}") from exc
-        return cls(cues, overlap_tolerance=overlap_tolerance)
+        return cls(parse_srt_cues(text), overlap_tolerance=overlap_tolerance)
 
     @property
     def duration(self) -> float:

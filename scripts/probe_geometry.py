@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def probe(*, cad=False, geometry=False, backend=None):
-    from faceless_champ.arch import geometry_capabilities
+    from faceless_champ.integrations.dependencies import geometry_capabilities
 
     result = geometry_capabilities(cad=cad, geometry=geometry)
     result["platform"] = platform.platform()
@@ -17,7 +17,10 @@ def probe(*, cad=False, geometry=False, backend=None):
         import pyvista as pv
 
         from faceless_champ import Canvas, Scene, Text, create_renderer, rendering_identity
-        from faceless_champ.arch import ArchChamp, ArchMesh, ArchScript, mesh_from_cad
+        from facelesschamp_kit.engineering.clip import ArchChamp
+        from faceless_champ.integrations.pyvista.model import ArchMesh
+        from facelesschamp_kit.engineering.script import ArchScript
+        from faceless_champ.integrations.build123d import mesh_from_cad
 
         if cad:
             import build123d as bd

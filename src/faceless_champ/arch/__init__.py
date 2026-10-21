@@ -1,27 +1,24 @@
-"""Technical 3D visualization and deterministic demonstrations with PyVista."""
+"""Deprecated Core-local geometry aliases; engineering authoring moved to Kit."""
 
-from .blueprint import blueprint_from_cad
-from .cad import TessellationOptions, mesh_from_cad, parts_from_cad, read_step
-from .camera import ArchCamera
-from .clip import ArchChamp, validate_design
-from .dependencies import geometry_capabilities
-from .mechanical import slider_crank_pose
-from .mesh import boolean_mesh, inspect_mesh, parts_from_trimesh_scene, repair_mesh, simplify_mesh, to_trimesh
-from .model import ArchDataError, ArchDimension, ArchLabel, ArchMesh, ArchPart, ArchStyle
-from .script import ArchScript
+from ..integrations.build123d import TessellationOptions, mesh_from_cad, parts_from_cad, read_step
+from ..integrations.dependencies import geometry_capabilities
+from ..integrations.pyvista import ArchCamera, ArchDataError, ArchMesh, ArchPart, ArchStyle
+from ..integrations.trimesh import (
+    boolean_mesh,
+    inspect_mesh,
+    parts_from_trimesh_scene,
+    repair_mesh,
+    simplify_mesh,
+    to_trimesh,
+)
 
 __all__ = [
     "ArchCamera",
-    "ArchChamp",
     "ArchDataError",
-    "ArchDimension",
-    "ArchLabel",
     "ArchMesh",
     "ArchPart",
-    "ArchScript",
     "ArchStyle",
     "TessellationOptions",
-    "blueprint_from_cad",
     "boolean_mesh",
     "geometry_capabilities",
     "inspect_mesh",
@@ -31,7 +28,23 @@ __all__ = [
     "read_step",
     "repair_mesh",
     "simplify_mesh",
-    "slider_crank_pose",
     "to_trimesh",
-    "validate_design",
 ]
+
+
+def __getattr__(name):
+    from importlib import import_module
+
+    aliases = {
+        "cad": "build123d",
+        "mesh": "trimesh",
+        "dependencies": "dependencies",
+        "model": "pyvista.model",
+        "camera": "pyvista.camera",
+        "rendering": "pyvista.rendering",
+    }
+    if name in aliases:
+        return import_module("faceless_champ.integrations." + aliases[name])
+    raise AttributeError(
+        f"{name} moved from faceless_champ.arch to facelesschamp_kit.engineering; see docs/v2/m4-migration.md"
+    )

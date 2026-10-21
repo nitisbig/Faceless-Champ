@@ -11,7 +11,7 @@ import json
 import uuid
 from pathlib import Path
 
-from faceless_champ import ExportProgress
+from facelesschamp_kit import ExportProgress
 from facelesschamp_agent import AgentError, AgentProject
 from facelesschamp_kit.diagnostics import KitError
 

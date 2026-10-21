@@ -9,11 +9,8 @@ from PIL import Image as PILImage
 
 from faceless_champ import (
     CLEAN_FLOW_FONT,
-    BarChart,
     Bounds,
     Canvas,
-    ChartStyle,
-    CodeTheme,
     ColorScheme,
     FadeIn,
     PillowRenderer,
@@ -24,6 +21,8 @@ from faceless_champ import (
     card_surface,
     dot_grid,
 )
+from facelesschamp_kit.charts import BarChart, ChartStyle
+from facelesschamp_kit.coding import CodeTheme
 
 
 def pixels(component):
@@ -84,8 +83,12 @@ def test_transparent_chart_fits_shadow_card_content():
     content = card_content_bounds(bounds, shadow=shadow)
     style = ChartStyle(scheme=replace(ColorScheme.named("clean-flow"), surface="#00000000"), grid=False)
     chart = BarChart(
-        ("Compose", "Replay"), {"Tasks": (4, 7)}, width=content.width, height=content.height,
-        position=content.center, style=style,
+        ("Compose", "Replay"),
+        {"Tasks": (4, 7)},
+        width=content.width,
+        height=content.height,
+        position=content.center,
+        style=style,
     )
     assert chart.bounds == content
     scene = Scene(Canvas(640, 480, "#E8E6E2")).add(card_surface(bounds, shadow=shadow), chart)
@@ -106,7 +109,10 @@ def test_packaged_clean_flow_font_and_editor_colors():
         assert renderer._font(Text("Clean flow", font=CLEAN_FLOW_FONT, font_weight=400), 48) is regular
     scheme = ColorScheme.named("clean-flow")
     assert (scheme.background, scheme.surface, scheme.text, scheme.primary) == (
-        "#E8E6E2", "#FFFFFF", "#111111", "#FF5A20"
+        "#E8E6E2",
+        "#FFFFFF",
+        "#111111",
+        "#FF5A20",
     )
     code = CodeTheme.named("clean-flow")
     assert (code.background, code.chrome, code.accent) == ("#14161A", "#1F2329", "#FF5A20")

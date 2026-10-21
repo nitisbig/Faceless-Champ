@@ -5,16 +5,14 @@ from dataclasses import replace
 from pathlib import Path
 
 from faceless_champ import Canvas, Scene, Sequence, render, validate_composition
-from faceless_champ.arch import (
-    ArchCamera,
-    ArchChamp,
-    ArchDimension,
-    ArchScript,
-    ArchStyle,
-    blueprint_from_cad,
-    parts_from_cad,
-)
-from faceless_champ.arch.cad_models import gear_pair, inline_engine, portal_frame
+from faceless_champ.integrations.pyvista.camera import ArchCamera
+from facelesschamp_kit.engineering.clip import ArchChamp
+from facelesschamp_kit.engineering.annotations import ArchDimension
+from facelesschamp_kit.engineering.script import ArchScript
+from faceless_champ.integrations.pyvista.model import ArchStyle
+from facelesschamp_kit.engineering.blueprint import blueprint_from_cad
+from faceless_champ.integrations.build123d import parts_from_cad
+from facelesschamp_kit.engineering.models import gear_pair, inline_engine, portal_frame
 
 
 def build_scene():

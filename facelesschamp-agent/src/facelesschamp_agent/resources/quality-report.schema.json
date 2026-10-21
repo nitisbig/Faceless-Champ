@@ -1,0 +1,214 @@
+{
+  "$defs": {
+    "ReviewFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "scene_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "source_time": {
+          "minimum": 0,
+          "title": "Source Time",
+          "type": "number"
+        },
+        "element": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Element"
+        },
+        "severity": {
+          "default": "warning",
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "code": {
+          "default": "VISUAL_REVIEW",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "observed": {
+          "minLength": 1,
+          "title": "Observed",
+          "type": "string"
+        },
+        "evidence_artifact": {
+          "minLength": 1,
+          "title": "Evidence Artifact",
+          "type": "string"
+        },
+        "suggested_repair": {
+          "minLength": 1,
+          "title": "Suggested Repair",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scene_id",
+        "source_time",
+        "observed",
+        "evidence_artifact",
+        "suggested_repair"
+      ],
+      "title": "ReviewFinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "fingerprint": {
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "structural_validation": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Structural Validation",
+      "type": "string"
+    },
+    "layout_validation": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Layout Validation",
+      "type": "string"
+    },
+    "preview_media_verification": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Preview Media Verification",
+      "type": "string"
+    },
+    "full_export_media_verification": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Full Export Media Verification",
+      "type": "string"
+    },
+    "visual_review": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Visual Review",
+      "type": "string"
+    },
+    "editorial_review": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Editorial Review",
+      "type": "string"
+    },
+    "narration_alignment": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "unverified",
+        "not_applicable"
+      ],
+      "title": "Narration Alignment",
+      "type": "string"
+    },
+    "draft": {
+      "default": true,
+      "title": "Draft",
+      "type": "boolean"
+    },
+    "draft_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Draft Reasons",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/ReviewFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "artifacts": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "repair_passes": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Repair Passes",
+      "type": "object"
+    },
+    "next_actions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Next Actions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "fingerprint"
+  ],
+  "title": "QualityReport",
+  "type": "object"
+}

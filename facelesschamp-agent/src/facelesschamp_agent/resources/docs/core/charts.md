@@ -5,7 +5,8 @@ runtime dependency is required. Supply Python sequences and mappings; load files
 compute samples in your application. All examples below use synthetic data.
 
 ```python
-from faceless_champ import Axis, BarChart, Canvas, ChartReveal, Scene
+from facelesschamp_kit.charts import Axis, BarChart, ChartReveal
+from faceless_champ import Canvas, Scene
 
 chart = BarChart(
     ["Q1", "Q2", "Q3"],
@@ -32,18 +33,7 @@ Width and height include the plot, labels, title and legend. Minimum dimensions 
 measures labels and raises a useful error if they leave no usable plot area.
 
 ```python
-from faceless_champ import (
-    Axis,
-    BarChart,
-    Heatmap,
-    Histogram,
-    LineChart,
-    NetworkGraph,
-    PieChart,
-    SankeyChart,
-    ScatterPlot,
-    VectorField,
-)
+from facelesschamp_kit.charts import Axis, BarChart, Heatmap, Histogram, LineChart, NetworkGraph, PieChart, SankeyChart, ScatterPlot, VectorField
 
 bars = BarChart(["A", "B"], {"One": [2, -1], "Two": [3, -2]}, stacked=True)
 line = LineChart({"f(x)": [(0, 0), (1, 1), (2, 4)]})
@@ -124,7 +114,8 @@ and ticks. Stacked bars cannot use log axes; ordinary log bars reveal from the
 lower axis bound. Tick labels are thinned horizontally to avoid collisions.
 
 ```python
-from faceless_champ import Axis, ChartStyle, ColorScheme, LineChart
+from facelesschamp_kit.charts import Axis, ChartStyle, LineChart
+from faceless_champ import ColorScheme
 
 chart = LineChart(
     {"Growth": [(1, 10), (2, 100), (3, 1000)]},
@@ -202,7 +193,8 @@ Dynamic number sprites are not retained in the renderer's sprite cache; chart fo
 use a bounded cache shared by chart types.
 
 ```python
-from faceless_champ import Canvas, ColorScheme, ChartStyle, Number, RankedBarChart, Scene
+from faceless_champ import Canvas, ColorScheme, Number, Scene
+from facelesschamp_kit.charts import ChartStyle, RankedBarChart
 
 chart = RankedBarChart(
     {"Alpha": 8, "Beta": 4, "New entrant": None},

@@ -1,0 +1,84 @@
+{
+  "import": {
+    "baseline_median_ms": 437.43704299413366,
+    "candidate_median_ms": 11.876857999595813,
+    "improvement_percent": 97.28489889235213,
+    "gate": true
+  },
+  "frames": [
+    {
+      "workload": "plain",
+      "aa": 1,
+      "baseline_median_ms": 5.26200649983366,
+      "candidate_median_ms": 5.018995998398168,
+      "median_change_percent": -4.6182098300937895,
+      "baseline_p95_ms": 14.102217999607092,
+      "candidate_p95_ms": 10.585128002276178,
+      "p95_change_percent": -24.93997750870752,
+      "gate": true
+    },
+    {
+      "workload": "plain",
+      "aa": 2,
+      "baseline_median_ms": 5.473174498547451,
+      "candidate_median_ms": 5.0913265004055575,
+      "median_change_percent": -6.9767188720775035,
+      "baseline_p95_ms": 11.500235999847064,
+      "candidate_p95_ms": 9.317912998085376,
+      "p95_change_percent": -18.976332327360147,
+      "gate": true
+    },
+    {
+      "workload": "ui",
+      "aa": 1,
+      "baseline_median_ms": 50.388567500704085,
+      "candidate_median_ms": 35.16228100124863,
+      "median_change_percent": -30.217740361923763,
+      "baseline_p95_ms": 91.2118010019185,
+      "candidate_p95_ms": 43.82315300608752,
+      "p95_change_percent": -51.95451408182833,
+      "gate": true
+    },
+    {
+      "workload": "ui",
+      "aa": 2,
+      "baseline_median_ms": 907.256424499792,
+      "candidate_median_ms": 756.3545865014021,
+      "median_change_percent": -16.632765988026854,
+      "baseline_p95_ms": 1593.9190230019449,
+      "candidate_p95_ms": 845.3190619984525,
+      "p95_change_percent": -46.96599702998707,
+      "gate": true
+    }
+  ],
+  "suites": {
+    "core": {
+      "passed": 1533,
+      "skipped": 2,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 299.381
+    },
+    "kit": {
+      "passed": 308,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 89.901
+    },
+    "agent": {
+      "passed": 178,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 226.714
+    },
+    "wheel": {
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 35.101
+    }
+  }
+}

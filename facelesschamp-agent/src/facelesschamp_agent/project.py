@@ -10,21 +10,14 @@ import uuid
 from dataclasses import replace
 from pathlib import Path
 
-from faceless_champ import (
-    Scene,
-    StoryboardSample,
-    SubtitleTrack,
-    create_renderer,
-    render,
-    render_storyboard,
-    rendering_identity,
-    save_frame,
-)
-from faceless_champ.audio import probe
-from facelesschamp_kit import Project, Video
+from faceless_champ import Scene, StoryboardSample, SubtitleTrack
+from facelesschamp_kit import Project, Video, validate_rendering
+from facelesschamp_kit import media_probe as probe
 from facelesschamp_kit.assets import digest
+from facelesschamp_kit.rendering import rendering_identity
 from facelesschamp_kit.themes import THEMES
 
+from . import __version__
 from .errors import AgentError
 from .media import run_tool, verify_media
 from .models import QualityReport, ReviewSubmission, VideoPlan
@@ -78,7 +71,7 @@ def _validate_evidence(record):
     text_fields(record, ("id", "operation", "fingerprint"))
     artifacts = record.get("artifacts")
     if not isinstance(artifacts, list):
-        raise ValueError("artifacts must be a list")
+        raise ValueError("artifacts must be a list")  # noqa: TRY004 - persisted evidence validation contract
     for artifact in artifacts:
         text_fields(artifact, ("id", "path", "checksum"))
     if "rendering" in record and not isinstance(record["rendering"], dict):
@@ -172,7 +165,7 @@ class AgentProject:
                 "plan": plan.model_dump(mode="json"),
                 "build": build,
                 "inputs": self._inputs(plan),
-                "agent_version": "0.1.0rc2",
+                "agent_version": __version__,
                 "implementations": implementations,
             }
         )
@@ -423,9 +416,7 @@ class AgentProject:
         profiles = {}
         for profile in ("preview", "final"):
             settings = self.kit.settings(compiled, profile)
-            with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
-                renderer.validate(compiled.composition)
-                profiles[profile] = rendering_identity(settings.backend, renderer=renderer)
+            profiles[profile] = validate_rendering(compiled, settings)
         return self._record(
             "validate",
             fingerprint,
@@ -440,9 +431,7 @@ class AgentProject:
         settings = self.kit.settings(compiled, "final")
         if settings.backend not in {"auto", "moderngl"}:
             return rendering_identity(settings.backend)
-        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
-            renderer.validate(compiled.composition)
-            return rendering_identity(settings.backend, renderer=renderer)
+        return validate_rendering(compiled, settings)
 
     @staticmethod
     def _same_rendering(actual, expected):
@@ -511,14 +500,15 @@ class AgentProject:
         path = self._output(output, "frame", ".png")
         settings = self.kit.settings(compiled, "preview")
         size = settings.dimensions(compiled.composition.canvas)
-        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
-            save_frame(compiled.composition, time, path, size=size, renderer=renderer)
+        result = compiled.save_frame(
+            time, path, size=size, backend=settings.backend, antialias=settings.antialias, gpu=settings.gpu
+        )
         return self._record(
             "frame",
             fingerprint,
             artifacts=[{"path": str(path), "kind": "frame", "source_time": time}],
             layout=compiled.layout_at(time),
-            rendering=rendering_identity(settings.backend, renderer=renderer),
+            rendering=result["rendering"],
         )
 
     def storyboard(self, output=None):
@@ -530,8 +520,10 @@ class AgentProject:
             for t in times
         ]
         settings = self.kit.settings(compiled, "preview")
-        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
-            sheet = render_storyboard(compiled.composition, samples, directory, renderer=renderer)
+        result = compiled.storyboard(
+            samples, directory, backend=settings.backend, antialias=settings.antialias, gpu=settings.gpu
+        )
+        sheet = result["output"]
         frames = sorted((p for p in directory.glob("*.png") if p != sheet), key=lambda p: int(p.stem.split("-", 1)[0]))
         artifacts = [
             {"path": str(p), "kind": "frame", "source_time": time} for p, time in zip(frames, times, strict=True)
@@ -563,7 +555,7 @@ class AgentProject:
             artifacts=artifacts,
             layouts=layouts,
             diagnostics=findings,
-            rendering=rendering_identity(settings.backend, renderer=renderer),
+            rendering=result["rendering"],
         )
 
     def _render(self, start, end, profile, output, *, operation, fps=None, quality=None, progress=None):
@@ -585,16 +577,7 @@ class AgentProject:
             settings = replace(settings, quality=EXPORT_QUALITIES[quality], width=None, height=None)
         settings.dimensions(compiled.composition.canvas)
         path = self._output(output, operation, ".mp4")
-        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
-            render(
-                compiled.composition,
-                path,
-                settings=settings,
-                start_time=start,
-                end_time=end,
-                progress=progress,
-                renderer=renderer,
-            )
+        result = compiled.export(path, settings=settings, start_time=start, end_time=end, progress=progress)
         width, height = settings.dimensions(compiled.composition.canvas)
         return self._record(
             operation,
@@ -608,7 +591,7 @@ class AgentProject:
                 "require_audio": bool(plan.brief.narration.audio),
             },
             profile=profile,
-            rendering=rendering_identity(settings.backend, renderer=renderer),
+            rendering=result["rendering"],
             source_range=[start, end],
             status="exported",
         )
@@ -895,7 +878,7 @@ def init_project(destination):
         (staging / "asset-brief.md").write_text("# Asset brief\n\nThis starter uses only library-drawn elements.\n")
         (staging / ".gitignore").write_text(".fc-agent/\n.fc-kit/\noutput/\n__pycache__/\n")
         (staging / "pyproject.toml").write_text(
-            '[project]\nname="agent-video"\nversion="0.1.0"\nrequires-python=">=3.12"\ndependencies=["facelesschamp-agent==0.1.0rc2"]\n'
+            '[project]\nname="agent-video"\nversion="0.1.0"\nrequires-python=">=3.12"\ndependencies=["facelesschamp-agent==2.0.0rc1"]\n'
         )
         write_render_entrypoint(staging)
         staging.rename(destination)

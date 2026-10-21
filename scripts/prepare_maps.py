@@ -24,7 +24,7 @@ def main():
     for path in (args.countries, args.texture):
         if path.stat().st_size > 10_000_000:
             raise ValueError("Source exceeds 10 MB")
-    root = Path(__file__).resolve().parents[1] / "src/faceless_champ/assets/maps"
+    root = Path(__file__).resolve().parents[1] / "facelesschamp-kit/src/facelesschamp_kit/maps/assets/maps"
     root.mkdir(parents=True, exist_ok=True)
     countries = []
     for feature in json.loads(args.countries.read_text())["features"]:

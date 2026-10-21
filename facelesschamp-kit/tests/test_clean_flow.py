@@ -1,22 +1,12 @@
 from dataclasses import replace
 
 import pytest
-from faceless_champ import (
-    Bounds,
-    Canvas,
-    ChessScript,
-    Circle,
-    CodeCheckpoint,
-    Group,
-    Image,
-    PlaygroundScript,
-    Text,
-    prepare_playground,
-)
+from faceless_champ import Bounds, Canvas, Circle, Group, Image, Text
 
 from facelesschamp_kit import CLEAN_FLOW, BuildContext, KitError, Video
-from facelesschamp_kit.blocks import ChessBoard, CodeEditor, CodingPlayground, Heading, OSWalkthrough, TextPanel
+from facelesschamp_kit.blocks import CodeEditor, CodingPlayground, Heading, OSWalkthrough, TextPanel
 from facelesschamp_kit.cli import CATALOG
+from facelesschamp_kit.playground import CodeCheckpoint, PlaygroundScript, prepare_playground
 from facelesschamp_kit.themes import LIGHT, MIDNIGHT, THEMES, WHITEBOARD
 
 
@@ -134,10 +124,6 @@ def test_profiles_and_explicit_styles(tmp_path):
     assert code.theme.accent == CLEAN_FLOW.accent
     override = CodeEditor(script, theme="paper").compose(ctx, box).root
     assert override.theme.background != code.theme.background
-    chess = ChessBoard(
-        ChessScript({"schema_version": 1, "duration": 3, "moves": [{"at": 1, "duration": 0.5, "uci": "e2e4"}]})
-    ).compose(ctx, box).root
-    assert chess.theme.accent == CLEAN_FLOW.accent
     prepared = prepare_playground(script, cache_dir=tmp_path / "prepared")
     panels = CodingPlayground(prepared).compose(ctx, box).children
     assert panels["canvas"].theme.accent == CLEAN_FLOW.accent

@@ -2,15 +2,25 @@
 
 import math
 import time as clock
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 
 from PIL import Image as PILImage
 
 from .._portable import guard_size
-from .._render_state import ByteCache, composition_frame, entry_geometry, ink_box, transformed_box
-from ..components import Image, Shape, Text, finite
+from .._rendering.composition import composition_frame
+from .._rendering.evaluate import (
+    density,
+    entry_geometry,
+    evaluate_frame,
+    ink_box,
+    render_signature,
+    sprite_key,
+    transformed_box,
+)
+from .._rendering.execute import walk_frame
+from .._rendering.resources import ByteCache
+from ..components import Shape, Text, finite
 from ..layout import Bounds, Group
-from ..subtitles import Captions
 from ..surfaces import Surface, _shadow_padding
 from ..timeline import Scene
 from ._native import image_from_pillow, image_to_pillow, load_skia
@@ -38,8 +48,13 @@ class SkiaRenderer:
         self.working_limit = round(finite(working_mb, "working_mb", 1) * 1024**2)
         self.working_bytes = 0
         self._effect_compositor = None
-        self.raster = PillowRasterAdapter(native_cache_mb, arch_session_limit)
-        self.text = TextSession()
+        self.raster = self.text = None
+        try:
+            self.raster = PillowRasterAdapter(native_cache_mb, arch_session_limit)
+            self.text = TextSession()
+        except BaseException:
+            self.close()
+            raise
         self.raster.text_session = self.text
         self.stats = {
             "native_leaves": 0,
@@ -56,19 +71,24 @@ class SkiaRenderer:
         self.close()
 
     def close(self):
+        if self._closed:
+            return
         self._closed = True
-        self.frames.clear()
-        self.images.clear()
-        self.text.close()
-        self.raster.close()
-        if self._effect_compositor is not None:
-            self._effect_compositor.device.close()
-            self._effect_compositor = None
+        with ExitStack() as cleanup:
+            cleanup.callback(self.frames.clear)
+            cleanup.callback(self.images.clear)
+            if self._effect_compositor is not None:
+                cleanup.callback(self._effect_compositor.device.close)
+                self._effect_compositor = None
+            if self.raster is not None:
+                cleanup.callback(self.raster.close)
+            if self.text is not None:
+                cleanup.callback(self.text.close)
 
     def validate(self, node):
         if self._closed:
             raise RuntimeError("SkiaRenderer is closed")
-        self.raster.renderer.validate(node, backend="skia")
+        self.raster.painter.validate(node, backend="skia")
 
     @contextmanager
     def _surface(self, size):
@@ -93,21 +113,6 @@ class SkiaRenderer:
         a, b, c, d, x, y = world
         return self.skia.Matrix.MakeAll(a, c, x, b, d, y, 0, 0, 1)
 
-    def _age_key(self, c, age):
-        if hasattr(c, "frame_key"):
-            return c.frame_key(age)
-        if isinstance(c, Captions):
-            return self.raster.renderer._caption_state(c, age)
-        if isinstance(c, Image):
-            frames, durations = self.raster.renderer._image(c)
-            if len(frames) > 1:
-                clock = age % sum(durations)
-                for i, duration in enumerate(durations):
-                    if clock < duration:
-                        return i
-                    clock -= duration
-        return None
-
     def frame(self, node, time, size):
         if self._closed:
             raise RuntimeError("SkiaRenderer is closed")
@@ -129,22 +134,8 @@ class SkiaRenderer:
             return self._effect_compositor.frame(node, time, size)
         if not isinstance(node, Scene):
             return composition_frame(self, node, time, size)
-        node.build()
-        signature = (
-            node.canvas,
-            size,
-            tuple(
-                (
-                    e.component,
-                    e.start,
-                    e.end,
-                    e.start <= time and (e.end is None or time < e.end),
-                    tuple(e.state_at(time).items()),
-                    self._age_key(e.component, max(0, time - e.start)),
-                )
-                for e in node.entries
-            ),
-        )
+        frame = evaluate_frame(node, time, geometry=False)
+        signature = size, render_signature(node, time, self.raster.measurement)
         cached = self.frames.get(node)
         if cached is not None and cached[0] == signature:
             self.stats["frame_cache_hits"] += 1
@@ -156,8 +147,8 @@ class SkiaRenderer:
             canvas = surface.getCanvas()
             canvas.clear(color(self.skia, node.canvas.bg))
             limit = Bounds(0, 0, *big)
-            for entry in sorted((e for e in node.entries if e.parent is None), key=lambda e: e.component.z_index):
-                self._visit(canvas, entry, time, (factor, 0, 0, factor, 0, 0), 1, limit)
+            for _ in walk_frame(frame, self._paint_node, (canvas, (factor, 0, 0, factor, 0, 0), 1, limit)):
+                pass
             started = clock.perf_counter()
             result = image_to_pillow(surface.makeImageSnapshot(), self.skia)
             self.stats["conversion_seconds"] += clock.perf_counter() - started
@@ -235,18 +226,18 @@ class SkiaRenderer:
                 mask.makeImageSnapshot(), 0, 0, s.SamplingOptions(), s.Paint(BlendMode=s.BlendMode.kDstIn)
             )
 
-    def _visit(self, canvas, entry, time, parent, inherited, limit):
-        c, state = entry.component, entry.state_at(time)
-        if time < entry.start or (entry.end is not None and time >= entry.end) or state["opacity"] <= 0:
-            return
+    def _paint_node(self, entry, children, context):
+        canvas, parent, inherited, limit = context
+        time = entry.time
+        c, state = entry.component, entry.state
         world, box = entry_geometry(entry, time, parent, self.raster)
         opacity = inherited * state["opacity"]
         if isinstance(c, Group):
             if c.drop_shadow is not None:
                 raise ValueError("Group shadows are unsupported; use a surface or leaf")
             if c.mask is None and state["clip"] == (0, 0, 1, 1):
-                for child in sorted(entry.children, key=lambda e: e.component.z_index):
-                    self._visit(canvas, child, time, world, opacity, limit)
+                for _ in children((canvas, world, opacity, limit)):
+                    pass
                 return
             ink = self._ink_box(entry, time, parent)
             clipped = self._clip_box(c, state, box)
@@ -275,8 +266,8 @@ class SkiaRenderer:
             with self._surface((right - left, bottom - top)) as layer:
                 target = layer.getCanvas()
                 target.translate(-left, -top)
-                for child in sorted(entry.children, key=lambda e: e.component.z_index):
-                    self._visit(target, child, time, world, opacity, roi)
+                for _ in children((target, world, opacity, roi)):
+                    pass
                 self._apply_mask(layer, c, state, box, world, (left, top))
                 canvas.drawImage(layer.makeImageSnapshot(), left, top)
             return
@@ -284,20 +275,14 @@ class SkiaRenderer:
             ink = self._ink_box(entry, time, parent)
             if ink.right < limit.left or ink.left > limit.right or ink.bottom < limit.top or ink.top > limit.bottom:
                 return
-            self._isolated_leaf(canvas, c, state, box, world, max(0, time - entry.start), opacity)
+            self._isolated_leaf(canvas, c, state, box, world, entry.age, opacity)
             return
         canvas.save()
         canvas.concat(self._matrix(world))
-        self._draw_leaf(canvas, c, state, box, max(0, time - entry.start), self._density(world), opacity)
+        self._draw_leaf(canvas, c, state, box, entry.age, self._density(world), opacity)
         canvas.restore()
 
-    @staticmethod
-    def _density(world):
-        a, b, c, d, _, _ = world
-        # Largest singular value includes shear from nested nonuniform transforms.
-        trace = a * a + b * b + c * c + d * d
-        det = (a * d - b * c) ** 2
-        return max(0.001, math.sqrt((trace + math.sqrt(max(0, trace * trace - 4 * det))) / 2))
+    _density = staticmethod(density)
 
     def _draw_leaf(self, canvas, c, state, box, age, density, opacity):
         s = self.skia
@@ -322,16 +307,7 @@ class SkiaRenderer:
             # their resolution tied to output, as in Pillow, rather than creating
             # a new native/VTK session on every animated ancestor scale sample.
             factor = self._raster_factor if hasattr(c, "frame_key") else density
-            key = (
-                c,
-                tuple(
-                    (k, v)
-                    for k, v in state.items()
-                    if k not in {"position", "rotation", "scale", "scale_x", "scale_y", "opacity"}
-                ),
-                self._age_key(c, age),
-                factor,
-            )
+            key = sprite_key(c, state, factor, age, self.raster.measurement)
             image = self.images.get(key)
             if image is None:
                 started = clock.perf_counter()
@@ -360,17 +336,7 @@ class SkiaRenderer:
         size = max(1, math.ceil(local.width * density)), max(1, math.ceil(local.height * density))
         # Keep the same local origin/scale after ceil allocation; extra edge is transparent.
         target = Bounds(local.left, local.top, local.left + size[0] / density, local.top + size[1] / density)
-        key = (
-            "isolated",
-            c,
-            tuple(
-                (k, v)
-                for k, v in state.items()
-                if k not in {"position", "rotation", "scale", "scale_x", "scale_y", "opacity"}
-            ),
-            self._age_key(c, age),
-            density,
-        )
+        key = ("isolated", sprite_key(c, state, density, age, self.raster.measurement))
         image = self.images.get(key)
         if image is None:
             with self._surface(size) as layer:

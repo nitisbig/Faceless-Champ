@@ -1,8 +1,9 @@
 from types import SimpleNamespace
 
 import pytest
-from faceless_champ import Canvas, FlowEdge, FlowGraph, FlowNode, FlowScript, FlowTheme, PillowRenderer
-from faceless_champ.flow.examples import recipe
+from faceless_champ import Canvas, PillowRenderer
+from facelesschamp_kit.diagrams import FlowEdge, FlowGraph, FlowNode, FlowScript, FlowTheme
+from facelesschamp_kit.diagrams.examples import recipe
 
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import FlowCanvas

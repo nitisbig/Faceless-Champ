@@ -4,6 +4,11 @@ Search with `fc-agent capabilities search architecture`, then describe
 `facelesschamp_kit.blocks.ArchCanvas` or `recipe:arch-design`. The bundled guides
 cover the shared geometry, script, camera, field and annotation contracts.
 
+Install `facelesschamp-agent[3d]` for PyVista/VTK before building Arch designs;
+the base Core engine now installs only Pillow. CAD and geometry extras include
+this conversion stack. Existing projects must declare the appropriate extra when
+rebuilding their environment; missing dependencies fail with installation guidance.
+
 Use the existing `ScenePlan` recipe treatment with content such as:
 
 ```json

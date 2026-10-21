@@ -3,11 +3,11 @@
 import hashlib
 import sys
 import threading
+from contextlib import ExitStack
 from importlib.resources import files
 
-from .._render_state import ByteCache
+from .._rendering.resources import ByteCache
 from ..gpu import GPUOptions
-from ..timeline import Scene
 
 
 class ModernGLRenderer:
@@ -87,43 +87,12 @@ class ModernGLRenderer:
 
     def validate(self, node):
         self._check()
-        self.raster.renderer.validate(node, backend="skia")
+        self.raster.painter.validate(node, backend="skia")
 
     def _signature(self, node, time):
-        if isinstance(node, Scene):
-            node.build()
-            return (
-                node.canvas,
-                tuple(
-                    (
-                        e.component,
-                        e.start,
-                        e.end,
-                        e.start <= time and (e.end is None or time < e.end),
-                        tuple(e.state_at(time).items()),
-                        self.raster.renderer_age_key(e.component, max(0, time - e.start)),
-                        max(0, time - e.start)
-                        if e.component.effects is not None
-                        and (e.component.effects.distortion is not None or e.component.effects.light_sweep is not None)
-                        else None,
-                    )
-                    for e in node.entries
-                ),
-            )
-        from .._composition_plan import composition_plan
+        from .._rendering.evaluate import render_signature
 
-        parts, progress = composition_plan(node, time, (node.canvas.width, node.canvas.height))
-        return (
-            node.canvas,
-            progress,
-            getattr(node, "transition", None),
-            getattr(node, "effects", None),
-            time
-            if getattr(getattr(node, "effects", None), "light_sweep", None)
-            or getattr(getattr(node, "effects", None), "distortion", None)
-            else None,
-            tuple((p.viewport, p.background, self._signature(p.node, p.time)) for p in parts),
-        )
+        return render_signature(node, time, self.raster.measurement)
 
     def frame(self, node, time, size):
         self._check()
@@ -150,14 +119,15 @@ class ModernGLRenderer:
             return
         if threading.get_ident() != self._thread:
             raise RuntimeError("ModernGLRenderer must be closed on its owning thread")
-        if self.raster is not None:
-            self.raster.close()
-        if self.device is not None:
-            self.device.close()
-        if self.ctx is not None:
-            self.ctx.release()
-        self.frames.clear()
         self._closed = True
+        with ExitStack() as cleanup:
+            cleanup.callback(self.frames.clear)
+            if self.ctx is not None:
+                cleanup.callback(self.ctx.release)
+            if self.device is not None:
+                cleanup.callback(self.device.close)
+            if self.raster is not None:
+                cleanup.callback(self.raster.close)
 
 
 __all__ = ["ModernGLRenderer"]

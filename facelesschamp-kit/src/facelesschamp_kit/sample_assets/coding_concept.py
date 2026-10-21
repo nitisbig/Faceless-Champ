@@ -1,10 +1,9 @@
 """Edit complete revisions below, then run fc-kit prepare."""
 
-from faceless_champ import CanvasItem, CodeCheckpoint, EventBinding, PlaygroundScript, ValueBinding
-
+from facelesschamp_kit.playground import CanvasItem, CodeCheckpoint, EventBinding, PlaygroundScript, ValueBinding
 from facelesschamp_kit.templates import coding_playground
 
-SOURCE = """import faceless_champ.playground.runtime as pg
+SOURCE = """import facelesschamp_kit.playground.runtime as pg
 
 class Car:
     def __init__(self, color):

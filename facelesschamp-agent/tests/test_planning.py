@@ -169,7 +169,7 @@ def test_project_direction_is_inherited_before_partial_user_overrides(tmp_path, 
     plan = select_scenes(
         tmp_path,
         prompt="Use recipe:before-after to explain the comparison",
-        instructions=["Use faceless_champ.FlowChamp", "Allow captions"],
+        instructions=["Use facelesschamp_kit.FlowChamp", "Allow captions"],
         design={"body_size": 56, "palette": {"accent": "#335577"}},
         context=context("Before this was slow. After the change it is fast."),
         registry=registry,
@@ -177,9 +177,9 @@ def test_project_direction_is_inherited_before_partial_user_overrides(tmp_path, 
     assert plan.design.theme == "light" and plan.design.body_size == 56
     assert plan.design.font == "assets/Custom.ttf"
     assert plan.design.palette == {"background": "#F0F0F0", "accent": "#335577"}
-    assert plan.instructions == ["Use faceless_champ.FlowChamp", "Allow captions"]
+    assert plan.instructions == ["Use facelesschamp_kit.FlowChamp", "Allow captions"]
     assert plan.guidelines["project_constraints"] == original["brief"]["constraints"]
-    assert plan.beats[0].selected_capability == "faceless_champ.FlowChamp"
+    assert plan.beats[0].selected_capability == "facelesschamp_kit.FlowChamp"
     assert json.loads(path.read_text()) == original
 
 

@@ -1,22 +1,28 @@
 # Faceless Champ
 
-> Python 3.12+ programmatic video authoring. Current source 0.1.5; Pillow frames and FFmpeg MP4. Core never imports kit.
+Optional CPU Skia backend: docs/skia.md. Pillow remains default. Explicit native
+text/surface opt-ins use existing animations/layouts; compare evidence only from
+the final backend. Example: examples/skia_showcase.py.
+
+> Python 3.12+ programmatic video authoring. Current source 2.0.0rc1; Pillow frames and FFmpeg MP4. Core never imports kit.
 
 ## Entry points
 
 - [Quickstart and capability index](README.md)
-- [Public API](docs/api.md)
-- [Authoring and troubleshooting](docs/guide.md)
-- [Architecture](docs/architecture.md)
-- [Narration and source-clock previews](docs/narration.md)
+- [Public API](docs/core/api.md)
+- [Raster sources and animation extensions](docs/core/raster-sources.md)
+- [Authoring and troubleshooting](docs/core/guide.md)
+- [Architecture](docs/core/architecture.md)
+- [Narration and source-clock previews](docs/core/narration.md)
 - [Authoring skill](skills/faceless-champ/SKILL.md)
 - [Website and runnable downloads](website/README.md)
-- [Kit agent reference](facelesschamp-kit/llms.txt)
-- [Agent planning and production](facelesschamp-agent/llms.txt)
-- [Context-aware scene selection](facelesschamp-agent/docs/scene-selection.md)
+- [Kit agent reference](kit-guide.txt)
+- [Agent planning and production](agent-guide.txt)
+- [Context-aware scene selection](docs/agent/scene-selection.md)
 
 Install from the checkout with python -m pip install -e .; use extras only as needed:
-coding=Pygments, chess=chess rules, web=Playwright, playground=coding+web,
+3d=PyVista/VTK (>=0.49.1,<0.50), cad=build123d+3d, geometry=Trimesh+SciPy+NetworkX+3d,
+geometry-advanced=geometry+Manifold+fast-simplification, Kit coding=Pygments, web=Playwright, playground=coding+web,
 equations=Matplotlib, maps=NumPy. Explicitly install Chromium for browser preparation
 with python -m playwright install chromium. Default imports and prepared playback
 require no browser. Do not assume a package has been published.
@@ -52,7 +58,7 @@ Explicit play(rate_func=...) overrides preset easing. Stagger/Succession/Repeat 
 finite animation schedules; Repeat cycles counts traversals, including ping-pong reversals.
 RectangleMask/CircleMask/ShapeMask and Wipe affect the complete component.
 ProgressBar/ProgressRing/Gauge/LoadingDots/Checkmark use progress_to; Countdown uses value_to.
-[Motion graphics](docs/motion-graphics.md).
+[Motion graphics](docs/core/motion-graphics.md).
 
 ## Assets, charts, and maps
 
@@ -62,14 +68,14 @@ geometry; missing auto files show a labeled box, but corrupt present files fail.
 Polyline(draw_by="x") requires strictly increasing open paths; rounded caps are supported.
 Equation uses the equations extra and supports symbol color_map and fixed-layout Write.
 Flag(country_code) uses 254 bundled case-insensitive codes; flag_path/supported_flags
-work offline. [Image and flag APIs](docs/api.md).
+work offline. [Image and flag APIs](docs/core/api.md).
 
 BarChart, RankedBarChart, LineChart, ScatterPlot, Histogram, Heatmap, NetworkGraph,
 SankeyChart, VectorField, PieChart use core Pillow. RankedBarChart.animate.data_to()
 interpolates ranks/values with stable category colors; None means missing data.
-Axis fixes limits; ChartStyle controls fonts, line width, and titles. [Charts](docs/charts.md).
+Axis fixes limits; ChartStyle controls fonts, line width, and titles. [Charts](docs/core/charts.md).
 OutlineMap, SatelliteMap, EarthMap need maps; zoom_to/animate.rotate support geography.
-[Maps](docs/maps.md).
+[Maps](docs/core/maps.md).
 
 ## CodingChamp editors
 
@@ -89,7 +95,7 @@ Pass chrome-free content; construct all children before Scene.add. Use code_boun
 editor_full/editor_split/terminal_bounds; editor_motion(window,running=bool) animates
 the root, editor_corners(...) supplies matching face/header animations. terminal_in/out
 animate a terminal window; caller schedules visibility, typing, stdout and durations.
-[API](docs/coding.md).
+[API](docs/core/coding.md).
 
 ## Prepared coding playgrounds
 
@@ -97,7 +103,7 @@ Import CodeCheckpoint, PlaygroundScript, CanvasItem, ValueBinding, EventBinding,
 prepare_playground, PreparedPlayground, CodeEditor, PlaygroundCanvas, PlaygroundOutput
 from faceless_champ. Complete checkpoint revisions execute explicitly during preparation.
 Animated intermediate edits never execute; outputs hold until the next publication.
-Use faceless_champ.playground.runtime.emit/event/inputs in authored Python programs.
+Use facelesschamp_kit.playground.runtime.emit/event/inputs in authored Python programs.
 ValueBinding maps emitted keys to authored items; EventBinding maps named events to
 highlights, travelling signals, or tensor cells. No inferred visual meaning.
 Modes: concept (cars/objects), backend (flows/variables/collections/vectors/matrices),
@@ -110,47 +116,36 @@ Preparation executes trusted local code with OS permissions, not a security sand
 Changed source/input/bindings/timing/settings require preparation; refresh=True forces it.
 Incomplete/failed preparations are not published. PLAYGROUND_* errors retain context.
 Keep the complete asset directory; prepare web frames at intended export FPS.
-[Contracts and examples](docs/coding-playgrounds.md).
+[Contracts and examples](docs/core/coding-playgrounds.md).
 
 ## HTML capture
 
 Import HtmlPage, WebScript, capture_html, WebCapture, HtmlClip, WebFocus,
-WebHighlight, WebCallout from faceless_champ.web.
+WebHighlight, WebCallout from facelesschamp_kit.web.
 Author local HTML/assets; WebScript supports move/click/type/press/select/scroll/track.
 Call capture_html explicitly, then reopen WebCapture(directory) for browser-free playback.
 Track selectors before cropping/focus. Capture and export FPS should match. start_time/
 end_time or sample_times prepare ranges/stills while replaying prior interactions.
 HtmlClip(source_start=...) seeks on the original capture clock; final pixels hold.
 Crops retain page backgrounds/occlusions. Offline captures do not record browser audio
-or live external services. [HTML API](docs/html-to-video.md).
+or live external services. [HTML API](docs/core/html-to-video.md).
 
 ## Offline OS tutorials
 
 Import OSClip, OSScript, MacOSPreset, File, Folder, VirtualFileSystem, SettingsPage,
-Control from faceless_champ.os_ui. Author virtual files and semantic actions: opening,
+Control from facelesschamp_kit.desktop. Author virtual files and semantic actions: opening,
 renaming, dragging, selecting, settings/value changes. No host filesystem or desktop automation.
 Desktop/finder/settings modes support isolated transparent windows; invalid hidden targets
 and overlapping actions fail before export. source_start preserves script time.
-[OS UI](docs/os-ui.md).
-
-## ChessChamp
-
-Import ChessChamp, ChessScript, ChessTheme, ChessAssets from faceless_champ.
-ChessScript.from_json/from_dict validates schema_version=1, positive duration, timed
-legal UCI moves and annotations; default standard start, optional initial_fen/orientation.
-from_pgn imports SAN mainlines; to_dict exports timed JSON. Moves/annotations use script seconds.
-ChessAssets.bundled provides PNG board/pieces; custom directory/board_grid supported.
-JSON assets.directory resolves from the document directory. Core is visual-only; attach
-existing audio once at zero. No interactive play, engine evaluation, or TTS.
-[Chess contracts](docs/chesschamp.md).
+[OS UI](docs/core/os-ui.md).
 
 ## FlowChamp
 
 Import FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme,
-FlowDataError from faceless_champ or faceless_champ.flow.
+FlowDataError from faceless_champ or facelesschamp_kit.diagrams.
 Python/JSON graph authoring supports stable IDs, ports, routes, labels, and arrows.
 FlowScript authors draws, signals, reveals, highlights and element transforms and signal/highlight colors.
-Recipes: workflow/system/network/idea-map/circuit in faceless_champ.flow.examples.
+Recipes: workflow/system/network/idea-map/circuit in facelesschamp_kit.diagrams.examples.
 FlowTheme.stroke supplies neutral outlines; None preserves legacy accent outlines.
 FlowTheme.node_stroke=None inherits stroke/accent; explicit colors separate node
 outlines from cables. highlight_width=2 preserves legacy emphasis width; 0 keeps it fixed.
@@ -168,7 +163,7 @@ FlowScript.signal(marker="capsule") uses native glossy rounded packets; dot/pack
 diagnostics_at(time) samples visible bounds/labels on the original script clock;
 sampling is not proof of collision-free motion. source_start supports excerpts.
 Label cache defaults to 8 MiB; label_cache_mb=0 disables it. Static intervals reuse keys.
-[Flow contracts](docs/flowchamp.md).
+[Flow contracts](docs/core/flowchamp.md).
 
 ## Narration, previews, and verification
 
@@ -186,7 +181,7 @@ decoding, audio alignment, and representative encoded frames. Preparation, a suc
 frame, and an excerpt do not prove a full export. render(progress=callback) reports frames.
 PillowRenderer has bounded held-frame/caption/code caches; zero budgets disable retention.
 
-ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK is required; core imports remain lazy. See [ArchChamp](docs/archchamp.md).
+ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK requires `faceless-champ[3d]` (or the Kit/Agent `3d` extra); the base installs only Pillow and core imports remain lazy. See [ArchChamp](docs/core/archchamp.md).
 
 Public 3D imports: ArchMesh, ArchPart, ArchStyle, ArchCamera, ArchScript, ArchLabel, ArchDimension, ArchChamp, ArchDataError. ArchMesh snapshots geometry; ArchChamp.state_at/project_at/diagnostics_at support inspection. Close directly owned PillowRenderer sessions with a context manager.
 
@@ -209,3 +204,31 @@ when selected, and load_coding_tutorial(project_root) when authoring scenes.
 Use template.group(..., bounds=bounds) for kit placement. Generated render.py
 accepts --fps and --quality low|high|4k independently of duration.
 [Template guide](templates/README.md).
+
+Optional GPU compositing/effects: docs/moderngl.md (faceless-champ[gpu], backend=moderngl or auto). Verification: docs/moderngl-verification.md.
+
+## Optional CAD and geometry
+
+Build123d CAD preparation, Trimesh processing, analytic mechanisms and CAD-derived
+blueprints extend ArchChamp. Install the cad, geometry or geometry-advanced extra.
+See [CAD and geometry](docs/core/cad-geometry.md) for units, APIs and native/headless use.
+
+## Raster source integrations and raw subtitles
+
+Viewport(source, width=..., height=..., source_start=0) accepts RasterSource inputs.
+Omit both dimensions for intrinsic size. Descriptors are deepcopy-safe inputs,
+never live native contexts. open(pixel_size) returns an owned RasterSession;
+frame(source_time) returns independent straight RGBA/sRGB pixels at that size.
+Pure frame_key identifies equivalent pixels; fingerprint includes all source inputs.
+Source age is local to component introduction, then offset/clamped to source duration.
+Measurement opens no source. Sampling density stays fixed during ancestor scaling.
+Custom renderers still implement validate(node) and frame(node,time,size) only.
+Component.validate_animation and Animation.resolve are the public extension hooks.
+parse_srt_cues(text) returns raw ordered SubtitleCue records without rejecting
+intentional overlaps. SubtitleTrack applies overlap policy. Kit exposes
+read_subtitle_cues(text); Agent retains bounded inputs and source-clock diagnostics.
+
+V2 2.0.0rc1 production: compile once, then use CompiledVideo.frame/save_frame/storyboard/export.
+Kit exports media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
+Supplied renderers remain caller-owned; operation metadata is captured before owned sessions close.
+Agent retains checksum/alignment/review policy. A decoded export does not imply visual/editorial approval.

@@ -142,4 +142,5 @@ def play_schedule(scene, animations, run_time, rate_func):
         scene.entries.append(new)
     scene._objects = {c: old_by_trial.get(id(e), e) for c, e in trial._objects.items()}
     scene._cursor = end
+    scene._invalidate()
     return scene

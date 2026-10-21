@@ -13,7 +13,7 @@ from .models import (
     VideoPlan,
 )
 
-__version__ = "0.1.0rc2"
+__version__ = "2.0.0rc1"
 __all__ = [
     "AgentError",
     "AgentProject",

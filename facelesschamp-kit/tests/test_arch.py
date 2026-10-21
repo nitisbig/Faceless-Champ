@@ -4,17 +4,11 @@ from dataclasses import asdict, replace
 
 import pytest
 import pyvista as pv
-from faceless_champ import (
-    ArchCamera,
-    ArchDataError,
-    ArchDimension,
-    ArchLabel,
-    ArchMesh,
-    ArchPart,
-    ArchScript,
-    ArchStyle,
-    Canvas,
-)
+from faceless_champ.integrations.pyvista.camera import ArchCamera
+from faceless_champ.integrations.pyvista.model import ArchDataError, ArchMesh, ArchPart, ArchStyle
+from facelesschamp_kit.engineering.annotations import ArchDimension, ArchLabel
+from facelesschamp_kit.engineering.script import ArchScript
+from faceless_champ import Canvas
 
 from facelesschamp_kit import BuildContext, KitError, Project, Video
 from facelesschamp_kit.blocks import ArchCanvas
@@ -204,7 +198,7 @@ def test_silent_arch_scaffold_and_external_versions(tmp_path):
 
 
 def test_scoped_render_failure(tmp_path, monkeypatch):
-    from faceless_champ import ArchDataError
+    from faceless_champ.integrations.pyvista.model import ArchDataError
 
     import facelesschamp_kit.project as module
 

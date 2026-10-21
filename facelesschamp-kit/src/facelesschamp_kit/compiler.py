@@ -6,7 +6,6 @@ from faceless_champ import (
     Animation,
     Bounds,
     Captions,
-    ChessChamp,
     FadeIn,
     FadeOut,
     Group,
@@ -17,9 +16,11 @@ from faceless_champ import (
     dot_grid,
     smooth,
 )
-from faceless_champ.arch import ArchChamp, ArchDataError
-from faceless_champ.flow import FlowChamp, FlowDataError
-from faceless_champ.os_ui import OSClip
+from faceless_champ.integrations.pyvista.model import ArchDataError
+
+from facelesschamp_kit.desktop import OSClip
+from facelesschamp_kit.diagrams import FlowChamp, FlowDataError
+from facelesschamp_kit.engineering.clip import ArchChamp
 
 from .assets import digest
 from .blocks import BlockBuild
@@ -36,6 +37,86 @@ class CompiledVideo:
     @property
     def duration(self):
         return self.composition.duration
+
+    def frame(self, time, *, size, backend="pillow", antialias=1, gpu=None, renderer=None):
+        """Return a source-time PIL image without rebuilding the video."""
+        from .rendering import frame
+
+        return frame(self, time, size=size, backend=backend, antialias=antialias, gpu=gpu, renderer=renderer)
+
+    def save_frame(
+        self, time, output, *, size, backend="pillow", antialias=1, gpu=None, renderer=None, overwrite=False
+    ):
+        """Save a PNG and return output/settings/source-range/rendering metadata."""
+        from .rendering import save
+
+        return save(
+            self,
+            time,
+            output,
+            size=size,
+            backend=backend,
+            antialias=antialias,
+            gpu=gpu,
+            renderer=renderer,
+            overwrite=overwrite,
+        )
+
+    def storyboard(
+        self,
+        samples,
+        directory,
+        *,
+        size=None,
+        columns=3,
+        backend="pillow",
+        antialias=1,
+        gpu=None,
+        renderer=None,
+        overwrite=False,
+    ):
+        """Save ordered source-time samples and their contact sheet."""
+        from .rendering import storyboard
+
+        return storyboard(
+            self,
+            samples,
+            directory,
+            size=size,
+            columns=columns,
+            backend=backend,
+            antialias=antialias,
+            gpu=gpu,
+            renderer=renderer,
+            overwrite=overwrite,
+        )
+
+    def export(
+        self,
+        output,
+        *,
+        settings,
+        start_time=0,
+        end_time=None,
+        progress=None,
+        renderer=None,
+        overwrite=False,
+        cancel=None,
+    ):
+        """Export the compiled composition, preserving its master audio clock."""
+        from .rendering import export
+
+        return export(
+            self,
+            output,
+            settings=settings,
+            start_time=start_time,
+            end_time=end_time,
+            progress=progress,
+            renderer=renderer,
+            overwrite=overwrite,
+            cancel=cancel,
+        )
 
     def layout_at(self, time):
         """Conservative animated bounds, in master design pixels.
@@ -103,7 +184,6 @@ def compile_video(video):
     duration = max(visual_end, video.voice.duration if video.voice else 0)
     final = max(video.segments, key=lambda s: (s.end, s.start))
     diagnostics, segment_reports, events = [], [], []
-    chess_assets = {}
     arch_designs = []
     layout_records = []
     claimed = set()
@@ -203,10 +283,8 @@ def compile_video(video):
                                         "source_time": placement_start + sample - member.source_start,
                                     }
                                 )
-                    if isinstance(member, ChessChamp):
-                        chess_assets[placement.handle.placement] = member.assets.checksums
                     if (
-                        isinstance(member, (OSClip, ChessChamp, FlowChamp, ArchChamp))
+                        isinstance(member, (OSClip, FlowChamp, ArchChamp))
                         and member.duration - member.source_start > authored_lifetime + 1e-9
                     ):
                         raise KitError("MOTION_WINDOW", "Script exceeds authored placement lifetime")
@@ -311,7 +389,7 @@ def compile_video(video):
             except KitError as exc:
                 raise KitError(exc.code, exc.message, **(exc.scope | scope)) from exc
             except (ValueError, TypeError, OSError) as exc:
-                from faceless_champ import PlaygroundError
+                from facelesschamp_kit.playground import PlaygroundError
 
                 if isinstance(exc, PlaygroundError):
                     raise KitError(exc.code, str(exc), **(exc.scope | scope)) from exc
@@ -397,7 +475,6 @@ def compile_video(video):
         "duration": duration,
         "segments": segment_reports,
         "diagnostics": diagnostics,
-        "chess_assets": chess_assets,
         "arch_designs": arch_designs,
         "narration": {
             "audio_checksum": digest(video.voice.audio),

@@ -1,8 +1,9 @@
 """Public layout and timeline contracts for the promoted networking design."""
 
 import pytest
-from faceless_champ import Bounds, Canvas, FlowChamp, FlowEdge, FlowGraph, FlowNode, FlowScript, FlowTheme, Group
-from faceless_champ.flow import FlowDesign
+from faceless_champ import Bounds, Canvas, Group
+from facelesschamp_kit.diagrams import FlowChamp, FlowEdge, FlowGraph, FlowNode, FlowScript, FlowTheme
+from facelesschamp_kit.diagrams import FlowDesign
 
 from facelesschamp_kit import Video, blocks
 from facelesschamp_kit.blocks import FlowBackdrop, FlowCanvas, FlowCard, FlowPopup

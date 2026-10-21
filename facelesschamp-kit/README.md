@@ -1,6 +1,6 @@
 # facelesschamp-kit
 
-The current kit requires **faceless-champ>=0.1.5,<0.2.0**. It offers code editors and prepared playgrounds, local HTML walkthroughs, offline OS tutorials, legal chess games, and scripted FlowChamp diagrams alongside the original blocks and whiteboard recipes. See the [complete block and starter catalog](docs/catalog.md) and [agent reference](llms.txt).
+The current kit requires **faceless-champ>=2.0.0rc1,<3.0.0**. It offers code editors and prepared playgrounds, local HTML walkthroughs, offline OS tutorials, and scripted FlowChamp diagrams alongside the original blocks and whiteboard recipes. See the [complete block and starter catalog](docs/catalog.md) and [agent reference](llms.txt).
 
 For coding projects, preparation is explicit:
 
@@ -15,14 +15,14 @@ fc-kit preview main -o output/preview.mp4
 Preparation executes trusted authored code. Ordinary build, validation, inspection, and rendering replay prepared assets. Run `prepare` again after changing sources, bindings, input, timing, or preparation settings; `--refresh` forces re-execution.
 
 A structured Python video framework built on the independent **faceless-champ** engine.
-Version **0.1.0rc7** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
+Version **2.0.0rc1** is a local release candidate, not a published release. Python 3.12+ and FFmpeg/ffprobe with libx264 are required for exports.
 
 ## Install and start
 
 Install the two wheels built from these repositories into your environment:
 
 ```bash
-python -m pip install /path/to/faceless_champ-0.1.5-py3-none-any.whl /path/to/facelesschamp_kit-0.1.0rc7-py3-none-any.whl
+python -m pip install /path/to/faceless_champ-2.0.0rc1-py3-none-any.whl /path/to/facelesschamp_kit-2.0.0rc1-py3-none-any.whl
 fc-kit init my-video --template silent
 cd my-video
 fc-kit doctor
@@ -36,6 +36,14 @@ fc-kit render main -o output/main.mp4
 `fc-kit --project /absolute/project/path ...` works from an unrelated directory. Paths passed as CLI outputs are relative to the invoking directory; assets and data resolve relative to the project. Default preview covers the first ten seconds; `render` covers the complete video. Output replacement requires `--overwrite`.
 
 The engine owns components, animation interpolation, rasterization, audio mixing, and encoding. The kit owns project conventions, blocks, measured layouts, themes, asset resolution, narration windows, and workflow tools. The core package does not import the kit.
+
+The base Core dependency installs only Pillow. Select `facelesschamp-kit[3d]` for
+ArchChamp, or `cad`, `geometry`, or `geometry-advanced` for those preparation APIs;
+each includes the PyVista conversion dependencies. For local wheels, request the
+extra on the Kit wheel path (for example `/path/to/facelesschamp_kit-2.0.0rc1-py3-none-any.whl[3d]`)
+and supply the matching Core wheel in the same install command. Existing Arch
+projects must declare the extra when recreating their environment. Doctor reports
+3D packages as optional; declared missing project requirements still fail.
 
 ## Author a video
 
@@ -82,7 +90,7 @@ Create a whiteboard video with `fc-kit init my-board --template whiteboard-basic
 and circles draw sequentially, hold, then clear between scenes. Recipes support explicit durations and original narration
 cue windows. The returned `Video` remains editable. See the [whiteboard guide](docs/whiteboard.md) for examples and timing.
 
-Install `facelesschamp-kit[maps]` or `[equations]` to forward the engine extras. Use explicit Python imports for custom blocks and templates. The current minor-line compatibility range is `faceless-champ>=0.1.5,<0.2.0`; only versions actually tested are claimed in verification records.
+Install `facelesschamp-kit[maps]` for maps or `[equations]` to forward Core equations. Use explicit Python imports for custom blocks and templates. The V2 major-line compatibility range is `faceless-champ>=2.0.0rc1,<3.0.0`; only versions actually tested are claimed in verification records.
 
 ## Development
 
@@ -110,10 +118,6 @@ for browser preparation; playback and block composition do not need Playwright.
 Use `OSWalkthrough`, `FinderWindow`, and `SettingsWindow`, or start with
 `fc-kit init my-tutorial --template os-ui`. See [OS UI tutorials](docs/os-ui.md).
 
-### ChessChamp
-
-Start with `fc-kit init my-chess --template chesschamp` after installing `facelesschamp-kit[chess]`. Edit required `data.json` for legal White/Black moves, commentary, arrows, highlights, and optional existing audio. See [ChessChamp](docs/chesschamp.md).
-
 ## Coding playgrounds
 
 Animate source edits beside real web output, car/object illustrations, or backend/AI data.
@@ -131,3 +135,11 @@ Reusable package starter templates remain available; draft styling awaits approv
 ## Optional GPU graphics
 
 Install `facelesschamp-kit[gpu]` and set a profile backend to `moderngl` or `auto`. Nested `[profiles.final.gpu]` options configure resources. `EffectBlock`, `ProceduralBackdrop`, and `ParticleBackdrop` use public Core APIs. `fc-kit --json doctor --gpu` explicitly probes EGL; reports record the renderer actually used. See the Core [ModernGL guide](../docs/moderngl.md).
+
+## V2 production candidate
+
+Core, Kit and Agent are coordinated at `2.0.0rc1`. Domain authoring belongs to Kit;
+Core stays standalone. Kit production methods reuse a compiled video, and Agent
+adds verification and review evidence. See the [M5 migration guide](../docs/v2/m5-migration.md)
+and [implementation evidence](../docs/v2/m5-implementation.md).
+This is a local candidate; publication and untested platform certification are separate.

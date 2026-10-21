@@ -6,8 +6,11 @@ from dataclasses import asdict, dataclass, fields, replace
 from importlib.resources import files
 from pathlib import Path
 
-from faceless_champ import Bounds, CodeTheme, CodeWorkspaceDesign, Spring
+from faceless_champ import Bounds, Spring
 from PIL import ImageColor
+
+from facelesschamp_kit.coding import CodeTheme
+from facelesschamp_kit.coding.workspace import CodeWorkspaceDesign
 
 from ...diagnostics import KitError
 

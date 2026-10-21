@@ -1,102 +1,267 @@
-"""Faceless Champ: programmatic animated videos for developers and agents."""
+"""Standalone video primitives and optional native integrations.
 
-from .animation import (
-    Animation,
-    BounceIn,
-    ChartReveal,
-    Draw,
-    FadeIn,
-    FadeOut,
-    PopIn,
-    PopOut,
-    Pulse,
-    Shake,
-    SlideIn,
-    SlideOut,
-    SpinIn,
-    Typewriter,
-    Wiggle,
-    Write,
-    ZoomIn,
-    ZoomOut,
-    ease_in,
-    ease_out,
-    linear,
-    smooth,
-)
-from .backends.moderngl import ModernGLRenderer
-from .backends.skia import SkiaRenderer
-from .charts import (
-    Axis,
-    BarChart,
-    Chart,
-    ChartStyle,
-    Heatmap,
-    Histogram,
-    LineChart,
-    NetworkGraph,
-    PieChart,
-    RankedBarChart,
-    SankeyChart,
-    ScatterPlot,
-    VectorField,
-)
-from .cli import main as main
-from .colors import COLOR_SCHEMES, ColorScheme, with_alpha
-from .components import (
-    Arrow,
-    Canvas,
-    Circle,
-    Component,
-    Ellipse,
-    Equation,
-    Icon,
-    Image,
-    ImageSlot,
-    Line,
-    Number,
-    Polyline,
-    Rectangle,
-    Square,
-    Text,
-    Triangle,
-)
-from .effects import Bloom, ChromaticAberration, Distortion, EffectStack, GaussianBlur, LightSweep, OuterGlow
-from .export import ExportSettings, render
-from .flags import Flag, flag_path, supported_flags
-from .gpu import GPUOptions, renderer_capabilities
-from .gradients import GradientStop, LinearGradient, RadialGradient
-from .layout import Bounds, Group
-from .maps import EarthMap, OutlineMap, SatelliteMap, supported_countries
-from .masks import PathMask
-from .narration import CueScene
-from .paths import PathData, VectorPath
-from .preview import StoryboardSample, render_storyboard, save_frame
-from .procedural import ParticleField, ProceduralBackground
-from .progress import ExportProgress
-from .renderer import PillowRenderer, Renderer, create_renderer, rendering_identity, validate_composition
-from .spring import Spring
-from .subtitles import Captions, SubtitleCue, SubtitleTrack
-from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
-from .timeline import Grid, Layer, Scene, Sequence
-from .transitions import DirectionalWipe, LuminanceWipe, ZoomBlurTransition
-from .typography import CLEAN_FLOW_FONT, fit_text
+Domain authoring lives in facelesschamp_kit. Public objects load on first access.
+"""
 
-__all__ = [
+from importlib import import_module as _import_module
+from typing import TYPE_CHECKING as _TYPE_CHECKING
+
+__version__ = "2.0.0rc1"
+
+if _TYPE_CHECKING:
+    from .animation import (
+        Animation,
+        BounceIn,
+        Draw,
+        FadeIn,
+        FadeOut,
+        PopIn,
+        PopOut,
+        Pulse,
+        Shake,
+        SlideIn,
+        SlideOut,
+        SpinIn,
+        Typewriter,
+        Wiggle,
+        Write,
+        ZoomIn,
+        ZoomOut,
+        ease_in,
+        ease_out,
+        linear,
+        smooth,
+    )
+    from .backends.moderngl import ModernGLRenderer
+    from .backends.skia import SkiaRenderer
+    from .cli import main as main
+    from .colors import COLOR_SCHEMES, ColorScheme, with_alpha
+    from .components import (
+        Arrow,
+        Canvas,
+        Circle,
+        Component,
+        Ellipse,
+        Equation,
+        Icon,
+        Image,
+        ImageSlot,
+        Line,
+        Number,
+        Polyline,
+        Rectangle,
+        Square,
+        Text,
+        Triangle,
+    )
+    from .effects import Bloom, ChromaticAberration, Distortion, EffectStack, GaussianBlur, LightSweep, OuterGlow
+    from .export import ExportSettings, render
+    from .gpu import GPUOptions, renderer_capabilities
+    from .gradients import GradientStop, LinearGradient, RadialGradient
+    from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
+    from .integrations.pyvista.camera import ArchCamera
+    from .integrations.pyvista.model import ArchDataError, ArchMesh, ArchPart, ArchStyle
+    from .layout import Bounds, Group
+    from .masks import CircleMask, PathMask, RectangleMask, ShapeMask, Wipe
+    from .narration import CueScene
+    from .paths import PathData, VectorPath
+    from .preview import StoryboardSample, render_storyboard, save_frame
+    from .procedural import ParticleField, ProceduralBackground
+    from .progress import ExportProgress
+    from .renderer import PillowRenderer, Renderer, create_renderer, rendering_identity, validate_composition
+    from .scheduling import Repeat, Stagger, Succession
+    from .sources import RasterSession, RasterSource, Viewport
+    from .spring import Spring
+    from .subtitles import Captions, SubtitleCue, SubtitleTrack, parse_srt_cues
+    from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
+    from .timeline import Grid, Layer, Scene, Sequence
+    from .transitions import DirectionalWipe, LuminanceWipe, ZoomBlurTransition
+    from .typography import CLEAN_FLOW_FONT, fit_text
+
+_EXPORTS = {
+    "Viewport": ("sources", "Viewport"),
+    "RasterSource": ("sources", "RasterSource"),
+    "RasterSession": ("sources", "RasterSession"),
+    "parse_srt_cues": ("subtitles", "parse_srt_cues"),
+    "CLEAN_FLOW_FONT": ("typography", "CLEAN_FLOW_FONT"),
+    "COLOR_SCHEMES": ("colors", "COLOR_SCHEMES"),
+    "Animation": ("animation", "Animation"),
+    "Arrow": ("components", "Arrow"),
+    "Bloom": ("effects", "Bloom"),
+    "BounceIn": ("animation", "BounceIn"),
+    "Bounds": ("layout", "Bounds"),
+    "Canvas": ("components", "Canvas"),
+    "Captions": ("subtitles", "Captions"),
+    "ChromaticAberration": ("effects", "ChromaticAberration"),
+    "Circle": ("components", "Circle"),
+    "ColorScheme": ("colors", "ColorScheme"),
+    "Component": ("components", "Component"),
+    "CueScene": ("narration", "CueScene"),
+    "DirectionalWipe": ("transitions", "DirectionalWipe"),
+    "Distortion": ("effects", "Distortion"),
+    "Draw": ("animation", "Draw"),
+    "EffectStack": ("effects", "EffectStack"),
+    "Ellipse": ("components", "Ellipse"),
+    "Equation": ("components", "Equation"),
+    "ExportProgress": ("progress", "ExportProgress"),
+    "ExportSettings": ("export", "ExportSettings"),
+    "FadeIn": ("animation", "FadeIn"),
+    "FadeOut": ("animation", "FadeOut"),
+    "GPUOptions": ("gpu", "GPUOptions"),
+    "GaussianBlur": ("effects", "GaussianBlur"),
+    "GradientStop": ("gradients", "GradientStop"),
+    "Grid": ("timeline", "Grid"),
+    "Group": ("layout", "Group"),
+    "Icon": ("components", "Icon"),
+    "Image": ("components", "Image"),
+    "ImageSlot": ("components", "ImageSlot"),
+    "Layer": ("timeline", "Layer"),
+    "LightSweep": ("effects", "LightSweep"),
+    "Line": ("components", "Line"),
+    "LinearGradient": ("gradients", "LinearGradient"),
+    "LuminanceWipe": ("transitions", "LuminanceWipe"),
+    "ModernGLRenderer": ("backends.moderngl", "ModernGLRenderer"),
+    "Number": ("components", "Number"),
+    "OuterGlow": ("effects", "OuterGlow"),
+    "ParticleField": ("procedural", "ParticleField"),
+    "PathData": ("paths", "PathData"),
+    "PathMask": ("masks", "PathMask"),
+    "PillowRenderer": ("renderer", "PillowRenderer"),
+    "Polyline": ("components", "Polyline"),
+    "PopIn": ("animation", "PopIn"),
+    "PopOut": ("animation", "PopOut"),
+    "ProceduralBackground": ("procedural", "ProceduralBackground"),
+    "Pulse": ("animation", "Pulse"),
+    "RadialGradient": ("gradients", "RadialGradient"),
+    "Rectangle": ("components", "Rectangle"),
+    "Renderer": ("renderer", "Renderer"),
+    "Scene": ("timeline", "Scene"),
+    "Sequence": ("timeline", "Sequence"),
+    "ShadowStyle": ("surfaces", "ShadowStyle"),
+    "Shake": ("animation", "Shake"),
+    "SkiaRenderer": ("backends.skia", "SkiaRenderer"),
+    "SlideIn": ("animation", "SlideIn"),
+    "SlideOut": ("animation", "SlideOut"),
+    "SpinIn": ("animation", "SpinIn"),
+    "Spring": ("spring", "Spring"),
+    "Square": ("components", "Square"),
+    "StoryboardSample": ("preview", "StoryboardSample"),
+    "SubtitleCue": ("subtitles", "SubtitleCue"),
+    "SubtitleTrack": ("subtitles", "SubtitleTrack"),
+    "Surface": ("surfaces", "Surface"),
+    "Text": ("components", "Text"),
+    "Triangle": ("components", "Triangle"),
+    "Typewriter": ("animation", "Typewriter"),
+    "VectorPath": ("paths", "VectorPath"),
+    "Wiggle": ("animation", "Wiggle"),
+    "Write": ("animation", "Write"),
+    "ZoomBlurTransition": ("transitions", "ZoomBlurTransition"),
+    "ZoomIn": ("animation", "ZoomIn"),
+    "ZoomOut": ("animation", "ZoomOut"),
+    "card_content_bounds": ("surfaces", "card_content_bounds"),
+    "card_surface": ("surfaces", "card_surface"),
+    "create_renderer": ("renderer", "create_renderer"),
+    "dot_grid": ("surfaces", "dot_grid"),
+    "ease_in": ("animation", "ease_in"),
+    "ease_out": ("animation", "ease_out"),
+    "fit_text": ("typography", "fit_text"),
+    "gradient_surface": ("surfaces", "gradient_surface"),
+    "linear": ("animation", "linear"),
+    "render": ("export", "render"),
+    "render_storyboard": ("preview", "render_storyboard"),
+    "renderer_capabilities": ("gpu", "renderer_capabilities"),
+    "rendering_identity": ("renderer", "rendering_identity"),
+    "save_frame": ("preview", "save_frame"),
+    "smooth": ("animation", "smooth"),
+    "validate_composition": ("renderer", "validate_composition"),
+    "with_alpha": ("colors", "with_alpha"),
+    "Checkmark": ("indicators", "Checkmark"),
+    "CircleMask": ("masks", "CircleMask"),
+    "Countdown": ("indicators", "Countdown"),
+    "Gauge": ("indicators", "Gauge"),
+    "LoadingDots": ("indicators", "LoadingDots"),
+    "ProgressBar": ("indicators", "ProgressBar"),
+    "ProgressRing": ("indicators", "ProgressRing"),
+    "RectangleMask": ("masks", "RectangleMask"),
+    "Repeat": ("scheduling", "Repeat"),
+    "ShapeMask": ("masks", "ShapeMask"),
+    "Stagger": ("scheduling", "Stagger"),
+    "Succession": ("scheduling", "Succession"),
+    "Wipe": ("masks", "Wipe"),
+    "ArchCamera": ("integrations.pyvista.camera", "ArchCamera"),
+    "ArchDataError": ("integrations.pyvista.model", "ArchDataError"),
+    "ArchMesh": ("integrations.pyvista.model", "ArchMesh"),
+    "ArchPart": ("integrations.pyvista.model", "ArchPart"),
+    "ArchStyle": ("integrations.pyvista.model", "ArchStyle"),
+    "main": ("cli", "main"),
+}
+
+_MOVED = {
+    "Axis": "facelesschamp_kit.charts",
+    "BarChart": "facelesschamp_kit.charts",
+    "Chart": "facelesschamp_kit.charts",
+    "ChartReveal": "facelesschamp_kit.charts",
+    "ChartStyle": "facelesschamp_kit.charts",
+    "EarthMap": "facelesschamp_kit.maps",
+    "Flag": "facelesschamp_kit.maps.flags",
+    "Heatmap": "facelesschamp_kit.charts",
+    "Histogram": "facelesschamp_kit.charts",
+    "LineChart": "facelesschamp_kit.charts",
+    "NetworkGraph": "facelesschamp_kit.charts",
+    "OutlineMap": "facelesschamp_kit.maps",
+    "PieChart": "facelesschamp_kit.charts",
+    "RankedBarChart": "facelesschamp_kit.charts",
+    "SankeyChart": "facelesschamp_kit.charts",
+    "SatelliteMap": "facelesschamp_kit.maps",
+    "ScatterPlot": "facelesschamp_kit.charts",
+    "VectorField": "facelesschamp_kit.charts",
+    "flag_path": "facelesschamp_kit.maps.flags",
+    "supported_countries": "facelesschamp_kit.maps",
+    "supported_flags": "facelesschamp_kit.maps.flags",
+    "CodeReveal": "facelesschamp_kit.coding",
+    "CodeTheme": "facelesschamp_kit.coding",
+    "CodingChamp": "facelesschamp_kit.coding",
+    "CodeWindow": "facelesschamp_kit.coding.workspace",
+    "CodeWorkspaceDesign": "facelesschamp_kit.coding.workspace",
+    "CanvasItem": "facelesschamp_kit.playground",
+    "CodeCheckpoint": "facelesschamp_kit.playground",
+    "CodeEditor": "facelesschamp_kit.playground",
+    "EditTimeline": "facelesschamp_kit.playground",
+    "EventBinding": "facelesschamp_kit.playground",
+    "PlaygroundCanvas": "facelesschamp_kit.playground",
+    "PlaygroundError": "facelesschamp_kit.playground",
+    "PlaygroundOutput": "facelesschamp_kit.playground",
+    "PlaygroundScript": "facelesschamp_kit.playground",
+    "PreparedPlayground": "facelesschamp_kit.playground",
+    "ValueBinding": "facelesschamp_kit.playground",
+    "prepare_playground": "facelesschamp_kit.playground",
+    "FlowChamp": "facelesschamp_kit.diagrams",
+    "FlowDataError": "facelesschamp_kit.diagrams",
+    "FlowDesign": "facelesschamp_kit.diagrams",
+    "FlowEdge": "facelesschamp_kit.diagrams",
+    "FlowGraph": "facelesschamp_kit.diagrams",
+    "FlowNode": "facelesschamp_kit.diagrams",
+    "FlowPort": "facelesschamp_kit.diagrams",
+    "FlowScript": "facelesschamp_kit.diagrams",
+    "FlowTheme": "facelesschamp_kit.diagrams",
+    "FlowVisual": "facelesschamp_kit.diagrams",
+    "ArchChamp": "facelesschamp_kit.engineering.clip",
+    "ArchDimension": "facelesschamp_kit.engineering.annotations",
+    "ArchLabel": "facelesschamp_kit.engineering.annotations",
+    "ArchScript": "facelesschamp_kit.engineering.script",
+}
+_RETIRED = ["ChessAssets", "ChessChamp", "ChessScript", "ChessTheme"]
+
+__all__ = [  # noqa: RUF022
     "CLEAN_FLOW_FONT",
     "COLOR_SCHEMES",
     "Animation",
     "Arrow",
-    "Axis",
-    "BarChart",
     "Bloom",
     "BounceIn",
     "Bounds",
     "Canvas",
     "Captions",
-    "Chart",
-    "ChartReveal",
-    "ChartStyle",
     "ChromaticAberration",
     "Circle",
     "ColorScheme",
@@ -105,7 +270,6 @@ __all__ = [
     "DirectionalWipe",
     "Distortion",
     "Draw",
-    "EarthMap",
     "EffectStack",
     "Ellipse",
     "Equation",
@@ -113,32 +277,25 @@ __all__ = [
     "ExportSettings",
     "FadeIn",
     "FadeOut",
-    "Flag",
     "GPUOptions",
     "GaussianBlur",
     "GradientStop",
     "Grid",
     "Group",
-    "Heatmap",
-    "Histogram",
     "Icon",
     "Image",
     "ImageSlot",
     "Layer",
     "LightSweep",
     "Line",
-    "LineChart",
     "LinearGradient",
     "LuminanceWipe",
     "ModernGLRenderer",
-    "NetworkGraph",
     "Number",
     "OuterGlow",
-    "OutlineMap",
     "ParticleField",
     "PathData",
     "PathMask",
-    "PieChart",
     "PillowRenderer",
     "Polyline",
     "PopIn",
@@ -146,12 +303,8 @@ __all__ = [
     "ProceduralBackground",
     "Pulse",
     "RadialGradient",
-    "RankedBarChart",
     "Rectangle",
     "Renderer",
-    "SankeyChart",
-    "SatelliteMap",
-    "ScatterPlot",
     "Scene",
     "Sequence",
     "ShadowStyle",
@@ -169,7 +322,6 @@ __all__ = [
     "Text",
     "Triangle",
     "Typewriter",
-    "VectorField",
     "VectorPath",
     "Wiggle",
     "Write",
@@ -183,7 +335,6 @@ __all__ = [
     "ease_in",
     "ease_out",
     "fit_text",
-    "flag_path",
     "gradient_surface",
     "linear",
     "render",
@@ -192,18 +343,8 @@ __all__ = [
     "rendering_identity",
     "save_frame",
     "smooth",
-    "supported_countries",
-    "supported_flags",
     "validate_composition",
     "with_alpha",
-]
-__version__ = "0.1.6"
-
-from .indicators import Checkmark, Countdown, Gauge, LoadingDots, ProgressBar, ProgressRing
-from .masks import CircleMask, RectangleMask, ShapeMask, Wipe
-from .scheduling import Repeat, Stagger, Succession
-
-__all__ += [
     "Checkmark",
     "CircleMask",
     "Countdown",
@@ -217,96 +358,35 @@ __all__ += [
     "Stagger",
     "Succession",
     "Wipe",
-]
-
-from .coding import CodeReveal, CodeTheme, CodingChamp
-
-__all__ += ["CodeReveal", "CodeTheme", "CodingChamp"]
-
-from .coding_workspace import CodeWindow, CodeWorkspaceDesign
-
-__all__ += ["CodeWindow", "CodeWorkspaceDesign"]
-
-from .chess import ChessAssets, ChessChamp, ChessScript, ChessTheme
-
-__all__ += ["ChessAssets", "ChessChamp", "ChessScript", "ChessTheme"]
-
-from .playground import (
-    CanvasItem,
-    CodeCheckpoint,
-    CodeEditor,
-    EditTimeline,
-    EventBinding,
-    PlaygroundCanvas,
-    PlaygroundError,
-    PlaygroundOutput,
-    PlaygroundScript,
-    PreparedPlayground,
-    ValueBinding,
-    prepare_playground,
-)
-
-__all__ += [
-    "CanvasItem",
-    "CodeCheckpoint",
-    "CodeEditor",
-    "EditTimeline",
-    "EventBinding",
-    "PlaygroundCanvas",
-    "PlaygroundError",
-    "PlaygroundOutput",
-    "PlaygroundScript",
-    "PreparedPlayground",
-    "ValueBinding",
-    "prepare_playground",
-]
-
-from .flow import (
-    FlowChamp,
-    FlowDataError,
-    FlowDesign,
-    FlowEdge,
-    FlowGraph,
-    FlowNode,
-    FlowPort,
-    FlowScript,
-    FlowTheme,
-    FlowVisual,
-)
-
-__all__ += [
-    "FlowChamp",
-    "FlowDataError",
-    "FlowDesign",
-    "FlowEdge",
-    "FlowGraph",
-    "FlowNode",
-    "FlowPort",
-    "FlowScript",
-    "FlowTheme",
-    "FlowVisual",
-]
-
-from .arch import (
-    ArchCamera,
-    ArchChamp,
-    ArchDataError,
-    ArchDimension,
-    ArchLabel,
-    ArchMesh,
-    ArchPart,
-    ArchScript,
-    ArchStyle,
-)
-
-__all__ += [
     "ArchCamera",
-    "ArchChamp",
     "ArchDataError",
-    "ArchDimension",
-    "ArchLabel",
     "ArchMesh",
     "ArchPart",
-    "ArchScript",
     "ArchStyle",
+    "RasterSession",
+    "RasterSource",
+    "Viewport",
+    "parse_srt_cues",
 ]
+
+
+def __getattr__(name):
+    if name in _MOVED:
+        raise AttributeError(
+            f"{name} moved to {_MOVED[name]}; install facelesschamp-kit and update the import. See docs/v2/m4-migration.md"
+        )
+    if name in _RETIRED:
+        raise AttributeError(
+            f"{name} was retired in V2. Use the frozen V1 checkout for chess projects; see docs/v2/m4-migration.md"
+        )
+    try:
+        module, attribute = _EXPORTS[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
+    value = getattr(_import_module(f".{module}", __name__), attribute)
+    globals()[name] = value
+    return value
+
+
+def __dir__():
+    return sorted(set(globals()) | set(_EXPORTS))

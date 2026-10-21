@@ -2,10 +2,10 @@
 
 Install the matching core and kit sources with the `web` extra and explicitly install
 Chromium (see the core HTML-to-video guide). Prepare captures using
-`faceless_champ.web.capture_html` before compiling a kit video.
+`facelesschamp_kit.web.capture_html` before compiling a kit video.
 
 ```python
-from faceless_champ.web import WebCapture, WebFocus, WebHighlight, WebCallout
+from facelesschamp_kit.web import WebCapture, WebFocus, WebHighlight, WebCallout
 from facelesschamp_kit.blocks import WebWalkthrough, WebElement
 
 capture = WebCapture('path/to/prepared/capture')

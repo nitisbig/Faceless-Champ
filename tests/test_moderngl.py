@@ -57,21 +57,7 @@ def solid(color, duration=1):
 
 
 def test_imports_and_capabilities_do_not_load_native_engines():
-    code = """
-import builtins,sys
-original=builtins.__import__
-def block(name,*a,**k):
-    if name in {'moderngl','glcontext','numpy','skia'}:raise ImportError('blocked optional dependency')
-    return original(name,*a,**k)
-builtins.__import__=block
-from faceless_champ import renderer_capabilities,create_renderer
-assert not renderer_capabilities()['probed']
-with create_renderer('pillow'):pass
-assert 'moderngl' not in sys.modules
-try:create_renderer('moderngl')
-except RuntimeError as e:assert 'faceless-champ[gpu]' in str(e)
-else:raise AssertionError('must fail explicitly')
-"""
+    code = "\nimport builtins,sys\noriginal=builtins.__import__\ndef block(name,*a,**k):\n    if name in {'moderngl','glcontext','numpy','skia'}:raise ImportError('blocked optional dependency')\n    return original(name,*a,**k)\nbuiltins.__import__=block\nfrom faceless_champ import renderer_capabilities, create_renderer\nassert not renderer_capabilities()['probed']\nwith create_renderer('pillow'):pass\nassert 'moderngl' not in sys.modules\ntry:create_renderer('moderngl')\nexcept RuntimeError as e:assert 'faceless-champ[gpu]' in str(e)\nelse:raise AssertionError('must fail explicitly')\n"
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr
 
@@ -258,18 +244,20 @@ def test_real_export_range_audio_and_caller_ownership(gpu, tmp_path, tone):
 
 def test_vtk_viewport_context_restores_for_gpu_overlay(gpu):
     import pyvista as pv
+    from facelesschamp_kit.engineering.clip import ArchChamp
 
-    from faceless_champ import ArchChamp, ArchMesh, Text
+    from faceless_champ import Text
+    from faceless_champ.integrations.pyvista.model import ArchMesh
 
     view = ArchChamp(ArchMesh.from_data(pv.Cube()), width=80, height=80, position=(40, 50))
     label = Text("GPU", font_size=18, position=(125, 50), color="white")
     node = Scene(Canvas(160, 100, "black")).add(view, label).wait(1)
     frame = gpu.frame(node, 0.3, (160, 100))
     assert frame.crop((90, 20, 160, 80)).convert("RGB").getbbox() is not None
-    worker = gpu.raster._arch_worker.process
+    owned = next(iter(gpu.raster.painter._sources.sessions.values()))[1]
+    worker = owned.worker.process
     assert worker.poll() is None
-    gpu.raster._arch_worker.close()
-    gpu.raster._arch_worker = None
+    owned.close()
     assert gpu.frame(solid("red"), 0, (80, 60)).getpixel((40, 30)) == (255, 0, 0, 255)
     gpu.close()
     assert worker.poll() == 0

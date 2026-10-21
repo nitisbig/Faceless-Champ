@@ -1,13 +1,12 @@
 # Public API and workflow
 
-Current source: **0.1.0rc6**, requiring core **>=0.1.4,<0.2.0**.
+Current source: **2.0.0rc1**, requiring Core **>=2.0.0rc1,<3.0.0**.
 
 | Capability | Public interface | Guide |
 | --- | --- | --- |
 | Prepared coding lessons | CodeEditor, CodingPlayground, ctx.playground, templates.coding_playground | [Coding playgrounds](coding-playgrounds.md) |
 | HTML walkthroughs | WebWalkthrough, WebElement | [HTML to video](html-to-video.md) |
 | Virtual OS tutorials | OSWalkthrough, FinderWindow, SettingsWindow | [OS UI](os-ui.md) |
-| Legal games | ChessBoard, templates.chesschamp | [ChessChamp](chesschamp.md) |
 | Scripted graphs and networking cards | FlowCanvas, FlowCard, FlowPopup, FlowBackdrop | [FlowChamp](flowchamp.md) |
 
 ### Explicit preparation
@@ -112,10 +111,6 @@ Fresh builds rehash referenced assets and use fresh renderers. Inputs changed du
 
 Library errors are KitError with stable `code`, `message`, and optional scope. CLI exits 1 for build/runtime failures and 2 for argument syntax failures. JSON build failures return an `error` object on stderr; argparse syntax diagnostics remain plain text. Reports in `.fc-kit/reports/` include a versioned schema, original segment/cue timing, asset checksums, source hashes, settings, environment, and output metadata. Fingerprints are audit identities, not promises of byte-identical media across machines. Unregistered external data dependencies are not discovered; declare them through the asset registry. Persistent render-result caching is intentionally absent.
 
-## ChessChamp and audio-only narration
-
-`templates.chesschamp(ctx, data="data.json")` returns a Video; `blocks.ChessBoard(script, theme=None, source_start=0)` exposes `board`. `Video.narration(audio=...)` accepts audio without subtitles; cue methods and captions still require subtitles. See [ChessChamp](chesschamp.md).
-
 ## FlowCanvas
 
 `FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0, design=None)` exposes the `"diagram"` handle. Pass `design="networking"` or a core `FlowDesign` instance for the approved soft connection styling; this adds a `"glow"` handle. Animate the placement handle to transform both layers together. `theme` and `design` are mutually exclusive. Without `design`, kit theme inheritance is unchanged.
@@ -148,3 +143,18 @@ bounding boxes alone do not prove a design error. Valid sample times are
 ## Technical models and dependencies
 
 ArchCanvas exposes model and fits a fresh core viewport. assets.mesh(id) resolves/checksums required model files. The arch-design recipe uses a shared structured design contract. Project.dependencies() inspects standard pyproject requirements before factory imports; reports include dependency versions and geometry fingerprints. See [ArchChamp and external tools](archchamp.md).
+
+## Compiled video production
+
+Compile once and call `compiled.frame(t, size=(960, 540))` for a PIL image,
+`compiled.save_frame(t, path, size=(960, 540))`,
+`compiled.storyboard([0.5, 1.0], directory)`, or
+`compiled.export(path, settings=ExportSettings(...), start_time=0, end_time=None)`.
+ExportSettings is the public Core value object. Methods never rerun a factory.
+Export also accepts progress and cancel callbacks and overwrite=False.
+Saved operations return a dict with output (Path), rendering, source_range and
+settings. Still/contact-sheet ranges are None; source_time belongs to the caller.
+Renderer identity includes the actual session and fonts, captured before close.
+A supplied renderer is not closed. Existing Project methods still return Path.
+Kit facades: media_probe(path), read_subtitle_cues(text), public_capabilities(),
+validate_rendering(compiled, settings), and the identical Core ExportProgress type.

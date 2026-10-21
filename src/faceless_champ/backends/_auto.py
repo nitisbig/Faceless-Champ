@@ -20,11 +20,21 @@ class AutoRenderer:
         if self.renderer is not None:
             self.renderer.validate(node)
             return
+        from .._rendering.support import requirements, unsupported
         from ..renderer import create_renderer, rendering_identity
 
+        features = requirements(node)
         failures = []
         for backend in ("moderngl", "skia", "pillow"):
             candidate = None
+            if unsupported(backend, features):
+                failures.append(
+                    {
+                        "backend": backend,
+                        "reason": "unsupported features: " + ", ".join(sorted(unsupported(backend, features))),
+                    }
+                )
+                continue
             try:
                 candidate = create_renderer(backend, antialias=self.antialias, gpu=self.gpu, **self.options)
                 if backend == "moderngl" and candidate.identity["device"] != "gpu":
@@ -52,6 +62,10 @@ class AutoRenderer:
         return self.renderer.frame(node, time, size)
 
     def close(self):
-        if self.renderer is not None:
-            self.renderer.close()
-        self._closed = True
+        if self._closed:
+            return
+        try:
+            if self.renderer is not None:
+                self.renderer.close()
+        finally:
+            self._closed = True

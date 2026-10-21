@@ -1,6 +1,10 @@
+V2 ownership: domain APIs are in facelesschamp_kit.charts, maps, coding, diagrams,
+desktop, playground, web and engineering. Generic video primitives and native
+geometry integrations remain in Core. ChessChamp is V1-only. See docs/v2/m4-migration.md.
+
 # API reference
 
-Current source: **0.1.4**. Optional capability references:
+Current source: **2.0.0rc1**. Domain APIs in the table below are owned by Kit. Optional capability references:
 
 | API | Documentation | Extra |
 | --- | --- | --- |
@@ -8,7 +12,6 @@ Current source: **0.1.4**. Optional capability references:
 | CodeCheckpoint, PlaygroundScript, prepare_playground, PreparedPlayground, CodeEditor, PlaygroundCanvas, PlaygroundOutput | [Prepared playgrounds](coding-playgrounds.md) | playground; Chromium for web preparation |
 | HtmlPage, WebScript, capture_html, WebCapture, HtmlClip | [HTML capture](html-to-video.md) | web for preparation |
 | OSClip, OSScript, VirtualFileSystem, MacOSPreset | [OS UI](os-ui.md) | none |
-| ChessChamp, ChessScript, ChessTheme, ChessAssets | [Chess](chesschamp.md) | chess |
 | FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme, FlowDesign, FlowVisual | [Flow diagrams](flowchamp.md) | none |
 
 The default core import does not install optional packages, run checkpoints, launch browsers, or download assets.
@@ -253,7 +256,8 @@ Assets ship in both the wheel and source distribution, require no optional extra
 and resolve independently of the working directory without network access.
 
 ```python
-from faceless_champ import FadeIn, Flag, flag_path, supported_flags
+from faceless_champ import FadeIn
+from facelesschamp_kit.maps.flags import Flag, flag_path, supported_flags
 
 flag = Flag("NP", width=180, height=120, position=(960, 540))
 self.play(FadeIn(flag), run_time=0.5)
@@ -522,7 +526,7 @@ Zero disables that cache and phrase-layout retention. Phrase layouts are reused
 across highlights and retained for at most 128 phrase/scale combinations.
 
 `render(node, output, *, settings=None, renderer=None, overwrite=False, progress=None,
-start_time=0.0, end_time=None, **options)`
+start_time=0.0, end_time=None, cancel=None, **options)`
 returns the absolute output `Path`. Pass either `ExportSettings(...)` or its fields
 as keyword options, not both.
 
@@ -537,6 +541,14 @@ a whole video frame; existing whole-video defaults are unchanged.
 every streamed frame. The callback is optional and should return quickly. The final
 file is published after the encoder finishes.
 
+`cancel=callback` polls a no-argument callable between frames and while waiting
+for encoder I/O. Returning true raises `concurrent.futures.CancelledError` and
+cleans the temporary export without replacing an existing output. Caller-owned
+renderers remain open. Set `encoder_timeout=60` (also an `ExportSettings` field)
+to bound each pipe write and encoder completion wait in seconds. A timeout raises
+`TimeoutError` and terminates/reaps the encoder. These bounds cover subprocess
+I/O; they do not interrupt a renderer or progress callback running user code.
+
 | Setting | Default | Values |
 | --- | --- | --- |
 | `quality` | `"qh"` | `ql`/`720p`, `qh`/`1080p`, `qk`/`4k` |
@@ -545,6 +557,7 @@ file is published after the encoder finishes.
 | `crf` | `18` | Integer 0–51; lower values increase quality and file size |
 | `preset` | `"medium"` | x264 presets from ultrafast through veryslow |
 | `antialias` | `2` | Supersampling factor 1, 2, 3, or 4 |
+| `encoder_timeout` | `60` | Positive finite seconds per encoder I/O/completion operation |
 
 Quality presets set the shorter dimension to 720, 1080, or 2160 and preserve aspect
 ratio, rounding to even dimensions. Explicit dimensions override preset resolution
@@ -624,16 +637,12 @@ composes its existing code children without executing them.
 
 ## OS UI
 
-`faceless_champ.os_ui` exposes `OSClip`, `OSScript`, `MacOSPreset`, `VirtualFileSystem`,
+`facelesschamp_kit.desktop` exposes `OSClip`, `OSScript`, `MacOSPreset`, `VirtualFileSystem`,
 `File`, `Folder`, `SettingsPage`, `Control`, and `starter_pages`. See [OS UI](os-ui.md).
-
-## ChessChamp
-
-`ChessChamp`, `ChessScript`, and `ChessTheme` render legal, timed chess games and annotations. See [the API and JSON contract](chesschamp.md).
 
 ## FlowChamp
 
-`FlowChamp`, `FlowGraph`, `FlowNode`, `FlowPort`, `FlowEdge`, `FlowScript`, `FlowTheme`, and `FlowDataError` are exported from core and `faceless_champ.flow`. See [API and JSON contracts](flowchamp.md).
+`FlowChamp`, `FlowGraph`, `FlowNode`, `FlowPort`, `FlowEdge`, `FlowScript`, `FlowTheme`, and `FlowDataError` are exported from core and `facelesschamp_kit.diagrams`. See [API and JSON contracts](flowchamp.md).
 
 `FlowTheme.stroke=None` retains accent outlines; set a neutral stroke to separate
 structure from emphasis. `FlowChamp.diagnostics_at(time)` returns visible overflow,

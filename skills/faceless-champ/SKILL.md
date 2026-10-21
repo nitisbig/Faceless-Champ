@@ -67,8 +67,8 @@ Read [the API](../../docs/api.md) for supported constructors and
   Motion entrances already animate opacity; do not add FadeIn on the same object.
   Use explicit play(rate_func=...) to override preset easing. Custom Animation
   keyframes must increase from progress 0 to 1 and end at the declared target.
-- Reuse the bundled default font or an explicit local TTF/OTF. Do not invent camera,
-  chart, video-import, or graphical-editor APIs absent from v0.1.
+- Reuse the bundled default font or an explicit local TTF/OTF. Discover chart and camera APIs from their owning Kit/Core modules; do not invent
+  unsupported video-import or graphical-editor constructors.
 
 Typical command:
 
@@ -151,3 +151,14 @@ template only when no custom design/instructions are supplied. The project-owned
 templates/coding-tutorial/style.json controls colors, layout and springs. Generated
 render.py must accept --fps and --quality low|high|4k.
 Its structural checks do not render scene frames; honor the user's render boundary.
+
+## V2 production ownership
+
+Core owns deterministic composition, rendering and FFmpeg. Kit owns domain APIs,
+preparation and CompiledVideo.frame/save_frame/storyboard/export. These operations
+reuse the compiled object and return backend provenance before closing owned
+renderers. Supplied renderers remain caller-owned. Agent delegates production to
+Kit and retains checksums, source alignment, evidence history and review policy.
+Preview, decoded export, visual review and editorial review are separate claims.
+Discover optional capabilities offline; discovery does not prove device support.
+ChessChamp is V1-only; migrate with the V2 M4 guide rather than installing a V2 chess extra.

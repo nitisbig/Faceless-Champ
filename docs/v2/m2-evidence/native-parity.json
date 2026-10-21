@@ -1,0 +1,15 @@
+{
+  "reference_package": "/tmp/fc-m2/baseline-env/lib/python3.12/site-packages/faceless_champ/__init__.py",
+  "candidate_package": "/tmp/fc-m2/candidate-env/lib/python3.12/site-packages/faceless_champ/__init__.py",
+  "frame_hashes": {
+    "native:0": "718cba7a8823e7e939b65b0d888ccb14f58cc2a6d86ec09606dd8748f438dc2d",
+    "native:0.35": "718cba7a8823e7e939b65b0d888ccb14f58cc2a6d86ec09606dd8748f438dc2d",
+    "native:1.25": "718cba7a8823e7e939b65b0d888ccb14f58cc2a6d86ec09606dd8748f438dc2d",
+    "scientific:0": "34a899eafb3a1312bd51d22ed23be4553a2c529759bfa8a572e1b1b8387d9031",
+    "scientific:0.35": "fa82b652af37c0f9d06d0b7e38033c243d40b26e0a5b9dd60e465587d29b8635",
+    "scientific:1.25": "53cd0d9003ea23f281b5894e617ca738d9351ba0307be86770ec31a7e904ad8b"
+  },
+  "baseline_wheel_sha256": "3c003e47c96f9bf440dc8f5d6bca08f9d2984797bcfa3c4efb2b919f4b9dc269",
+  "candidate_wheel_sha256": "8a263475f1457763440b9bf8541d45b5284f4d8ff84ae67b90ba024e096abb86",
+  "all_native_samples_match_complete_m1": true
+}

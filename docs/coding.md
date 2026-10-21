@@ -1,13 +1,14 @@
 # CodingChamp
 
 CodingChamp renders source code inside an editor surface using the ordinary Pillow renderer.
-Install syntax highlighting with `pip install 'faceless-champ[coding]'` (or `uv sync --extra coding`).
+Install syntax highlighting with `pip install 'facelesschamp-kit[coding]'` (or `uv pip install -e . -e ./facelesschamp-kit[coding]`).
 `language="text"` is the dependency-free default. Set a Pygments language alias such as `python`,
 `javascript`, or `typescript` to color syntax. This editor displays source without executing it. For explicit checkpoint execution and side canvases,
 see [CodingChamp playgrounds](coding-playgrounds.md).
 
 ```python
-from faceless_champ import Canvas, Scene, CodingChamp, CodeReveal
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.coding import CodingChamp, CodeReveal
 
 scene = Scene(Canvas(1920, 1080, "#080E1B"))
 code = CodingChamp(
@@ -44,7 +45,7 @@ immutable themes with `dataclasses.replace`, for example:
 
 ```python
 from dataclasses import replace
-from faceless_champ import CodeTheme
+from facelesschamp_kit.coding import CodeTheme
 
 theme = replace(CodeTheme.named("midnight"), accent="#FFCF70",
                 syntax={"Keyword": "#C6A0F6", "Literal.String": "#A6DA95"})
@@ -90,7 +91,9 @@ without overshoot. Code, chrome, highlights and shadow share the window transfor
 Only source, window labels, commands and output need appear on screen.
 
 ```python
-from faceless_champ import Canvas, CodeWorkspaceDesign, CodingChamp, Scene
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.coding.workspace import CodeWorkspaceDesign
+from facelesschamp_kit.coding import CodingChamp
 
 design = CodeWorkspaceDesign.named("clean-flow")
 scene = Scene(Canvas(1920, 1080, design.background))

@@ -2,16 +2,33 @@
 
 import argparse
 import json
+from importlib.resources import files
 from pathlib import Path
 
-from faceless_champ import Canvas, StoryboardSample, render, render_storyboard
+from faceless_champ import Canvas, ExportSettings, StoryboardSample
+from faceless_champ.typography import load_font
 from facelesschamp_kit import BuildContext, Video
 from facelesschamp_kit.recipes import apply_recipe, recipe_specs
 from facelesschamp_kit.themes import MIDNIGHT
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 from facelesschamp_agent.examples import create_example, prepare_example
 from facelesschamp_agent.media import verify_media
+
+
+def recipe_gallery(posters):
+    """Size the atlas from its content, including future recipes beyond ten."""
+    if not posters:
+        raise ValueError("A recipe gallery needs at least one poster")
+    gallery = Image.new("RGB", (960, ((len(posters) + 1) // 2) * 310), "#18202b")
+    draw = ImageDraw.Draw(gallery)
+    font = load_font(None, 20)
+    for i, (name, poster) in enumerate(posters):
+        x, y = (i % 2) * 480, (i // 2) * 310
+        with Image.open(poster) as frame:
+            gallery.paste(frame.resize((480, 270)), (x, y))
+        draw.text((x + 12, y + 279), name, font=font, fill="white")
+    return gallery
 
 
 def main():
@@ -22,7 +39,15 @@ def main():
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=True)
     prepared = prepare_example(root / "prepared")
-    report = {"recipes": [], "examples": [], "visual_review": "pending", "editorial_review": "pending"}
+    report = {
+        "capabilities": json.loads(
+            files("facelesschamp_agent").joinpath("resources/public-capabilities.json").read_text()
+        ),
+        "recipes": [],
+        "examples": [],
+        "visual_review": "pending",
+        "editorial_review": "pending",
+    }
     posters = []
     for spec in recipe_specs():
         directory = root / "recipes" / spec.id
@@ -34,7 +59,7 @@ def main():
         apply_recipe(video.segment(spec.id, duration=4), spec.id, content)
         compiled = video.compile()
         media = directory / "preview.mp4"
-        render(compiled.composition, media, width=960, height=540, fps=15, antialias=1, preset="veryfast")
+        compiled.export(media, settings=ExportSettings(width=960, height=540, fps=15, antialias=1, preset="veryfast"))
         result = verify_media(
             media,
             width=960,
@@ -45,9 +70,9 @@ def main():
             frame_directory=directory / "decoded",
             samples=[0.5, 2.2, 3.9],
         )
-        sheet = render_storyboard(
-            compiled.composition, [StoryboardSample(t, spec.id) for t in (0.5, 2.2, 3.9)], directory / "storyboard"
-        )
+        sheet = compiled.storyboard([StoryboardSample(t, spec.id) for t in (0.5, 2.2, 3.9)], directory / "storyboard")[
+            "output"
+        ]
         poster = Path(result["frames"][1]["path"])
         posters.append((spec.id, poster))
         row = {
@@ -61,15 +86,7 @@ def main():
         report["recipes"].append(row)
         (root / "verification.json").write_text(json.dumps(report, indent=2))
         print(spec.id, result["status"], flush=True)
-    gallery = Image.new("RGB", (960, 5 * 310), "#18202b")
-    draw = ImageDraw.Draw(gallery)
-    font = ImageFont.truetype("DejaVuSans.ttf", 20)
-    for i, (name, poster) in enumerate(posters):
-        x, y = (i % 2) * 480, (i // 2) * 310
-        with Image.open(poster) as frame:
-            gallery.paste(frame.resize((480, 270)), (x, y))
-        draw.text((x + 12, y + 279), name, font=font, fill="white")
-    gallery.save(root / "recipe-gallery.png")
+    recipe_gallery(posters).save(root / "recipe-gallery.png")
     if not args.recipes_only:
         for kind in ("narrated-system", "chart-explanation", "code-result"):
             project = create_example(root / "examples" / kind, kind)

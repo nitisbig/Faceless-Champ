@@ -22,7 +22,10 @@ CASES = ("bracket", "gears", "instances", "mesh", "engine", "blueprint")
 
 def workload(case, width):
     from faceless_champ import Canvas, Scene
-    from faceless_champ.arch import ArchChamp, ArchScript, blueprint_from_cad, mesh_from_cad, parts_from_cad
+    from facelesschamp_kit.engineering.clip import ArchChamp
+    from facelesschamp_kit.engineering.script import ArchScript
+    from facelesschamp_kit.engineering.blueprint import blueprint_from_cad
+    from faceless_champ.integrations.build123d import mesh_from_cad, parts_from_cad
 
     height = round(width * 9 / 16)
     stats = {}
@@ -30,7 +33,7 @@ def workload(case, width):
     if case == "mesh":
         import trimesh
 
-        from faceless_champ.arch import inspect_mesh, simplify_mesh
+        from faceless_champ.integrations.trimesh import inspect_mesh, simplify_mesh
 
         # Trimesh doubles longitude subdivisions internally: this is 996k faces.
         source = trimesh.creation.uv_sphere(count=(500, 500))
@@ -47,7 +50,7 @@ def workload(case, width):
 
         import build123d as bd
 
-        from faceless_champ.arch.cad_models import gear_pair, inline_engine
+        from facelesschamp_kit.engineering.models import gear_pair, inline_engine
 
         if case == "bracket":
             shape = bd.fillet(bd.Box(50, 30, 15).edges().filter_by(bd.Axis.Z), 2)

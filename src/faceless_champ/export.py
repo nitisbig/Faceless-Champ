@@ -10,6 +10,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
+from ._rendering.process import ProcessIO
 from .audio import require_tools
 from .components import Canvas, finite
 from .gpu import GPUOptions
@@ -28,6 +29,7 @@ class ExportSettings:
     antialias: int = 2
     backend: str = "pillow"
     gpu: GPUOptions | None = None
+    encoder_timeout: float = 60
 
     def dimensions(self, canvas: Canvas) -> tuple[int, int]:
         if self.backend not in {"pillow", "skia", "moderngl", "auto"}:
@@ -40,6 +42,7 @@ class ExportSettings:
         if self.quality not in presets:
             raise ValueError("quality must be ql/720p, qh/1080p, or qk/4k")
         finite(self.fps, "fps", 0.001)
+        finite(self.encoder_timeout, "encoder_timeout", 0.001)
         if not isinstance(self.crf, int) or not 0 <= self.crf <= 51:
             raise ValueError("crf must be an integer between 0 and 51")
         if self.preset not in {
@@ -134,6 +137,7 @@ def render(
     progress: Callable[[int, int], None] | None = None,
     start_time: float = 0.0,
     end_time: float | None = None,
+    cancel: Callable[[], bool] | None = None,
     **options,
 ) -> Path:
     """Render to MP4. ``progress(completed_frames, total_frames)`` is optional.
@@ -141,11 +145,16 @@ def render(
     Pass an ExportSettings object or its fields as keywords. Progress starts at
     zero and runs after each streamed frame; publication follows encoder completion.
     A source-clock range trims both visuals and mixed audio without moving events.
+    ``cancel()`` raises concurrent.futures.CancelledError when true. Pipe writes
+    and encoder completion are bounded by ``encoder_timeout`` (seconds per
+    operation). Cancellation is checked between frames and while waiting on I/O.
     """
     if settings is not None and options:
         raise ValueError("Use settings or keyword export options, not both")
     if progress is not None and not callable(progress):
         raise TypeError("progress must be callable")
+    if cancel is not None and not callable(cancel):
+        raise TypeError("cancel must be callable")
     if not isinstance(node, Renderable):
         raise TypeError("Expected a Scene, Sequence, Grid, or Layer")
     settings = settings or ExportSettings(**options)
@@ -217,22 +226,20 @@ def render(
         with (temporary / "ffmpeg.log").open("w+b") as log:
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=log)
             try:
-                for index in range(frame_count):
-                    frame = renderer.frame(node, start_time + index / settings.fps, size).convert("RGB")
-                    process.stdin.write(frame.tobytes())
-                    if progress is not None:
-                        progress(index + 1, frame_count)
-                process.stdin.close()
-                returncode = process.wait()
+                with ProcessIO(process, timeout=settings.encoder_timeout, cancel=cancel) as pipe:
+                    for index in range(frame_count):
+                        pipe.check_cancelled()
+                        frame = renderer.frame(node, start_time + index / settings.fps, size).convert("RGB")
+                        payload = frame.tobytes()
+                        pipe.call(lambda payload=payload: process.stdin.write(payload))
+                        if progress is not None:
+                            progress(index + 1, frame_count)
+                    pipe.call(process.stdin.close)
+                    returncode = pipe.call(process.wait)
                 if returncode:
                     log.seek(0)
                     raise RuntimeError("FFmpeg failed: " + log.read().decode(errors="replace"))
             except BaseException as exc:
-                if process.poll() is None:
-                    process.terminate()
-                process.wait()
-                if process.stdin and not process.stdin.closed:
-                    process.stdin.close()
                 if isinstance(exc, BrokenPipeError):
                     log.seek(0)
                     raise RuntimeError("FFmpeg failed: " + log.read().decode(errors="replace")) from exc  # noqa: TRY004

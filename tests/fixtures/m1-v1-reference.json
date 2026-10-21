@@ -1,0 +1,752 @@
+{
+  "commit": "22f3beaccb5a56990bd0974666b7c639a0667a68",
+  "wheel_path": "/tmp/fc-m1/reference-env/lib/python3.12/site-packages/faceless_champ/__init__.py",
+  "versions": {
+    "Pillow": "12.3.0"
+  },
+  "exports": {
+    "CLEAN_FLOW_FONT": {
+      "module": "faceless_champ.typography",
+      "attribute": "CLEAN_FLOW_FONT"
+    },
+    "COLOR_SCHEMES": {
+      "module": "faceless_champ.colors",
+      "attribute": "COLOR_SCHEMES"
+    },
+    "Animation": {
+      "module": "faceless_champ.animation",
+      "attribute": "Animation"
+    },
+    "Arrow": {
+      "module": "faceless_champ.components",
+      "attribute": "Arrow"
+    },
+    "Axis": {
+      "module": "faceless_champ.charts",
+      "attribute": "Axis"
+    },
+    "BarChart": {
+      "module": "faceless_champ.charts",
+      "attribute": "BarChart"
+    },
+    "Bloom": {
+      "module": "faceless_champ.effects",
+      "attribute": "Bloom"
+    },
+    "BounceIn": {
+      "module": "faceless_champ.animation",
+      "attribute": "BounceIn"
+    },
+    "Bounds": {
+      "module": "faceless_champ.layout",
+      "attribute": "Bounds"
+    },
+    "Canvas": {
+      "module": "faceless_champ.components",
+      "attribute": "Canvas"
+    },
+    "Captions": {
+      "module": "faceless_champ.subtitles",
+      "attribute": "Captions"
+    },
+    "Chart": {
+      "module": "faceless_champ.charts",
+      "attribute": "Chart"
+    },
+    "ChartReveal": {
+      "module": "faceless_champ.animation",
+      "attribute": "ChartReveal"
+    },
+    "ChartStyle": {
+      "module": "faceless_champ.charts",
+      "attribute": "ChartStyle"
+    },
+    "ChromaticAberration": {
+      "module": "faceless_champ.effects",
+      "attribute": "ChromaticAberration"
+    },
+    "Circle": {
+      "module": "faceless_champ.components",
+      "attribute": "Circle"
+    },
+    "ColorScheme": {
+      "module": "faceless_champ.colors",
+      "attribute": "ColorScheme"
+    },
+    "Component": {
+      "module": "faceless_champ.components",
+      "attribute": "Component"
+    },
+    "CueScene": {
+      "module": "faceless_champ.narration",
+      "attribute": "CueScene"
+    },
+    "DirectionalWipe": {
+      "module": "faceless_champ.transitions",
+      "attribute": "DirectionalWipe"
+    },
+    "Distortion": {
+      "module": "faceless_champ.effects",
+      "attribute": "Distortion"
+    },
+    "Draw": {
+      "module": "faceless_champ.animation",
+      "attribute": "Draw"
+    },
+    "EarthMap": {
+      "module": "faceless_champ.maps",
+      "attribute": "EarthMap"
+    },
+    "EffectStack": {
+      "module": "faceless_champ.effects",
+      "attribute": "EffectStack"
+    },
+    "Ellipse": {
+      "module": "faceless_champ.components",
+      "attribute": "Ellipse"
+    },
+    "Equation": {
+      "module": "faceless_champ.components",
+      "attribute": "Equation"
+    },
+    "ExportProgress": {
+      "module": "faceless_champ.progress",
+      "attribute": "ExportProgress"
+    },
+    "ExportSettings": {
+      "module": "faceless_champ.export",
+      "attribute": "ExportSettings"
+    },
+    "FadeIn": {
+      "module": "faceless_champ.animation",
+      "attribute": "FadeIn"
+    },
+    "FadeOut": {
+      "module": "faceless_champ.animation",
+      "attribute": "FadeOut"
+    },
+    "Flag": {
+      "module": "faceless_champ.flags",
+      "attribute": "Flag"
+    },
+    "GPUOptions": {
+      "module": "faceless_champ.gpu",
+      "attribute": "GPUOptions"
+    },
+    "GaussianBlur": {
+      "module": "faceless_champ.effects",
+      "attribute": "GaussianBlur"
+    },
+    "GradientStop": {
+      "module": "faceless_champ.gradients",
+      "attribute": "GradientStop"
+    },
+    "Grid": {
+      "module": "faceless_champ.timeline",
+      "attribute": "Grid"
+    },
+    "Group": {
+      "module": "faceless_champ.layout",
+      "attribute": "Group"
+    },
+    "Heatmap": {
+      "module": "faceless_champ.charts",
+      "attribute": "Heatmap"
+    },
+    "Histogram": {
+      "module": "faceless_champ.charts",
+      "attribute": "Histogram"
+    },
+    "Icon": {
+      "module": "faceless_champ.components",
+      "attribute": "Icon"
+    },
+    "Image": {
+      "module": "faceless_champ.components",
+      "attribute": "Image"
+    },
+    "ImageSlot": {
+      "module": "faceless_champ.components",
+      "attribute": "ImageSlot"
+    },
+    "Layer": {
+      "module": "faceless_champ.timeline",
+      "attribute": "Layer"
+    },
+    "LightSweep": {
+      "module": "faceless_champ.effects",
+      "attribute": "LightSweep"
+    },
+    "Line": {
+      "module": "faceless_champ.components",
+      "attribute": "Line"
+    },
+    "LineChart": {
+      "module": "faceless_champ.charts",
+      "attribute": "LineChart"
+    },
+    "LinearGradient": {
+      "module": "faceless_champ.gradients",
+      "attribute": "LinearGradient"
+    },
+    "LuminanceWipe": {
+      "module": "faceless_champ.transitions",
+      "attribute": "LuminanceWipe"
+    },
+    "ModernGLRenderer": {
+      "module": "faceless_champ.backends.moderngl",
+      "attribute": "ModernGLRenderer"
+    },
+    "NetworkGraph": {
+      "module": "faceless_champ.charts",
+      "attribute": "NetworkGraph"
+    },
+    "Number": {
+      "module": "faceless_champ.components",
+      "attribute": "Number"
+    },
+    "OuterGlow": {
+      "module": "faceless_champ.effects",
+      "attribute": "OuterGlow"
+    },
+    "OutlineMap": {
+      "module": "faceless_champ.maps",
+      "attribute": "OutlineMap"
+    },
+    "ParticleField": {
+      "module": "faceless_champ.procedural",
+      "attribute": "ParticleField"
+    },
+    "PathData": {
+      "module": "faceless_champ.paths",
+      "attribute": "PathData"
+    },
+    "PathMask": {
+      "module": "faceless_champ.masks",
+      "attribute": "PathMask"
+    },
+    "PieChart": {
+      "module": "faceless_champ.charts",
+      "attribute": "PieChart"
+    },
+    "PillowRenderer": {
+      "module": "faceless_champ.renderer",
+      "attribute": "PillowRenderer"
+    },
+    "Polyline": {
+      "module": "faceless_champ.components",
+      "attribute": "Polyline"
+    },
+    "PopIn": {
+      "module": "faceless_champ.animation",
+      "attribute": "PopIn"
+    },
+    "PopOut": {
+      "module": "faceless_champ.animation",
+      "attribute": "PopOut"
+    },
+    "ProceduralBackground": {
+      "module": "faceless_champ.procedural",
+      "attribute": "ProceduralBackground"
+    },
+    "Pulse": {
+      "module": "faceless_champ.animation",
+      "attribute": "Pulse"
+    },
+    "RadialGradient": {
+      "module": "faceless_champ.gradients",
+      "attribute": "RadialGradient"
+    },
+    "RankedBarChart": {
+      "module": "faceless_champ.charts",
+      "attribute": "RankedBarChart"
+    },
+    "Rectangle": {
+      "module": "faceless_champ.components",
+      "attribute": "Rectangle"
+    },
+    "Renderer": {
+      "module": "faceless_champ.renderer",
+      "attribute": "Renderer"
+    },
+    "SankeyChart": {
+      "module": "faceless_champ.charts",
+      "attribute": "SankeyChart"
+    },
+    "SatelliteMap": {
+      "module": "faceless_champ.maps",
+      "attribute": "SatelliteMap"
+    },
+    "ScatterPlot": {
+      "module": "faceless_champ.charts",
+      "attribute": "ScatterPlot"
+    },
+    "Scene": {
+      "module": "faceless_champ.timeline",
+      "attribute": "Scene"
+    },
+    "Sequence": {
+      "module": "faceless_champ.timeline",
+      "attribute": "Sequence"
+    },
+    "ShadowStyle": {
+      "module": "faceless_champ.surfaces",
+      "attribute": "ShadowStyle"
+    },
+    "Shake": {
+      "module": "faceless_champ.animation",
+      "attribute": "Shake"
+    },
+    "SkiaRenderer": {
+      "module": "faceless_champ.backends.skia",
+      "attribute": "SkiaRenderer"
+    },
+    "SlideIn": {
+      "module": "faceless_champ.animation",
+      "attribute": "SlideIn"
+    },
+    "SlideOut": {
+      "module": "faceless_champ.animation",
+      "attribute": "SlideOut"
+    },
+    "SpinIn": {
+      "module": "faceless_champ.animation",
+      "attribute": "SpinIn"
+    },
+    "Spring": {
+      "module": "faceless_champ.spring",
+      "attribute": "Spring"
+    },
+    "Square": {
+      "module": "faceless_champ.components",
+      "attribute": "Square"
+    },
+    "StoryboardSample": {
+      "module": "faceless_champ.preview",
+      "attribute": "StoryboardSample"
+    },
+    "SubtitleCue": {
+      "module": "faceless_champ.subtitles",
+      "attribute": "SubtitleCue"
+    },
+    "SubtitleTrack": {
+      "module": "faceless_champ.subtitles",
+      "attribute": "SubtitleTrack"
+    },
+    "Surface": {
+      "module": "faceless_champ.surfaces",
+      "attribute": "Surface"
+    },
+    "Text": {
+      "module": "faceless_champ.components",
+      "attribute": "Text"
+    },
+    "Triangle": {
+      "module": "faceless_champ.components",
+      "attribute": "Triangle"
+    },
+    "Typewriter": {
+      "module": "faceless_champ.animation",
+      "attribute": "Typewriter"
+    },
+    "VectorField": {
+      "module": "faceless_champ.charts",
+      "attribute": "VectorField"
+    },
+    "VectorPath": {
+      "module": "faceless_champ.paths",
+      "attribute": "VectorPath"
+    },
+    "Wiggle": {
+      "module": "faceless_champ.animation",
+      "attribute": "Wiggle"
+    },
+    "Write": {
+      "module": "faceless_champ.animation",
+      "attribute": "Write"
+    },
+    "ZoomBlurTransition": {
+      "module": "faceless_champ.transitions",
+      "attribute": "ZoomBlurTransition"
+    },
+    "ZoomIn": {
+      "module": "faceless_champ.animation",
+      "attribute": "ZoomIn"
+    },
+    "ZoomOut": {
+      "module": "faceless_champ.animation",
+      "attribute": "ZoomOut"
+    },
+    "card_content_bounds": {
+      "module": "faceless_champ.surfaces",
+      "attribute": "card_content_bounds"
+    },
+    "card_surface": {
+      "module": "faceless_champ.surfaces",
+      "attribute": "card_surface"
+    },
+    "create_renderer": {
+      "module": "faceless_champ.renderer",
+      "attribute": "create_renderer"
+    },
+    "dot_grid": {
+      "module": "faceless_champ.surfaces",
+      "attribute": "dot_grid"
+    },
+    "ease_in": {
+      "module": "faceless_champ.animation",
+      "attribute": "ease_in"
+    },
+    "ease_out": {
+      "module": "faceless_champ.animation",
+      "attribute": "ease_out"
+    },
+    "fit_text": {
+      "module": "faceless_champ.typography",
+      "attribute": "fit_text"
+    },
+    "flag_path": {
+      "module": "faceless_champ.flags",
+      "attribute": "flag_path"
+    },
+    "gradient_surface": {
+      "module": "faceless_champ.surfaces",
+      "attribute": "gradient_surface"
+    },
+    "linear": {
+      "module": "faceless_champ.animation",
+      "attribute": "linear"
+    },
+    "render": {
+      "module": "faceless_champ.export",
+      "attribute": "render"
+    },
+    "render_storyboard": {
+      "module": "faceless_champ.preview",
+      "attribute": "render_storyboard"
+    },
+    "renderer_capabilities": {
+      "module": "faceless_champ.gpu",
+      "attribute": "renderer_capabilities"
+    },
+    "rendering_identity": {
+      "module": "faceless_champ.renderer",
+      "attribute": "rendering_identity"
+    },
+    "save_frame": {
+      "module": "faceless_champ.preview",
+      "attribute": "save_frame"
+    },
+    "smooth": {
+      "module": "faceless_champ.animation",
+      "attribute": "smooth"
+    },
+    "supported_countries": {
+      "module": "faceless_champ.maps",
+      "attribute": "supported_countries"
+    },
+    "supported_flags": {
+      "module": "faceless_champ.flags",
+      "attribute": "supported_flags"
+    },
+    "validate_composition": {
+      "module": "faceless_champ.renderer",
+      "attribute": "validate_composition"
+    },
+    "with_alpha": {
+      "module": "faceless_champ.colors",
+      "attribute": "with_alpha"
+    },
+    "Checkmark": {
+      "module": "faceless_champ.indicators",
+      "attribute": "Checkmark"
+    },
+    "CircleMask": {
+      "module": "faceless_champ.masks",
+      "attribute": "CircleMask"
+    },
+    "Countdown": {
+      "module": "faceless_champ.indicators",
+      "attribute": "Countdown"
+    },
+    "Gauge": {
+      "module": "faceless_champ.indicators",
+      "attribute": "Gauge"
+    },
+    "LoadingDots": {
+      "module": "faceless_champ.indicators",
+      "attribute": "LoadingDots"
+    },
+    "ProgressBar": {
+      "module": "faceless_champ.indicators",
+      "attribute": "ProgressBar"
+    },
+    "ProgressRing": {
+      "module": "faceless_champ.indicators",
+      "attribute": "ProgressRing"
+    },
+    "RectangleMask": {
+      "module": "faceless_champ.masks",
+      "attribute": "RectangleMask"
+    },
+    "Repeat": {
+      "module": "faceless_champ.scheduling",
+      "attribute": "Repeat"
+    },
+    "ShapeMask": {
+      "module": "faceless_champ.masks",
+      "attribute": "ShapeMask"
+    },
+    "Stagger": {
+      "module": "faceless_champ.scheduling",
+      "attribute": "Stagger"
+    },
+    "Succession": {
+      "module": "faceless_champ.scheduling",
+      "attribute": "Succession"
+    },
+    "Wipe": {
+      "module": "faceless_champ.masks",
+      "attribute": "Wipe"
+    },
+    "CodeReveal": {
+      "module": "faceless_champ.coding",
+      "attribute": "CodeReveal"
+    },
+    "CodeTheme": {
+      "module": "faceless_champ.coding",
+      "attribute": "CodeTheme"
+    },
+    "CodingChamp": {
+      "module": "faceless_champ.coding",
+      "attribute": "CodingChamp"
+    },
+    "CodeWindow": {
+      "module": "faceless_champ.coding_workspace",
+      "attribute": "CodeWindow"
+    },
+    "CodeWorkspaceDesign": {
+      "module": "faceless_champ.coding_workspace",
+      "attribute": "CodeWorkspaceDesign"
+    },
+    "ChessAssets": {
+      "module": "faceless_champ.chess",
+      "attribute": "ChessAssets"
+    },
+    "ChessChamp": {
+      "module": "faceless_champ.chess",
+      "attribute": "ChessChamp"
+    },
+    "ChessScript": {
+      "module": "faceless_champ.chess",
+      "attribute": "ChessScript"
+    },
+    "ChessTheme": {
+      "module": "faceless_champ.chess",
+      "attribute": "ChessTheme"
+    },
+    "CanvasItem": {
+      "module": "faceless_champ.playground",
+      "attribute": "CanvasItem"
+    },
+    "CodeCheckpoint": {
+      "module": "faceless_champ.playground",
+      "attribute": "CodeCheckpoint"
+    },
+    "CodeEditor": {
+      "module": "faceless_champ.playground",
+      "attribute": "CodeEditor"
+    },
+    "EditTimeline": {
+      "module": "faceless_champ.playground",
+      "attribute": "EditTimeline"
+    },
+    "EventBinding": {
+      "module": "faceless_champ.playground",
+      "attribute": "EventBinding"
+    },
+    "PlaygroundCanvas": {
+      "module": "faceless_champ.playground",
+      "attribute": "PlaygroundCanvas"
+    },
+    "PlaygroundError": {
+      "module": "faceless_champ.playground",
+      "attribute": "PlaygroundError"
+    },
+    "PlaygroundOutput": {
+      "module": "faceless_champ.playground",
+      "attribute": "PlaygroundOutput"
+    },
+    "PlaygroundScript": {
+      "module": "faceless_champ.playground",
+      "attribute": "PlaygroundScript"
+    },
+    "PreparedPlayground": {
+      "module": "faceless_champ.playground",
+      "attribute": "PreparedPlayground"
+    },
+    "ValueBinding": {
+      "module": "faceless_champ.playground",
+      "attribute": "ValueBinding"
+    },
+    "prepare_playground": {
+      "module": "faceless_champ.playground",
+      "attribute": "prepare_playground"
+    },
+    "FlowChamp": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowChamp"
+    },
+    "FlowDataError": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowDataError"
+    },
+    "FlowDesign": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowDesign"
+    },
+    "FlowEdge": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowEdge"
+    },
+    "FlowGraph": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowGraph"
+    },
+    "FlowNode": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowNode"
+    },
+    "FlowPort": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowPort"
+    },
+    "FlowScript": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowScript"
+    },
+    "FlowTheme": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowTheme"
+    },
+    "FlowVisual": {
+      "module": "faceless_champ.flow",
+      "attribute": "FlowVisual"
+    },
+    "ArchCamera": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchCamera"
+    },
+    "ArchChamp": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchChamp"
+    },
+    "ArchDataError": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchDataError"
+    },
+    "ArchDimension": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchDimension"
+    },
+    "ArchLabel": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchLabel"
+    },
+    "ArchMesh": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchMesh"
+    },
+    "ArchPart": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchPart"
+    },
+    "ArchScript": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchScript"
+    },
+    "ArchStyle": {
+      "module": "faceless_champ.arch",
+      "attribute": "ArchStyle"
+    }
+  },
+  "frames": {
+    "plain:0": "a0d117609bb3e2f73c142d1b40263e5106b62debd59a17e54a4a5175df91d301",
+    "plain:0.35": "e27e91a69955640dbdd389894b5f5c5fcc63d29d971c98b5d73bbcf40f180f56",
+    "plain:1.25": "4026111b64626b86186d67a891e583955f7442c5fd1f0520912d6fb3bae24fcc",
+    "plain:1.9": "ca3eaa560d961078843573a3f5ce3754ab2c993869f24bd574c719a1da356e07",
+    "nested:0": "f1f7a16a949ca5f7b6cab7f03c8967ff817e0dae968d1bf9220b796c18ec3e39",
+    "nested:0.35": "f1f7a16a949ca5f7b6cab7f03c8967ff817e0dae968d1bf9220b796c18ec3e39",
+    "nested:1.25": "f1f7a16a949ca5f7b6cab7f03c8967ff817e0dae968d1bf9220b796c18ec3e39",
+    "nested:1.9": "f1f7a16a949ca5f7b6cab7f03c8967ff817e0dae968d1bf9220b796c18ec3e39",
+    "captions:0": "6f77f852d070d718abceaf639531c5424c1abecf4b2b603c640169f3546be7a1",
+    "captions:0.35": "12022db0a550e0dbc35ae8617c8c7a64225452b3a533522b77db2aaa7c8c54ed",
+    "captions:1.25": "17dd7c49843a3bd2444e0e2d124f6c5176ec528bb7155f892ecfed93ebdab436",
+    "captions:1.9": "6f77f852d070d718abceaf639531c5424c1abecf4b2b603c640169f3546be7a1",
+    "chart:0": "0c08d31f85fe1ce9d91b2829ad97a3888ae40392b7f4d25817d56841c54499b0",
+    "chart:0.35": "0c08d31f85fe1ce9d91b2829ad97a3888ae40392b7f4d25817d56841c54499b0",
+    "chart:1.25": "0c08d31f85fe1ce9d91b2829ad97a3888ae40392b7f4d25817d56841c54499b0",
+    "chart:1.9": "0c08d31f85fe1ce9d91b2829ad97a3888ae40392b7f4d25817d56841c54499b0",
+    "flow:0": "5cbd89a75821d26f8d07339a72a0d23b84df53f9c47c313fc11acb5ca77022a4",
+    "flow:0.35": "5cbd89a75821d26f8d07339a72a0d23b84df53f9c47c313fc11acb5ca77022a4",
+    "flow:1.25": "5cbd89a75821d26f8d07339a72a0d23b84df53f9c47c313fc11acb5ca77022a4",
+    "flow:1.9": "5cbd89a75821d26f8d07339a72a0d23b84df53f9c47c313fc11acb5ca77022a4",
+    "path:0": "dd37adc57e7cfaf022d70f11941aeea8ed78233d163a3df4625f0969b84c4d96",
+    "path:0.35": "dd37adc57e7cfaf022d70f11941aeea8ed78233d163a3df4625f0969b84c4d96",
+    "path:1.25": "dd37adc57e7cfaf022d70f11941aeea8ed78233d163a3df4625f0969b84c4d96",
+    "path:1.9": "dd37adc57e7cfaf022d70f11941aeea8ed78233d163a3df4625f0969b84c4d96",
+    "prepared:0": "034629d1725812ced869fd1ea58ec5075509d9a32ca225fa914e986d00e3e785",
+    "prepared:0.35": "acf8fbffff04326884d6d4e45f07ec20d843bec70f7dcdec1d0d569e858d443d",
+    "prepared:1.25": "acf8fbffff04326884d6d4e45f07ec20d843bec70f7dcdec1d0d569e858d443d",
+    "prepared:1.9": "acf8fbffff04326884d6d4e45f07ec20d843bec70f7dcdec1d0d569e858d443d"
+  },
+  "layout": [
+    46.0,
+    36.0,
+    114.0,
+    84.0
+  ],
+  "native_versions": {
+    "Pillow": "12.3.0",
+    "pyvista": "0.49.1",
+    "vtk": "9.7.1",
+    "numpy": "2.5.3",
+    "skia-python": "144.0.post2"
+  },
+  "native_frames": {
+    "native:0": "718cba7a8823e7e939b65b0d888ccb14f58cc2a6d86ec09606dd8748f438dc2d",
+    "native:0.35": "718cba7a8823e7e939b65b0d888ccb14f58cc2a6d86ec09606dd8748f438dc2d",
+    "native:1.25": "718cba7a8823e7e939b65b0d888ccb14f58cc2a6d86ec09606dd8748f438dc2d",
+    "scientific:0": "ddb2c12b218266a16672d5a90ca16693890aae2c709ef5bdbf9ed51e38dd360d",
+    "scientific:0.35": "ddc4dde8b5b74a015d69aee0e879ca2cf15f90bb2a56c4d2bee36554eba47c18",
+    "scientific:1.25": "f922e5f80eaea45c73f553e9b5cd9aa017fcd88ddb48e6ff3580cbb7b805264a"
+  },
+  "rendering": {
+    "backend": "pillow",
+    "antialias": 2,
+    "size": [
+      320,
+      180
+    ],
+    "pixel_format": "RGBA",
+    "sample_times": [
+      0,
+      0.35,
+      1.25,
+      1.9,
+      0.35
+    ]
+  },
+  "platform": {
+    "system": "Linux",
+    "machine": "x86_64"
+  },
+  "pillow_features": {
+    "freetype2": "2.14.3",
+    "raqm": "0.10.5"
+  },
+  "fonts": {
+    "DejaVuSans.ttf": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
+    "DMSans[opsz,wght].ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d"
+  }
+}

@@ -1,6 +1,6 @@
 # OS UI rendering
 
-`faceless_champ.os_ui` renders authored macOS-style tutorials offline with Pillow.
+`facelesschamp_kit.desktop` renders authored macOS-style tutorials offline with Pillow.
 It is a simulated desktop: files, Wi-Fi, volume, and other settings belong to the video.
 No host desktop, browser, network connection, or macOS installation is needed.
 
@@ -8,7 +8,7 @@ No host desktop, browser, network connection, or macOS installation is needed.
 
 ```python
 from faceless_champ import Scene
-from faceless_champ.os_ui import File, Folder, OSClip, OSScript, VirtualFileSystem
+from facelesschamp_kit.desktop import File, Folder, OSClip, OSScript, VirtualFileSystem
 
 files = VirtualFileSystem(Folder("home", "Home", (
     Folder("docs", "Documents", (
@@ -128,6 +128,6 @@ This release includes one starter File/context menu, the documented settings pag
 and authored files. Spotlight, notifications, Control Center, terminal emulation,
 real filesystem imports, and live OS control are outside this release.
 
-Import the UI APIs from `faceless_champ.os_ui`; no optional dependency is needed.
-The `examples/programming/hello_world/README.md` in the source checkout composes
+Import the UI APIs from `facelesschamp_kit.desktop`; no optional dependency is needed.
+The [premium opening draft](../examples/programming/hello_world/README.md) composes
 an isolated Finder window with CodingChamp and FlowChamp. It is not yet rendered.

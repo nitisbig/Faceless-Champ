@@ -7,7 +7,6 @@ from faceless_champ import Bounds, ImageSlot, Number, Rectangle, card_content_bo
 
 from ..diagnostics import KitError, number
 from .base import Block, BlockBuild, build_group, centered, fit_text
-from .chess import ChessBoard
 from .coding import CodeEditor, CodingPlayground
 from .effects import EffectBlock, ParticleBackdrop, ProceduralBackdrop
 from .flow import FlowDiagram
@@ -210,7 +209,6 @@ class StepList:
 __all__ = [
     "Block",
     "BlockBuild",
-    "ChessBoard",
     "CodeEditor",
     "CodingPlayground",
     "Comparison",

@@ -43,7 +43,7 @@ def test_cli_preparation_json_and_catalog(tmp_path, capsys):
 
 
 def test_stacked_layout_and_minimum_size(tmp_path):
-    from faceless_champ import prepare_playground
+    from facelesschamp_kit.playground import prepare_playground
 
     from facelesschamp_kit.sample_assets.coding_concept import script
 

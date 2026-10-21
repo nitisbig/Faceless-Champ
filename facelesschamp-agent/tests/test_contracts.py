@@ -39,7 +39,7 @@ def test_registry_covers_public_api_and_bundled_docs():
     assert {f"faceless_champ.{name}" for name in faceless_champ.__all__} <= ids
     assert registry.check()["ok"]
     assert registry.search("request")
-    assert "guide" in registry.describe("faceless_champ.FlowChamp")
+    assert "guide" in registry.describe("facelesschamp_kit.FlowChamp")
     with pytest.raises(AgentError, match="CAPABILITY_ID"):
         registry.describe("CodeEditor")
 
@@ -53,7 +53,7 @@ def test_clean_flow_theme_is_in_plan_schema():
 
 def test_networking_design_discovery_has_installed_guide_and_block_handles():
     registry = CapabilityRegistry()
-    design = registry.describe("faceless_champ.FlowDesign")
+    design = registry.describe("facelesschamp_kit.FlowDesign")
     assert design["family"] == "flow"
     assert 'FlowDesign.named("networking")' in design["guide"]
     assert 'marker="capsule"' in design["guide"]
@@ -205,7 +205,7 @@ def test_storyboard_timestamps_follow_numeric_frame_order(project, monkeypatch):
     times = [i / 25 for i in range(120)]
     monkeypatch.setattr(project, "sample_times", lambda: times)
     monkeypatch.setattr(
-        "facelesschamp_agent.project.render_storyboard",
+        "facelesschamp_kit.rendering.render_storyboard",
         lambda composition, samples, directory, **kwargs: render_storyboard(
             composition, samples, directory, size=(80, 45), **kwargs
         ),

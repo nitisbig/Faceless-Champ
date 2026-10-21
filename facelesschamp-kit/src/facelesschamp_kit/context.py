@@ -57,7 +57,7 @@ class BuildContext:
         import os
         import tempfile
 
-        from faceless_champ import PlaygroundError, PreparedPlayground, prepare_playground
+        from facelesschamp_kit.playground import PlaygroundError, PreparedPlayground, prepare_playground
 
         settings = {"timeout": timeout, "output_limit": output_limit, "fps": fps}
         key = hashlib.sha256(json.dumps({"script": script.record(), **settings}, sort_keys=True).encode()).hexdigest()

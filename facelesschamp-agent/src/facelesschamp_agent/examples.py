@@ -2,7 +2,7 @@
 
 from importlib.resources import files
 
-from faceless_champ import CanvasItem, CodeCheckpoint, PlaygroundScript, ValueBinding, prepare_playground
+from facelesschamp_kit.playground import CanvasItem, CodeCheckpoint, PlaygroundScript, ValueBinding, prepare_playground
 
 from .models import VideoPlan
 from .project import AgentProject, init_project
@@ -10,7 +10,7 @@ from .project import AgentProject, init_project
 
 def prepare_example(directory):
     """Explicitly execute a tiny deterministic code/result lesson."""
-    source = 'from faceless_champ.playground import runtime\n\nvalues = [2, 4, 6]\ntotal = sum(values)\nruntime.emit("total", total)\nprint("Total:", total)\n'
+    source = 'from facelesschamp_kit.playground import runtime\n\nvalues = [2, 4, 6]\ntotal = sum(values)\nruntime.emit("total", total)\nprint("Total:", total)\n'
     script = PlaygroundScript(
         [
             CodeCheckpoint("first", {"lesson.py": source}, "lesson.py", "lesson.py", 0, 0.5, 0.6),

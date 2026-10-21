@@ -1,13 +1,14 @@
 # CodingChamp
 
 CodingChamp renders source code inside an editor surface using the ordinary Pillow renderer.
-Install syntax highlighting with `pip install 'faceless-champ[coding]'` (or `uv sync --extra coding`).
+Install syntax highlighting with `pip install 'facelesschamp-kit[coding]'` (or `uv pip install -e . -e ./facelesschamp-kit[coding]`).
 `language="text"` is the dependency-free default. Set a Pygments language alias such as `python`,
 `javascript`, or `typescript` to color syntax. This editor displays source without executing it. For explicit checkpoint execution and side canvases,
 see [CodingChamp playgrounds](coding-playgrounds.md).
 
 ```python
-from faceless_champ import Canvas, Scene, CodingChamp, CodeReveal
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.coding import CodingChamp, CodeReveal
 
 scene = Scene(Canvas(1920, 1080, "#080E1B"))
 code = CodingChamp(
@@ -24,7 +25,7 @@ scene.wait(1)
 
 `CodingChamp(code, *, language="text", theme="midnight", width=1200, height=720,
 font_size=32, font=None, filename="", chrome=True, line_numbers=True,
-highlighted_lines=(), reveal_mode="typewriter", block_ends=None, first_line=1,
+highlighted_lines=(), reveal_mode="typewriter", reveal=1, block_ends=None, first_line=1,
 tab_size=4, padding=28, **component_options)` is a standard Component.
 It supports position, anchor, scale, rotation, opacity, groups and masks.
 `first_line` changes displayed numbering; highlighted lines and block ends always use
@@ -44,7 +45,7 @@ immutable themes with `dataclasses.replace`, for example:
 
 ```python
 from dataclasses import replace
-from faceless_champ import CodeTheme
+from facelesschamp_kit.coding import CodeTheme
 
 theme = replace(CodeTheme.named("midnight"), accent="#FFCF70",
                 syntax={"Keyword": "#C6A0F6", "Literal.String": "#A6DA95"})
@@ -65,7 +66,10 @@ Unknown languages and missing optional dependencies raise explicit errors; selec
   and include the final line. A trailing newline does not add an extra blank group.
 
 `CodeReveal(panel, start=0, end=1)` uses linear, normalized progress. It leaves chrome
-and line numbers visible. Text starts fully visible when no reveal animation is authored.
+and line numbers visible. Text defaults to fully visible when no reveal animation is authored.
+Pass `reveal=0` (or set `panel.reveal` before adding it) to initialize hidden code;
+values in `[0, 1]` are snapshotted when the panel joins the scene. Later changes use
+`CodeReveal` or the timeline's normal reveal animation.
 To pause between blocks, animate 0→1/3, hold, then 1/3→2/3, and finally 2/3→1.
 Use ordinary `Scene.at`/`CueScene.at_cue` for narration timing. Effects have no implicit clock.
 
@@ -87,7 +91,9 @@ without overshoot. Code, chrome, highlights and shadow share the window transfor
 Only source, window labels, commands and output need appear on screen.
 
 ```python
-from faceless_champ import Canvas, CodeWorkspaceDesign, CodingChamp, Scene
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.coding.workspace import CodeWorkspaceDesign
+from facelesschamp_kit.coding import CodingChamp
 
 design = CodeWorkspaceDesign.named("clean-flow")
 scene = Scene(Canvas(1920, 1080, design.background))
@@ -126,10 +132,10 @@ then animate it with `design.terminal_in(window)` / `design.terminal_out(window)
 The caller schedules typing, output publication, visibility and durations; these
 helpers never run code or add audio. Existing editor/playground defaults are unchanged.
 
-The current the approved coding reference in the source checkout
+The current [approved coding reference](../examples/programming/hello_world/README.md)
 uses these public helpers. Its lesson content and timing remain local. Reusable template data lives in the kit.
 In Kit projects, return a fresh complete hierarchy from a `Segment.add_core` factory.
 
-For default agent coding tutorials, see the approved template collection in the source checkout.
+For default agent coding tutorials, see the [approved template collection](../templates/README.md).
 The kit exposes CodingTutorialStyle and CodingTutorialTemplate; each agent project
 gets editable style.json data. Custom design/instructions bypass automatic selection.

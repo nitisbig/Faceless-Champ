@@ -1,0 +1,176 @@
+{
+  "registry": {
+    "ok": true,
+    "count": 1008
+  },
+  "arch_failure": {
+    "type": "KitError",
+    "error": "ARCH_DEPENDENCY: dependency: Install faceless-champ[3d] (or facelesschamp-kit[3d]/facelesschamp-agent[3d]); cannot load PyVista: No module named 'pyvista' ({'path': 'dependency', 'segment': 'assembly', 'placement': 'assembly/arch-design-model'})"
+  },
+  "doctor": {
+    "dependencies": [],
+    "ok": true,
+    "checks": {
+      "python_312": true,
+      "ffmpeg": true,
+      "ffprobe": true,
+      "libx264": true,
+      "/tmp/fc-m1/output": true,
+      "/tmp/fc-m1/.fc-kit": true,
+      "project_dependencies": true
+    },
+    "optional": {
+      "pyvista": false,
+      "vtk": false,
+      "maps": false,
+      "equations": false,
+      "coding": false,
+      "web": false
+    },
+    "guidance": {
+      "3d": "Install facelesschamp-kit[3d] (or facelesschamp-agent[3d]) for ArchChamp/PyVista."
+    },
+    "versions": {
+      "faceless-champ": "0.1.6",
+      "facelesschamp-kit": "0.1.0rc7",
+      "pyvista": "source",
+      "vtk": "source"
+    },
+    "gpu": {
+      "backend": "moderngl",
+      "versions": {
+        "moderngl": "unavailable",
+        "glcontext": "unavailable",
+        "numpy": "unavailable"
+      },
+      "probed": false,
+      "installed": false,
+      "features": [
+        "composition",
+        "masks",
+        "effects",
+        "procedural",
+        "particles",
+        "transitions"
+      ]
+    }
+  },
+  "agent_validation": {
+    "id": "1e39fcb49c8f425ab626259c53959169",
+    "operation": "validate",
+    "fingerprint": "eb387de0839578408c57f5ba67ad72fc08f80bd6000835b2fdbbb5cd3e3c8f4a",
+    "status": "passed",
+    "duration": 6.0,
+    "diagnostics": [],
+    "scene_count": 1,
+    "profile_rendering": {
+      "preview": {
+        "backend": "pillow",
+        "versions": {
+          "Pillow": "12.3.0"
+        },
+        "device": "cpu"
+      },
+      "final": {
+        "backend": "pillow",
+        "versions": {
+          "Pillow": "12.3.0"
+        },
+        "device": "cpu"
+      }
+    },
+    "artifacts": []
+  },
+  "agent_frame": {
+    "id": "ef2c8986dc5f46869e60a2f6cbe17fbf",
+    "operation": "frame",
+    "fingerprint": "eb387de0839578408c57f5ba67ad72fc08f80bd6000835b2fdbbb5cd3e3c8f4a",
+    "layout": {
+      "source_time": 1.0,
+      "conservative": true,
+      "placements": [
+        {
+          "id": "process/process-flow-diagram",
+          "segment": "process",
+          "start": 0.0,
+          "end": 6.0,
+          "bounds": {
+            "left": 64.0,
+            "top": 88.0,
+            "right": 1856.0,
+            "bottom": 1016.0
+          },
+          "children": {
+            "diagram": {
+              "left": 64.0,
+              "top": 88.0,
+              "right": 1856.0,
+              "bottom": 1016.0
+            }
+          },
+          "child_ancestors": {
+            "diagram": []
+          }
+        }
+      ]
+    },
+    "rendering": {
+      "backend": "pillow",
+      "versions": {
+        "Pillow": "12.3.0"
+      },
+      "device": "cpu"
+    },
+    "artifacts": [
+      {
+        "path": "/tmp/fc-m1/agent-base-final.png",
+        "kind": "frame",
+        "source_time": 1,
+        "id": "35740d37187e49639fad6594c91002cd",
+        "checksum": "e93a16001cc1de6b57b96f16de9a2399885ef7f7a5c190ee02b04f9c9c107c73"
+      }
+    ]
+  },
+  "distributions": [
+    [
+      "annotated-types",
+      "0.8.0"
+    ],
+    [
+      "faceless-champ",
+      "0.1.6"
+    ],
+    [
+      "facelesschamp-agent",
+      "0.1.0rc2"
+    ],
+    [
+      "facelesschamp-kit",
+      "0.1.0rc7"
+    ],
+    [
+      "packaging",
+      "26.3"
+    ],
+    [
+      "pillow",
+      "12.3.0"
+    ],
+    [
+      "pydantic",
+      "2.14.1"
+    ],
+    [
+      "pydantic_core",
+      "2.50.1"
+    ],
+    [
+      "typing-inspection",
+      "0.4.4"
+    ],
+    [
+      "typing_extensions",
+      "4.16.0"
+    ]
+  ]
+}

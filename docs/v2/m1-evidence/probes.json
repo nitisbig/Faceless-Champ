@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "rendering": {
+      "backend": "moderngl",
+      "versions": {
+        "moderngl": "5.13.0",
+        "glcontext": "3.1.0",
+        "numpy": "2.5.3"
+      },
+      "probed": false,
+      "installed": true,
+      "features": [
+        "composition",
+        "masks",
+        "effects",
+        "procedural",
+        "particles",
+        "transitions"
+      ]
+    },
+    "geometry": {
+      "versions": {
+        "pyvista": "0.49.1",
+        "vtk": "9.7.1",
+        "numpy": "2.5.3",
+        "build123d": "0.13.0",
+        "cadquery-ocp-novtk": "8.0.1.1.0",
+        "cadquery-ocp": null,
+        "trimesh": "5.1.1",
+        "scipy": "1.18.1",
+        "networkx": "3.7",
+        "manifold3d": "3.5.4",
+        "fast-simplification": "0.2.0"
+      },
+      "probes": {},
+      "ok": true
+    }
+  },
+  "probes": {
+    "rendering": {
+      "backend": "moderngl",
+      "versions": {
+        "moderngl": "5.13.0",
+        "glcontext": "3.1.0",
+        "numpy": "2.5.3"
+      },
+      "probed": true,
+      "installed": true,
+      "features": [
+        "composition",
+        "masks",
+        "effects",
+        "procedural",
+        "particles",
+        "transitions"
+      ],
+      "resolved": true,
+      "device": "software",
+      "vendor": "Mesa",
+      "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+      "driver": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+      "context_backend": "egl",
+      "shader_hash": "40780c27968052589c979acb2aa674ad79127fc09e269f3e37fbc4f979685a03",
+      "color_pipeline": "encoded-srgb-composition/linear-effects-v1",
+      "available": true
+    },
+    "geometry": {
+      "versions": {
+        "pyvista": "0.49.1",
+        "vtk": "9.7.1",
+        "numpy": "2.5.3",
+        "build123d": "0.13.0",
+        "cadquery-ocp-novtk": "8.0.1.1.0",
+        "cadquery-ocp": null,
+        "trimesh": "5.1.1",
+        "scipy": "1.18.1",
+        "networkx": "3.7",
+        "manifold3d": "3.5.4",
+        "fast-simplification": "0.2.0"
+      },
+      "probes": {
+        "cad": {
+          "ok": true,
+          "faces": 12
+        },
+        "geometry": {
+          "ok": true,
+          "faces": 12
+        }
+      },
+      "ok": true
+    }
+  }
+}

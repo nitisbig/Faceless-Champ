@@ -1,0 +1,73 @@
+{
+  "scope": "M2 only; M3 and later deferred",
+  "baseline": "complete frozen M1 wheels",
+  "suites": {
+    "core": {
+      "passed": 1572,
+      "skipped": 2,
+      "seconds": 296.32
+    },
+    "kit": {
+      "passed": 309,
+      "seconds": 76.3
+    },
+    "agent": {
+      "passed": 179,
+      "seconds": 336.71
+    },
+    "final_focused_core": {
+      "passed": 183,
+      "seconds": 5.89,
+      "additional_cache_boundary_cases": 5
+    }
+  },
+  "render_gates": [
+    {
+      "workload": "plain",
+      "aa": 1,
+      "baseline_median_ms": 6.558254499964278,
+      "candidate_median_ms": 5.5286889999024424,
+      "baseline_p95_ms": 29.786585000010746,
+      "candidate_p95_ms": 18.948983999962365,
+      "gate": true,
+      "protocol": "three trials per build"
+    },
+    {
+      "workload": "plain",
+      "aa": 2,
+      "baseline_median_ms": 5.031937000012476,
+      "candidate_median_ms": 5.110817499826226,
+      "baseline_p95_ms": 8.291008000014699,
+      "candidate_p95_ms": 7.829803999811702,
+      "gate": true,
+      "protocol": "nine counterbalanced pairs"
+    },
+    {
+      "workload": "ui",
+      "aa": 1,
+      "baseline_median_ms": 56.07838449998326,
+      "candidate_median_ms": 29.989656499992634,
+      "baseline_p95_ms": 154.37810999992507,
+      "candidate_p95_ms": 39.18363299999328,
+      "gate": true,
+      "protocol": "three trials per build"
+    },
+    {
+      "workload": "ui",
+      "aa": 2,
+      "baseline_median_ms": 707.8099964999183,
+      "candidate_median_ms": 705.079402000024,
+      "baseline_p95_ms": 751.9961819998571,
+      "candidate_p95_ms": 748.5025350001706,
+      "gate": true,
+      "protocol": "three trials per build"
+    }
+  ],
+  "linear_snapshots": true,
+  "changed_file_lint_and_format": true,
+  "original_initial_static_aa2_gate": false,
+  "repeated_static_aa2_gate": true,
+  "original_results_retained": true,
+  "browser_opt_in_unverified": true,
+  "whole_repo_lint_preexisting": "TRY004 facelesschamp-agent/src/facelesschamp_agent/project.py:81"
+}

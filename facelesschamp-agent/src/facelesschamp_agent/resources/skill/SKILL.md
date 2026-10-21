@@ -102,3 +102,14 @@ Render already runs full-export media verification. Inspect decoded frames as we
 Use `status` to report structural, media, narration, visual, and editorial results
 separately. If you cannot inspect media, record the applicable review as `unverified`;
 never claim visual or human-level quality from automated checks alone.
+
+## V2 production ownership
+
+Core owns deterministic composition, rendering and FFmpeg. Kit owns domain APIs,
+preparation and CompiledVideo.frame/save_frame/storyboard/export. These operations
+reuse the compiled object and return backend provenance before closing owned
+renderers. Supplied renderers remain caller-owned. Agent delegates production to
+Kit and retains checksums, source alignment, evidence history and review policy.
+Preview, decoded export, visual review and editorial review are separate claims.
+Discover optional capabilities offline; discovery does not prove device support.
+ChessChamp is V1-only; migrate with the V2 M4 guide rather than installing a V2 chess extra.

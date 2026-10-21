@@ -59,6 +59,11 @@ class Checkmark(ProgressBar):
 class Countdown(Number):
     """Nonnegative numeric countdown; animate value_to(0) with explicit timing."""
 
+    def validate_animation(self, property, value):
+        if property == "value":
+            finite(value, property, 0)
+        super().validate_animation(property, value)
+
     def __init__(self, seconds, **kwargs):
         kwargs.setdefault("formatter", lambda value: str(math.ceil(max(0, value))))
         super().__init__(finite(seconds, "seconds", 0), **kwargs)

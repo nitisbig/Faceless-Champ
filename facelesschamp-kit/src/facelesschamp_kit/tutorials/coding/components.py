@@ -2,23 +2,11 @@
 
 import math
 
-from faceless_champ import (
-    CLEAN_FLOW_FONT,
-    Canvas,
-    Circle,
-    CodingChamp,
-    FlowChamp,
-    FlowEdge,
-    FlowGraph,
-    FlowNode,
-    FlowScript,
-    FlowTheme,
-    Group,
-    Polyline,
-    Rectangle,
-    Spring,
-)
-from faceless_champ.os_ui import File, Folder, MacOSPreset, OSClip, OSScript, VirtualFileSystem
+from faceless_champ import CLEAN_FLOW_FONT, Canvas, Circle, Group, Polyline, Rectangle, Spring
+
+from facelesschamp_kit.coding import CodingChamp
+from facelesschamp_kit.desktop import File, Folder, MacOSPreset, OSClip, OSScript, VirtualFileSystem
+from facelesschamp_kit.diagrams import FlowChamp, FlowEdge, FlowGraph, FlowNode, FlowScript, FlowTheme
 
 from .style import CodingTutorialStyle
 

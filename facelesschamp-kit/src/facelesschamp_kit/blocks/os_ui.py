@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from faceless_champ.os_ui import MacOSPreset, OSClip, OSScript, VirtualFileSystem
+from facelesschamp_kit.desktop import MacOSPreset, OSClip, OSScript, VirtualFileSystem
 
 from .base import BlockBuild
 

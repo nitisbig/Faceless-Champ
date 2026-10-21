@@ -1,6 +1,6 @@
 # facelesschamp-kit
 
-> Python 3.12+ structured video authoring over faceless-champ. Current local source 0.1.0rc7; core dependency >=0.1.5,<0.2.0.
+> Python 3.12+ structured video authoring over faceless-champ. Current local source 2.0.0rc1; core dependency >=2.0.0rc1,<3.0.0.
 
 ## Entry points and installation
 
@@ -13,7 +13,7 @@
 
 Install matching sources from repository root:
 python -m pip install -e . -e ./facelesschamp-kit
-Optional kit extras forward coding, playground, web, chess, maps, equations to core.
+Optional kit extras forward native/equation extras to Core; coding, playground, web and maps are Kit-owned.
 Explicitly install Chromium only for web preparation: python -m playwright install chromium.
 Do not assume the release candidate is published.
 
@@ -101,43 +101,17 @@ OSWalkthrough/FinderWindow/SettingsWindow consume core OSScript virtual files/se
 Semantic actions are offline authored tutorials, not host filesystem/desktop automation.
 All expose ui; isolated windows preserve transparency. [OS blocks](docs/os-ui.md).
 
-## ChessChamp and FlowChamp
-
-ChessBoard(script, theme=None, assets=None, source_start=0) exposes board.
-templates.chesschamp(ctx, data="data.json") uses required timed legal game data. Optional
-narration.audio is a kit asset ID; core from_pgn/to_dict supports SAN-to-timed-JSON conversion.
-Artwork defaults to bundled PNGs; custom ChessAssets and document-relative assets.directory
-are supported. Install chess extra. [Chess](docs/chesschamp.md).
-
-FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0, design=None) exposes diagram.
-design="networking" (or FlowDesign instance) selects approved soft connections;
-omitting design preserves existing kit theme inheritance.
-theme and design are mutually exclusive. Designed placements expose diagram/glow;
-animate the placement handle to transform both layers together. Persistent neutral
-cables survive quiet spans/final holds; input script duration/actions stay intact.
-FlowCard(label,icon,size=(240,260),detail=None,address=None,design="networking"):
-surface,label,icon plus supplied detail/address handles; measured rounded asset card.
-FlowPopup(kind,value,design="networking"): surface,icon,kind,value handles.
-FlowBackdrop(design="networking"): background handle. Artwork and font bundled in core.
-Target node/edge IDs through core FlowScript; kit handles animate the entire viewport.
-Neutral outlines inherit Theme.muted; accent is reserved for signals/highlights.
-Compiler samples action boundaries/midpoints and excerpt endpoints for FLOW_BOUNDS,
-FLOW_OVERLAP, FLOW_LABEL_OVERLAP. Diagnostics include segment/placement/script_time/master
-source_time; sampling cannot prove every intermediate frame safe. Use Segment.cue_time for
-narrated graph events. FLOW_DATA and MOTION_WINDOW provide actionable failures.
-[Flow](docs/flowchamp.md).
-
 ## All ten registered starters
 
 silent; explainer-short (silent alias); narrated-short (labeled synthetic audio fixture);
-whiteboard-basic; os-ui; chesschamp; flowchamp; archchamp; coding-concept; coding-backend; coding-web.
+whiteboard-basic; os-ui; flowchamp; archchamp; coding-concept; coding-backend; coding-web.
 CLI init generates editable files and never merges existing destinations. Playground starters
 need explicit prepare; coding-web additionally needs Chromium. Other starters build directly.
 whiteboard_basic and immutable WhiteboardScene recipes provide sequential geometry/hold/clear
 with explicit durations or original cue windows. [Whiteboard](docs/whiteboard.md).
 Website example canvases are black; package and starter theme defaults remain configurable.
 
-Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffold with `fc-kit init my-design --template archchamp`. Register files as mesh assets; declare external tools in project pyproject.toml with uv add. Project.dependencies() and doctor check installed requirements without installation. See [ArchChamp](docs/archchamp.md).
+Install `facelesschamp-kit[3d]` for PyVista/VTK; base Core installs only Pillow. The Arch starter declares the extra. CAD/geometry extras include conversion dependencies. Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffold with `fc-kit init my-design --template archchamp`. Register files as mesh assets; declare external tools in project pyproject.toml with uv add. Project.dependencies() and doctor check installed requirements without installation. See [ArchChamp](docs/archchamp.md).
 
 ## Premium scene references
 
@@ -158,3 +132,12 @@ when selected, and load_coding_tutorial(project_root) when authoring scenes.
 Use template.group(..., bounds=bounds) for kit placement. Generated render.py
 accepts --fps and --quality low|high|4k independently of duration.
 [Template guide](../templates/README.md).
+
+Raw subtitle parsing: read_subtitle_cues(text) returns Core SubtitleCue tuples,
+preserving original times, cue numbers and intentional overlaps. It delegates
+Core parse_srt_cues; production clients retain their own input-size limits.
+
+V2 2.0.0rc1 production: compile once, then use CompiledVideo.frame/save_frame/storyboard/export.
+Kit exports media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
+Supplied renderers remain caller-owned; operation metadata is captured before owned sessions close.
+Agent retains checksum/alignment/review policy. A decoded export does not imply visual/editorial approval.

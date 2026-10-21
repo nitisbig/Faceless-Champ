@@ -9,10 +9,7 @@ pixels without filesystem or network access. The package includes variable DM Sa
 and its OFL license; `CLEAN_FLOW_FONT` resolves the installed font's absolute path.
 
 ```python
-from faceless_champ import (
-    CLEAN_FLOW_FONT, Bounds, Canvas, ColorScheme, Scene, ShadowStyle,
-    SlideIn, SlideOut, Text, card_content_bounds, card_surface, dot_grid,
-)
+from faceless_champ import CLEAN_FLOW_FONT, Bounds, Canvas, ColorScheme, Scene, ShadowStyle, SlideIn, SlideOut, Text, card_content_bounds, card_surface, dot_grid
 
 scheme = ColorScheme.named("clean-flow")
 scene = Scene(Canvas(1920, 1080, scheme.background))

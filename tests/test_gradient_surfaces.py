@@ -14,11 +14,10 @@ import PIL
 import pytest
 from PIL import Image as PI
 
+from facelesschamp_kit.charts import BarChart, ChartStyle
 from faceless_champ import (
-    BarChart,
     Bounds,
     Canvas,
-    ChartStyle,
     ColorScheme,
     GradientStop,
     Group,
@@ -36,7 +35,7 @@ from faceless_champ import (
     smooth,
 )
 from faceless_champ._surface_raster import _allocation, _paint
-from faceless_champ.web import HtmlClip, WebCapture
+from facelesschamp_kit.web import HtmlClip, WebCapture
 
 
 def paint(color="red", second="blue", angle=0):

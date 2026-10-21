@@ -34,17 +34,26 @@ class Animation:
     relative: tuple[str, ...] = ()
     rate_func: Callable[[float], float] | None = None
 
+    def resolve(self, state) -> Animation:
+        """Return detached scheduling data without changing authoring inputs."""
+        from copy import copy, deepcopy
+
+        result = copy(self)
+        result.targets = deepcopy(self.targets)
+        result.starts = deepcopy(self.starts)
+        result.keyframes = deepcopy(self.keyframes)
+        result.relative = tuple(self.relative)
+        return result
+
 
 class AnimationBuilder(Animation):
     def __init__(self, component: Component) -> None:
         super().__init__(component, {})
 
     def _to(self, key, value):
-        from .timeline import _validate_animated_value
-
         if key not in self.component.state():
             raise ValueError(f"Unsupported animation property: {key}")
-        _validate_animated_value(key, value)
+        self.component.validate_animation(key, value)
         self.targets[key] = value if isinstance(value, tuple) else finite(value, key)
         return self
 
@@ -96,11 +105,10 @@ class AnimationBuilder(Animation):
         return self
 
     def data_to(self, data) -> Self:
-        from .charts import Chart
-
-        if not isinstance(self.component, Chart):
-            raise TypeError("data_to requires a Chart")
-        self.targets["data"] = self.component.transition_data(data)
+        transition = getattr(self.component, "transition_data", None)
+        if transition is None:
+            raise TypeError("data_to requires a component with transition_data()")
+        self.targets["data"] = transition(data)
         return self
 
     def value_to(self, value: float) -> Self:
@@ -326,12 +334,3 @@ def interpolate(a, b, t):
     if isinstance(a, tuple):
         return tuple(x + (y - x) * t for x, y in zip(a, b))
     return a + (b - a) * t
-
-
-def ChartReveal(component) -> Animation:
-    """Reveal chart marks while retaining axes and labels."""
-    from .charts import Chart
-
-    if not isinstance(component, Chart):
-        raise TypeError("ChartReveal requires a Chart")
-    return Animation(component, {"reveal": 1.0}, {"reveal": 0.0}, rate_func=linear)

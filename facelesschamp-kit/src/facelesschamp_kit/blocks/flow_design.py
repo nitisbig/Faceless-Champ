@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from faceless_champ.flow import FlowDesign
+from facelesschamp_kit.diagrams import FlowDesign
 
 from .base import BlockBuild
 

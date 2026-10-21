@@ -3,7 +3,9 @@
 from copy import deepcopy
 from dataclasses import asdict, dataclass
 
-from faceless_champ.arch import ArchChamp, ArchStyle
+from faceless_champ.integrations.pyvista.model import ArchStyle
+
+from facelesschamp_kit.engineering.clip import ArchChamp
 
 from .base import BlockBuild
 

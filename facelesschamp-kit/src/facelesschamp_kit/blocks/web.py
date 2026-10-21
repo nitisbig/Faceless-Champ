@@ -3,7 +3,8 @@
 from dataclasses import dataclass
 
 from faceless_champ import Bounds, Group, Rectangle, fit_text
-from faceless_champ.web import HtmlClip, WebCallout, WebCapture, WebFocus, WebHighlight
+
+from facelesschamp_kit.web import HtmlClip, WebCallout, WebCapture, WebFocus, WebHighlight
 
 from .base import BlockBuild
 

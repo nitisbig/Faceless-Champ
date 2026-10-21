@@ -1,116 +1,11 @@
 """Recent feature chapters; examples only execute preparation from explicit runners."""
 
-CODING = '''from faceless_champ import Canvas, CodeReveal, CodingChamp, Scene
+CODING = 'from faceless_champ import Canvas, Scene\nfrom facelesschamp_kit.coding import CodeReveal, CodingChamp\n\nclass CodeDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1280, 720, "#080E1B"))\n\n    def construct(self):\n        panel = CodingChamp(\n            "def square(x):\\n    return x * x\\n\\nprint(square(7))",\n            language="python", filename="square.py", theme="midnight",\n            width=1080, height=520, font_size=40, position=(640, 360),\n            reveal_mode="block", block_ends=(2, 4), highlighted_lines=(2,),\n        )\n        self.play(CodeReveal(panel, end=.5), run_time=1)\n        self.wait(.5)\n        self.play(CodeReveal(panel, start=.5), run_time=1)\n        self.wait(1)\n'
 
-class CodeDemo(Scene):
-    def __init__(self):
-        super().__init__(Canvas(1280, 720, "#080E1B"))
+PLAYGROUND = 'import argparse\nfrom faceless_champ import Canvas, Scene\nfrom facelesschamp_kit.playground import CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas, PlaygroundOutput, PlaygroundScript, PreparedPlayground, ValueBinding, prepare_playground\n\nSOURCE = "from facelesschamp_kit.playground import (\\n    runtime as pg,\\n)\\nx = VALUE\\nanswer = x * x\\npg.emit(\'answer\', answer)\\nprint(answer)\\n"\n\ndef script():\n    return PlaygroundScript([\n        CodeCheckpoint("first", {"square.py": SOURCE.replace("VALUE", "6")},\n                       "square.py", "square.py", 0, 1, 1),\n        CodeCheckpoint("second", {"square.py": SOURCE.replace("VALUE", "7")},\n                       "square.py", "square.py", 2.5, 4, 4),\n    ], duration=6, mode="backend",\n       items=[CanvasItem("answer", "variable", "Answer")],\n       bindings=[ValueBinding("answer", "answer")])\n\ndef build_scene(asset):\n    scene = Scene(Canvas(1280, 720, "#0B1020"))\n    scene.add(CodeEditor(asset.script, width=780, height=600,\n                         font_size=22, position=(420, 360)))\n    scene.add(PlaygroundCanvas(asset, width=400, height=380, position=(1050, 250)))\n    scene.add(PlaygroundOutput(asset, width=400, height=180, position=(1050, 570)))\n    scene.wait(asset.script.duration)\n    return scene\n\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument("--prepare", action="store_true",\n                        help="Execute trusted checkpoints explicitly")\n    parser.add_argument("--cache", default=".playground-cache")\n    parser.add_argument("--asset", help="Prepared directory for browser-free replay")\n    parser.add_argument("--output", default="output/playground.mp4")\n    parser.add_argument("--overwrite", action="store_true")\n    args = parser.parse_args()\n    if args.prepare:\n        asset = prepare_playground(script(), cache_dir=args.cache)\n        print("Prepared:", asset.directory)\n    elif args.asset:\n        asset = PreparedPlayground(args.asset)\n    else:\n        parser.error("Use --prepare or --asset PATH")\n    build_scene(asset).render(args.output, width=640, height=360, fps=15,\n                             antialias=1, overwrite=args.overwrite)\n\nif __name__ == "__main__":\n    main()\n'
 
-    def construct(self):
-        panel = CodingChamp(
-            "def square(x):\\n    return x * x\\n\\nprint(square(7))",
-            language="python", filename="square.py", theme="midnight",
-            width=1080, height=520, font_size=40, position=(640, 360),
-            reveal_mode="block", block_ends=(2, 4), highlighted_lines=(2,),
-        )
-        self.play(CodeReveal(panel, end=.5), run_time=1)
-        self.wait(.5)
-        self.play(CodeReveal(panel, start=.5), run_time=1)
-        self.wait(1)
-'''
 
-PLAYGROUND = '''import argparse
-from faceless_champ import (
-    Canvas, CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas,
-    PlaygroundOutput, PlaygroundScript, PreparedPlayground, Scene,
-    ValueBinding, prepare_playground,
-)
-
-SOURCE = "from faceless_champ.playground import (\\n    runtime as pg,\\n)\\nx = VALUE\\nanswer = x * x\\npg.emit('answer', answer)\\nprint(answer)\\n"
-
-def script():
-    return PlaygroundScript([
-        CodeCheckpoint("first", {"square.py": SOURCE.replace("VALUE", "6")},
-                       "square.py", "square.py", 0, 1, 1),
-        CodeCheckpoint("second", {"square.py": SOURCE.replace("VALUE", "7")},
-                       "square.py", "square.py", 2.5, 4, 4),
-    ], duration=6, mode="backend",
-       items=[CanvasItem("answer", "variable", "Answer")],
-       bindings=[ValueBinding("answer", "answer")])
-
-def build_scene(asset):
-    scene = Scene(Canvas(1280, 720, "#0B1020"))
-    scene.add(CodeEditor(asset.script, width=780, height=600,
-                         font_size=22, position=(420, 360)))
-    scene.add(PlaygroundCanvas(asset, width=400, height=380, position=(1050, 250)))
-    scene.add(PlaygroundOutput(asset, width=400, height=180, position=(1050, 570)))
-    scene.wait(asset.script.duration)
-    return scene
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--prepare", action="store_true",
-                        help="Execute trusted checkpoints explicitly")
-    parser.add_argument("--cache", default=".playground-cache")
-    parser.add_argument("--asset", help="Prepared directory for browser-free replay")
-    parser.add_argument("--output", default="output/playground.mp4")
-    parser.add_argument("--overwrite", action="store_true")
-    args = parser.parse_args()
-    if args.prepare:
-        asset = prepare_playground(script(), cache_dir=args.cache)
-        print("Prepared:", asset.directory)
-    elif args.asset:
-        asset = PreparedPlayground(args.asset)
-    else:
-        parser.error("Use --prepare or --asset PATH")
-    build_scene(asset).render(args.output, width=640, height=360, fps=15,
-                             antialias=1, overwrite=args.overwrite)
-
-if __name__ == "__main__":
-    main()
-'''
-
-CHESS = '''from faceless_champ import Canvas, ChessChamp, ChessScript, ChessTheme, Scene
-
-class ChessDemo(Scene):
-    def __init__(self):
-        super().__init__(Canvas(1280, 720, "#171E1A"))
-
-    def construct(self):
-        script = ChessScript.from_dict({
-            "schema_version": 1, "duration": 6,
-            "players": {"white": "White", "black": "Black"},
-            "moves": [
-                {"at": 1, "duration": .5, "uci": "e2e4"},
-                {"at": 2.5, "duration": .5, "uci": "d7d5"},
-                {"at": 4, "duration": .5, "uci": "e4d5"},
-            ],
-            "annotations": [
-                {"type": "text", "at": 0, "duration": 6,
-                 "text": "e4 / d5 / exd5"},
-                {"type": "highlight", "at": 3, "duration": 1,
-                 "squares": ["e4", "d5"]},
-            ],
-        })
-        self.add(ChessChamp(script, theme=ChessTheme(background="#000000"), width=1280, height=720, position=(640, 360)))
-        self.wait(script.duration)
-'''
-
-FLOW = '''from faceless_champ import Canvas, FlowChamp, FlowTheme, Scene
-from faceless_champ.flow.examples import recipe
-
-class FlowDemo(Scene):
-    def __init__(self):
-        super().__init__(Canvas(1200, 675, "#0B1020"))
-
-    def construct(self):
-        graph, script = recipe("system")
-        diagram = FlowChamp(graph, script, width=1200, height=675,
-                            position=(600, 337.5),
-                            theme=FlowTheme(background="#000000", stroke="#8996AD"))
-        self.add(diagram)
-        self.wait(6)
-'''
+FLOW = 'from faceless_champ import Canvas, Scene\nfrom facelesschamp_kit.diagrams import FlowChamp, FlowTheme\nfrom facelesschamp_kit.diagrams.examples import recipe\n\nclass FlowDemo(Scene):\n    def __init__(self):\n        super().__init__(Canvas(1200, 675, "#0B1020"))\n\n    def construct(self):\n        graph, script = recipe("system")\n        diagram = FlowChamp(graph, script, width=1200, height=675,\n                            position=(600, 337.5),\n                            theme=FlowTheme(background="#000000", stroke="#8996AD"))\n        self.add(diagram)\n        self.wait(6)\n'
 
 
 def add_features(root, code, section, note, link, lesson):
@@ -136,13 +31,6 @@ def add_features(root, code, section, note, link, lesson):
         section('Use structured projects', 'Choose coding-concept, coding-backend, or coding-web and prepare explicitly.', link('Kit coding playgrounds →', 'kit.html#kit-coding-playgrounds')),
     ], 'playground')
 
-    lesson('chesschamp', 'ChessChamp', 'Library fundamentals',
-           'Render legal timed games with bundled board artwork and annotations.', [
-        section('Render legal moves', 'Install the chess extra. ChessScript validates every move before rendering; the bundled PNG artwork works offline.', code(CHESS, filename='chess.py', target='ChessDemo')),
-        section('Author JSON or import PGN', 'ChessScript.from_json reads required schema_version=1, duration, timed UCI moves, and optional annotations. from_dict accepts the same document. from_pgn imports SAN mainlines into timed moves; to_dict exports the JSON contract. Legal move validation includes a custom starting FEN when supplied.'),
-        section('Choose artwork and perspective', 'ChessAssets.bundled provides the board and twelve piece cutouts. ChessAssets(directory, board_grid=...) accepts a custom set; JSON assets.directory resolves relative to its document. orientation="black" rotates the board while pieces remain upright.'),
-        section('Narration and scope', 'Core callers attach existing audio once at master zero. ChessChamp supplies visuals and rules, without interactive play or engine evaluation.', link('Kit chess tutorials →', 'kit.html#kit-chesschamp')),
-    ], 'chess')
 
     lesson('archchamp', 'ArchChamp technical 3D', 'Library fundamentals',
            'Explain geometry through named parts, camera motion, sections and dimensions.', [
@@ -182,12 +70,6 @@ def add_features(root, code, section, note, link, lesson):
         section('Keep execution explicit', 'Project.prepare / fc-kit prepare are the checkpoint execution boundary. Use --refresh to rerun matching cached inputs. build, validate, inspect, frame, storyboard, preview, and render replay prepared assets. Reports include prepared_assets fingerprints and paths.', link('Core checkpoint and binding guide →', 'index.html#coding-playgrounds')),
     ], guide='kit')
 
-    lesson('kit-chesschamp', 'Chess tutorials', 'Framework fundamentals',
-           'Use a legal timed data.json game in an editable kit project.', [
-        section('Create a chess project', 'Install matching sources with the chess extra; edit the required scaffold data.json.', code('python -m pip install -e ".[chess]" -e "./facelesschamp-kit[chess]"\nfc-kit init chess-lesson --template chesschamp\ncd chess-lesson\nfc-kit validate main\nfc-kit preview main -o output/preview.mp4', 'bash')),
-        section('Compose a reusable board', 'The scaffold supplies data.json. templates.chesschamp returns an editable Video; ChessBoard exposes the board child and accepts theme, assets, and source_start.', code('from facelesschamp_kit.templates import chesschamp\n\ndef build(ctx):\n    return chesschamp(ctx, data="data.json")', filename='kit_chess.py', kind='kit', template='chesschamp')),
-        section('Attach existing narration', 'JSON narration.audio names a registered kit audio asset. Audio-only narration is supported; cue methods and captions require subtitles. Audio stays on the master clock.', link('Core moves, PGN, and artwork →', 'index.html#chesschamp')),
-    ], guide='kit')
 
     lesson('kit-flowchamp', 'Flow diagrams', 'Framework fundamentals',
            'Fit scripted graphs into structured video layouts and narration windows.', [
@@ -201,7 +83,7 @@ HTML = '''import argparse
 import tempfile
 from pathlib import Path
 from faceless_champ import Canvas, Scene
-from faceless_champ.web import HtmlClip, HtmlPage, WebCapture, WebScript, capture_html
+from facelesschamp_kit.web import HtmlClip, HtmlPage, WebCapture, WebScript, capture_html
 
 PAGE = """<!doctype html><meta charset="utf-8">
 <style>body { background: black; color: white; font: 36px sans-serif;

@@ -1,7 +1,6 @@
 """Local multi-file web revisions, captured explicitly before rendering."""
 
-from faceless_champ import CodeCheckpoint, PlaygroundScript
-
+from facelesschamp_kit.playground import CodeCheckpoint, PlaygroundScript
 from facelesschamp_kit.templates import coding_playground
 
 HTML = """<!doctype html>
@@ -42,7 +41,7 @@ button.onclick = () => {
 
 
 def script():
-    from faceless_champ.web import WebScript
+    from facelesschamp_kit.web import WebScript
 
     def files(color):
         return {"index.html": HTML, "style.css": CSS.replace("COLOR", color), "app.js": JS}

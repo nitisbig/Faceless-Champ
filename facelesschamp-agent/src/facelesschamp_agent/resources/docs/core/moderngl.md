@@ -53,10 +53,7 @@ renderer and never re-executes a project entrypoint.
 ## Local effects and animation
 
 ```python
-from faceless_champ import (
-    Bloom, Canvas, Circle, EffectStack, GaussianBlur, Layer,
-    OuterGlow, Scene, linear,
-)
+from faceless_champ import Bloom, Canvas, Circle, EffectStack, GaussianBlur, Layer, OuterGlow, Scene, linear
 
 orb = Circle(90, fill="#9DE1FF", stroke=None, position=(480, 270),
              effects=EffectStack(glow=OuterGlow("#55AEFF", 20, 0.7)))

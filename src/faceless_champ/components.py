@@ -41,6 +41,58 @@ class Canvas:
 
 
 class Component:
+    relative_animation_properties = frozenset({"position", "scale", "rotation"})
+
+    def render_raster(self, state, factor, age, painter):
+        """Optional raster extension; return RGBA pixels or NotImplemented.
+
+        State/age are already evaluated. The owned painter supplies shared font
+        and image services; native handles belong in raster_source() sessions.
+        """
+        return NotImplemented
+
+    def raster_source(self, *, isolate=False):
+        """Optional deepcopy-safe source descriptor; never open a session here."""
+        return
+
+    def validate_render(self, backend, painter):
+        """Return whether this extension handles its own rendering validation."""
+        return (
+            type(self).render_raster is not Component.render_raster
+            or type(self).raster_source is not Component.raster_source
+            or callable(getattr(self, "frame_image", None))
+        )
+
+    def validate_animation(self, property: str, value: object) -> None:
+        """Validate a Core-owned state key; integrations override their own keys."""
+        core = {
+            "position",
+            "scale",
+            "scale_x",
+            "scale_y",
+            "rotation",
+            "opacity",
+            "reveal",
+            "draw",
+            "fill",
+            "stroke",
+            "color",
+            "width",
+            "height",
+            "stroke_width",
+            "corner_radius",
+            "value",
+            "progress",
+            "wipe",
+            "clip",
+            "mask_position",
+            "mask_width",
+            "mask_height",
+        }
+        if property not in self.state() or (property not in core and not property.startswith("effect.")):
+            raise ValueError(f"Unsupported animation property '{property}'")
+        _validate_animated_value(property, value)
+
     def __init__(
         self,
         *,
@@ -438,3 +490,36 @@ class Arrow(Line):
         self.tip_size = finite(tip_size, "tip_size", 1)
         if self.tip_size > length:
             raise ValueError("Arrow tip_size must fit its length")
+
+
+def _validate_animated_value(key: str, value) -> None:
+    if key.startswith("effect."):
+        from .effects import validate_effect_value
+
+        validate_effect_value(key, value)
+    elif key == "clip":
+        if not isinstance(value, tuple) or len(value) != 4 or any(not 0 <= finite(v, key) <= 1 for v in value):
+            raise ValueError("clip requires four normalized coordinates")
+        if value[0] > value[2] or value[1] > value[3]:
+            raise ValueError("clip edges must be ordered")
+    elif key in {"fill", "stroke", "color"}:
+        if not isinstance(value, tuple) or len(value) != 4:
+            raise ValueError("Animated colors must be RGBA tuples; use color builders")
+        for channel in value:
+            if not 0 <= finite(channel, key) <= 255:
+                raise ValueError("Color channels must be in [0, 255]")
+    elif key in {"position", "mask_position"}:
+        if not isinstance(value, tuple) or len(value) != 2:
+            raise ValueError("Animated position must be an (x, y) tuple")
+        for coordinate in value:
+            finite(coordinate, "position")
+    else:
+        finite(
+            value,
+            key,
+            0.001
+            if key in {"scale", "scale_x", "scale_y", "width", "height"}
+            else (None if key in {"rotation", "value"} else 0),
+        )
+        if key in {"opacity", "reveal", "draw", "progress", "wipe"} and value > 1:
+            raise ValueError(f"{key} must be <= 1")

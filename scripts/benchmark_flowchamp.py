@@ -6,8 +6,8 @@ import resource
 import time
 import tracemalloc
 
-from faceless_champ import FlowChamp, FlowEdge, FlowGraph, FlowNode, FlowScript
-from faceless_champ.flow.examples import recipe
+from facelesschamp_kit.diagrams import FlowChamp, FlowEdge, FlowGraph, FlowNode, FlowScript
+from facelesschamp_kit.diagrams.examples import recipe
 
 
 def benchmark(frames=45, factor=0.8):

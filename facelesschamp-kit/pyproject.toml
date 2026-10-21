@@ -4,22 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "facelesschamp-kit"
-version = "0.1.0rc7"
+version = "2.0.0rc1"
 description = "Structured video authoring with reusable Faceless Champ components"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["faceless-champ>=0.1.6,<0.2.0", "packaging>=24"]
+dependencies = ["faceless-champ>=2.0.0rc1,<3.0.0", "packaging>=24"]
 
 [project.optional-dependencies]
-gpu = ["faceless-champ[gpu]>=0.1.6,<0.2.0"]
-effects = ["faceless-champ[effects]>=0.1.6,<0.2.0"]
-skia = ["faceless-champ[skia]>=0.1.6,<0.2.0"]
-coding = ["faceless-champ[coding]>=0.1.6,<0.2.0"]
-playground = ["faceless-champ[coding,web]>=0.1.6,<0.2.0"]
-chess = ["faceless-champ[chess]>=0.1.6,<0.2.0"]
-web = ["faceless-champ[web]>=0.1.6,<0.2.0"]
-maps = ["faceless-champ[maps]>=0.1.6,<0.2.0"]
-equations = ["faceless-champ[equations]>=0.1.6,<0.2.0"]
+3d = ["faceless-champ[3d]>=2.0.0rc1,<3.0.0"]
+cad = ["faceless-champ[cad]>=2.0.0rc1,<3.0.0"]
+geometry = ["faceless-champ[geometry]>=2.0.0rc1,<3.0.0"]
+geometry-advanced = ["faceless-champ[geometry-advanced]>=2.0.0rc1,<3.0.0"]
+gpu = ["faceless-champ[gpu]>=2.0.0rc1,<3.0.0"]
+effects = ["faceless-champ[effects]>=2.0.0rc1,<3.0.0"]
+skia = ["faceless-champ[skia]>=2.0.0rc1,<3.0.0"]
+coding = ["Pygments>=2.18,<3"]
+playground = ["Pygments>=2.18,<3", "playwright>=1.58,<2"]
+web = ["playwright>=1.58,<2"]
+maps = ["numpy>=1.26,<3"]
+equations = ["faceless-champ[equations]>=2.0.0rc1,<3.0.0"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
 
 [project.scripts]
@@ -35,7 +38,7 @@ testpaths = ["tests"]
 line-length = 120
 
 [tool.setuptools.package-data]
-facelesschamp_kit = ["sample_assets/*", "tutorials/coding/*.json", "tutorials/coding/*.md"]
+facelesschamp_kit = ["sample_assets/*", "tutorials/coding/*.json", "tutorials/coding/*.md", "maps/assets/**/*", "diagrams/schema.json", "diagrams/assets/**/*"]
 
 [tool.setuptools.exclude-package-data]
 "*" = ["**/__pycache__/*", "*.py[cod]"]

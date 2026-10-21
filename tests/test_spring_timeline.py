@@ -10,10 +10,8 @@ import pytest
 import faceless_champ
 from faceless_champ import (
     Animation,
-    BarChart,
     Canvas,
     Component,
-    EarthMap,
     FadeIn,
     Group,
     Number,
@@ -22,7 +20,6 @@ from faceless_champ import (
     ProgressBar,
     Rectangle,
     RectangleMask,
-    SatelliteMap,
     Scene,
     SlideIn,
     Spring,
@@ -31,6 +28,8 @@ from faceless_champ import (
     linear,
     smooth,
 )
+from facelesschamp_kit.charts import BarChart
+from facelesschamp_kit.maps import EarthMap, SatelliteMap
 from faceless_champ.spring import Spring as KernelSpring
 
 BOUNCY = Spring(1, 0.4, 1)

@@ -10,9 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import os
-import re
 from collections.abc import Iterable
 from itertools import pairwise
 from pathlib import Path
@@ -77,7 +75,6 @@ _MEDIA = {
     ".exr",
 }
 _FONTS = {".ttf", ".otf", ".woff", ".woff2"}
-_TIMING = re.compile(r"(\d{2,}):([0-5]\d):([0-5]\d)[,.](\d{3})")
 
 
 def _error(code: str, message: str, *, path: str | Path | None = None, fix: str = "") -> AgentError:
@@ -203,52 +200,36 @@ def _kind(path: Path) -> str:
     return "asset"
 
 
-def _timestamp(value: str) -> float:
-    match = _TIMING.fullmatch(value.strip())
-    if not match:
-        raise ValueError(f"Invalid timestamp {value!r}; expected HH:MM:SS,mmm")
-    hours, minutes, seconds, milliseconds = map(int, match.groups())
-    return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000
-
-
 def _parse_srt(text: str, source: str) -> list[dict[str, Any]]:
-    normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip()
-    if not normalized:
-        raise _error("CONTEXT_SRT", "Subtitle file is empty", path=source)
-    cues: list[dict[str, Any]] = []
-    indices: set[int] = set()
-    for block_number, block in enumerate(re.split(r"\n(?:[ \t]*\n)+", normalized), 1):
-        try:
-            lines = block.splitlines()
-            index = int(lines[0].strip())
-            if index < 1 or index in indices:
-                raise ValueError("Cue indices must be positive and unique")
-            start_text, end_text = re.split(r"\s*-->\s*", lines[1])
-            start, end = _timestamp(start_text), _timestamp(end_text)
-            content = "\n".join(lines[2:]).strip()
-            if not math.isfinite(start) or not math.isfinite(end) or end <= start or not content:
-                raise ValueError("Each cue needs text and an end time after its start")
-            if cues and start < cues[-1]["start"]:
-                raise ValueError("Cue start times must be in source order")
-        except (IndexError, ValueError, OverflowError) as exc:
-            raise _error(
-                "CONTEXT_SRT",
-                f"Malformed SRT block {block_number}: {exc}",
-                path=source,
-                fix="Fix the indicated SRT block; retain original source timestamps and intentional overlaps",
-            ) from exc
-        indices.add(index)
-        cues.append(
-            {"id": f"{source}#{index}", "index": index, "start": start, "end": end, "text": content, "source": source}
+    from facelesschamp_kit import read_subtitle_cues
+
+    try:
+        raw = read_subtitle_cues(text)
+    except (ValueError, OverflowError) as exc:
+        raise _error(
+            "CONTEXT_SRT",
+            f"Malformed SRT: {exc}",
+            path=source,
+            fix="Fix the indicated SRT block; retain original source timestamps and intentional overlaps",
+        ) from exc
+    if len(raw) > MAX_CUES:
+        raise _error(
+            "CONTEXT_LIMIT",
+            f"Subtitle file exceeds {MAX_CUES} cues",
+            path=source,
+            fix="Split the project into chapters; do not truncate or retime the source clock",
         )
-        if len(cues) > MAX_CUES:
-            raise _error(
-                "CONTEXT_LIMIT",
-                f"Subtitle file exceeds {MAX_CUES} cues",
-                path=source,
-                fix="Split the project into chapters; do not truncate or retime the source clock",
-            )
-    return cues
+    return [
+        {
+            "id": f"{source}#{c.index}",
+            "index": c.index,
+            "start": c.start,
+            "end": c.end,
+            "text": c.text.strip(),
+            "source": source,
+        }
+        for c in raw
+    ]
 
 
 def _read_bytes(path: Path, limit: int) -> bytes:

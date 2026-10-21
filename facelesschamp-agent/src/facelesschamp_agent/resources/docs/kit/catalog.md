@@ -1,6 +1,6 @@
-# v0.1 block catalog
+# V2 block catalog
 
-The `clean-flow` theme adds white cards with measured shadow clearance, packaged DM Sans weights, orange highlights and automatic nested flow entrances/outros. Specialized code, OS, chess, FlowChamp and ArchChamp blocks inherit their clean-flow defaults unless explicitly styled. See [Clean-flow](clean-flow.md) for placement overrides and card sizing.
+The `clean-flow` theme adds white cards with measured shadow clearance, packaged DM Sans weights, orange highlights and automatic nested flow entrances/outros. Specialized code, OS, FlowChamp and ArchChamp blocks inherit their clean-flow defaults unless explicitly styled. See [Clean-flow](clean-flow.md) for placement overrides and card sizing.
 
 ## Current capability catalog
 
@@ -13,7 +13,6 @@ The `clean-flow` theme adds white cards with measured shadow clearance, packaged
 | OSWalkthrough | Authored desktop script | ui | [OS UI](os-ui.md) |
 | FinderWindow | Authored isolated Finder | ui | [OS UI](os-ui.md) |
 | SettingsWindow | Authored isolated settings | ui | [OS UI](os-ui.md) |
-| ChessBoard | Legal timed ChessScript | board | [Chess](chesschamp.md) |
 | FlowCanvas | Graph and timed FlowScript | diagram, glow (with design) | [Flow](flowchamp.md) |
 | FlowCard | Networking label, bundled icon, optional address/detail | surface, label, icon, optional address/detail | [Flow](flowchamp.md) |
 | FlowPopup | Short protocol and value | surface, icon, kind, value | [Flow](flowchamp.md) |
@@ -30,7 +29,6 @@ Check named children in the feature guide before targeting a handle. OS/window b
 | narrated-short | Labeled synthetic narration fixture | none |
 | whiteboard-basic | Two sequential drawing recipes | none |
 | os-ui | Virtual desktop/Finder/settings tutorial | none |
-| chesschamp | Required timed game data.json | chess extra, no checkpoint preparation |
 | flowchamp | Editable graph recipe | none |
 | coding-concept | Independent cars and bound properties | fc-kit prepare |
 | coding-backend | Flows, data, and tensor results | fc-kit prepare |
@@ -38,7 +36,7 @@ Check named children in the feature guide before targeting a handle. OS/window b
 
 Use `fc-kit list templates` and `fc-kit list blocks` for the installed catalog. `init` creates editable files and refuses existing destinations. Only playground preparation executes authored code; normal playback consumes prepared assets.
 
-Each block constructs ordinary core components. The original basic-block gallery below covers portrait/landscape and midnight/light themes. The complete current catalog above also includes specialized code, web, OS, chess, and graph blocks. Block code licensing is pending; chess uses core bundled PNG artwork and other blocks use their declared local assets. The engine supplies its licensed default font and asset notices.
+Each block constructs ordinary core components. The original basic-block gallery below covers portrait/landscape and midnight/light themes. The complete current catalog above also includes specialized code, web, OS, and graph blocks. Block code licensing is pending; blocks use their declared local assets. The engine supplies its licensed default font and asset notices.
 
 | Block | Content properties | Style properties | Named children |
 | --- | --- | --- | --- |
@@ -62,10 +60,6 @@ Entry motion: fade, pop, stagger. Default duration is 0.6 seconds. Stagger anima
 
 `OSWalkthrough`, `FinderWindow`, and `SettingsWindow` fit authored system tutorials
 into any layout. See [OS UI tutorials](os-ui.md); starter template: `os-ui`.
-
-## ChessChamp
-
-`ChessBoard(script, theme=None, source_start=0)` exposes the named child `board`. The `chesschamp` template and CLI scaffold use required root `data.json`. See [ChessChamp](chesschamp.md).
 
 ## FlowChamp
 

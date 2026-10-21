@@ -13,20 +13,9 @@ from pathlib import Path
 from facelesschamp_kit import CodingTutorialStyle, CodingTutorialTemplate
 from PIL import ImageFont
 
-from faceless_champ import (
-    CLEAN_FLOW_FONT,
-    Animation,
-    Circle,
-    CodeReveal,
-    CodingChamp,
-    FlowScript,
-    Rectangle,
-    Scene,
-    SubtitleTrack,
-    Text,
-    linear,
-    smooth,
-)
+from faceless_champ import CLEAN_FLOW_FONT, Animation, Circle, Rectangle, Scene, SubtitleTrack, Text, linear, smooth
+from facelesschamp_kit.coding import CodeReveal, CodingChamp
+from facelesschamp_kit.diagrams import FlowScript
 
 ROOT = Path(__file__).resolve().parent
 STATUS = "full-length-authored"

@@ -6,9 +6,8 @@ It uses Pillow and bundled vector symbols, with no additional runtime dependency
 Circuit diagrams are illustrations, not electrical simulations.
 
 ```python
-from faceless_champ import (
-    Canvas, Scene, FlowChamp, FlowGraph, FlowNode, FlowEdge, FlowPort, FlowScript,
-)
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.diagrams import FlowChamp, FlowGraph, FlowNode, FlowEdge, FlowPort, FlowScript
 
 graph = FlowGraph(
     nodes=(
@@ -134,7 +133,7 @@ not extend motion windows. Initial layout diagnostics enter the compilation repo
 The existing `FlowDiagram` and its child handles remain unchanged.
 
 Run `fc-kit init my-flow --template flowchamp` for an editable starter. Five recipes
-are available through `faceless_champ.flow.examples.recipe(family, portrait=False)`;
+are available through `facelesschamp_kit.diagrams.examples.recipe(family, portrait=False)`;
 families are `workflow`, `system`, `network`, `idea-map`, `circuit`. Their recommended
 viewports are `(1200,675)` and `(600,1000)` respectively.
 
@@ -224,7 +223,8 @@ the visual directly. Its `bounds` includes symmetric shadow clearance; the visib
 face remains centered. `backdrop` returns an ordinary core `Image`.
 
 ```python
-from faceless_champ import Bounds, Canvas, FlowDesign, Scene
+from faceless_champ import Bounds, Canvas, Scene
+from facelesschamp_kit.diagrams import FlowDesign
 
 design = FlowDesign.named("networking")
 scene = Scene(Canvas(1920, 1080, design.palette["background"]))

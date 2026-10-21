@@ -2,11 +2,11 @@ from types import SimpleNamespace
 
 import pytest
 from faceless_champ import Canvas, PillowRenderer
-from faceless_champ.os_ui import OSScript
 
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import FinderWindow, OSWalkthrough, SettingsWindow
 from facelesschamp_kit.context import BuildContext
+from facelesschamp_kit.desktop import OSScript
 from facelesschamp_kit.diagnostics import KitError
 from facelesschamp_kit.project import Project
 from facelesschamp_kit.scaffold import init_project
@@ -52,7 +52,7 @@ def test_scaffold_os_ui(tmp_path):
     root = tmp_path / "demo"
     init_project(root, template="os-ui")
     assert "landscape" in (root / "facelesschamp.toml").read_text()
-    assert "0.1.0rc7" in (root / "pyproject.toml").read_text()
+    assert "2.0.0rc1" in (root / "pyproject.toml").read_text()
     project = Project(root)
     compiled = project.build("main")
     assert compiled.duration == 35

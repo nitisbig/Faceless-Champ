@@ -108,13 +108,13 @@ def shape_sprite(c, state, factor):
         # Reuse the legacy outline producer, with a white stroke and no fill.
         from copy import copy
 
-        from .renderer import PillowRenderer
+        from ._rendering.raster import RasterPainter
 
         view = copy(c)
         view.fill, view.stroke = None, "white"
         view_state = {**state, "fill": (0, 0, 0, 0), "stroke": (255, 255, 255, 255)}
-        with PillowRenderer(1, frame_cache_mb=0) as renderer:
-            stroke = renderer._base_sprite(view, view_state, factor, 0).getchannel("A")
+        with RasterPainter(source_cache_mb=0) as renderer:
+            stroke = renderer.primitive(view, view_state, factor, 0).getchannel("A")
     else:
         draw = ImageDraw.Draw(stroke)
         lengths = [math.dist(a, b) for pts in contours for a, b in pairwise(pts)]

@@ -7,7 +7,7 @@ import sys
 from fractions import Fraction
 from pathlib import Path
 
-from faceless_champ.audio import probe
+from facelesschamp_kit import media_probe as probe
 
 from .errors import AgentError
 

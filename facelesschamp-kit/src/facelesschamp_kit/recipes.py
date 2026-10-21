@@ -8,17 +8,10 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 
-from faceless_champ import (
-    Bounds,
-    ChartReveal,
-    ChartStyle,
-    ColorScheme,
-    FadeIn,
-    LineChart,
-    PieChart,
-    Pulse,
-)
-from faceless_champ.flow import FlowEdge, FlowGraph, FlowNode, FlowScript
+from faceless_champ import Bounds, ColorScheme, FadeIn, Pulse
+
+from facelesschamp_kit.charts import ChartReveal, ChartStyle, LineChart, PieChart
+from facelesschamp_kit.diagrams import FlowEdge, FlowGraph, FlowNode, FlowScript
 
 from .blocks import BlockBuild, CodingPlayground, FlowCanvas, MetricCard, TextPanel
 from .diagnostics import KitError, fields, number
@@ -166,7 +159,9 @@ def validate_recipe(recipe_id, content):
     if missing:
         raise KitError("RECIPE_CONTENT", "Missing content fields", recipe=recipe_id, fields=sorted(missing))
     if recipe_id == "arch-design":
-        from faceless_champ.arch import ArchDataError, validate_design
+        from faceless_champ.integrations.pyvista.model import ArchDataError
+
+        from facelesschamp_kit.engineering.clip import validate_design
 
         try:
             validate_design(content["design"], registered_only=True)
@@ -429,7 +424,7 @@ class _Prepared:
     duration: float
 
     def compose(self, ctx, box):
-        from faceless_champ import PreparedPlayground
+        from facelesschamp_kit.playground import PreparedPlayground
 
         prepared = PreparedPlayground(ctx.root / self.path)
         if prepared.script.duration > self.duration + 1e-9:

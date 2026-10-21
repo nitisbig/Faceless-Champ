@@ -4,16 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "facelesschamp-agent"
-version = "0.1.0rc2"
+version = "2.0.0rc1"
 description = "Planning, discovery, and evidence-based video production tools for external agents"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["facelesschamp-kit>=0.1.0rc7,<0.2.0", "pydantic>=2,<3"]
+dependencies = ["facelesschamp-kit>=2.0.0rc1,<3.0.0", "pydantic>=2,<3"]
 
 [project.optional-dependencies]
-gpu = ["facelesschamp-kit[gpu]>=0.1.0rc7,<0.2.0"]
-effects = ["facelesschamp-kit[effects]>=0.1.0rc7,<0.2.0"]
-skia = ["facelesschamp-kit[skia]>=0.1.0rc7,<0.2.0"]
+coding = ["facelesschamp-kit[coding]>=2.0.0rc1,<3.0.0"]
+playground = ["facelesschamp-kit[playground]>=2.0.0rc1,<3.0.0"]
+web = ["facelesschamp-kit[web]>=2.0.0rc1,<3.0.0"]
+maps = ["facelesschamp-kit[maps]>=2.0.0rc1,<3.0.0"]
+3d = ["facelesschamp-kit[3d]>=2.0.0rc1,<3.0.0"]
+cad = ["facelesschamp-kit[cad]>=2.0.0rc1,<3.0.0"]
+geometry = ["facelesschamp-kit[geometry]>=2.0.0rc1,<3.0.0"]
+geometry-advanced = ["facelesschamp-kit[geometry-advanced]>=2.0.0rc1,<3.0.0"]
+gpu = ["facelesschamp-kit[gpu]>=2.0.0rc1,<3.0.0"]
+effects = ["facelesschamp-kit[effects]>=2.0.0rc1,<3.0.0"]
+skia = ["facelesschamp-kit[skia]>=2.0.0rc1,<3.0.0"]
+equations = ["facelesschamp-kit[equations]>=2.0.0rc1,<3.0.0"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
 
 [project.scripts]

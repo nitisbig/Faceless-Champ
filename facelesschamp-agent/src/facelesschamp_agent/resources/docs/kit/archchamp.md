@@ -8,7 +8,8 @@ accounting for `source_start`, and samples annotation diagnostics.
 
 ```python
 import pyvista as pv
-from faceless_champ import ArchMesh, ArchPart, ArchScript
+from faceless_champ.integrations.pyvista.model import ArchMesh, ArchPart
+from facelesschamp_kit.engineering.script import ArchScript
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import ArchCanvas
 
@@ -41,8 +42,11 @@ to in-memory meshes and VTM child datasets.
 
 Scaffold with `fc-kit init my-design --template archchamp`. This is a silent
 landscape project demonstrating an exploded assembly and a dimension line. Core
-PyVista is required transitively; external model-generation tools remain project
-dependencies. No automatic installation or model downloads occur.
+PyVista/VTK require `facelesschamp-kit[3d]` (or `facelesschamp-agent[3d]`);
+the starter declares that extra in its project requirements. Run `uv sync` before
+building. Existing Arch projects should add the extra explicitly when rebuilding
+their environments. `cad`, `geometry`, and `geometry-advanced` also include the
+conversion stack. External model-generation tools remain project dependencies. No automatic installation or model downloads occur.
 
 ## External project dependencies
 

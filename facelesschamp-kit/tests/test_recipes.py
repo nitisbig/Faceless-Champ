@@ -117,7 +117,7 @@ def test_hierarchy_edges_do_not_collide_with_node_ids(tmp_path, root_id):
 
 @pytest.mark.parametrize("size", [(1920, 1080), (1080, 1920)])
 def test_code_result_accepts_empty_prepared_sources(tmp_path, monkeypatch, size):
-    from faceless_champ import CanvasItem, CodeCheckpoint, PlaygroundScript, prepare_playground
+    from facelesschamp_kit.playground import CanvasItem, CodeCheckpoint, PlaygroundScript, prepare_playground
 
     script = PlaygroundScript(
         [CodeCheckpoint("empty", {"main.py": "", "other.py": ""}, "main.py", "main.py", 0, 0, 0)],

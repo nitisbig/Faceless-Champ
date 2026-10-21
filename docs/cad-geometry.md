@@ -2,7 +2,7 @@
 
 ArchChamp accepts dimensioned build123d models and processed Trimesh surfaces through
 optional preparation APIs. Rendering still uses PyVista and the existing Pillow,
-Skia and ModernGL composition paths. This is the local core 0.1.6 source candidate. From this checkout, install only
+Skia and ModernGL composition paths. This is the local core 2.0.0rc1 source candidate. From this checkout, install only
 the capabilities your project uses:
 
 ```sh
@@ -11,7 +11,9 @@ uv pip install --python .venv/bin/python -e '.[cad,geometry-advanced]'
 
 `cad` uses build123d 0.13 and its OCP 8 `cadquery-ocp-novtk` provider on Python
 3.12–3.14. Do not install the competing `cadquery-ocp` distribution in the same
-environment. The existing PyVista/VTK dependency remains unchanged. The CAD wheel
+environment. Each CAD/geometry extra explicitly includes the optional PyVista/VTK conversion
+stack; a base installation alone does not supply 3D. PyVista is bounded to
+`>=0.49.1,<0.50`, the tested minor series. The CAD wheel
 requires a supported native platform; Linux wheels require glibc 2.28 or later.
 `geometry` installs Trimesh, SciPy and NetworkX. `geometry-advanced` adds Manifold
 booleans and fast-simplification decimation. These packages load only when called.
@@ -20,8 +22,9 @@ booleans and fast-simplification decimation. These packages load only when calle
 
 ```python
 from faceless_champ import Canvas, Scene
-from faceless_champ.arch import ArchChamp, ArchScript, parts_from_cad
-from faceless_champ.arch.cad_models import gear_pair
+from facelesschamp_kit.engineering import ArchChamp, ArchScript
+from faceless_champ.arch import parts_from_cad
+from facelesschamp_kit.engineering.models import gear_pair
 
 def build_scene():
     parts = parts_from_cad(gear_pair(module=2, teeth=(24, 48), width=10))
@@ -79,7 +82,7 @@ repeatability is tested; kernel/driver upgrades can change geometry or pixels.
 
 ## Parametric teaching models and motion
 
-`faceless_champ.arch.cad_models` supplies `spur_gear`, `gear_pair`, `piston`,
+`facelesschamp_kit.engineering.models` supplies `spur_gear`, `gear_pair`, `piston`,
 `slider_crank`, `inline_engine`, and `portal_frame`. They return native Shapes or
 Compounds. `validate_preset(name, params)` validates the bounded preset contract
 without loading the kernel. Gears use sampled involute flanks and full-depth
@@ -153,7 +156,7 @@ formal manufacturing sheets/GD&T are outside this release.
 source. Structural `validate_design` checks import no optional native engines.
 
 ```python
-from faceless_champ.arch import ArchChamp
+from facelesschamp_kit.engineering import ArchChamp
 
 view = ArchChamp.from_dict({
     "units": "mm",

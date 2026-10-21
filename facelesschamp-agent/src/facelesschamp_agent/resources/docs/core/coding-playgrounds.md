@@ -4,7 +4,7 @@ CodingChamp can pair an animated editor with actual web output, concept illustra
 or backend/AI data. Authors supply complete source revisions and explicitly bind results
 to visuals. It does not infer diagrams from arbitrary code.
 
-Install `faceless-champ[playground]` for core authoring or
+Install `facelesschamp-kit[playground]` for domain authoring or
 `facelesschamp-kit[playground]` for the kit. For web captures, separately run
 `python -m playwright install chromium`. Python and prepared-asset playback do not
 need a browser. Syntax-colored editors require the `coding` extra.
@@ -40,12 +40,10 @@ instruction. Successful preparation is not a claim that a video export was verif
 ## Core authoring
 
 ```python
-from faceless_champ import (
-    Canvas, CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas,
-    PlaygroundOutput, PlaygroundScript, Scene, ValueBinding, prepare_playground,
-)
+from faceless_champ import Canvas, Scene
+from facelesschamp_kit.playground import CanvasItem, CodeCheckpoint, CodeEditor, PlaygroundCanvas, PlaygroundOutput, PlaygroundScript, ValueBinding, prepare_playground
 
-source = '''from faceless_champ.playground.runtime import emit
+source = '''from facelesschamp_kit.playground.runtime import emit
 x = 6 * 7
 emit("answer", x)
 print(x)
@@ -107,7 +105,7 @@ Each checkpoint runs in a fresh subprocess and temporary project directory, with
 `runtime="python"`. Import these helpers in the authored program:
 
 ```python
-from faceless_champ.playground.runtime import emit, event, inputs
+from facelesschamp_kit.playground.runtime import emit, event, inputs
 emit("car", {"speed": 40, "color": "red"})
 event("accelerated", {"amount": 40})
 ```

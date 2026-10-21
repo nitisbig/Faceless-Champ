@@ -19,7 +19,6 @@ CATALOG = {
         "ProceduralBackdrop",
         "ParticleBackdrop",
         "ArchCanvas",
-        "ChessBoard",
         "CodeEditor",
         "CodingPlayground",
         "WebWalkthrough",
@@ -46,7 +45,6 @@ CATALOG = {
         "archchamp",
         "flowchamp",
         "os-ui",
-        "chesschamp",
         "coding-web",
         "coding-concept",
         "coding-backend",
@@ -65,8 +63,6 @@ def doctor(root=".", *, gpu=False):
         "ffmpeg": bool(ffmpeg),
         "ffprobe": bool(ffprobe),
         "libx264": encoder,
-        "pyvista": package_version("pyvista") != "source",
-        "vtk": package_version("vtk") != "source",
     }
     root = Path(root).resolve()
     root = root.parent if root.is_file() else root
@@ -75,14 +71,14 @@ def doctor(root=".", *, gpu=False):
         while not parent.exists():
             parent = parent.parent
         checks[str(directory)] = os.access(parent, os.W_OK)
-    import importlib.util
-
     optional = {
-        name: importlib.util.find_spec(module) is not None
-        for name, module in (
+        name: package_version(distribution) != "source"
+        for name, distribution in (
+            ("pyvista", "pyvista"),
+            ("vtk", "vtk"),
             ("maps", "numpy"),
             ("equations", "matplotlib"),
-            ("coding", "pygments"),
+            ("coding", "Pygments"),
             ("web", "playwright"),
         )
     }
@@ -95,6 +91,7 @@ def doctor(root=".", *, gpu=False):
         "ok": all(checks.values()),
         "checks": checks,
         "optional": optional,
+        "guidance": {"3d": "Install facelesschamp-kit[3d] (or facelesschamp-agent[3d]) for ArchChamp/PyVista."},
         "versions": {name: package_version(name) for name in ("faceless-champ", "facelesschamp-kit", "pyvista", "vtk")},
     }
     from faceless_champ import renderer_capabilities

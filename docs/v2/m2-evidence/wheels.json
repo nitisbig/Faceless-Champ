@@ -1,0 +1,17 @@
+{
+  "facelesschamp_kit-0.1.0rc7-py3-none-any.whl": {
+    "sha256": "9a63c69bedec82ceb6cefeed7821a2f3fba569aa2ee72e83e03168cfc5e43899",
+    "bytes": 845945,
+    "verified_python_files": 39
+  },
+  "faceless_champ-0.1.6-py3-none-any.whl": {
+    "sha256": "8a263475f1457763440b9bf8541d45b5284f4d8ff84ae67b90ba024e096abb86",
+    "bytes": 17400522,
+    "verified_python_files": 99
+  },
+  "facelesschamp_agent-0.1.0rc2-py3-none-any.whl": {
+    "sha256": "5c092704d7f1d74b699814a6b7b3cad27b3b8570860e79af88d70366febeee49",
+    "bytes": 207876,
+    "verified_python_files": 15
+  }
+}

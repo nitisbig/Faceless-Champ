@@ -38,7 +38,7 @@ validate every track before mutating the scene. Presets use this same track mode
 the renderer needs no animation-specific logic.
 A custom easing function must be deterministic. The base Component and renderer
 protocol provide extension points; adding a new visual type requires a renderer
-that understands it. v0.1 does not have a global plugin registry.
+that understands it. There is no global plugin registry.
 
 `spring.py` adds one immutable `Spring` easing callable without a separate
 animation or rendering system. Standard-library closed forms cover underdamped,

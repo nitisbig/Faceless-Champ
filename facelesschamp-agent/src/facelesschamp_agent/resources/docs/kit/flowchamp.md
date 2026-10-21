@@ -1,11 +1,11 @@
 # FlowChamp in the kit
 
 `FlowCanvas(graph, script=None, theme=None, viewport=(1600,900), source_start=0, design=None)`
-composes the core `FlowChamp` component. The `"diagram"` handle addresses the whole
+composes the Kit `FlowChamp` component. The `"diagram"` handle addresses the whole
 viewport. Use `FlowScript` target IDs for individual node/connection animations.
 
 ```python
-from faceless_champ.flow.examples import recipe
+from facelesschamp_kit.diagrams.examples import recipe
 from facelesschamp_kit import Video
 from facelesschamp_kit.blocks import FlowCanvas
 
@@ -23,7 +23,7 @@ Start with `fc-kit init my-flow --template flowchamp`. The starter follows the c
 orientation and can switch between workflow, system, network, idea-map, and circuit
 recipes. Kit colors/fonts are inherited unless a `FlowTheme` is supplied.
 
-JSON uses the public core `FlowChamp.from_json`/`to_dict` document API. To place a
+JSON uses the public Kit `FlowChamp.from_json`/`to_dict` document API. To place a
 loaded document, pass its `graph`, `script`, `theme`, viewport and `source_start` to
 `FlowCanvas`. Asset paths are resolved when loading the file.
 
@@ -32,7 +32,7 @@ including placements with narration tails. `source_start` permits excerpts. Layo
 warnings are returned as `FLOW_OVERLAP`/`FLOW_BOUNDS` diagnostics. Invalid core diagram
 data becomes `FLOW_DATA` with a field path and placement scope.
 
-See [the full core guide](../../docs/flowchamp.md) for symbol, port, route, timing,
+See [the full core guide](../core/flowchamp.md) for symbol, port, route, timing,
 serialization, diagnostic and deterministic-playback contracts.
 
 Default FlowCanvas themes use `context.theme.muted` for outlines and `accent` for
@@ -54,9 +54,10 @@ adjusted geometry. Defaults preserve existing placement.
 
 ## Approved networking design
 
-Select `FlowCanvas(..., design="networking")` for the approved soft networking
-connections. Author `FlowScript.signal(marker="capsule")` or use core
-`FlowDesign.signal` for rounded traffic markers. `design` also accepts a core `FlowDesign`
+Create `FlowDesign.named("networking")` from `facelesschamp_kit.diagrams`, or
+select `FlowCanvas(..., design="networking")` for the approved soft networking
+connections. Author `FlowScript.signal(marker="capsule")` or use Kit
+`FlowDesign.signal` for rounded traffic markers. `design` also accepts a Kit `FlowDesign`
 instance. This is an explicit diagram-level selection; it does not change the
 video's global kit theme. Existing placements without `design` retain their theme
 inheritance and appearance. `theme` and `design` are mutually exclusive; the design
@@ -107,7 +108,7 @@ Designed `FlowCanvas` placements expose `diagram` for foreground connections and
 packets, plus `glow` for their soft highlight layer. Animate the placement handle
 itself to move or fade both layers together. Ordinary placements retain the whole
 `diagram` handle. Target graph IDs through `FlowScript`.
-The core [saved design guide](../../docs/flowchamp.md#saved-networking-design)
+The core [saved design guide](../core/flowchamp.md#saved-networking-design)
 documents connection layering, native `capsule` markers, and fluid motion.
 
 For narration, attach audio/SRT once with `video.narration(...)`, create cue-bounded

@@ -5,10 +5,7 @@ Use original one-based SRT indices, including nonconsecutive indices, to author
 chapters without repeatedly calculating offsets.
 
 ```python
-from faceless_champ import (
-    Canvas, CueScene, FadeIn, Layer, Scene, Sequence, SubtitleTrack, Text,
-    StoryboardSample, render_storyboard, save_frame,
-)
+from faceless_champ import Canvas, CueScene, FadeIn, Layer, Scene, Sequence, SubtitleTrack, Text, StoryboardSample, render_storyboard, save_frame
 
 track = SubtitleTrack.from_srt("cue-per-word.srt")
 canvas = Canvas(1080, 1620, "#FFFFFF")

@@ -2,8 +2,10 @@
 
 from dataclasses import dataclass
 
-from faceless_champ import Bounds, Group, PlaygroundCanvas, PlaygroundOutput, PlaygroundScript, PreparedPlayground
-from faceless_champ import CodeEditor as CoreEditor
+from faceless_champ import Bounds, Group
+
+from facelesschamp_kit.playground import CodeEditor as CoreEditor
+from facelesschamp_kit.playground import PlaygroundCanvas, PlaygroundOutput, PlaygroundScript, PreparedPlayground
 
 from ..diagnostics import KitError
 from .base import BlockBuild

@@ -1,7 +1,7 @@
 # FacelessChamp Agent
 
-Version **0.1.0rc2** supplies offline production tools for external AI agents. It uses
-FacelessChamp Kit **0.1.0rc7** and core **0.1.5**. These are local source releases.
+Version **2.0.0rc1** supplies offline production tools for external AI agents. It uses
+FacelessChamp Kit **2.0.0rc1** and core **2.0.0rc1**. These are local source releases.
 Python 3.12+ and FFmpeg/ffprobe with libx264 are required for video exports.
 
 ```bash
@@ -21,6 +21,14 @@ Run the install command from the repository root. The starter is an editable six
 example. Your external agent replaces its plan and Python content using the exported
 skill. `fc-agent` does not call an LLM, generate speech, or automatically write videos
 from natural language. The external agent plans, authors, inspects, and repairs.
+
+The base Core engine installs only Pillow. Install `facelesschamp-agent[3d]` for
+ArchChamp; `cad`, `geometry`, and `geometry-advanced` forward the matching Kit/Core
+extras and include PyVista conversion dependencies. From this checkout use
+`python -m pip install -e . -e ./facelesschamp-kit -e './facelesschamp-agent[3d]'`.
+Existing Arch projects must add the extra explicitly when rebuilding environments.
+Doctor lists native packages without importing them; `--gpu` explicitly opens and
+closes a probe and reports the actual software/hardware renderer identity.
 
 ## Context-aware scene selection
 
@@ -124,3 +132,11 @@ Discovery omits thumbnail/motion-preview fields when those resources are absent.
 ## GPU capability discovery
 
 Install `facelesschamp-agent[gpu]` for the optional ModernGL backend. GPU effects and Kit wrappers appear in the offline public API catalog; discovery opens no GL context. `fc-agent doctor --gpu --json` explicitly probes the device. Profiles remain authoritative, and evidence records actual fallback/device/shader provenance. Native mesh rendering and custom GLSL are subsequent releases. See [ModernGL](../docs/moderngl.md).
+
+## V2 production candidate
+
+Core, Kit and Agent are coordinated at `2.0.0rc1`. Domain authoring belongs to Kit;
+Core stays standalone. Kit production methods reuse a compiled video, and Agent
+adds verification and review evidence. See the [M5 migration guide](../docs/v2/m5-migration.md)
+and [implementation evidence](../docs/v2/m5-implementation.md).
+This is a local candidate; publication and untested platform certification are separate.

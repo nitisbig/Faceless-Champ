@@ -187,3 +187,17 @@ def test_byte_and_inventory_limits_are_explicit(tmp_path, monkeypatch):
 def test_invalid_prompt_budgets_are_rejected(tmp_path, budget):
     with pytest.raises(AgentError, match="CONTEXT_LIMIT"):
         read_project_context(tmp_path, max_chars=budget)
+
+
+def test_shared_raw_cues_keep_agent_count_limit(monkeypatch):
+    from facelesschamp_agent import context
+
+    monkeypatch.setattr(context, "MAX_CUES", 1)
+    text = "1\n00:00:00,000 --> 00:00:01,001\n First \n\n2\n00:00:01,000 --> 00:00:02,000\nSecond\n"
+    with pytest.raises(AgentError) as caught:
+        context._parse_srt(text, "cues.srt")
+    assert caught.value.as_dict()["code"] == "CONTEXT_LIMIT"
+    monkeypatch.setattr(context, "MAX_CUES", 2)
+    cues = context._parse_srt(text, "cues.srt")
+    assert cues[0]["end"] == 1.001 and cues[1]["start"] == 1
+    assert cues[0]["text"] == "First"

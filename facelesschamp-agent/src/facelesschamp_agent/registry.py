@@ -15,6 +15,7 @@ from functools import lru_cache
 from importlib.resources import files
 from pathlib import Path
 
+from facelesschamp_kit import public_capabilities
 from facelesschamp_kit.recipes import recipe_specs
 
 from .errors import AgentError
@@ -39,7 +40,7 @@ GUIDANCE = {
         "Use named parts, focused camera motion and sections to explain geometry.",
         "Supply real geometry and fields; this renderer does not solve physics or create CAD.",
         "archchamp.md",
-        ("PyVista/VTK (required)",),
+        ("3d (PyVista/VTK)",),
     ),
     "flow": (
         "systems process causality request journey hierarchy networks circuits",
@@ -61,13 +62,6 @@ GUIDANCE = {
         "Prepare explicitly; rendering replays assets without executing checkpoints.",
         "coding-playgrounds.md",
         ("playground (preparation)",),
-    ),
-    "chess": (
-        "chess board legal moves analysis game",
-        "Use legal timed game data and preserve board orientation.",
-        "No engine evaluation or inferred analysis.",
-        "chesschamp.md",
-        ("chess",),
     ),
     "os_ui": (
         "desktop finder settings virtual files tutorial",
@@ -120,7 +114,6 @@ CHILDREN = {
     "ArchCanvas": ["model"],
     "CodeEditor": ["editor"],
     "CodingPlayground": ["editor", "canvas", "output (when enabled)"],
-    "ChessBoard": ["board"],
     "OSWalkthrough": ["ui"],
     "FinderWindow": ["ui"],
     "SettingsWindow": ["ui"],
@@ -251,7 +244,8 @@ def _root_import_closure(roots, modules):
 
     Unrelated CLI/project imports must not turn optional source entries into
     runtime entries or create extra aliases for imported preset registries.
-    Only unconditional top-level imports are followed; no module is executed.
+    Public facade declarations (including typed lazy re-exports) are followed;
+    no module is executed by this source walk.
     """
     pending, result = list(roots), set()
     while pending:
@@ -261,7 +255,7 @@ def _root_import_closure(roots, modules):
         result.add(module_name)
         path, tree = modules[module_name]
         package_name = module_name if path.name == "__init__.py" else module_name.rpartition(".")[0]
-        for node in tree.body:
+        for node in _declarations(tree):
             imported = []
             if isinstance(node, ast.Import):
                 imported = [alias.name for alias in node.names]
@@ -274,13 +268,25 @@ def _root_import_closure(roots, modules):
     return result
 
 
+def _declarations(tree):
+    """Read typed lazy facades without executing their runtime attribute hooks."""
+    typing_names = {"TYPE_CHECKING"}
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom) and node.module == "typing":
+            typing_names.update(alias.asname or alias.name for alias in node.names if alias.name == "TYPE_CHECKING")
+    for node in tree.body:
+        yield node
+        if isinstance(node, ast.If) and isinstance(node.test, ast.Name) and node.test.id in typing_names:
+            yield from node.body
+
+
 def _static_definition(module_name, name, modules, seen=None):
     seen = set() if seen is None else seen
     if (module_name, name) in seen or module_name not in modules:
         return None
     seen.add((module_name, name))
     path, tree = modules[module_name]
-    for node in tree.body:
+    for node in _declarations(tree):
         if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == name:
             return module_name, node
         if isinstance(node, ast.ImportFrom):
@@ -328,7 +334,7 @@ def _category(name, origin):
         ("design", ("design", "theme", "style", "scheme", "palette")),
         ("transition", ("transition", "fadeout", "slideout", "wipe", "zoomout", "popout")),
         ("animation", ("animation", "spring", "scheduling", "motion")),
-        ("ui", ("os_ui", "coding", "playground", "web", "window")),
+        ("ui", ("os_ui", "desktop", "coding", "playground", "web", "window")),
         ("composition", ("layout", "timeline", "canvas", "scene", "video", "group", "block")),
         ("engine", ("renderer", "export", "champ")),
     ):
@@ -338,6 +344,17 @@ def _category(name, origin):
 
 
 def _family(name, origin):
+    for module, family in (
+        (".integrations.pyvista", "arch"),
+        (".integrations.build123d", "arch"),
+        (".integrations.trimesh", "arch"),
+        (".integrations.geometry", "arch"),
+        (".engineering", "arch"),
+        (".diagrams", "flow"),
+        (".desktop", "os_ui"),
+    ):
+        if module in origin:
+            return family
     if name in {
         "ModernGLRenderer",
         "GPUOptions",
@@ -401,7 +418,13 @@ class CapabilityRegistry:
 
     def __init__(self):
         self._entries = {}
-        self._packages = [importlib.import_module(name) for name in ("faceless_champ", "facelesschamp_kit")]
+        self._packages = [importlib.import_module(name) for name in public_capabilities()["packages"]]
+        # The catalog enumerates the whole supported facade deliberately. Resolve
+        # its lazy objects once so signatures/defaults and API-vs-CLI discovery
+        # stay independent of which attributes callers happened to access first.
+        for package in self._packages:
+            for name in vars(package).get("__all__", ()):
+                getattr(package, name, None)
         self._versions = {package.__name__: vars(package).get("__version__", "unknown") for package in self._packages}
         self._modules = {
             name: (path, tree) for package in self._packages for name, path, tree in _public_modules(package)
@@ -428,7 +451,7 @@ class CapabilityRegistry:
                 "tags": spec.purpose.lower().split(),
                 "use_when": spec.purpose,
                 "named_targets": list(spec.targets),
-                "dependencies": ["PyVista/VTK (required)"] if spec.id == "arch-design" else [],
+                "dependencies": ["3d (PyVista/VTK)"] if spec.id == "arch-design" else [],
                 "preparation": "explicit" if spec.id == "code-result" else "none",
                 "documentation": "recipes.md",
                 "parameters": list(spec.fields),
@@ -701,24 +724,24 @@ class CapabilityRegistry:
                 _, tree = self._modules[module_name]
                 assigned = {
                     target.id
-                    for node in tree.body
+                    for node in _declarations(tree)
                     if isinstance(node, ast.Assign)
                     for target in node.targets
                     if isinstance(target, ast.Name)
                 }
                 assigned.update(
                     node.target.id
-                    for node in tree.body
+                    for node in _declarations(tree)
                     if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)
                 )
                 assigned.update(
                     node.name
-                    for node in tree.body
+                    for node in _declarations(tree)
                     if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
                 )
                 assigned.update(
                     alias.asname or alias.name.split(".")[0]
-                    for node in tree.body
+                    for node in _declarations(tree)
                     if isinstance(node, (ast.Import, ast.ImportFrom))
                     for alias in node.names
                 )

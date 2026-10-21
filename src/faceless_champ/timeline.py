@@ -12,17 +12,25 @@ from numbers import Real
 from pathlib import Path
 from typing import Any, Self
 
-from .animation import Animation, interpolate, relative_value, smooth
+from .animation import Animation, relative_value, smooth
 from .audio import AudioClip
 from .components import Canvas, Component, finite
 from .layout import Group
-from .motion import style_value
 from .spring import _spring_progress_bounds
 from .subtitles import Captions
 
 
 class Renderable:
     canvas: Canvas
+
+    def __getstate__(self):
+        # Execution plans are process-local, rebuildable caches. Do not let
+        # mapping proxies break existing composition deepcopy/pickle workflows.
+        state = self.__dict__.copy()
+        for name in ("_compiled_key", "_compiled_plan", "_evaluated_frame"):
+            if name in state:
+                state[name] = None
+        return state
 
     @property
     def duration(self) -> float:
@@ -45,17 +53,9 @@ class Track:
     keyframes: tuple[tuple[float, object], ...] | None = None
 
     def value_at(self, time: float):
-        progress = (time - self.start) / self.duration
-        if progress <= 0:
-            return self.initial
-        if progress >= 1:
-            return self.target
-        if self.keyframes:
-            for (left, initial), (right, target) in pairwise(self.keyframes):
-                if progress <= right:
-                    local = (progress - left) / (right - left)
-                    return interpolate(initial, target, self.easing(local))
-        return interpolate(self.initial, self.target, self.easing(progress))
+        from ._rendering.evaluate import track_value
+
+        return track_value(self, time)
 
 
 @dataclass
@@ -91,6 +91,17 @@ class Scene(Renderable):
         self._built = False
         self._building = False
         self._objects: dict[Component, Entry] = {}
+        self._revision = 0
+        self._compiled_key = self._compiled_plan = self._evaluated_frame = None
+
+    def _invalidate(self):
+        self._revision += 1
+        self._compiled_key = self._compiled_plan = self._evaluated_frame = None
+
+    def _compile(self):
+        from ._rendering.plan import compile_scene
+
+        return compile_scene(self)
 
     def construct(self) -> None:
         """Override to author a scene."""
@@ -106,6 +117,7 @@ class Scene(Renderable):
                 self.audio.clear()
                 self._objects.clear()
                 self._cursor = 0.0
+                self._invalidate()
                 raise
             finally:
                 self._building = False
@@ -139,16 +151,19 @@ class Scene(Renderable):
         time = finite(time, "time", 0)
         previous = self._cursor
         self._cursor = time
+        self._invalidate()
         try:
             yield self
         finally:
             self._cursor = max(previous, self._cursor)
+            self._invalidate()
 
     def wait_until(self, time: float) -> Self:
         time = finite(time, "time", 0)
         if time < self._cursor - 1e-9:
             raise ValueError("wait_until cannot move backward; use with scene.at(time)")
         self._cursor = max(time, self._cursor)
+        self._invalidate()
         return self
 
     def remove(self, *components: Component) -> Self:
@@ -168,6 +183,7 @@ class Scene(Renderable):
         for component in components:
             for entry in self._descendants(self._objects[component]):
                 entry.end = min(entry.end, self._cursor) if entry.end is not None else self._cursor
+        self._invalidate()
         return self
 
     @staticmethod
@@ -226,7 +242,8 @@ class Scene(Renderable):
 
     def add(self, *components: Component) -> Self:
         prepared = self._prepare_add(components)
-        snapshots = [(component, parent, deepcopy(component)) for component, parent in prepared]
+        memo = {}
+        snapshots = [(component, parent, deepcopy(component, memo)) for component, parent in prepared]
         for component, parent, snapshot in snapshots:
             parent_entry = self._objects[parent] if parent is not None else None
             entry = Entry(snapshot, self._cursor, component.state(), [], parent=parent_entry)
@@ -234,6 +251,8 @@ class Scene(Renderable):
             self._objects[component] = entry
             if parent_entry is not None:
                 parent_entry.children.append(entry)
+        if snapshots:
+            self._invalidate()
         return self
 
     def bounds_at(self, component: Component, time: float):
@@ -241,52 +260,26 @@ class Scene(Renderable):
 
         Masks, opacity and lifetimes do not shrink the reserved layout box.
         """
-        from copy import copy
+        from ._rendering.evaluate import scene_entries
+        from ._rendering.measure import measurement_session
 
         self.build()
         time = finite(time, "time", 0)
         if component not in self._objects:
             raise ValueError("bounds_at requires a component in the scene")
-
-        def evaluated(entry):
-            result = copy(entry.component)
-            for key, value in entry.state_at(time).items():
-                if hasattr(result, key):
-                    setattr(result, key, style_value(key, value))
-            if isinstance(result, Group):
-                result._children = tuple(evaluated(child) for child in entry.children)
-            return result
-
-        entry = self._objects[component]
-        result = evaluated(entry)
-        for parent in entry.ancestors():
-            wrapper = evaluated(parent)
-            wrapper._children = (result,)
-            result = wrapper
-        return result.bounds
+        index = self.entries.index(self._objects[component])
+        return measurement_session().entry_bounds(scene_entries(self, time)[index], time, ancestors=True)
 
     def ink_bounds_at(self, component: Component, time: float):
-        """Conservative effect bounds, including leaf shadows and ancestors.
-
-        Logical bounds_at remains unchanged; masks do not shrink this ink box.
-        This read-only measurement opens no 3D/browser render sessions.
-        """
-        from ._render_state import entry_geometry, ink_box
-        from .backends._raster_adapter import PillowRasterAdapter
+        """Conservative effect bounds without opening viewport sessions."""
+        from ._rendering.evaluate import evaluate_frame
 
         self.build()
         time = finite(time, "time", 0)
         if component not in self._objects:
             raise ValueError("ink_bounds_at requires a component in the scene")
-        raster = PillowRasterAdapter()
-        try:
-            entry = self._objects[component]
-            parent = (1, 0, 0, 1, 0, 0)
-            for ancestor in reversed(tuple(entry.ancestors())):
-                parent, _ = entry_geometry(ancestor, time, parent, raster)
-            return ink_box(entry, time, parent, raster)
-        finally:
-            raster.close()
+        index = self.entries.index(self._objects[component])
+        return evaluate_frame(self, time, resource_keys=False).geometry[index].ink
 
     def play(self, *animations, run_time=None, rate_func=None) -> Self:
         from .scheduling import Schedule, play_schedule
@@ -310,49 +303,32 @@ class Scene(Renderable):
                 raise TypeError("play requires nonempty animations")
             if not isinstance(animation.component, Component):
                 raise TypeError("Animation requires a Component")
-            if isinstance(animation.component, Group) and {
-                k for k in animation.targets if not k.startswith("effect.")
-            } - {
-                "position",
-                "scale",
-                "rotation",
-                "opacity",
-                "scale_x",
-                "scale_y",
-                "mask_position",
-                "mask_width",
-                "mask_height",
-                "wipe",
-                "clip",
-            }:
-                raise ValueError("Groups support transforms, opacity, masks, and wipe animations")
+            entry = self._objects.get(animation.component)
+            state = entry.state_at(self._cursor) if entry is not None else animation.component.state()
+            resolved = animation.resolve(state.copy())
+            if (
+                not isinstance(resolved, Animation)
+                or resolved.component is not animation.component
+                or not resolved.targets
+            ):
+                raise TypeError("Animation.resolve must return an Animation for the same component")
+            animation = resolved
             if animation.rate_func is not None and not callable(animation.rate_func):
                 raise TypeError("Animation rate_func must be callable")
             if set(animation.starts or {}) - set(animation.targets):
                 raise ValueError("Animation starts must refer to animated properties")
             if set(animation.keyframes or {}) - set(animation.targets):
                 raise ValueError("Keyframes must refer to animated properties")
-            if set(animation.relative) - (
-                set(animation.targets) & {"position", "scale", "rotation", "longitude", "latitude", "map_rotation"}
-            ):
+            if set(animation.relative) - (set(animation.targets) & animation.component.relative_animation_properties):
                 raise ValueError("Unsupported relative animation property")
             for properties in (animation.targets, animation.starts or {}):
                 for key, value in properties.items():
                     if key not in animation.component.state():
                         raise ValueError(f"Unsupported animation property: {key}")
-                    if key == "latitude" and key in animation.relative:
+                    if key in animation.relative and key not in Component.relative_animation_properties:
                         finite(value, key)
                     else:
-                        _validate_animated_value(key, value)
-                    if key == "value":
-                        from .indicators import Countdown
-
-                        if isinstance(animation.component, Countdown):
-                            finite(value, key, 0)
-                    if key == "data":
-                        animation.component.validate_data(value)
-            entry = self._objects.get(animation.component)
-            state = entry.state_at(self._cursor) if entry is not None else animation.component.state()
+                        animation.component.validate_animation(key, value)
             tracks = []
             for key in animation.targets:
                 identity = (animation.component, key)
@@ -378,8 +354,6 @@ class Scene(Renderable):
                         relative_value(key, base, animation.starts[key]) if key in (animation.starts or {}) else base
                     )
                     target = relative_value(key, base, target)
-                if key == "longitude" and getattr(animation, "map_shortest", False):
-                    target = base + (target - base + 180) % 360 - 180
                 frames = None
                 if key in (animation.keyframes or {}):
                     points = animation.keyframes[key]
@@ -394,16 +368,9 @@ class Scene(Renderable):
                         progress = finite(progress, "keyframe progress", 0)
                         if progress > 1 or progress <= previous:
                             raise ValueError("Keyframe progress must increase strictly within [0, 1]")
-                        _validate_animated_value(key, value)
-                        if key == "value":
-                            from .indicators import Countdown
-
-                            if isinstance(animation.component, Countdown):
-                                finite(value, key, 0)
-                        if key == "data":
-                            animation.component.validate_data(value)
+                        animation.component.validate_animation(key, value)
                         value = relative_value(key, base, value) if relative else value
-                        _validate_animated_value(key, value)
+                        animation.component.validate_animation(key, value)
                         frames.append((progress, value))
                         previous = progress
                     if frames[0][0] != 0 or frames[-1][0] != 1:
@@ -414,8 +381,8 @@ class Scene(Renderable):
                         raise ValueError("First keyframe must match the explicit animation start")
                     initial = frames[0][1]
                     frames = tuple(frames)
-                _validate_animated_value(key, initial)
-                _validate_animated_value(key, target)
+                animation.component.validate_animation(key, initial)
+                animation.component.validate_animation(key, target)
                 track = Track(
                     key, self._cursor, duration, initial, target, rate_func or animation.rate_func or smooth, frames
                 )
@@ -427,10 +394,12 @@ class Scene(Renderable):
         for component, tracks in prepared:
             self._objects[component].tracks.extend(tracks)
         self._cursor += duration
+        self._invalidate()
         return self
 
     def wait(self, duration: float = 1.0) -> Self:
         self._cursor += finite(duration, "duration", 0)
+        self._invalidate()
         return self
 
     def add_audio(
@@ -447,6 +416,7 @@ class Scene(Renderable):
         self.audio.append(
             AudioClip(path, self._cursor if start is None else start, trim_start, trim_end, volume, fade_in, fade_out)
         )
+        self._invalidate()
         return self
 
 
@@ -501,48 +471,11 @@ def _validate_spring_track(track: Track) -> None:
                 )
 
 
-def _validate_animated_value(key: str, value) -> None:
-    if key.startswith("effect."):
-        from .effects import validate_effect_value
+def _validate_animated_value(key, value):
+    """Private compatibility forwarder; components own animation validation."""
+    from .components import _validate_animated_value as validate
 
-        validate_effect_value(key, value)
-    elif key == "clip":
-        if not isinstance(value, tuple) or len(value) != 4 or any(not 0 <= finite(v, key) <= 1 for v in value):
-            raise ValueError("clip requires four normalized coordinates")
-        if value[0] > value[2] or value[1] > value[3]:
-            raise ValueError("clip edges must be ordered")
-    elif key in {"fill", "stroke", "color"}:
-        if not isinstance(value, tuple) or len(value) != 4:
-            raise ValueError("Animated colors must be RGBA tuples; use color builders")
-        for channel in value:
-            if not 0 <= finite(channel, key) <= 255:
-                raise ValueError("Color channels must be in [0, 255]")
-    elif key == "data":
-        if not isinstance(value, tuple) or not value:
-            raise ValueError("Animated data must be a nonempty numeric tuple")
-        for item in value:
-            finite(item, "data")
-    elif key == "latitude":
-        finite(value, key)
-        if not -90 <= value <= 90:
-            raise ValueError("latitude must be between -90 and 90")
-    elif key == "zoom":
-        finite(value, key, 0.001)
-    elif key in {"position", "mask_position"}:
-        if not isinstance(value, tuple) or len(value) != 2:
-            raise ValueError("Animated position must be an (x, y) tuple")
-        for coordinate in value:
-            finite(coordinate, "position")
-    else:
-        finite(
-            value,
-            key,
-            0.001
-            if key in {"scale", "scale_x", "scale_y", "width", "height"}
-            else (None if key in {"rotation", "value", "longitude", "map_rotation"} else 0),
-        )
-        if key in {"opacity", "reveal", "draw", "progress", "wipe"} and value > 1:
-            raise ValueError(f"{key} must be <= 1")
+    return validate(key, value)
 
 
 class Sequence(Renderable):

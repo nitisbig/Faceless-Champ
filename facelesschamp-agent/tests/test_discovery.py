@@ -245,3 +245,25 @@ def test_installed_design_font_and_icon_catalog_is_available():
     assert manifest["count"] == sum(manifest["counts"].values())
     assert manifest["schema_version"] == 1
     assert len(manifest["fingerprint"]) == 64
+
+
+def test_lazy_core_catalog_preserves_signatures_without_native_imports():
+    code = """
+import importlib.abc, sys
+class Block(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'pyvista','vtk','vtkmodules','numpy','matplotlib','skia','moderngl','glcontext','build123d','OCP','trimesh','scipy','chess','pygments','playwright'}:
+            raise AssertionError('native discovery import: '+fullname)
+sys.meta_path.insert(0,Block())
+import faceless_champ as core
+assert not any(name.startswith('faceless_champ.') for name in sys.modules)
+from facelesschamp_agent import CapabilityRegistry
+registry=CapabilityRegistry()
+assert registry.check()['ok']
+record=registry.describe('faceless_champ.ArchCamera')
+assert 'position' in [p['name'] for p in record['parameters']]
+assert '3d (PyVista/VTK)' in record['dependencies']
+assert not any(name in sys.modules for name in ('pyvista','vtk','numpy','skia','moderngl','build123d'))
+"""
+    result = subprocess.run([sys.executable, "-B", "-c", code], capture_output=True, text=True, check=False)
+    assert result.returncode == 0, result.stderr

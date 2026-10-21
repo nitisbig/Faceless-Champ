@@ -26,8 +26,8 @@ Finish group membership and layout before scene insertion. Use measured bounds a
 fit_text; never infer supported arguments from similarly named libraries.
 
 Prepared code/results require complete checkpoint execution during explicit preparation.
-Rendering and inspection only replay prepared assets. Core maps, equations, chess,
-highlighting, or browser preparation can require optional extras. Follow the returned
+Rendering and inspection only replay prepared assets. Kit maps, highlighted code and browser preparation require matching optional extras.
+Core equations and native backends require their explicit extras. ChessChamp is V1-only. Follow the returned
 dependency guidance and the current core/kit guides; preparation is not a sandbox.
 
 The package does not dynamically install dependencies, fetch remote assets, call model
