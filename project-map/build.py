@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import ast
 import base64
 import importlib.util
@@ -32,6 +33,7 @@ def git(*args):
 
 
 def snapshot():
+    capabilities = json.loads((ROOT / "docs/v2/public-capabilities.json").read_text())
     packages = []
     for directory, source, label in (
         ("", "src/faceless_champ", "Core engine"),
@@ -39,6 +41,10 @@ def snapshot():
         ("facelesschamp-agent", "facelesschamp-agent/src/facelesschamp_agent", "Agent workflow"),
     ):
         manifest = tomllib.loads((ROOT / directory / "pyproject.toml").read_text())["project"]
+        module = Path(source).name
+        public = capabilities["packages"][module]
+        if public["version"] != manifest["version"] or public["dependencies"] != manifest.get("dependencies", []):
+            raise ValueError("Stale V2 metadata; run .venv/bin/python scripts/sync_reference_docs.py")
         test_root = ROOT / directory / "tests"
         # Bundled copies of docs/examples are resources, not implementation modules.
         modules = [
@@ -51,9 +57,9 @@ def snapshot():
                 "label": label,
                 "source": source,
                 "modules": len(modules),
-                "tests": len(list(test_root.glob("test*.py"))),
-                "exports": exports(source + "/__init__.py"),
-                "dependencies": manifest.get("dependencies", []),
+                "tests": len(list(test_root.rglob("test*.py"))),
+                "exports": public["exports"],
+                "dependencies": public["dependencies"],
                 "extras": manifest.get("optional-dependencies", {}),
             }
         )
@@ -102,20 +108,21 @@ def snapshot():
         "head": git("rev-parse", "--short", "HEAD"),
         "branch": git("branch", "--show-current"),
         "packages": packages,
+        "capabilities": capabilities,
         "recipes": recipes,
         "templates": templates,
         "projects": projects,
         "history": history,
         "curves": curves,
-        "web_exports": exports("src/faceless_champ/web/__init__.py"),
-        "os_exports": exports("src/faceless_champ/os_ui/__init__.py"),
+        "web_exports": exports("facelesschamp-kit/src/facelesschamp_kit/web/__init__.py"),
+        "os_exports": exports("facelesschamp-kit/src/facelesschamp_kit/desktop/__init__.py"),
     }
 
 
-def build():
+def build(*, check=False):
     data = snapshot()
     page = (HERE / "src/page.html").read_text()
-    font = base64.b64encode((ROOT / "assets/fonts/DMSans[opsz,wght].ttf").read_bytes()).decode()
+    font = base64.b64encode((ROOT / "src/faceless_champ/assets/DMSans[opsz,wght].ttf").read_bytes()).decode()
     styles = (HERE / "src/style.css").read_text().replace("ATLAS_FONT_BASE64", font)
     page = page.replace("/* ATLAS_STYLES */", styles)
     page = page.replace(
@@ -123,12 +130,20 @@ def build():
     )
     page = page.replace("/* ATLAS_CATALOG */", (HERE / "src/catalog.js").read_text())
     page = page.replace("/* ATLAS_APP */", (HERE / "src/app.js").read_text())
-    (HERE / "index.html").write_text(page)
+    output = HERE / "index.html"
+    if check:
+        current = output.is_file() and output.read_text() == page
+        print("Atlas is current" if current else "Atlas is stale; run python3 project-map/build.py")
+        return 0 if current else 1
+    output.write_text(page)
     print(f"Built {HERE / 'index.html'} ({len(page.encode()):,} bytes)")
     print(
         f"Source {data['head']}: {len(data['projects'])} premium references, {len(data['recipes'])} recipes, {len(data['templates'])} starters"
     )
+    return 0
 
 
 if __name__ == "__main__":
-    build()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Check snapshot drift without writing")
+    raise SystemExit(build(check=parser.parse_args().check))

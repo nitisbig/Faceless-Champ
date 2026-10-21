@@ -112,3 +112,13 @@ Core stays standalone. Kit production methods reuse a compiled video, and Agent
 adds verification and review evidence. See the [M5 migration guide](docs/v2/m5-migration.md)
 and [implementation evidence](docs/v2/m5-implementation.md).
 This is a local candidate; publication and untested platform certification are separate.
+
+## Repository layout
+
+Core remains at `src/faceless_champ/`; Kit and Agent are independently packaged in
+`facelesschamp-kit/` and `facelesschamp-agent/`. Domain implementations now live
+inside Kit. The [V2 layout guide](docs/v2/repository-layout.md) maps each directory
+and distinguishes intentional migration notices from disposable generated caches.
+The [offline project atlas](project-map/index.html) shows current ownership and
+historical milestones. User projects, design references and render evidence stay
+in their existing directories.

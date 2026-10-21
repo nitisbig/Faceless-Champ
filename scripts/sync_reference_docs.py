@@ -63,6 +63,7 @@ INCLUSION = {
     Path("docs/v2/m4-migration.md"): RESOURCES / "docs/v2/m4-migration.md",
     Path("docs/v2/m5-migration.md"): RESOURCES / "docs/v2/m5-migration.md",
     Path("docs/v2/m5-implementation.md"): RESOURCES / "docs/v2/m5-implementation.md",
+    Path("docs/v2/repository-layout.md"): RESOURCES / "docs/v2/repository-layout.md",
     Path("docs/legacy/v1/chesschamp.md"): RESOURCES / "docs/legacy/v1/chesschamp.md",
     Path("docs/legacy/v1/kit-chesschamp.md"): RESOURCES / "docs/legacy/v1/kit-chesschamp.md",
 }

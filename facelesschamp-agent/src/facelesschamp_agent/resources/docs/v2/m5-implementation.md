@@ -14,7 +14,7 @@ No commit, push, publication or remote render was performed.
 | Kit `capabilities.py`, `subtitles.py`, public facade | media_probe, raw read_subtitle_cues, public_capabilities, validate_rendering and the identical Core ExportProgress type. Discovery loads no optional engine and allocates no native context. |
 | Agent `project.py`, `media.py`, `registry.py`, `cli.py`, generated `delivery.py` source | Rendering/probing/discovery/progress use Kit services. Agent retains checksum/fingerprint history, plan validation, alignment, conformance, layout diagnostics and separate visual/editorial reviews. The exact object returned by Agent's validated build reaches Kit production; no factory is rerun for that operation. User-owned render.py is not replaced. |
 | `scripts/sync_reference_docs.py` | Explicit source/resource inclusion table, canonical local-link validation, rewriting links between included references, deterministic version/export/extra metadata, model-generated JSON schemas, and read-only --check drift detection. Historical audit/release reports are not bulk-copied or rewritten. References to repository-only examples/history retain their canonical source context. |
-| Website builder and Agent `scripts/release_evidence.py` | Share capability/version metadata. The recipe gallery is the existing atlas builder; rows now derive from recipe count instead of ten fixed slots. Its font uses the packaged Core font loader. Recipe production calls CompiledVideo services. |
+| Website builder, `project-map/build.py` and Agent `scripts/release_evidence.py` | Share V2 capability/version metadata. The project atlas is distinct from the recipe gallery. The initial M5 pass missed the project atlas; the follow-up below corrects it. Recipe gallery rows derive from recipe count; its font uses the packaged Core font loader and production calls CompiledVideo services. |
 | Three manifests and public versions; Kit/Agent scaffolds; Kit MANIFEST.in; uv.lock | All distributions use 2.0.0rc1. Kit requires Core >=2.0.0rc1,<3.0.0; Agent requires Kit in that range. Extras forward through their proper owners, including newly forwarded Agent equations. Maps/diagram resources are explicit sdist inputs. |
 | READMEs, llms files, current API/architecture guides, portable skills and website | Current V2 ownership/version/install guidance. ChessChamp remains V1-only with preserved migration/recovery docs. Legacy recovery links were corrected for their moved location. Existing historical verification reports retain their original claims. |
 
@@ -126,3 +126,22 @@ no publication or automatic project migration.
 **M1–M5 implementation is complete.** The next step is release-candidate review
 and the chosen platform/native/media certification scope, followed by licensing
 and publication decisions. There is no additional planned implementation milestone.
+
+## Repository and atlas follow-up
+
+The initial completion claim missed `project-map/`: its builder still referenced
+removed Core web/OS packages and its curated catalog still advertised V1 ownership
+and chess. This follow-up fixes those references, consumes the shared V2 capability
+metadata, regenerates the offline page and adds a read-only atlas drift check.
+Current backend/effects and Kit production descriptions replace obsolete feature
+reservations. Dated V1 history remains labeled historical.
+
+The root keeps the three existing package paths; their names are not evidence of
+an old runtime. The [repository layout guide](repository-layout.md) documents
+current ownership and intentional migration stubs. The scoped cache-cleanup tool
+skips tracked files, symlinks, user projects, environments, assets, prepared caches
+and render evidence. Reference synchronization now covers 50 generated outputs.
+This follow-up passed four focused tooling regressions, including all seven atlas
+view builders, metadata/links, read-only drift detection and cleanup exclusions.
+Interactive browser/visual inspection was unavailable in this session. The 27
+runtime cases above remain original M5 evidence rather than a new full-suite claim.

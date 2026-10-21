@@ -14,13 +14,24 @@ the top-left menu.
 From the repository root, refresh the snapshot with:
 
 ```bash
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/sync_reference_docs.py
 python3 project-map/build.py
+python3 project-map/build.py --check
 ```
 
-The builder uses the standard library. It reads package manifests and Python ASTs,
+The builder uses the standard library. It reads the shared V2 capability metadata
+from `docs/v2/public-capabilities.json`, checks versions/dependencies against package
+manifests, and uses Python ASTs for the current Kit web/desktop APIs. It also
 enumerates premium-reference READMEs, captures local Git history and samples the
 standalone Spring kernel. It does not execute authored scenes, prepare code/web
 assets, render video, run tests, or contact external services.
+
+`--check` returns a nonzero status for a stale snapshot and never writes the page.
+Refresh references first when changing public APIs or manifests. Current feature
+cards follow V2 ownership; the timeline preserves labeled V1 history, including
+the later removal of ChessChamp. Test-module counts include nested domain tests.
+The existing package paths and disposable-cache policy are explained in the
+[repository layout guide](../docs/v2/repository-layout.md).
 
 `src/catalog.js` owns curated feature descriptions, project summaries and major
 milestones. `src/app.js` owns navigation and interactions; `src/style.css` and

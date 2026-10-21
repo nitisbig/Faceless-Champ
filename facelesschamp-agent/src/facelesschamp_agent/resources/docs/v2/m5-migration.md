@@ -51,7 +51,10 @@ selects offline Agent resources, retaining historical reports separately. The
 website and recipe gallery/atlas use the same generated capability metadata.
 Run `python website/scripts/build_content.py` and
 `python website/scripts/verify_examples.py` for the website's content/link gate.
-No independent atlas builder exists; `release_evidence.py` builds the recipe atlas.
+The offline project atlas is built by `project-map/build.py` using the shared V2
+metadata. Run `python3 project-map/build.py --check` to detect a stale page without
+writing. `release_evidence.py` separately builds the recipe gallery. See
+[repository layout and cleanup](repository-layout.md).
 
 The [M5 implementation record](m5-implementation.md) distinguishes executed
 Linux checks from deferred native/platform/browser and human review coverage.
