@@ -12,6 +12,7 @@ from .effects import EffectBlock, ParticleBackdrop, ProceduralBackdrop
 from .flow import FlowDiagram
 from .flow_canvas import FlowCanvas
 from .flow_design import FlowBackdrop, FlowCard, FlowPopup
+from .manim import ManimCanvas
 from .os_ui import FinderWindow, OSWalkthrough, SettingsWindow
 from .web import WebElement, WebWalkthrough
 from .whiteboard import (
@@ -241,3 +242,4 @@ __all__ = [
 from .arch import ArchCanvas
 
 __all__ += ["ArchCanvas"]
+__all__ += ["ManimCanvas"]

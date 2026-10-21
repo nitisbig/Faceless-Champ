@@ -1,0 +1,23 @@
+schema_version = 1
+
+[project]
+name = "Manim equation transformation"
+seed = 0
+safe_margin = 64
+
+[videos.main]
+factory = "scene:build"
+format = "landscape"
+theme = "midnight"
+
+[profiles.preview]
+width = 640
+height = 360
+fps = 15
+antialias = 1
+
+[profiles.final]
+width = 640
+height = 360
+fps = 15
+antialias = 1

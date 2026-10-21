@@ -69,7 +69,7 @@ assert callable(core.main)
 def test_discovery_and_all_exports_never_import_optional_engines():
     code = """
 import importlib.abc, sys
-blocked = {'pyvista','vtk','vtkmodules','numpy','matplotlib','skia','moderngl','glcontext',
+blocked = {'manim','cairo','manimpango','av','pyvista','vtk','vtkmodules','numpy','matplotlib','skia','moderngl','glcontext',
            'build123d','OCP','trimesh','scipy','networkx','manifold3d','fast_simplification',
            'chess','pygments','playwright'}
 class Block(importlib.abc.MetaPathFinder):

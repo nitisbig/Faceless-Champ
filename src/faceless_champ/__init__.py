@@ -65,6 +65,7 @@ if _TYPE_CHECKING:
     from .masks import CircleMask, PathMask, RectangleMask, ShapeMask, Wipe
     from .narration import CueScene
     from .paths import PathData, VectorPath
+    from .prepared import PreparedFrameSource
     from .preview import StoryboardSample, render_storyboard, save_frame
     from .procedural import ParticleField, ProceduralBackground
     from .progress import ExportProgress
@@ -79,6 +80,7 @@ if _TYPE_CHECKING:
     from .typography import CLEAN_FLOW_FONT, fit_text
 
 _EXPORTS = {
+    "PreparedFrameSource": ("prepared", "PreparedFrameSource"),
     "Viewport": ("sources", "Viewport"),
     "RasterSource": ("sources", "RasterSource"),
     "RasterSession": ("sources", "RasterSession"),
@@ -367,6 +369,7 @@ __all__ = [  # noqa: RUF022
     "RasterSource",
     "Viewport",
     "parse_srt_cues",
+    "PreparedFrameSource",
 ]
 
 

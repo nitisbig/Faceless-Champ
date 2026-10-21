@@ -232,3 +232,9 @@ V2 2.0.0rc1 production: compile once, then use CompiledVideo.frame/save_frame/st
 Kit exports media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
 Supplied renderers remain caller-owned; operation metadata is captured before owned sessions close.
 Agent retains checksum/alignment/review policy. A decoded export does not imply visual/editorial approval.
+
+Optional Manim Community 0.22: explicit Cairo subprocess preparation, immutable RGBA PNG playback.
+Core owns PreparedFrameSource and integrations.manim; Kit owns EquationTransform, ManimCanvas and ctx.manim.
+Use Project.prepare/fc-kit prepare before normal builds. Playback/discovery starts no engine; use static Equation/Write when sufficient.
+Agent metadata distinguishes preparation requirements from Pillow-only playback; there is no automatic math router.
+[Manim guide](docs/manim.md).

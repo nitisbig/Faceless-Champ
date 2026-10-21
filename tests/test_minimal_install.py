@@ -27,6 +27,10 @@ def runtime_probe(directory, fixtures, *, minimal=False):
     import wave
 
     blocked = {
+        "manim",
+        "cairo",
+        "manimpango",
+        "av",
         "pyvista",
         "vtk",
         "vtkmodules",

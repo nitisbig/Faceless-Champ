@@ -36,7 +36,7 @@ def test_doctor_and_agent_discovery_open_no_native_engines(tmp_path):
 import importlib.abc, json, sys
 class Block(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
-        if fullname.split('.')[0] in {'pyvista','vtk','vtkmodules','numpy','matplotlib','skia','moderngl','glcontext','build123d','OCP','trimesh','scipy','chess','pygments','playwright'}:
+        if fullname.split('.')[0] in {'manim','cairo','manimpango','av','pyvista','vtk','vtkmodules','numpy','matplotlib','skia','moderngl','glcontext','build123d','OCP','trimesh','scipy','chess','pygments','playwright'}:
             raise AssertionError('unexpected native import: '+fullname)
 sys.meta_path.insert(0,Block())
 from facelesschamp_kit.cli import doctor

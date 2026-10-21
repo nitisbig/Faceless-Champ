@@ -38,6 +38,12 @@ M3 backend convergence and bounded export cancellation:
 [docs/v2/m3-implementation.md](docs/v2/m3-implementation.md).
 M4 domain ownership and migration: [docs/v2/m4-implementation.md](docs/v2/m4-implementation.md).
 
+Optional [Manim mathematical animation](docs/manim.md) prepares authored Cairo
+scenes in an isolated subprocess, then replays verified RGBA frames through the
+existing renderers. Install `faceless-champ[manim]` or select a separate Manim
+environment. Kit supplies an equation-transformation preset and `ManimCanvas`;
+normal playback requires only Pillow and never starts Manim.
+
 ## Premium references
 
 The [premium collection](examples/README.md) is the default scene reference for

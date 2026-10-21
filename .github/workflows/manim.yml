@@ -1,0 +1,43 @@
+name: Optional Manim integration
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/faceless_champ/integrations/manim/**'
+      - 'src/faceless_champ/prepared.py'
+      - 'facelesschamp-kit/src/facelesschamp_kit/mathematics/**'
+      - 'facelesschamp-kit/src/facelesschamp_kit/blocks/manim.py'
+      - 'tests/*manim*'
+      - 'tests/integration/test_manim_render.py'
+      - 'tests/fixtures/manim/**'
+      - 'tests/test_prepared_media.py'
+      - 'facelesschamp-kit/src/facelesschamp_kit/context.py'
+      - 'facelesschamp-agent/src/facelesschamp_agent/registry.py'
+      - 'facelesschamp-kit/tests/test_manim.py'
+      - 'facelesschamp-agent/tests/test_manim.py'
+      - 'examples/mathematics/manim_transform/**'
+      - '**/pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/manim.yml'
+
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libcairo2-dev libpango1.0-dev ffmpeg dvisvgm texlive-latex-extra texlive-fonts-recommended cm-super tipa
+          python -m venv .venv
+          .venv/bin/pip install -e '.[manim]' -e ./facelesschamp-kit -e ./facelesschamp-agent pytest
+      - run: .venv/bin/python -m pytest tests/test_prepared_media.py tests/test_manim_adapter.py tests/integration/test_manim_render.py -q
+        env:
+          FC_MANIM_PYTHON: .venv/bin/python
+          FC_MANIM_TEX: '1'
+      - run: .venv/bin/python -m pytest facelesschamp-kit/tests/test_manim.py -q
+      - run: .venv/bin/python -m pytest facelesschamp-agent/tests/test_manim.py -q

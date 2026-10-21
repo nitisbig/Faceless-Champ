@@ -516,6 +516,32 @@ class CapabilityRegistry:
                 "path": str(path),
             },
         }
+        # Optional descriptive metadata is read as literals, never imported or
+        # executed. Aliases use the defining module's metadata as well.
+        declaration = self._modules.get(origin)
+        if declaration is not None:
+            for statement in declaration[1].body:
+                if isinstance(statement, ast.Assign) and any(
+                    isinstance(target, ast.Name) and target.id == "CAPABILITY_METADATA" for target in statement.targets
+                ):
+                    metadata = _literal(statement.value)
+                    detail = metadata.get(name, {}) if isinstance(metadata, dict) else {}
+                    if not isinstance(detail, dict):
+                        continue
+                    for field in ("family", "category", "preparation", "use_when", "avoid", "documentation"):
+                        if isinstance(detail.get(field), str):
+                            self._entries[key][field] = detail[field]
+                    for field in (
+                        "tags",
+                        "dependencies",
+                        "preparation_requirements",
+                        "playback_requirements",
+                        "output_formats",
+                        "named_targets",
+                    ):
+                        value = detail.get(field)
+                        if isinstance(value, list) and all(isinstance(item, str) for item in value):
+                            self._entries[key][field] = deepcopy(value)
 
     def _add_designs(self, module_name, path, tree, live):
         """Find named preset contracts from mappings and class selectors, without invoking them."""
@@ -662,6 +688,9 @@ class CapabilityRegistry:
             "preparation",
             "dependencies",
             "named_targets",
+            "preparation_requirements",
+            "playback_requirements",
+            "output_formats",
         )
         result = {key: deepcopy(record[key]) for key in keys if key in record}
         result["use_when"] = record.get("use_when", "")[:220]

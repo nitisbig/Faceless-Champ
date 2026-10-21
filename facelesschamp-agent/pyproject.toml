@@ -23,6 +23,7 @@ gpu = ["facelesschamp-kit[gpu]>=2.0.0rc1,<3.0.0"]
 effects = ["facelesschamp-kit[effects]>=2.0.0rc1,<3.0.0"]
 skia = ["facelesschamp-kit[skia]>=2.0.0rc1,<3.0.0"]
 equations = ["facelesschamp-kit[equations]>=2.0.0rc1,<3.0.0"]
+manim = ["facelesschamp-kit[manim]>=2.0.0rc1,<3.0.0"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
 
 [project.scripts]

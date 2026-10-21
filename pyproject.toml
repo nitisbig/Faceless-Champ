@@ -20,6 +20,7 @@ gpu = ["moderngl>=5.13,<6", "glcontext>=3.1,<4", "numpy>=1.26,<3"]
 effects = ["numpy>=1.26,<3"]
 skia = ["skia-python>=144.0.post2,<145", "numpy>=1.26,<3"]
 equations = ["matplotlib>=3.9,<4"]
+manim = ["manim>=0.22,<0.23"]
 
 [project.scripts]
 faceless-champ = "faceless_champ:main"
@@ -33,6 +34,7 @@ dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["manim: explicit native Manim tests (set FC_MANIM_PYTHON)"]
 
 [tool.ruff]
 line-length = 120

@@ -79,6 +79,7 @@ _DOMAIN_EXPORTS = {
     "ArchDimension": ("engineering.annotations", "ArchDimension"),
     "ArchLabel": ("engineering.annotations", "ArchLabel"),
     "ArchScript": ("engineering.script", "ArchScript"),
+    "EquationTransform": ("mathematics", "EquationTransform"),
 }
 __all__ += list(_DOMAIN_EXPORTS)
 

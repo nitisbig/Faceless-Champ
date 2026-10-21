@@ -23,6 +23,7 @@ CATALOG = {
         "CodingPlayground",
         "WebWalkthrough",
         "WebElement",
+        "ManimCanvas",
         "Heading",
         "TextPanel",
         "MetricCard",

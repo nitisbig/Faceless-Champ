@@ -23,6 +23,7 @@ playground = ["Pygments>=2.18,<3", "playwright>=1.58,<2"]
 web = ["playwright>=1.58,<2"]
 maps = ["numpy>=1.26,<3"]
 equations = ["faceless-champ[equations]>=2.0.0rc1,<3.0.0"]
+manim = ["faceless-champ[manim]>=2.0.0rc1,<3.0.0"]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1"]
 
 [project.scripts]

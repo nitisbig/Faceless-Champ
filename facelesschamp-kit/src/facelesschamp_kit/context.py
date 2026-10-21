@@ -51,6 +51,47 @@ class BuildContext:
         with (self.root / path).open(newline="") as stream:
             return list(csv.DictReader(stream))
 
+    def manim(self, spec, *, options=None, python=None, timeout=600, output_limit=2 * 1024**3, cancel=None):
+        """Declare prepared mathematical media; only Project.prepare executes it."""
+        from faceless_champ.integrations.manim import (
+            ManimError,
+            ManimRenderOptions,
+            load_manim,
+            prepare_manim,
+        )
+
+        options = options or ManimRenderOptions(seed=self.seed)
+        try:
+            arguments = {"cache_dir": self.root / ".fc-kit/manim", "options": options, "python": python}
+            if self.preparing:
+                prepared = prepare_manim(
+                    spec,
+                    **arguments,
+                    timeout=timeout,
+                    output_limit=output_limit,
+                    refresh=self.refresh_prepared,
+                    cancel=cancel,
+                )
+            else:
+                prepared = load_manim(spec, **arguments)
+            self.prepared_assets.append(
+                {
+                    "kind": "manim",
+                    "status": "prepared",
+                    "fingerprint": prepared.fingerprint,
+                    "path": str(prepared.directory),
+                    "size": list(prepared.intrinsic_size),
+                    "fps": str(prepared.fps),
+                    "duration": prepared.duration,
+                    "provenance": prepared.provenance,
+                }
+            )
+            return prepared
+        except ManimError as exc:
+            raise KitError(exc.code, str(exc), **exc.details) from exc
+        except (OSError, ValueError, TypeError) as exc:
+            raise KitError("MANIM_ASSET", str(exc)) from exc
+
     def playground(self, script, *, timeout=10, output_limit=1_000_000, fps=15):
         """Declare a prepared dependency. Only Project.prepare executes checkpoints."""
         import hashlib
