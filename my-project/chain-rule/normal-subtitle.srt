@@ -1,0 +1,1128 @@
+1
+00:00:00,060 --> 00:00:02,120
+Imagine looking inside the brain of a modern
+
+2
+00:00:02,120 --> 00:00:04,660
+artificial intelligence right at the moment it learns
+
+3
+00:00:04,660 --> 00:00:07,570
+something new. On the screen, picture a massive
+
+4
+00:00:07,570 --> 00:00:10,320
+network of glowing nodes arranged in tall vertical
+
+5
+00:00:10,320 --> 00:00:13,550
+columns from left to right, connected by thousands
+
+6
+00:00:13,550 --> 00:00:16,000
+of thin pulsing lines. Each line has a
+
+7
+00:00:16,000 --> 00:00:18,910
+tunable dial, a weight that controls how strongly
+
+8
+00:00:18,910 --> 00:00:22,410
+one neuron influences the next. When you show
+
+9
+00:00:22,410 --> 00:00:24,290
+this network an image, a wave of numbers
+
+10
+00:00:24,290 --> 00:00:26,090
+flows from the input column on the far
+
+11
+00:00:26,090 --> 00:00:27,960
+left, all the way to the output column
+
+12
+00:00:27,960 --> 00:00:30,080
+on the far right, where the network makes
+
+13
+00:00:30,080 --> 00:00:32,760
+a guess. Early in training, that guess is
+
+14
+00:00:32,760 --> 00:00:34,700
+usually wrong. At the very end of the
+
+15
+00:00:34,700 --> 00:00:36,940
+network, a single number lights up in red,
+
+16
+00:00:36,940 --> 00:00:39,600
+measuring the size of the mistake. We call
+
+17
+00:00:39,600 --> 00:00:42,320
+this the loss. Now, here is the central
+
+18
+00:00:42,320 --> 00:00:45,100
+mystery of deep learning. Buried all the way
+
+19
+00:00:45,100 --> 00:00:46,950
+back in the very first column on the
+
+20
+00:00:46,950 --> 00:00:48,920
+left is a single dial. To make the
+
+21
+00:00:48,920 --> 00:00:51,250
+network smarter, we need to turn that dial
+
+22
+00:00:51,250 --> 00:00:53,610
+slightly up or slightly down to shrink the
+
+23
+00:00:53,610 --> 00:00:55,760
+red error score at the far right. If
+
+24
+00:00:55,760 --> 00:00:57,800
+that dial does not touch the final output
+
+25
+00:00:57,800 --> 00:01:01,300
+directly, its influence passes through dozens of intermediate
+
+26
+00:01:01,300 --> 00:01:04,430
+layers, getting added, multiplied and bent through curve
+
+27
+00:01:04,430 --> 00:01:07,010
+after curve along the way. How could that
+
+28
+00:01:07,010 --> 00:01:08,900
+one tiny dial at the beginning possibly know
+
+29
+00:01:08,900 --> 00:01:11,180
+how much it contributed to the final mistake
+
+30
+00:01:11,180 --> 00:01:13,470
+at the end? The answer, and the mathematical
+
+31
+00:01:13,470 --> 00:01:16,720
+engine behind virtually all of modern artificial intelligence,
+
+32
+00:01:16,720 --> 00:01:19,560
+is a single, remarkably simple idea from first
+
+33
+00:01:19,560 --> 00:01:22,480
+year calculus. It is called the chain rule.
+
+34
+00:01:22,540 --> 00:01:25,160
+In Rome Shroom, Combs Pawnode, most people first
+
+35
+00:01:25,160 --> 00:01:26,920
+meet the chain rule as a dry rule
+
+36
+00:01:26,920 --> 00:01:29,800
+for shuffling symbols on a page, memorize the
+
+37
+00:01:29,800 --> 00:01:32,660
+formula, pass the test and forget it. But
+
+38
+00:01:32,660 --> 00:01:34,520
+if you look at it visually, the chain
+
+39
+00:01:34,520 --> 00:01:36,680
+rule is not really about algebra at all.
+
+40
+00:01:36,680 --> 00:01:38,730
+It is the mathematics of cause and effect
+
+41
+00:01:38,730 --> 00:01:41,380
+flowing through a chain of connected systems. And
+
+42
+00:01:41,380 --> 00:01:43,480
+once you see what it actually looks like,
+
+43
+00:01:43,480 --> 00:01:46,570
+both calculus and neural networks suddenly click into
+
+44
+00:01:46,570 --> 00:01:48,700
+place. To see why, let us clear the
+
+45
+00:01:48,700 --> 00:01:51,040
+complex network from the screen and start with
+
+46
+00:01:51,040 --> 00:01:54,110
+the simplest possible visual building block. What a
+
+47
+00:01:54,110 --> 00:01:56,840
+derivative actually looks like when you strip away
+
+48
+00:01:56,840 --> 00:01:59,600
+the jargon. Instead of drawing a traditional coordinate
+
+49
+00:01:59,600 --> 00:02:01,160
+grid with a curved line and a tangent
+
+50
+00:02:01,160 --> 00:02:04,380
+slope, let us try a different picture. Imagine
+
+51
+00:02:04,380 --> 00:02:06,720
+two horizontal number lines floating on a dark
+
+52
+00:02:06,720 --> 00:02:09,450
+background. One stacked directly above the other. On
+
+53
+00:02:09,450 --> 00:02:11,610
+the top number line sits a glowing blue
+
+54
+00:02:11,610 --> 00:02:15,030
+slider. This represents our input variable, which we
+
+55
+00:02:15,030 --> 00:02:17,240
+will call X. On the bottom number line
+
+56
+00:02:17,240 --> 00:02:20,120
+sits a glowing yellow slider. This represents our
+
+57
+00:02:20,120 --> 00:02:22,920
+output variable, which we will call Y. Suppose
+
+58
+00:02:22,920 --> 00:02:24,970
+these two sliders are linked by a simple
+
+59
+00:02:24,970 --> 00:02:28,670
+rule. Y equals X squared. Whenever you drag
+
+60
+00:02:28,670 --> 00:02:30,630
+the blue slider along the top line, the
+
+61
+00:02:30,630 --> 00:02:33,640
+yellow slider automatically moves to the matching squared
+
+62
+00:02:33,640 --> 00:02:35,890
+value on the bottom line. Let us place
+
+63
+00:02:35,890 --> 00:02:38,240
+the blue slider right at the number three.
+
+64
+00:02:38,240 --> 00:02:40,820
+Because three squared is nine. The yellow slider
+
+65
+00:02:40,820 --> 00:02:42,830
+on the bottom line settles right at the
+
+66
+00:02:42,830 --> 00:02:45,540
+number nine. Now, watch what happens when we
+
+67
+00:02:45,540 --> 00:02:47,480
+give the blue slider a tiny nudge to
+
+68
+00:02:47,480 --> 00:02:50,280
+the right. Watch a small green arrow pushing
+
+69
+00:02:50,280 --> 00:02:52,100
+X forward by a tiny fraction of a
+
+70
+00:02:52,100 --> 00:02:54,820
+unit. In calculus, we call the length of
+
+71
+00:02:54,820 --> 00:02:57,310
+that tiny input nudge DX. The moment X
+
+72
+00:02:57,310 --> 00:02:59,450
+nudge is forward, the yellow slider on the
+
+73
+00:02:59,450 --> 00:03:01,580
+bottom line responds with its own nudge to
+
+74
+00:03:01,580 --> 00:03:04,400
+the right, which we call DY. Because we
+
+75
+00:03:04,400 --> 00:03:06,080
+are sitting near X equals three on a
+
+76
+00:03:06,080 --> 00:03:09,330
+squaring function. That bottom nudge is noticeably wider
+
+77
+00:03:09,330 --> 00:03:11,990
+than the top nudge. Specifically, if you zoom
+
+78
+00:03:11,990 --> 00:03:14,800
+in closely around this spot, the bottom arrow
+
+79
+00:03:14,800 --> 00:03:17,520
+DY is almost exactly six times as wide
+
+80
+00:03:17,520 --> 00:03:20,670
+as the top arrow DX. That magnification factor,
+
+81
+00:03:20,670 --> 00:03:22,860
+how much the output nudge gets stretched or
+
+82
+00:03:22,860 --> 00:03:25,120
+shrunk compared to the input nudge, is the
+
+83
+00:03:25,120 --> 00:03:28,020
+entire meaning of a derivative. When we write
+
+84
+00:03:28,020 --> 00:03:30,780
+DY over DX, we are simply asking, if
+
+85
+00:03:30,780 --> 00:03:32,720
+I wiggle the top slider by a tiny
+
+86
+00:03:32,720 --> 00:03:35,220
+amount, by what factor does that wiggle get
+
+87
+00:03:35,220 --> 00:03:38,300
+amplified on the bottom slider? For the function
+
+88
+00:03:38,300 --> 00:03:40,750
+Y equals X squared, calculus tells us the
+
+89
+00:03:40,750 --> 00:03:43,890
+derivative is two times X. And X equals
+
+90
+00:03:43,890 --> 00:03:46,610
+three, two times three is six. So any
+
+91
+00:03:46,610 --> 00:03:49,590
+tiny input nudge gets magnified by a factor
+
+92
+00:03:49,590 --> 00:03:52,310
+of six, hoof. With that visual anchor in
+
+93
+00:03:52,310 --> 00:03:54,560
+place, we are ready to build a chain.
+
+94
+00:03:54,560 --> 00:03:56,620
+What happens when we add a third horizontal
+
+95
+00:03:56,620 --> 00:03:58,320
+number line at the very bottom of the
+
+96
+00:03:58,320 --> 00:04:01,050
+screen? Let us place a glowing red slider
+
+97
+00:04:01,050 --> 00:04:03,320
+on this third line and call it Z.
+
+98
+00:04:03,320 --> 00:04:05,480
+Now we have a three level cascade stacked
+
+99
+00:04:05,480 --> 00:04:07,580
+from top to bottom. The blue slider X
+
+100
+00:04:07,580 --> 00:04:09,640
+at the top controls the yellow slider Y
+
+101
+00:04:09,640 --> 00:04:11,850
+in the middle, and the yellow slider Y
+
+102
+00:04:11,850 --> 00:04:14,300
+in the middle controls the red slider Z
+
+103
+00:04:14,300 --> 00:04:16,770
+at the bottom. Before we put any complicated
+
+104
+00:04:16,770 --> 00:04:19,280
+curves into this system, imagine these three sliders
+
+105
+00:04:19,280 --> 00:04:22,530
+are linked like simple mechanical gears. Suppose that
+
+106
+00:04:22,530 --> 00:04:24,370
+whenever we nudge the top slider X, the
+
+107
+00:04:24,370 --> 00:04:26,790
+middle slider Y moves twice as far, in
+
+108
+00:04:26,790 --> 00:04:30,240
+the language of derivatives, the scaling factor from
+
+109
+00:04:30,240 --> 00:04:32,720
+X to Y, written as DY over DX
+
+110
+00:04:32,720 --> 00:04:35,840
+equals two. At the same time, suppose that
+
+111
+00:04:35,840 --> 00:04:38,300
+whenever the middle slider Y moves, the bottom
+
+112
+00:04:38,300 --> 00:04:41,110
+slider Z moves three times as far as
+
+113
+00:04:41,110 --> 00:04:42,040
+Y did. That means the scaling factor from
+
+114
+00:04:42,040 --> 00:04:42,610
+Y to Z, written as DZ over DY
+
+115
+00:04:42,610 --> 00:04:50,320
+equals three. Now ask yourself the natural question.
+
+116
+00:04:50,320 --> 00:04:52,000
+If we give the top slider X a
+
+117
+00:04:52,000 --> 00:04:54,560
+tiny nudge DX, how much does the bottom
+
+118
+00:04:54,560 --> 00:04:57,500
+slider Z move in response? Let us watch
+
+119
+00:04:57,500 --> 00:04:59,810
+the nudge travel down the screen step by
+
+120
+00:04:59,810 --> 00:05:02,030
+step. First, the tiny arrow DX on the
+
+121
+00:05:02,030 --> 00:05:04,200
+top line drops down to the middle line,
+
+122
+00:05:04,200 --> 00:05:06,920
+where it gets stretched to twice its original
+
+123
+00:05:06,920 --> 00:05:10,340
+length. That new doubled arrow is DY. Next,
+
+124
+00:05:10,340 --> 00:05:12,290
+that middle arrow drops down to the bottom
+
+125
+00:05:12,290 --> 00:05:14,360
+line, where it gets stretched by a factor
+
+126
+00:05:14,360 --> 00:05:17,360
+of three. An arrow that was first multiplied
+
+127
+00:05:17,360 --> 00:05:19,680
+by two, and then multiplied by three, ends
+
+128
+00:05:19,680 --> 00:05:21,640
+up six times as long as the original
+
+129
+00:05:21,640 --> 00:05:24,110
+nudge at the top. Two multiplied by three
+
+130
+00:05:24,110 --> 00:05:27,140
+equals six. That is the chain rule. Visually,
+
+131
+00:05:27,140 --> 00:05:29,170
+if one system magnifies a nudge by a
+
+132
+00:05:29,170 --> 00:05:32,170
+first factor, and a second system magnifies that
+
+133
+00:05:32,170 --> 00:05:35,050
+result by a second factor, the total magnification
+
+134
+00:05:35,050 --> 00:05:37,480
+from start to finish is simply the product
+
+135
+00:05:37,480 --> 00:05:39,790
+of the two factors. Written out as an
+
+136
+00:05:39,790 --> 00:05:42,220
+equation, the derivative of Z with respect to
+
+137
+00:05:42,220 --> 00:05:44,790
+X equals the derivative of Z with respect
+
+138
+00:05:44,790 --> 00:05:47,690
+to Y, multiplied by the derivative of Y
+
+139
+00:05:47,690 --> 00:05:50,860
+with respect to X, or in fraction form,
+
+140
+00:05:50,860 --> 00:05:54,910
+DZ over DX equals DZ over DY times
+
+141
+00:05:54,910 --> 00:05:57,700
+DY over DX. When you see those two
+
+142
+00:05:57,700 --> 00:05:59,600
+ratios side by side on the screen, it
+
+143
+00:05:59,600 --> 00:06:02,420
+looks almost irresistible to cross out the matching
+
+144
+00:06:02,420 --> 00:06:04,840
+DY terms in the numerator and the denominator,
+
+145
+00:06:04,840 --> 00:06:07,840
+as if they were ordinary fractions cancelling out.
+
+146
+00:06:07,840 --> 00:06:10,190
+In many classrooms, you are strictly warned never
+
+147
+00:06:10,190 --> 00:06:12,360
+to think of it that way, because derivatives
+
+148
+00:06:12,360 --> 00:06:15,300
+are formally defined as limits rather than static
+
+149
+00:06:15,300 --> 00:06:18,570
+fractions. Yet when you picture derivatives as actual,
+
+150
+00:06:18,570 --> 00:06:21,440
+tiny nudges on stacked number lines, before shrinking
+
+151
+00:06:21,440 --> 00:06:23,820
+them down towards zero, the middle change DY
+
+152
+00:06:23,820 --> 00:06:26,860
+literally is the same intermediate movement in both
+
+153
+00:06:26,860 --> 00:06:29,210
+ratios. It is the output of the first
+
+154
+00:06:29,210 --> 00:06:31,680
+step, and the input to the second step.
+
+155
+00:06:31,740 --> 00:06:34,030
+Knowing the two ratios works precisely because the
+
+156
+00:06:34,030 --> 00:06:36,090
+middle nudge bridges the top line and the
+
+157
+00:06:36,090 --> 00:06:38,250
+bottom line. Now let us see how this
+
+158
+00:06:38,250 --> 00:06:40,880
+visual chain handles a genuine non-linear function that
+
+159
+00:06:40,880 --> 00:06:44,120
+looks intimidating on paper. Let us place the
+
+160
+00:06:44,120 --> 00:06:46,680
+equation Z equals the sine of X squared
+
+161
+00:06:46,680 --> 00:06:48,800
+at the top of the screen. If you
+
+162
+00:06:48,800 --> 00:06:50,680
+try to picture the graph of the sine
+
+163
+00:06:50,680 --> 00:06:52,370
+of X squared all at once, you see
+
+164
+00:06:52,370 --> 00:06:54,990
+a wave that oscillates faster and faster as
+
+165
+00:06:54,990 --> 00:06:57,480
+you move away from zero, finding the slope
+
+166
+00:06:57,480 --> 00:07:01,000
+of that compressed wave directly feels daunting. Instead,
+
+167
+00:07:01,000 --> 00:07:03,120
+let us break the formula apart, and feed
+
+168
+00:07:03,120 --> 00:07:06,040
+it into our three stacked number lines. On
+
+169
+00:07:06,040 --> 00:07:08,920
+the top line sits our input slider, X.
+
+170
+00:07:08,920 --> 00:07:10,600
+To get from the top line to the
+
+171
+00:07:10,600 --> 00:07:12,900
+middle line Y, we apply the inside part
+
+172
+00:07:12,900 --> 00:07:16,390
+of the formula, Y equals X squared. Then,
+
+173
+00:07:16,390 --> 00:07:18,040
+to get from the middle line Y to
+
+174
+00:07:18,040 --> 00:07:20,240
+the bottom line Z, we apply the outside
+
+175
+00:07:20,240 --> 00:07:23,040
+part of the formula, Z equals the sine
+
+176
+00:07:23,040 --> 00:07:25,640
+of Y, look at how clean that is.
+
+177
+00:07:25,640 --> 00:07:28,020
+Neither step is complicated on its own. The
+
+178
+00:07:28,020 --> 00:07:30,120
+first step is just a simple parabola, and
+
+179
+00:07:30,120 --> 00:07:32,080
+the second step is just a standard sine
+
+180
+00:07:32,080 --> 00:07:34,540
+wave. Now let us send a tiny nudge
+
+181
+00:07:34,540 --> 00:07:36,620
+DX into the top slider, and watch how
+
+182
+00:07:36,620 --> 00:07:39,280
+it scales as it falls through both steps.
+
+183
+00:07:39,280 --> 00:07:41,140
+As the nudge drops from the top line
+
+184
+00:07:41,140 --> 00:07:42,880
+X to the middle line Y, it passes
+
+185
+00:07:42,880 --> 00:07:47,320
+through the squaring rule, Y equals X squared.
+
+186
+00:07:47,320 --> 00:07:49,700
+We already know that the local scaling factor
+
+187
+00:07:49,700 --> 00:07:51,300
+for X squared is 2 times X, so
+
+188
+00:07:51,300 --> 00:07:54,000
+on the middle line, the arrow DY has
+
+189
+00:07:54,000 --> 00:07:57,160
+a length of 2 times X multiplied by
+
+190
+00:07:57,160 --> 00:07:59,920
+DX. Next, that middle arrow DY triggers a
+
+191
+00:07:59,920 --> 00:08:02,680
+movement on the bottom line Z, passing through
+
+192
+00:08:02,680 --> 00:08:05,640
+the rule Z equals the sine of Y.
+
+193
+00:08:05,640 --> 00:08:08,370
+From basic calculus, the scaling factor for a
+
+194
+00:08:08,370 --> 00:08:10,050
+sine wave at any point Y is the
+
+195
+00:08:10,050 --> 00:08:12,950
+cosine of Y, so whatever nudge arrives at
+
+196
+00:08:12,950 --> 00:08:15,350
+the middle line gets multiplied by the cosine
+
+197
+00:08:15,350 --> 00:08:17,040
+of Y as it drops to the bottom
+
+198
+00:08:17,040 --> 00:08:19,800
+line. But the two steps together, the initial
+
+199
+00:08:19,800 --> 00:08:22,200
+nudge DX first gets multiplied by 2 times
+
+200
+00:08:22,200 --> 00:08:24,910
+X, and then gets multiplied by the cosine
+
+201
+00:08:24,910 --> 00:08:27,560
+of Y, therefore the overall scaling factor from
+
+202
+00:08:27,560 --> 00:08:30,520
+top to bottom, DZ over DX, is simply
+
+203
+00:08:30,520 --> 00:08:33,600
+2 times X multiplied by the cosine of
+
+204
+00:08:33,600 --> 00:08:36,160
+Y. Finally, to write our answer purely in
+
+205
+00:08:36,160 --> 00:08:38,520
+terms of our original input X, we remember
+
+206
+00:08:38,520 --> 00:08:40,720
+that the middle slider Y is, sits at
+
+207
+00:08:40,720 --> 00:08:43,600
+the position X squared, replacing Y with X
+
+208
+00:08:43,600 --> 00:08:47,110
+squared gives us our complete derivative, 2 times
+
+209
+00:08:47,110 --> 00:08:50,080
+X multiplied by the cosine of X squared.
+
+210
+00:08:50,080 --> 00:08:52,280
+Every time you hear the classic textbook phrase,
+
+211
+00:08:52,280 --> 00:08:55,060
+take the derivative of the outside function, leave
+
+212
+00:08:55,060 --> 00:08:57,600
+the inside alone, and multiply by the derivative
+
+213
+00:08:57,600 --> 00:09:00,390
+of the inside function. This three line cascade
+
+214
+00:09:00,390 --> 00:09:02,960
+is what is actually happening. You keep the
+
+215
+00:09:02,960 --> 00:09:05,650
+inside function inside the cosine, because the bottom
+
+216
+00:09:05,650 --> 00:09:08,520
+slider's sensitivity depends on where the middle slider
+
+217
+00:09:08,520 --> 00:09:10,720
+is currently sitting, and you multiply by the
+
+218
+00:09:10,720 --> 00:09:13,250
+derivative of the inside function, because the middle
+
+219
+00:09:13,250 --> 00:09:15,840
+slider's movement was already stretched by that exact
+
+220
+00:09:15,840 --> 00:09:18,640
+factor, before it ever reached the final step.
+
+221
+00:09:18,640 --> 00:09:20,900
+Now, hold that image of the three stacked
+
+222
+00:09:20,900 --> 00:09:23,120
+number lines in your mind, and watch as
+
+223
+00:09:23,120 --> 00:09:25,890
+we rotate them 90 degrees, so they stand
+
+224
+00:09:25,890 --> 00:09:28,520
+vertically from left to right. Let us add
+
+225
+00:09:28,520 --> 00:09:31,040
+a fourth vertical line, then a fifth, then
+
+226
+00:09:31,040 --> 00:09:34,490
+dozens more, turning our simple three-step chain into
+
+227
+00:09:34,490 --> 00:09:37,370
+a long corridor of linked sliders. Around each
+
+228
+00:09:37,370 --> 00:09:39,240
+line, let us bring back the glowing nodes
+
+229
+00:09:39,240 --> 00:09:41,500
+and connecting lines from the beginning of the
+
+230
+00:09:41,500 --> 00:09:43,980
+video. Just like that, we are back inside
+
+231
+00:09:43,980 --> 00:09:47,210
+our artificial intelligence network. A deep neural network
+
+232
+00:09:47,210 --> 00:09:49,890
+is nothing more than a massive composite function,
+
+233
+00:09:49,890 --> 00:09:52,910
+a long chain of simple mathematical steps feeding
+
+234
+00:09:52,910 --> 00:09:54,980
+one into the next. Let us highlight a
+
+235
+00:09:54,980 --> 00:09:56,910
+single path glowing in gold from the first
+
+236
+00:09:56,910 --> 00:09:58,800
+column on the left to the final error
+
+237
+00:09:58,800 --> 00:10:01,200
+score on the right. At the very beginning
+
+238
+00:10:01,200 --> 00:10:03,240
+of this path is our single tunable dial,
+
+239
+00:10:03,240 --> 00:10:05,100
+a weight we will call W, when we
+
+240
+00:10:05,100 --> 00:10:07,640
+nudge that dial by a tiny amount DW,
+
+241
+00:10:07,640 --> 00:10:09,960
+it nudges the value of a neuron in
+
+242
+00:10:10,020 --> 00:10:13,200
+the first layer, which we will call A1.
+
+243
+00:10:13,200 --> 00:10:15,400
+At tiny shift in A1 nudges are connected
+
+244
+00:10:15,400 --> 00:10:17,640
+neuron in the second layer, which we will
+
+245
+00:10:17,640 --> 00:10:20,970
+call A2. At shift in A2 nudges a
+
+246
+00:10:20,970 --> 00:10:24,320
+neuron in the third layer, A3. And finally,
+
+247
+00:10:24,320 --> 00:10:26,560
+at shift changes the red error score at
+
+248
+00:10:26,560 --> 00:10:29,050
+the end, the loss L. Remember our original
+
+249
+00:10:29,050 --> 00:10:31,160
+question, how does the computer know how to
+
+250
+00:10:31,160 --> 00:10:33,800
+adjust that very first dial W to reduce
+
+251
+00:10:33,800 --> 00:10:36,760
+the final error L? In calculus terms, the
+
+252
+00:10:36,760 --> 00:10:39,480
+computer needs to know the total sensitivity connecting
+
+253
+00:10:39,480 --> 00:10:42,110
+the start of the chain to the end
+
+254
+00:10:42,110 --> 00:10:45,090
+of the chain, DL over DW. Thanks to
+
+255
+00:10:45,090 --> 00:10:47,250
+the chain rule, the computer never has to
+
+256
+00:10:47,250 --> 00:10:49,940
+solve one giant impossible equation for the whole
+
+257
+00:10:49,940 --> 00:10:53,140
+network. Instead, it breaks the problem into tiny
+
+258
+00:10:53,140 --> 00:10:57,130
+local steps along the path. The total sensitivity
+
+259
+00:10:57,130 --> 00:11:00,790
+DL over DW is simply DL over DA3,
+
+260
+00:11:00,790 --> 00:11:04,730
+multiplied by DA3 over DA2, multiplied by DA2
+
+261
+00:11:04,730 --> 00:11:09,390
+over DA1, multiplied by DA1 over DW. When
+
+262
+00:11:09,390 --> 00:11:12,230
+an artificial intelligence trains on data, an algorithm
+
+263
+00:11:12,230 --> 00:11:14,140
+starts at the final error on the right
+
+264
+00:11:14,140 --> 00:11:16,580
+side of the screen and walks backward toward
+
+265
+00:11:16,580 --> 00:11:18,920
+the left, layer by layer. At each step,
+
+266
+00:11:18,920 --> 00:11:21,260
+it measures the local scaling factor between two
+
+267
+00:11:21,260 --> 00:11:24,230
+neighboring columns, and multiplies it into a running
+
+268
+00:11:24,230 --> 00:11:26,630
+total. By the time that backward wave reaches
+
+269
+00:11:26,630 --> 00:11:28,960
+the first layer, every single weight knows its
+
+270
+00:11:28,960 --> 00:11:32,220
+exact magnification factor, relative to the final mistake,
+
+271
+00:11:32,220 --> 00:11:34,750
+and nudges itself in the opposite direction to
+
+272
+00:11:34,750 --> 00:11:37,750
+make the error smaller. Computer scientists call this
+
+273
+00:11:37,750 --> 00:11:40,720
+backward walk back propagation, but underneath the impressive
+
+274
+00:11:40,720 --> 00:11:43,080
+name, it is purely the chain rule running
+
+275
+00:11:43,080 --> 00:11:46,520
+in reverse across millions of sliders at once.
+
+276
+00:11:46,520 --> 00:11:48,110
+So the next time you see an intricate
+
+277
+00:11:48,110 --> 00:11:50,320
+derivative in a calculus textbook, or watch an
+
+278
+00:11:50,320 --> 00:11:53,900
+artificial intelligence generate human language and art, look
+
+279
+00:11:53,900 --> 00:11:56,950
+past the surface complexity. Underneath it all is
+
+280
+00:11:56,950 --> 00:11:59,880
+the same gentle geometry, a single tiny nudge,
+
+281
+00:11:59,880 --> 00:12:02,520
+rippling through a chain of connected spaces, scaling
+
+282
+00:12:02,520 --> 00:12:04,040
+step by step along the way.
+

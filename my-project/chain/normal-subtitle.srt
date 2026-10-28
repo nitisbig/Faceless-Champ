@@ -1,0 +1,688 @@
+1
+00:00:00,070 --> 00:00:02,620
+Right now, somewhere in the world, a neural
+
+2
+00:00:02,620 --> 00:00:05,700
+network is learning. It has billions of tiny
+
+3
+00:00:05,700 --> 00:00:08,210
+dials, and every single dial must be nudged
+
+4
+00:00:08,210 --> 00:00:10,800
+in exactly the right direction, by exactly the
+
+5
+00:00:10,800 --> 00:00:13,120
+right amount. But how does it know which
+
+6
+00:00:13,120 --> 00:00:15,760
+way to turn one dial, buried deep inside,
+
+7
+00:00:15,760 --> 00:00:17,670
+many layers away from the answer it is
+
+8
+00:00:17,670 --> 00:00:20,090
+judged on? The answer is one idea from
+
+9
+00:00:20,090 --> 00:00:22,980
+calculus, an idea you may have memorized, without
+
+10
+00:00:22,980 --> 00:00:25,920
+ever feeling why it works. The chain rule,
+
+11
+00:00:25,990 --> 00:00:27,660
+it is the same idea that tells you
+
+12
+00:00:27,660 --> 00:00:29,920
+how fast a shadow races across the ground,
+
+13
+00:00:29,920 --> 00:00:32,120
+when a lamp swings overhead, and how a
+
+14
+00:00:32,120 --> 00:00:34,730
+tiny change in an interest rate ripples through
+
+15
+00:00:34,730 --> 00:00:37,050
+a bank balance. In the next seven minutes,
+
+16
+00:00:37,050 --> 00:00:39,210
+we will build the chain rule from nothing.
+
+17
+00:00:39,210 --> 00:00:41,690
+We start with a simple picture, three gears
+
+18
+00:00:41,690 --> 00:00:44,560
+turning one another. Then we derive the rule
+
+19
+00:00:44,560 --> 00:00:47,730
+from first principles, using only the definition of
+
+20
+00:00:47,730 --> 00:00:49,770
+a derivative. We test it on a real
+
+21
+00:00:49,770 --> 00:00:52,370
+example, the sign of X squared, and watch
+
+22
+00:00:52,370 --> 00:00:55,150
+the numbers agree. And finally, we return to
+
+23
+00:00:55,150 --> 00:00:58,080
+that neural network, and discover that its entire
+
+24
+00:00:58,080 --> 00:01:01,000
+learning process is this one rule, repeated again
+
+25
+00:01:01,000 --> 00:01:03,350
+and again. The year album day. By the
+
+26
+00:01:03,350 --> 00:01:06,120
+end, you will not just know the formula,
+
+27
+00:01:06,120 --> 00:01:08,470
+you will see it. Imagine three gears in
+
+28
+00:01:08,470 --> 00:01:11,170
+a row, glowing against a dark background. The
+
+29
+00:01:11,170 --> 00:01:14,070
+first gear, call it gear A, meshes with
+
+30
+00:01:14,070 --> 00:01:17,110
+the second, gear B. Gear B, meshes with
+
+31
+00:01:17,110 --> 00:01:19,940
+the third, gear C. Suppose every time gear
+
+32
+00:01:19,940 --> 00:01:22,260
+A makes one full turn, gear B makes
+
+33
+00:01:22,260 --> 00:01:24,850
+two full turns. So gear B moves twice
+
+34
+00:01:24,850 --> 00:01:27,510
+as fast as gear A. Label that rate
+
+35
+00:01:27,510 --> 00:01:30,690
+on screen, times two. Now suppose every time
+
+36
+00:01:30,690 --> 00:01:32,530
+gear B makes one full turn, gear C
+
+37
+00:01:32,530 --> 00:01:35,080
+makes three full turns. So gear C moves
+
+38
+00:01:35,080 --> 00:01:37,520
+three times as fast as gear B. Label
+
+39
+00:01:37,520 --> 00:01:40,670
+that rate times three. Here is the question.
+
+40
+00:01:40,670 --> 00:01:43,140
+When gear A turns once, how many times
+
+41
+00:01:43,140 --> 00:01:45,870
+does gear C turn? Gear A turns once,
+
+42
+00:01:45,870 --> 00:01:48,750
+gear B turns twice. And each of those
+
+43
+00:01:48,750 --> 00:01:51,440
+two turns sends gear C around three times,
+
+44
+00:01:51,440 --> 00:01:54,310
+two times three, six full turns. Watch the
+
+45
+00:01:54,310 --> 00:01:56,960
+two and the three slide together and merge
+
+46
+00:01:56,960 --> 00:01:59,500
+into a six, rates multiply. Hold on to
+
+47
+00:01:59,500 --> 00:02:02,130
+that, because that is the chain rule in
+
+48
+00:02:02,130 --> 00:02:04,420
+disguise. A derivative is just a rate, how
+
+49
+00:02:04,420 --> 00:02:07,030
+fast an output changes compared to its input.
+
+50
+00:02:07,030 --> 00:02:09,360
+And when one thing drives a second thing,
+
+51
+00:02:09,360 --> 00:02:11,990
+which drives a third, the rates multiply. Now
+
+52
+00:02:11,990 --> 00:02:14,650
+let us swap the gears for functions. Picture
+
+53
+00:02:14,650 --> 00:02:17,540
+two machines sitting side by side, connected by
+
+54
+00:02:17,540 --> 00:02:20,320
+a pipe. A number X enters the first
+
+55
+00:02:20,320 --> 00:02:23,360
+machine, which we call G. Outcomes a new
+
+56
+00:02:23,360 --> 00:02:26,630
+number U. Then U enters the second machine
+
+57
+00:02:26,630 --> 00:02:30,440
+called F. And out comes the final number
+
+58
+00:02:30,440 --> 00:02:32,720
+Y. So Y equals F of G of
+
+59
+00:02:32,720 --> 00:02:35,271
+X, a function inside a function. We want
+
+60
+00:02:35,270 --> 00:02:37,400
+to know if we nudge X by a
+
+61
+00:02:37,400 --> 00:02:40,630
+tiny amount, how much does Y move? Watch
+
+62
+00:02:40,630 --> 00:02:43,330
+the nudge travel. On the number line, we
+
+63
+00:02:43,330 --> 00:02:45,550
+push X forward by a tiny step, which
+
+64
+00:02:45,550 --> 00:02:48,450
+we call Delta X. The first machine stretches
+
+65
+00:02:48,450 --> 00:02:50,460
+or squeezes that step into a new step
+
+66
+00:02:50,460 --> 00:02:52,640
+in U called Delta U. Then the second
+
+67
+00:02:52,640 --> 00:02:55,750
+machine stretches or squeezes Delta U into a
+
+68
+00:02:55,750 --> 00:02:58,310
+step in Y called Delta Y. Each machine
+
+69
+00:02:58,310 --> 00:03:00,720
+behaves like a gear with its own local
+
+70
+00:03:00,720 --> 00:03:04,120
+rate. The first machine's rate compares Delta U
+
+71
+00:03:04,120 --> 00:03:06,880
+to Delta X. The second machine's rate compares
+
+72
+00:03:06,880 --> 00:03:09,150
+Delta Y to Delta U. The nudge travels
+
+73
+00:03:09,150 --> 00:03:12,160
+down the chain, getting scaled at every link,
+
+74
+00:03:12,160 --> 00:03:14,940
+let us make this precise. The derivative of
+
+75
+00:03:14,940 --> 00:03:16,830
+Y with respect to X is defined as
+
+76
+00:03:16,830 --> 00:03:19,060
+a limit. The change in Y divided by
+
+77
+00:03:19,060 --> 00:03:20,890
+the change in X as the change in
+
+78
+00:03:20,890 --> 00:03:23,840
+X shrinks towards zero. Now comes one small
+
+79
+00:03:23,840 --> 00:03:26,350
+trick. We rewrite Delta Y over Delta X
+
+80
+00:03:26,350 --> 00:03:30,150
+as two fractions multiplied together. Delta Y over
+
+81
+00:03:30,150 --> 00:03:32,770
+Delta U times Delta U over Delta X
+
+82
+00:03:32,770 --> 00:03:36,280
+is that allowed. Watch the screen. Delta U
+
+83
+00:03:36,280 --> 00:03:38,580
+sits on the top of one fraction and
+
+84
+00:03:38,580 --> 00:03:40,580
+the bottom of the other, so it cancels,
+
+85
+00:03:40,580 --> 00:03:43,450
+leaving exactly what we started with. Nothing has
+
+86
+00:03:43,450 --> 00:03:45,680
+changed. We have only added a stepping stone
+
+87
+00:03:45,680 --> 00:03:48,080
+in the middle. Now look at each piece.
+
+88
+00:03:48,080 --> 00:03:50,550
+The right fraction Delta U over Delta X
+
+89
+00:03:50,550 --> 00:03:53,080
+is the rate of the first machine. The
+
+90
+00:03:53,080 --> 00:03:55,250
+left fraction Delta Y over Delta U is
+
+91
+00:03:55,250 --> 00:03:58,170
+the rate of the second machine. Next, let
+
+92
+00:03:58,170 --> 00:04:01,300
+Delta X shrink towards zero, because the first
+
+93
+00:04:01,300 --> 00:04:04,170
+machine is smooth. When Delta X shrinks, Delta
+
+94
+00:04:04,170 --> 00:04:06,470
+U shrinks right along with it. So both
+
+95
+00:04:06,470 --> 00:04:09,760
+fractions settle into true derivatives. The left fraction
+
+96
+00:04:09,760 --> 00:04:12,380
+becomes the derivative of Y with respect to
+
+97
+00:04:12,380 --> 00:04:15,310
+U. The right fraction becomes the derivative of
+
+98
+00:04:15,310 --> 00:04:17,750
+U with respect to X. And there it
+
+99
+00:04:17,750 --> 00:04:20,430
+is. The derivative of Y with respect to
+
+100
+00:04:20,430 --> 00:04:23,190
+X equals the derivative of Y with respect
+
+101
+00:04:23,190 --> 00:04:25,300
+to U times the derivative of U with
+
+102
+00:04:25,300 --> 00:04:27,870
+respect to X. In plain words, the rate
+
+103
+00:04:27,870 --> 00:04:30,160
+of the outer machine measured at the inner
+
+104
+00:04:30,160 --> 00:04:32,630
+machine's output times the rate of the inner
+
+105
+00:04:32,630 --> 00:04:35,610
+machine. One honest footnote, if Delta U ever
+
+106
+00:04:35,610 --> 00:04:39,040
+lands on exactly zero, the canceling step breaks
+
+107
+00:04:39,040 --> 00:04:41,320
+and a fully rigorous proof handles that case
+
+108
+00:04:41,320 --> 00:04:43,620
+separately. But the heart of the idea is
+
+109
+00:04:43,620 --> 00:04:46,310
+complete. The total rate is the product of
+
+110
+00:04:46,310 --> 00:04:48,780
+the rates along the chain. Let us test
+
+111
+00:04:48,780 --> 00:04:50,380
+it on Y equals the sign of X
+
+112
+00:04:50,380 --> 00:04:53,370
+squared. On the left, a parabola, on the
+
+113
+00:04:53,370 --> 00:04:56,580
+right, a sine wave. The inner machine is
+
+114
+00:04:56,580 --> 00:04:59,050
+U equals X squared. The outer machine is
+
+115
+00:04:59,050 --> 00:05:01,430
+Y equals the sign of U. The inner
+
+116
+00:05:01,430 --> 00:05:03,990
+rate is 2X. The outer rate is the
+
+117
+00:05:03,990 --> 00:05:07,210
+cosine of U. Multiply them, put X squared
+
+118
+00:05:07,210 --> 00:05:09,140
+back in for U. And we get the
+
+119
+00:05:09,140 --> 00:05:12,550
+derivative equals 2X times the cosine of X
+
+120
+00:05:12,550 --> 00:05:15,640
+squared. But is the formula telling the truth?
+
+121
+00:05:15,640 --> 00:05:17,651
+Let us check at X equals 1, at
+
+122
+00:05:17,650 --> 00:05:19,840
+X equals 1, the inner rate is 2.
+
+123
+00:05:19,840 --> 00:05:22,700
+So the first machine stretches every tiny nudge
+
+124
+00:05:22,700 --> 00:05:24,960
+by a factor of 2. The outer rate
+
+125
+00:05:24,960 --> 00:05:27,330
+is the cosine of 1, which is about
+
+126
+00:05:27,330 --> 00:05:33,000
+0.54. Multiply 2 times 0.54, about 1.08. Now
+
+127
+00:05:33,000 --> 00:05:35,320
+the brute force check with no formula at
+
+128
+00:05:35,320 --> 00:05:38,240
+all. Nudge X from 1 to 1.001. Watch
+
+129
+00:05:38,240 --> 00:05:44,700
+X squared move from 1 to 1.002001, about
+
+130
+00:05:44,700 --> 00:05:47,040
+twice the nudge. Then the sign of that
+
+131
+00:05:47,040 --> 00:05:51,990
+moves from about 0.8415 to about 0.8426, a
+
+132
+00:05:51,990 --> 00:05:56,640
+change of roughly 0.00108. Divide that change by
+
+133
+00:05:56,640 --> 00:05:59,800
+our nudge of 0.001 and we get about
+
+134
+00:05:59,800 --> 00:06:02,970
+1.08, the formula and the brute force agree.
+
+135
+00:06:02,970 --> 00:06:05,450
+A common mistake is to write only the
+
+136
+00:06:05,450 --> 00:06:08,400
+cosine of X squared, forgetting the inner rate.
+
+137
+00:06:08,400 --> 00:06:11,090
+That means forgetting the first gear. Now, back
+
+138
+00:06:11,090 --> 00:06:13,680
+to our neural network. Picture three layers of
+
+139
+00:06:13,680 --> 00:06:16,920
+glowing nodes joined by thousands of thin lines.
+
+140
+00:06:16,920 --> 00:06:19,360
+One weight sits deep inside. On a single
+
+141
+00:06:19,360 --> 00:06:21,840
+line, it shapes a neuron's input that passes
+
+142
+00:06:21,840 --> 00:06:24,600
+through an activation function to become the neuron's
+
+143
+00:06:24,600 --> 00:06:27,560
+output. That output feeds the next layer, which
+
+144
+00:06:27,560 --> 00:06:30,470
+finally produces a prediction. The prediction is compared
+
+145
+00:06:30,470 --> 00:06:32,760
+to the truth, giving one number called the
+
+146
+00:06:32,760 --> 00:06:35,360
+loss, which measures how wrong the network is.
+
+147
+00:06:35,360 --> 00:06:37,530
+That is a long chain of functions, each
+
+148
+00:06:37,530 --> 00:06:40,050
+one inside the next, asking how the loss
+
+149
+00:06:40,050 --> 00:06:41,890
+changes when we nudge that one weight is
+
+150
+00:06:41,890 --> 00:06:43,900
+a chain rule problem, with a rate at
+
+151
+00:06:43,900 --> 00:06:47,510
+every link. Back propagation simply walks backward from
+
+152
+00:06:47,510 --> 00:06:49,840
+the loss, multiplying one local rate at a
+
+153
+00:06:49,840 --> 00:06:52,600
+time, like gears turning in reverse. When it
+
+154
+00:06:52,600 --> 00:06:54,820
+arrives at the weight, the product tells it
+
+155
+00:06:54,820 --> 00:06:56,840
+exactly which way to turn and by how
+
+156
+00:06:56,840 --> 00:06:58,900
+much. Then it does the same for every
+
+157
+00:06:58,900 --> 00:07:01,570
+other weight, billions of times. There is no
+
+158
+00:07:01,570 --> 00:07:04,520
+new mathematics hiding inside. It is the chain
+
+159
+00:07:04,520 --> 00:07:07,010
+rule applied at enormous scale, so the next
+
+160
+00:07:07,010 --> 00:07:09,110
+time you meet the derivative of Y with
+
+161
+00:07:09,110 --> 00:07:11,960
+respect to X equals the derivative of Y
+
+162
+00:07:11,960 --> 00:07:13,930
+with respect to U times the derivative of
+
+163
+00:07:13,930 --> 00:07:16,060
+U with respect to X, do not see
+
+164
+00:07:16,060 --> 00:07:19,400
+symbols, see gears. The nudge enters at one
+
+165
+00:07:19,400 --> 00:07:22,020
+end, get stretched or squeezed by every link
+
+166
+00:07:22,020 --> 00:07:23,960
+along the way, and what comes out is
+
+167
+00:07:23,960 --> 00:07:26,340
+the product of all those stretches that is
+
+168
+00:07:26,340 --> 00:07:28,440
+why a shadow, a bank balance, and a
+
+169
+00:07:28,440 --> 00:07:31,440
+billion-dial neural network can all be understood by
+
+170
+00:07:31,440 --> 00:07:33,640
+the same idea. In the next video, we
+
+171
+00:07:33,640 --> 00:07:36,080
+will watch back propagation run on a real
+
+172
+00:07:36,080 --> 00:07:40,920
+network, one step at time. See you there.
+
