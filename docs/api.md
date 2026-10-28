@@ -229,6 +229,14 @@ Scene subclass or a factory from the command line: no flags renders the full vid
 The last stdout line is JSON with the written paths. `python -m faceless_champ.runner
 file.py[:name] [flags]` runs a file that has no `run(...)` call.
 
+**External pixels.** `FunctionSource(fn, size=(w, h), duration=None, fps=None, key=None,
+setup=None)` and `@raster_source(...)` turn `fn(t, size)` (PIL image or numpy array) into a
+RasterSource; place it with `source.viewport(...)` or `Viewport(source, ...)`. `Plugin`,
+`Capability` and `faceless_champ.plugins` (`register`, `discover`, `plugin_report`,
+`component`, `source`, `capabilities`) extend themes, easings, components, sources, kit shots
+and agent discovery through the `faceless_champ.plugins` entry-point group. See
+[plugins and function sources](plugins.md).
+
 **Design audit.** `design_audit(node, times=None, samples=8, ...)` returns a
 `DesignReport` (`ok`, `findings`, `to_dict()`). Codes: `TEXT_TOO_SMALL` (error below 22 px,
 warning below 28 px at 1080p), `LOW_CONTRAST` (WCAG), `TEXT_CLUTTER` (more than 30 visible

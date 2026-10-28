@@ -122,34 +122,20 @@ Website example canvases are black; package and starter theme defaults remain co
 
 Install `facelesschamp-kit[3d]` for PyVista/VTK; base Core installs only Pillow. The Arch starter declares the extra. CAD/geometry extras include conversion dependencies. Use ArchCanvas or the arch-design recipe for fitted technical 3D designs. Scaffold with `fc-kit init my-design --template archchamp`. Register files as mesh assets; declare external tools in project pyproject.toml with uv add. Project.dependencies() and doctor check installed requirements without installation. See [ArchChamp](docs/kit/archchamp.md).
 
-## Premium scene references
+## Coding tutorial template
 
-Use the [current collection](../examples/README.md) as the default reference. The Hello World
-opening has user design approval; encoded media remains unverified. Previous standalone demo data and
-preview artifacts were retired. Keep library starter templates available; do not
-claim a full export has been verified.
-
-## Approved coding tutorial fallback
-
-For coding tutorials without custom design/instructions, fc-agent selects the
-approved coding-tutorial pack. Custom design, instructions and project constraints
-take priority; untouched scaffold defaults are not custom direction. The project
-copy is templates/coding-tutorial/style.json. Edit colors, sizes, insets and spring
-tuning there; the planner preserves edits and builds reload them. Reusable helpers
-live in facelesschamp_kit.tutorials.coding. Carry design.template into the plan
-when selected, and load_coding_tutorial(project_root) when authoring scenes.
-Use template.group(..., bounds=bounds) for kit placement. Generated render.py
-accepts --fps and --quality low|high|4k independently of duration.
-[Template guide](../templates/README.md).
+Without custom design direction, use the coding-tutorial pack: helpers in
+facelesschamp_kit.tutorials.coding, load_coding_tutorial(project_root), and
+template.group(..., bounds=bounds) for placement. [Template guide](../templates/README.md).
 
 Raw subtitle parsing: read_subtitle_cues(text) returns Core SubtitleCue tuples,
 preserving original times, cue numbers and intentional overlaps. It delegates
 Core parse_srt_cues; production clients retain their own input-size limits.
 
-V2 2.0.0rc1 production: compile once, then use CompiledVideo.frame/save_frame/storyboard/export.
-Kit exports media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
-Supplied renderers remain caller-owned; operation metadata is captured before owned sessions close.
-Agent retains checksum/alignment/review policy. A decoded export does not imply visual/editorial approval.
+Compile once, then use CompiledVideo.frame/save_frame/storyboard/export. Kit exports
+media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
+Plugins can add shot templates and themes (see the core Plugins section); they appear in
+`fc-kit shot --list`, `--theme` and `fc-kit doctor`.
 
 Optional Manim Community 0.22: explicit Cairo subprocess preparation, immutable RGBA PNG playback.
 Core owns PreparedFrameSource and integrations.manim; Kit owns EquationTransform, ManimCanvas and ctx.manim.

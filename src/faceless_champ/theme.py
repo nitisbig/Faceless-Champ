@@ -91,10 +91,15 @@ class Theme:
 
     @classmethod
     def named(cls, name: str) -> Theme:
-        try:
+        if name in THEMES:
             return THEMES[name]
-        except KeyError:
-            raise ValueError(f"Unknown theme {name!r}; choose {', '.join(THEMES)}") from None
+        from . import plugins
+
+        found = plugins.theme(name)
+        if found is not None:
+            return found
+        choices = [*THEMES, *plugins.names("themes")]
+        raise ValueError(f"Unknown theme {name!r}; choose {', '.join(choices)}")
 
     def color(self, role_or_color: str) -> str:
         """A color role ("text", "muted", "primary"...) or a literal color string."""

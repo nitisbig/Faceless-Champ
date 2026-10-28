@@ -1,10 +1,7 @@
 # Faceless Champ
 
-Optional CPU Skia backend: docs/skia.md. Pillow remains default. Explicit native
-text/surface opt-ins use existing animations/layouts; compare evidence only from
-the final backend. Example: examples/skia_showcase.py.
-
-> Python 3.12+ programmatic video authoring. Current source 2.0.0rc1; Pillow frames and FFmpeg MP4. Core never imports kit.
+> Python 3.12+ programmatic video authoring (2.0.0rc1). Pillow frames by default, optional Skia
+> ([docs/skia.md](docs/skia.md)) and ModernGL backends, FFmpeg MP4. Core never imports kit.
 
 ## Start here (agents)
 
@@ -195,35 +192,19 @@ exactly to its interval and rejects overflow. Cut-only Sequence with continuous 
 on a Layer preserves chapter source timing.
 
 save_frame and render_storyboard sample source-time stills with output protection.
-render(start_time=0, end_time=None) exports ranges preserving animation/audio offsets.
-Use frame/storyboard/short preview before full export; verify metadata, complete FFmpeg
-decoding, audio alignment, and representative encoded frames. Preparation, a successful
-frame, and an excerpt do not prove a full export. render(progress=callback) reports frames.
+render(start_time=0, end_time=None) exports ranges preserving animation/audio offsets;
+render(progress=callback) reports frames. Check frames/storyboards before a full export.
 PillowRenderer has bounded held-frame/caption/code caches; zero budgets disable retention.
 
 ArchChamp adds PyVista-backed technical 3D models, named assembly parts, deterministic camera/part/section actions, supplied fields, and world-anchored labels/dimensions. PyVista/VTK requires `faceless-champ[3d]` (or the Kit/Agent `3d` extra); the base installs only Pillow and core imports remain lazy. See [ArchChamp](docs/archchamp.md).
 
 Public 3D imports: ArchMesh, ArchPart, ArchStyle, ArchCamera, ArchScript, ArchLabel, ArchDimension, ArchChamp, ArchDataError. ArchMesh snapshots geometry; ArchChamp.state_at/project_at/diagnostics_at support inspection. Close directly owned PillowRenderer sessions with a context manager.
 
-## Premium scene references
+## Coding tutorial template
 
-Use the [current collection](examples/README.md) as the default reference. The Hello World
-opening has user design approval; encoded media remains unverified. Previous standalone demo data and
-preview artifacts were retired. Keep library starter templates available; do not
-claim a full export has been verified.
-
-## Approved coding tutorial fallback
-
-For coding tutorials without custom design/instructions, fc-agent selects the
-approved coding-tutorial pack. Custom design, instructions and project constraints
-take priority; untouched scaffold defaults are not custom direction. The project
-copy is templates/coding-tutorial/style.json. Edit colors, sizes, insets and spring
-tuning there; the planner preserves edits and builds reload them. Reusable helpers
-live in facelesschamp_kit.tutorials.coding. Carry design.template into the plan
-when selected, and load_coding_tutorial(project_root) when authoring scenes.
-Use template.group(..., bounds=bounds) for kit placement. Generated render.py
-accepts --fps and --quality low|high|4k independently of duration.
-[Template guide](templates/README.md).
+Without custom design direction, fc-agent uses the coding-tutorial pack
+(templates/coding-tutorial/style.json; helpers in facelesschamp_kit.tutorials.coding,
+load_coding_tutorial(project_root)). [Template guide](templates/README.md).
 
 Optional GPU compositing/effects: docs/moderngl.md (faceless-champ[gpu], backend=moderngl or auto). Verification: docs/moderngl-verification.md.
 
@@ -242,16 +223,26 @@ frame(source_time) returns independent straight RGBA/sRGB pixels at that size.
 Pure frame_key identifies equivalent pixels; fingerprint includes all source inputs.
 Source age is local to component introduction, then offset/clamped to source duration.
 Measurement opens no source. Sampling density stays fixed during ancestor scaling.
+FunctionSource(fn, size=(w, h), duration=None, fps=None) turns fn(t, size) returning a PIL
+image or numpy array into a source (also @raster_source(...) and source.viewport(...)):
+the easiest bridge for matplotlib, procedural shaders or any external renderer.
 Custom renderers still implement validate(node) and frame(node,time,size) only.
 Component.validate_animation and Animation.resolve are the public extension hooks.
 parse_srt_cues(text) returns raw ordered SubtitleCue records without rejecting
 intentional overlaps. SubtitleTrack applies overlap policy. Kit exposes
 read_subtitle_cues(text); Agent retains bounded inputs and source-clock diagnostics.
 
-V2 2.0.0rc1 production: compile once, then use CompiledVideo.frame/save_frame/storyboard/export.
-Kit exports media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
-Supplied renderers remain caller-owned; operation metadata is captured before owned sessions close.
-Agent retains checksum/alignment/review policy. A decoded export does not imply visual/editorial approval.
+Kit compiles once, then CompiledVideo.frame/save_frame/storyboard/export. Kit also exports
+media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
+
+## Plugins
+
+Packages extend the library through the `faceless_champ.plugins` entry-point group (or
+FACELESS_CHAMP_PLUGINS="module:plugin"). A Plugin(name, themes=, easings=, components=,
+sources=, shots=, capabilities=) adds Theme.named themes, rate_func easing names,
+faceless_champ.plugins.component()/source() lookups, fc-kit shot templates and
+fc-agent capability records. `python -m faceless_champ plugins` lists them.
+[Plugin guide](docs/plugins.md).
 
 Optional Manim Community 0.22: explicit Cairo subprocess preparation, immutable RGBA PNG playback.
 Core owns PreparedFrameSource and integrations.manim; Kit owns EquationTransform, ManimCanvas and ctx.manim.

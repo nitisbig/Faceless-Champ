@@ -35,6 +35,7 @@ CORE_DOCS = (
     "motion-graphics",
     "narration",
     "os-ui",
+    "plugins",
     "premium-effects",
     "raster-sources",
     "skia",

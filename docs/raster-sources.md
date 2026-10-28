@@ -1,5 +1,8 @@
 # Raster sources and animation extensions
 
+The quickest way to make a source is `FunctionSource(fn, size=..., duration=...)`: write a
+function returning pixels for time `t`. See [plugins and function sources](plugins.md).
+
 Core supports custom raster viewports on Pillow, Skia and ModernGL. The base
 installation still needs only Pillow. Integrations supply a deepcopy-safe input
 descriptor and open renderer-owned sessions when pixels are requested.

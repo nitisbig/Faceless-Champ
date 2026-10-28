@@ -67,6 +67,7 @@ if _TYPE_CHECKING:
     from .masks import CircleMask, PathMask, RectangleMask, ShapeMask, Wipe
     from .narration import CueScene
     from .paths import PathData, VectorPath
+    from .plugins import Capability, Plugin
     from .prepared import PreparedFrameSource
     from .preview import StoryboardSample, render_storyboard, save_frame
     from .primitives import Arc, Badge, Callout, Composite, Divider, Dot, GlassCard, IconText, Pill, Stat
@@ -75,7 +76,7 @@ if _TYPE_CHECKING:
     from .renderer import PillowRenderer, Renderer, create_renderer, rendering_identity, validate_composition
     from .runner import run
     from .scheduling import Repeat, Stagger, Succession
-    from .sources import RasterSession, RasterSource, Viewport
+    from .sources import FunctionSource, RasterSession, RasterSource, Viewport, raster_source
     from .spring import Spring
     from .subtitles import Captions, SubtitleCue, SubtitleTrack, parse_srt_cues
     from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
@@ -94,6 +95,10 @@ if _TYPE_CHECKING:
     )
 
 _EXPORTS = {
+    "Plugin": ("plugins", "Plugin"),
+    "Capability": ("plugins", "Capability"),
+    "FunctionSource": ("sources", "FunctionSource"),
+    "raster_source": ("sources", "raster_source"),
     "Theme": ("theme", "Theme"),
     "THEMES": ("theme", "THEMES"),
     "MotionStyle": ("theme", "MotionStyle"),
@@ -446,6 +451,10 @@ __all__ = [  # noqa: RUF022
     "DesignReport",
     "contrast_ratio",
     "readable_color",
+    "Plugin",
+    "Capability",
+    "FunctionSource",
+    "raster_source",
 ]
 
 

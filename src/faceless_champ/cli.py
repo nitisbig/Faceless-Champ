@@ -25,7 +25,15 @@ def main() -> int:
     command.add_argument("--antialias", type=int, default=2)
     command.add_argument("--backend", choices=("pillow", "skia", "moderngl", "auto"), default="pillow")
     command.add_argument("--overwrite", action="store_true")
+    sub.add_parser("plugins", help="List discovered plugins, their status and capabilities")
     args = parser.parse_args()
+    if args.command == "plugins":
+        import json
+
+        from . import plugins
+
+        print(json.dumps({"plugins": plugins.plugin_report(), "capabilities": plugins.capabilities()}, indent=2))
+        return 0
     try:
         path = args.file.resolve()
         sys.path.insert(0, str(path.parent))

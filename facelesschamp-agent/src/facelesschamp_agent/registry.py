@@ -462,6 +462,7 @@ class CapabilityRegistry:
                 relative = f"previews/{spec.id}.{extension}"
                 if files("facelesschamp_agent").joinpath("resources", relative).is_file():
                     self._entries[f"recipe:{spec.id}"][key] = relative
+        self._add_plugins()
         self._index = {}
         for record in self._entries.values():
             fields = []
@@ -542,6 +543,23 @@ class CapabilityRegistry:
                         value = detail.get(field)
                         if isinstance(value, list) and all(isinstance(item, str) for item in value):
                             self._entries[key][field] = deepcopy(value)
+
+    def _add_plugins(self):
+        """Capabilities from installed faceless_champ plugins (importing a plugin runs its code)."""
+        from faceless_champ import plugins
+
+        for record in plugins.capabilities():
+            self._entries[record["id"]] = {
+                **record,
+                "family": "plugin",
+                "category": record["kind"],
+                "preparation": "none",
+                "parameters": [],
+                "named_targets": [],
+                "excerpt": record["use_when"],
+                "example_kind": "plugin",
+                "source": {"kind": "plugin", "plugin": record["plugin"]},
+            }
 
     def _add_designs(self, module_name, path, tree, live):
         """Find named preset contracts from mappings and class selectors, without invoking them."""
@@ -744,6 +762,12 @@ class CapabilityRegistry:
             if entry["kind"] == "asset":
                 if not Path(entry["path"]).is_file():
                     raise AgentError("CAPABILITY_RESOURCE", "Installed resource is missing", capability=entry["id"])
+                continue
+            if entry.get("source", {}).get("kind") == "plugin":
+                from faceless_champ import plugins
+
+                if entry["plugin"] not in plugins.plugins():
+                    raise AgentError("CAPABILITY_ID", "Plugin is no longer registered", capability=entry["id"])
                 continue
             module_name, symbol = entry["import_path"].rsplit(".", 1)
             loaded = sys.modules.get(module_name)

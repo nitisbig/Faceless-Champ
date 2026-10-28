@@ -12,9 +12,10 @@ There are three packages:
 1. [CHEATSHEET.md](CHEATSHEET.md): tested patterns. Start every scene from one of them.
 2. [llms.txt](llms.txt): a compact map of the core API. Then [facelesschamp-kit/llms.txt](facelesschamp-kit/llms.txt) for kit.
 3. [docs/api.md](docs/api.md): only the sections for the components you use.
+4. [docs/plugins.md](docs/plugins.md): `FunctionSource` for external renderers, and plugins.
 
-Skip `docs/v2/`, `docs/audits/`, `docs/decisions/`, `output/`, `build/`, `scratch/` and `project-map/`.
-They are history and generated files, not instructions.
+Skip `docs/archive/`, `docs/v2/`, `output/`, `build/`, `scratch/`, `my-project/` and `project-map/`.
+They are history, user work and generated files, not instructions.
 
 ## Rules for scenes
 
@@ -35,6 +36,8 @@ python -m pytest tests facelesschamp-kit/tests facelesschamp-agent/tests
 ruff check . && ruff format --check .
 python scripts/sync_reference_docs.py         # after changing llms.txt, docs/*.md or public exports
 python scripts/build_font_coverage.py         # after adding or replacing a bundled font
+python scripts/tidy_repo.py [--apply] [--caches]  # archive history docs, clear caches (dry run by default)
+python -m faceless_champ plugins              # list discovered plugins
 ```
 
 ## Changing the library

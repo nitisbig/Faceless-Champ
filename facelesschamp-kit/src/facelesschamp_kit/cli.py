@@ -104,6 +104,9 @@ def doctor(root=".", *, gpu=False):
     from faceless_champ import renderer_capabilities
 
     result["gpu"] = renderer_capabilities("moderngl", probe=gpu)
+    from faceless_champ import plugins
+
+    result["plugins"] = plugins.plugin_report()
     return result
 
 
@@ -115,18 +118,19 @@ def shot_main(argv):
     """
     from faceless_champ import run
 
-    from .shots import SHOTS, shot_fields, shot_video
+    from .shots import all_shots, shot_fields, shot_video
 
+    templates = all_shots()
     parser = argparse.ArgumentParser(prog="fc-kit shot", description=shot_main.__doc__)
-    parser.add_argument("template", nargs="?", choices=list(SHOTS))
+    parser.add_argument("template", nargs="?", choices=list(templates))
     parser.add_argument("content", nargs="?", help="JSON file or inline JSON object")
     parser.add_argument("--list", action="store_true", help="print templates and their fields")
-    parser.add_argument("--theme", default="midnight", choices=list(THEMES))
+    parser.add_argument("--theme", default="midnight", help=f"kit, core or plugin theme ({', '.join(THEMES)}, ...)")
     parser.add_argument("--duration", type=float, default=5.0)
     parser.add_argument("--portrait", action="store_true", help="1080x1920 instead of 1920x1080")
     args, rest = parser.parse_known_args(argv)
     if args.list or not args.template:
-        print(json.dumps({name: shot_fields(name) for name in SHOTS}, indent=2))
+        print(json.dumps({name: shot_fields(name) for name in templates}, indent=2))
         return 0
     if not args.content:
         print(f"fc-kit shot: {args.template} needs content with fields {shot_fields(args.template)}", file=sys.stderr)

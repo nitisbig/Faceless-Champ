@@ -163,8 +163,13 @@ def easing(value):
     if value is None or callable(value):
         return value
     if isinstance(value, str):
-        try:
+        if value in EASINGS:
             return EASINGS[value]
-        except KeyError:
-            raise ValueError(f"Unknown easing {value!r}; choose {', '.join(EASINGS)} or pass a function") from None
+        from . import plugins
+
+        found = plugins.easing(value)
+        if found is not None:
+            return found
+        choices = [*EASINGS, *plugins.names("easings")]
+        raise ValueError(f"Unknown easing {value!r}; choose {', '.join(choices)} or pass a function")
     raise TypeError("rate_func must be a callable or an easing preset name")

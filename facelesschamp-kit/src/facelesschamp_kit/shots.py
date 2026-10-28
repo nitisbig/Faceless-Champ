@@ -299,11 +299,22 @@ def shot_fields(name):
     return [f.name + ("?" if f.default is not MISSING else "") for f in fields(_template(name))]
 
 
+def all_shots():
+    """Built-in and plugin shot templates by name."""
+    from faceless_champ import plugins
+
+    result = dict(SHOTS)
+    for name in plugins.names("shots"):
+        result.setdefault(name, plugins.shot_template(name))
+    return result
+
+
 def _template(name):
+    templates = all_shots()
     try:
-        return SHOTS[name]
+        return templates[name]
     except KeyError:
-        raise KitError("SHOT", f"Unknown shot {name!r}; choose {', '.join(SHOTS)}") from None
+        raise KitError("SHOT", f"Unknown shot {name!r}; choose {', '.join(templates)}") from None
 
 
 def shot(name, content):
@@ -328,14 +339,12 @@ def shot_video(name, content, *, theme="midnight", duration=5.0, size=(1920, 108
     from faceless_champ import Canvas
 
     from .context import BuildContext
-    from .themes import THEMES
     from .themes import Theme as KitTheme
+    from .themes import resolve_theme
     from .video import Video
 
     if isinstance(theme, str):
-        if theme not in THEMES:
-            raise KitError("THEME", f"Unknown theme {theme!r}; choose {', '.join(THEMES)}")
-        theme = THEMES[theme]
+        theme = resolve_theme(theme)
     if not isinstance(theme, KitTheme):
         raise KitError("THEME", "theme must be a kit Theme or theme name")
     width, height = size
@@ -353,6 +362,7 @@ __all__ = [
     "QuoteCard",
     "StepsCard",
     "TitleCard",
+    "all_shots",
     "shot",
     "shot_fields",
     "shot_video",

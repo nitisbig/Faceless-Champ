@@ -70,3 +70,39 @@ def test_agents_md_points_to_existing_files():
     for target in re.findall(r"\]\(([^)#]+)", text):
         if not target.startswith("http"):
             assert (ROOT / target).exists(), target
+
+
+def _guide_blocks():
+    text = (ROOT / "docs" / "plugins.md").read_text()
+    return [
+        pytest.param(code, id=f"plugins-{index}")
+        for index, code in enumerate(re.findall(r"```python\n(.*?)```", text, re.DOTALL))
+    ]
+
+
+@pytest.mark.parametrize("code", _guide_blocks())
+def test_plugin_guide_examples_run(code, monkeypatch):
+    from faceless_champ import FunctionSource, PillowRenderer, Theme
+    from faceless_champ import plugins as registry
+
+    monkeypatch.setattr(registry, "_registered", {})
+    monkeypatch.setattr(registry, "_report", {})
+    monkeypatch.setattr(registry, "_discovered", True)
+    namespace = {"__name__": "plugin_guide"}
+    try:
+        exec(compile(code, "docs/plugins.md", "exec"), namespace)  # noqa: S102 - tested docs
+    except ImportError as exc:
+        pytest.skip(f"optional dependency: {exc}")
+    if "scene" in namespace:
+        scene = namespace["scene"]
+        with PillowRenderer(1) as renderer:
+            renderer.validate(scene)
+            try:
+                renderer.frame(scene, scene.duration * 0.6, (320, 180))
+            except ImportError as exc:
+                pytest.skip(f"optional dependency: {exc}")
+    if "plugin" in namespace:
+        registry.register(namespace["plugin"])
+        assert Theme.named("studio").radius == 12
+        source = registry.source("stripes", size=(64, 36), duration=1)
+        assert isinstance(source, FunctionSource) and source.open((64, 36)).frame(0.5).size == (64, 36)

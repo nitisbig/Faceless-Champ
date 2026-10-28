@@ -226,3 +226,15 @@ THEMES = MappingProxyType(
         "paper": PAPER,
     }
 )
+
+
+def resolve_theme(name):
+    """A kit theme by name: built-in kit themes, then core/plugin themes via Theme.from_core."""
+    if name in THEMES:
+        return THEMES[name]
+    from faceless_champ.theme import Theme as CoreTheme
+
+    try:
+        return Theme.from_core(CoreTheme.named(name))
+    except ValueError as exc:
+        raise KitError("THEME", str(exc).replace("choose ", f"choose {', '.join(THEMES)}, ")) from None
