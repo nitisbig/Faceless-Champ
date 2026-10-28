@@ -154,12 +154,16 @@ class Captions(Component):
         if not isinstance(track, SubtitleTrack):
             raise TypeError("Captions requires a SubtitleTrack")
         self.track = track
-        self.font = str(font) if font else None
         self.font_size = finite(font_size, "font_size", 1)
         self.width = finite(width, "width", 1)
         self.spacing = finite(spacing, "spacing", 0)
         self.color, self.highlight_color, self.future_color = color, highlight_color, future_color
         self.phrases = track.phrases(max_words, max_duration)
+        from .typography import resolve_font
+
+        # Named fonts carry their default weight; paths keep the file default.
+        words = " ".join(cue.text for phrase in self.phrases for cue in phrase)
+        self.font, self.font_weight = resolve_font(font, words)
         self._phrase_starts = tuple(phrase[0].start for phrase in self.phrases)
         self._phrase_ends = tuple(max(cue.end for cue in phrase) for phrase in self.phrases)
         self._max_phrase_ends = tuple(accumulate(self._phrase_ends, max))

@@ -196,29 +196,60 @@ class Component:
 
 
 class Text(Component):
+    """Single- or multi-line text in design pixels.
+
+    ``role`` ("display", "title", "heading", "body", "label", "caption") applies
+    a TypeScale style; explicit ``font``/``font_size``/``font_weight``/
+    ``line_height``/``tracking`` override it. ``font`` accepts a file path or a
+    bundled name: "sans", "display", "serif", "serif-italic", "mono".
+    ``line_height`` is a multiple of font size (replaces pixel ``spacing``);
+    ``tracking`` is letter spacing in em. Text never wraps: use fit_text.
+    """
+
     def __init__(
         self,
         text: str,
         *,
         font: str | Path | None = None,
-        font_size: float = 64,
+        font_size: float | None = None,
         color: str = "white",
         align: str = "left",
         spacing: float = 8,
         font_weight: float | None = None,
         text_engine: str = "pillow",
+        role: str | None = None,
+        type_scale: Any = None,
+        line_height: float | None = None,
+        tracking: float | None = None,
         **kwargs: Any,
     ) -> None:
+        from .typography import resolve_font, role_style
+
         super().__init__(**kwargs)
         if not isinstance(text, str):
             raise TypeError("text must be a string")
         if align not in {"left", "center", "right"}:
             raise ValueError("align must be left, center, or right")
-        self.text, self.font = text, str(font) if font else None
-        self.font_size = finite(font_size, "font_size", 1)
+        style = role_style(role, type_scale)
+        if style is not None:
+            font = style.font if font is None else font
+            font_size = style.font_size if font_size is None else font_size
+            font_weight = style.font_weight if font_weight is None else font_weight
+            line_height = style.line_height if line_height is None else line_height
+            tracking = style.tracking if tracking is None else tracking
+        self.role = role
+        self.text = text
+        self.font_size = finite(64 if font_size is None else font_size, "font_size", 1)
         self.color, self.align = color, align
         self.spacing = finite(spacing, "spacing", 0)
-        self.font_weight = None if font_weight is None else finite(font_weight, "font_weight", 1)
+        self.line_height = None if line_height is None else finite(line_height, "line_height", 0.5)
+        if self.line_height is not None and self.line_height > 4:
+            raise ValueError("line_height is a multiple of font size and must be <= 4")
+        self.tracking = 0.0 if tracking is None else finite(tracking, "tracking")
+        if abs(self.tracking) > 0.5:
+            raise ValueError("tracking is an em value between -0.5 and 0.5")
+        weight = None if font_weight is None else finite(font_weight, "font_weight", 1)
+        self.font, self.font_weight = resolve_font(font, text, weight)
         if text_engine not in {"pillow", "skia"}:
             raise ValueError("text_engine must be pillow or skia")
         self.text_engine = text_engine

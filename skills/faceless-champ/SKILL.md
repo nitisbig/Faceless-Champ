@@ -5,9 +5,11 @@ description: Author and render Python videos with Faceless Champ scenes, animati
 
 # Faceless Champ authoring
 
-- Use public fit_text(text, Bounds(...), font_size=..., min_font_size=..., color=...)
-  for measured wrapping/shrinking; it returns an unowned centered Text. Use ordinary
-  Text for exact whitespace such as code indentation. Impossible fits are errors.
+- Style text with roles: Text("...", role="title"|"heading"|"body"|"label"|...) and
+  fit_text(text, Bounds(...), role="body", color=...). Never hand-pick tiny sizes.
+  A TextBudgetError means the copy is too long: shorten it or split the beat; do
+  not pass budget=False or a lower min_font_size to force it in. Use ordinary Text
+  for exact whitespace such as code indentation.
 - In kit projects, use Segment.cue_time(original_index, edge="start", offset=0)
   and add/add_core(at=..., duration=...) for individual word-triggered visuals.
   Entrances and motions must remain inside placement lifetimes; narration is attached
@@ -44,7 +46,8 @@ Read [the API](../../docs/api.md) for supported constructors and
   graph colors and labels. Keys are individual characters or TeX symbol commands;
   matches include roman-text glyphs, so choose a map for each expression.
   with_alpha() makes shaded fills; Polyline(line_cap="round") rounds endpoints.
-  Text(font_weight=...) needs an explicit variable font with a Weight axis.
+  Fonts: font="sans" (default), "display", "serif", "mono"; or
+  TypeScale.named("tech"|"editorial") for a heading/body pairing.
 - Start with ql previews. Render to output/ and inspect representative decoded frames
   and media metadata. Add a final wait() when an animation's endpoint needs a hold.
 - For narration, read SubtitleTrack.from_srt() and schedule visual events with
@@ -67,7 +70,7 @@ Read [the API](../../docs/api.md) for supported constructors and
   Motion entrances already animate opacity; do not add FadeIn on the same object.
   Use explicit play(rate_func=...) to override preset easing. Custom Animation
   keyframes must increase from progress 0 to 1 and end at the declared target.
-- Reuse the bundled default font or an explicit local TTF/OTF. Discover chart and camera APIs from their owning Kit/Core modules; do not invent
+- Reuse the bundled named fonts or an explicit local TTF/OTF. Discover chart and camera APIs from their owning Kit/Core modules; do not invent
   unsupported video-import or graphical-editor constructors.
 
 Typical command:

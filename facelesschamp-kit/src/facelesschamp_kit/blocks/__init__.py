@@ -6,7 +6,7 @@ from pathlib import Path
 from faceless_champ import Bounds, ImageSlot, Number, Rectangle, card_content_bounds, card_surface
 
 from ..diagnostics import KitError, number
-from .base import Block, BlockBuild, build_group, centered, fit_text
+from .base import Block, BlockBuild, build_group, centered, fit_text, text_weight
 from .coding import CodeEditor, CodingPlayground
 from .effects import EffectBlock, ParticleBackdrop, ProceduralBackdrop
 from .flow import FlowDiagram
@@ -128,7 +128,8 @@ class MetricCard:
         metric = Number(
             value,
             font=ctx.theme.font,
-            font_weight=ctx.theme.heading_weight,
+            font_weight=text_weight(ctx.theme, heading=True),
+            tracking=-0.02,
             text_engine=ctx.theme.text_engine,
             font_size=132,
             color=palette(ctx, self.variant, self.color),

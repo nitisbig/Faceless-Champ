@@ -33,7 +33,7 @@ from ..layout import Group
 from ..motion import style_value
 from ..subtitles import Captions
 from ..timeline import Grid, Layer, Renderable, Scene, Sequence
-from ..typography import load_font
+from ..typography import draw_tracked, load_font, pillow_line_spacing, tracked_layout
 
 
 class RasterPainter:
@@ -341,15 +341,30 @@ class RasterPainter:
             font = self._font(c, max(1, round(c.font_size * factor)))
             text = c.format(state["value"])
             d = ImageDraw.Draw(PILImage.new("RGBA", (1, 1)))
-            box = d.textbbox((0, 0), text or " ", font=font)
+            track = c.tracking * max(1, round(c.font_size * factor))
+            if track:
+                box, placed = tracked_layout(d, font, text or " ", spacing=0, align="left", track=track)
+            else:
+                box = d.textbbox((0, 0), text or " ", font=font)
             text_width = math.ceil(box[2] - box[0])
             width = text_width if c.width is None else round(c.width * factor)
             if width < text_width:
                 raise ValueError("Number text exceeds its fixed width")
             sprite = PILImage.new("RGBA", (max(1, width) + 4, max(1, math.ceil(box[3] - box[1])) + 4))
             x = 0 if c.align == "left" else (width - text_width if c.align == "right" else (width - text_width) / 2)
-            visible = text[: math.floor(len(text) * state["reveal"] + 1e-9)]
-            ImageDraw.Draw(sprite).text((x + 2 - box[0], 2 - box[1]), visible, font=font, fill=c.color)
+            visible_count = math.floor(len(text) * state["reveal"] + 1e-9)
+            if track:
+                draw_tracked(
+                    ImageDraw.Draw(sprite),
+                    (x + 2 - box[0], 2 - box[1]),
+                    placed,
+                    font,
+                    fill=c.color,
+                    track=track,
+                    limit=visible_count,
+                )
+            else:
+                ImageDraw.Draw(sprite).text((x + 2 - box[0], 2 - box[1]), text[:visible_count], font=font, fill=c.color)
             return sprite
         # Dynamic reveal/draw frames are deliberately not retained in the cache.
         static = not dynamic and state["reveal"] == 1 and state["draw"] == 1
@@ -373,17 +388,38 @@ class RasterPainter:
                     revealed.paste(sprite.crop((0, 0, visible, sprite.height)), (0, 0))
                 sprite = revealed
         elif isinstance(c, Text):
-            font = self._font(c, max(1, round(c.font_size * factor)))
-            spacing = round(c.spacing * factor)
+            size = max(1, round(c.font_size * factor))
+            font = self._font(c, size)
+            spacing = pillow_line_spacing(font, size, c.line_height, c.spacing * factor)
             draw = ImageDraw.Draw(PILImage.new("RGBA", (1, 1)))
-            box = draw.multiline_textbbox((0, 0), c.text or " ", font=font, spacing=spacing, align=c.align)
+            track = c.tracking * size
+            if track:
+                box, placed = tracked_layout(draw, font, c.text or " ", spacing=spacing, align=c.align, track=track)
+            else:
+                box = draw.multiline_textbbox((0, 0), c.text or " ", font=font, spacing=spacing, align=c.align)
             sprite = PILImage.new(
                 "RGBA", (max(1, math.ceil(box[2] - box[0]) + 4), max(1, math.ceil(box[3] - box[1]) + 4))
             )
-            text = c.text[: math.floor(len(c.text) * state["reveal"] + 1e-9)]
-            ImageDraw.Draw(sprite).multiline_text(
-                (2 - box[0], 2 - box[1]), text, font=font, fill=c.color, spacing=spacing, align=c.align
-            )
+            visible_count = math.floor(len(c.text) * state["reveal"] + 1e-9)
+            if track:
+                draw_tracked(
+                    ImageDraw.Draw(sprite),
+                    (2 - box[0], 2 - box[1]),
+                    placed,
+                    font,
+                    fill=c.color,
+                    track=track,
+                    limit=visible_count,
+                )
+            else:
+                ImageDraw.Draw(sprite).multiline_text(
+                    (2 - box[0], 2 - box[1]),
+                    c.text[:visible_count],
+                    font=font,
+                    fill=c.color,
+                    spacing=spacing,
+                    align=c.align,
+                )
         elif isinstance(c, Image):
             size = (max(1, round(c.width * factor)), max(1, round(c.height * factor)))
             source = frames[frame_index]

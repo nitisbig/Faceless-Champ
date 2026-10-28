@@ -1,4 +1,8 @@
-"""Fixed-stack V1 wheel fixtures shared by source and minimal-wheel checks."""
+"""Fixed-stack V1 wheel fixtures shared by source and minimal-wheel checks.
+
+V1 rendered unspecified fonts with DejaVu Sans; V2 defaults to DM Sans, so the
+parity scenes name the DejaVu ``fallback`` font explicitly.
+"""
 
 from pathlib import Path
 
@@ -27,14 +31,18 @@ def scenes(directory, *, include_domains=True):
     plain.play(shape.animate.move_to(240, 120), run_time=2, rate_func=linear)
     group = Group(
         Group(Rectangle(width=90, height=60, fill="#db9944", position=(140, 90)), opacity=0.6),
-        Text("V1 / AV 012", font_size=20, position=(150, 90)),
+        Text("V1 / AV 012", font="fallback", font_size=20, position=(150, 90)),
         mask=CircleMask(65),
         rotation=12,
         opacity=0.7,
     )
     nested = Scene(Canvas(320, 180, "#00000000")).add(group).wait(2)
     track = SubtitleTrack([SubtitleCue(1, 0.2, 0.9, "Source."), SubtitleCue(2, 1.1, 1.8, "Clock.")])
-    captions = Scene(Canvas(320, 180)).add(Captions(track, width=240, font_size=24, position=(160, 90))).wait(2)
+    captions = (
+        Scene(Canvas(320, 180))
+        .add(Captions(track, font="fallback", width=240, font_size=24, position=(160, 90)))
+        .wait(2)
+    )
     if include_domains:
         from facelesschamp_kit.charts import BarChart
         from facelesschamp_kit.diagrams import FlowChamp, FlowEdge, FlowGraph, FlowNode
@@ -74,7 +82,7 @@ def native_scenes():
 
     from faceless_champ.integrations.pyvista.model import ArchMesh, ArchPart, ArchStyle
 
-    text = Text("Native AV 012", font_size=30, text_engine="skia", position=(160, 70))
+    text = Text("Native AV 012", font="fallback", font_size=30, text_engine="skia", position=(160, 70))
     native = (
         Scene(Canvas(320, 180, "#101522"))
         .add(

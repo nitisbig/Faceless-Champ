@@ -11,7 +11,7 @@ from PIL import ImageColor, ImageDraw
 
 from ..components import Arrow, Equation, Number, Shape, Text
 from ..subtitles import Captions
-from ..typography import DEFAULT_FONT, load_font
+from ..typography import DEFAULT_FONT, load_font, pillow_line_spacing, tracked_layout
 
 
 class Measurement:
@@ -57,7 +57,12 @@ class Measurement:
             return self._equation(c, 1).size
         if isinstance(c, Number):
             font = self._font(c, max(1, round(c.font_size)))
-            box = ImageDraw.Draw(PILImage.new("L", (1, 1))).textbbox((0, 0), c.format(state["value"]) or " ", font=font)
+            draw = ImageDraw.Draw(PILImage.new("L", (1, 1)))
+            value = c.format(state["value"]) or " "
+            if c.tracking:
+                box = tracked_layout(draw, font, value, spacing=0, align="left", track=c.tracking * c.font_size)[0]
+            else:
+                box = draw.textbbox((0, 0), value, font=font)
             width = math.ceil(box[2] - box[0])
             if c.width is not None:
                 if round(c.width) < width:
@@ -65,10 +70,16 @@ class Measurement:
                 width = round(c.width)
             return max(1, width) + 4, max(1, math.ceil(box[3] - box[1])) + 4
         if isinstance(c, Text):
-            font = self._font(c, max(1, round(c.font_size)))
-            box = ImageDraw.Draw(PILImage.new("L", (1, 1))).multiline_textbbox(
-                (0, 0), c.text or " ", font=font, spacing=round(c.spacing), align=c.align
-            )
+            size = max(1, round(c.font_size))
+            font = self._font(c, size)
+            spacing = pillow_line_spacing(font, size, c.line_height, c.spacing)
+            draw = ImageDraw.Draw(PILImage.new("L", (1, 1)))
+            if c.tracking:
+                box = tracked_layout(
+                    draw, font, c.text or " ", spacing=spacing, align=c.align, track=c.tracking * size
+                )[0]
+            else:
+                box = draw.multiline_textbbox((0, 0), c.text or " ", font=font, spacing=spacing, align=c.align)
             return max(1, math.ceil(box[2] - box[0]) + 4), max(1, math.ceil(box[3] - box[1]) + 4)
         if hasattr(c, "width") and hasattr(c, "height"):
             return max(1, round(c.width)), max(1, round(c.height))
@@ -166,11 +177,14 @@ class Measurement:
     def _font(self, component: Text | Captions, size: int):
         path = component.font or DEFAULT_FONT
         weight = getattr(component, "font_weight", None)
-        key = (path, size, weight)
+        # Optical size follows the design size, so supersampled and 4K rasters
+        # use the same cut as 1080p measurement.
+        opsz = getattr(component, "font_size", size)
+        key = (path, size, weight, opsz)
         if key not in self._fonts:
             if len(self._fonts) >= 128:
                 self._fonts.pop(next(iter(self._fonts)))
-            self._fonts[key] = load_font(path, size, weight)
+            self._fonts[key] = load_font(path, size, weight, opsz=opsz)
         return self._fonts[key]
 
     def _equation(self, c: Equation, factor: float):

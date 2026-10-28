@@ -280,10 +280,14 @@ def test_strict_assets(tmp_path):
 
 def test_minimum_font_and_long_label_wrap(ctx):
     box = Bounds(0, 0, 420, 400)
-    result = Heading("A longer sentence that should wrap without cropping").compose(ctx, box)
+    result = Heading("Labels wrap cleanly").compose(ctx, box)
     assert "\n" in result.root.text
     assert result.root.font_size >= ctx.theme.minimum_font_size
     assert result.root.bounds.width <= box.width
+    # A long headline in a narrow column is a budget error, not tiny text.
+    with pytest.raises(KitError, match="TEXT_BUDGET") as error:
+        Heading("A longer sentence that should wrap without cropping").compose(ctx, box)
+    assert error.value.code == "TEXT_BUDGET"
 
 
 def test_duplicate_manifest_keys(tmp_path):

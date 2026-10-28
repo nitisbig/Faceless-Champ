@@ -5,7 +5,9 @@ Premium defaults fill unspecified choices: landscape 1920×1080 at 30 fps (or
 body 44 px, heading 76 px, minimum 24 px, spacing 28 px, safe margin 64 px,
 0.6-second meaningful motion, restrained color and no automatic captions. Keep
 one idea and focal change per beat; use a settled hold, aligned geometry and
-negative space. Do not treat this as a requirement for every scene to have a title,
+negative space. On-screen text is a label, not a transcript: headings up to 8 words,
+body up to 22 words, labels up to 5. KitError TEXT_BUDGET means cut or split the copy;
+never lower font sizes to force it in. Do not treat this as a requirement for every scene to have a title,
 card, heading, transition or subtitle. User instructions override every design
 default, including these. Layout checks still report actual geometry problems.
 

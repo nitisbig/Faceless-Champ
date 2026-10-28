@@ -35,12 +35,17 @@ add(), play(), wait(), wait_until(), remove(), and with scene.at(time) schedule 
 play arguments run concurrently; successive calls advance the cursor. Audio defaults to
 the current cursor: attach master narration explicitly with add_audio(path, start=0).
 
-Text preserves whitespace and indentation. fit_text(text, Bounds(...), font_size=64,
-min_font_size=24) wraps/shrinks into measured bounds and rejects impossible fits.
-Text.font_weight controls an explicit variable font's Weight axis. Number supports
-formatting and animate.value_to(). ColorScheme.named: midnight, paper, ocean, clean-flow.
+Typography: use roles, not raw sizes. Text("...", role="title") with roles display,
+title, heading, body, label, caption sets size/weight/line_height/tracking; explicit
+args override. font names: sans (DM Sans, default), display (Space Grotesk), serif,
+serif-italic (Cormorant), mono, fallback (DejaVu); paths also work. Missing glyphs
+switch to DejaVu with a warning. TypeScale.named("modern"|"tech"|"editorial") picks a
+pairing; pass type_scale=. fit_text(text, Bounds(...), role="body") wraps with
+balanced lines, shrinks at most to 85%, and raises TextBudgetError when copy exceeds
+the role budget (title 8 words/2 lines, body 22/3, label 5/1): shorten or split it.
+Text preserves whitespace and never wraps. Number supports formatting and
+animate.value_to(). ColorScheme.named: midnight, paper, ocean, clean-flow.
 clean-flow pairs warm gray/white surfaces with black text and orange highlights.
-CLEAN_FLOW_FONT is packaged DM Sans; font_weight=400 for body or700 for headings.
 ShadowStyle, card_surface(Bounds, fill=..., radius=44, shadow=...), card_content_bounds
 and dot_grid(Bounds, color=..., spacing=28, radius=1) rasterize once as ordinary Images.
 Allocated bounds include transparent shadow clearance; use card_content_bounds for content.

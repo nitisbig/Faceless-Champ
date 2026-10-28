@@ -77,9 +77,24 @@ if _TYPE_CHECKING:
     from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
     from .timeline import Grid, Layer, Scene, Sequence
     from .transitions import DirectionalWipe, LuminanceWipe, ZoomBlurTransition
-    from .typography import CLEAN_FLOW_FONT, fit_text
+    from .typography import (
+        CLEAN_FLOW_FONT,
+        FONTS,
+        TYPE_SCALE,
+        TextBudgetError,
+        TextStyle,
+        TypeScale,
+        fit_text,
+        font_path,
+    )
 
 _EXPORTS = {
+    "FONTS": ("typography", "FONTS"),
+    "TYPE_SCALE": ("typography", "TYPE_SCALE"),
+    "TextBudgetError": ("typography", "TextBudgetError"),
+    "TextStyle": ("typography", "TextStyle"),
+    "TypeScale": ("typography", "TypeScale"),
+    "font_path": ("typography", "font_path"),
     "PreparedFrameSource": ("prepared", "PreparedFrameSource"),
     "Viewport": ("sources", "Viewport"),
     "RasterSource": ("sources", "RasterSource"),
@@ -370,6 +385,12 @@ __all__ = [  # noqa: RUF022
     "Viewport",
     "parse_srt_cues",
     "PreparedFrameSource",
+    "FONTS",
+    "TYPE_SCALE",
+    "TextBudgetError",
+    "TextStyle",
+    "TypeScale",
+    "font_path",
 ]
 
 

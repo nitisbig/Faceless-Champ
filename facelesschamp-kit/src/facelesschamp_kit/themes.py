@@ -38,6 +38,7 @@ class Theme:
     text_engine: str = "pillow"
     surface_mode: str = "raster"
     code_theme: str = "midnight"
+    text_budgets: bool = True
 
     def __post_init__(self):
         if self.text_engine not in {"pillow", "skia"} or self.surface_mode not in {"raster", "vector"}:

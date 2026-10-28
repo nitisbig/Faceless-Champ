@@ -62,8 +62,10 @@ not cross-machine byte-identical media promises. Inspect frames and fully decode
 ## Blocks, layouts, and assets
 
 Heading, TextPanel, MetricCard, ImageCard, Comparison, StepList, FlowDiagram, Stack, Split,
-WhiteboardDrawing compose reusable content. Fonts wrap/shrink to the theme minimum; impossible
-fits fail. TextPanel adapts title/body space. ImageCard uses core ImageSlot; missing auto images
+WhiteboardDrawing compose reusable content. Text wraps in balanced lines and shrinks at most
+to 80% (never below the theme minimum). Headings follow the title budget (8 words/2 lines),
+body text the body budget (22 words/3 lines): KitError TEXT_BUDGET means shorten or split
+the copy; TEXT_FIT means the box is too small. Theme(text_budgets=False) opts out. TextPanel adapts title/body space. ImageCard uses core ImageSlot; missing auto images
 show labeled placeholders, corrupt present assets fail. Named children support core motions.
 FlowDiagram is a simple ordered chain with node-N/label-N/edge-N children.
 

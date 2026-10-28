@@ -93,7 +93,7 @@ def test_color_map_alias_conflicts_and_invalid_colors_fail_validation(tmp_path, 
 
 def test_font_weight_requires_variable_font():
     with pytest.raises(ValueError, match="variable font"):
-        PillowRenderer().validate(Scene().add(Text("Hello", font_weight=600)))
+        PillowRenderer().validate(Scene().add(Text("Hello", font="fallback", font_weight=600)))
 
 
 def test_variable_font_weight_cache_does_not_leak_between_texts():

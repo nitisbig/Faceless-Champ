@@ -56,7 +56,7 @@ Use animation builders for changes over time.
 
 | Component | Specific arguments |
 | --- | --- |
-| `Text(text, ...)` | `font=None`, `font_size=64`, `color="white"`, `align="left"`, `spacing=8`, `font_weight=None` |
+| `Text(text, ...)` | `role=None`, `font=None`, `font_size=64`, `font_weight=None`, `line_height=None`, `tracking=0`, `color="white"`, `align="left"`, `spacing=8`, `type_scale=None` |
 | `Number(value, ...)` | Text options plus `format_spec=",.0f"`, `prefix=""`, `suffix=""`, `formatter=None`, `width=None`; animate with `.animate.value_to(value)` |
 | `Ellipse(...)` | Shape options with independent `width` and `height`; supports `Draw`, fill, stroke, and transforms |
 | `Equation(expression, ...)` | `font_size=64`, `color="white"`, `fontset="stix"`, `max_width=None`, `color_map=None`; requires the `equations` extra |
@@ -76,23 +76,52 @@ Shapes accept `fill=None`, `stroke="white"`, `stroke_width=4`.
 `None` disables fill/stroke. Lines have no fill. Shape raster bounds include stroke
 padding so strokes are not cut off. Top-left anchors refer to that raster box.
 
-Text accepts an explicit TTF/OTF font file; `None` uses the bundled DejaVu Sans.
-`fit_text(text, bounds, *, font_size=64, min_font_size=24, font=None,
-font_weight=None, color="white", align="center", spacing=8)` returns an unowned
-Text centered inside positive `Bounds`. It wraps words, preserves explicit newline
-breaks, then shrinks in two-pixel steps (always trying the minimum) until measured
-geometry fits. Unbreakable words are shrunk rather than split; impossible fits
-raise `ValueError`. Use ordinary Text when exact whitespace/indentation is needed.
-Newlines are supported; `align` is left, center, or right alignment within multiline
-text. Text itself does not wrap. There is no rich text, font-family lookup, or guaranteed
-fallback for characters absent from the selected font.
-`font_weight` sets the Weight axis of an explicit variable font. Values must fit
-that font's axis range; static fonts reject this option. `None` preserves the font's
-default weight. The renderer keeps separate cached instances for each weight.
+### Typography
 
-`CLEAN_FLOW_FONT` is the absolute path to bundled variable DM Sans. Use
-`font=CLEAN_FLOW_FONT, font_weight=400` for body text and `font_weight=700` for
-headings. Its OFL license is packaged alongside the font.
+Prefer roles over raw sizes. `Text("Revenue doubled", role="title")` takes size,
+weight, font, line height and tracking from the default `TYPE_SCALE`; any explicit
+argument overrides the role. Roles at the 1080p reference:
+
+| Role | Size | Weight | Line height | Tracking | Budget |
+| --- | --- | --- | --- | --- | --- |
+| `display` | 120 | 700 | 1.0 | -0.025 em | 6 words / 2 lines |
+| `title` | 84 | 700 | 1.06 | -0.015 em | 8 words / 2 lines |
+| `heading` | 60 | 600 | 1.12 | -0.01 em | 10 words / 2 lines |
+| `body` | 42 | 400 | 1.35 | 0 | 22 words / 3 lines |
+| `label` | 32 | 500 | 1.2 | 0.01 em | 5 words / 1 line |
+| `caption` | 32 | 400 | 1.3 | 0 | 14 words / 2 lines |
+
+`TypeScale.named("modern" | "tech" | "editorial")` picks a font pairing (DM Sans,
+Space Grotesk headings, Cormorant serif headings). `scale.for_canvas(canvas)` scales
+sizes by the canvas short side; `scale.with_fonts(heading=..., body=...)` and
+`dataclasses.replace` customise it. Pass `type_scale=` to `Text` or `fit_text`.
+
+`font` accepts a TTF/OTF path or a bundled name: `"sans"` (DM Sans, the default),
+`"display"` (Space Grotesk), `"serif"`/`"serif-italic"` (Cormorant Garamond),
+`"mono"` and `"fallback"` (DejaVu). `font_path(name)` returns the file; `FONTS` lists
+families. Named fonts use their family's default weight. If a bundled font lacks a
+glyph in the text (arrows, Greek, check marks), the component switches to the DejaVu
+fallback, drops the variable weight and emits a `UserWarning`. Variable fonts with
+an optical-size axis (DM Sans) select the cut from the design font size.
+
+`line_height` is a multiple of the font size and replaces pixel `spacing` when set.
+`tracking` is letter spacing in em (±0.5); negative values tighten display type,
+positive values suit uppercase labels. Both work with Pillow and Skia text and
+with `Typewriter` reveals. `font_weight` sets a variable font's Weight axis; static
+fonts reject it.
+
+`fit_text(text, bounds, *, role=None, type_scale=None, font_size=None,
+min_font_size=None, font=None, font_weight=None, color="white", align="center",
+line_height=None, tracking=None, max_words=None, max_lines=None, budget=True,
+balance=True)` returns an unowned Text centered in positive `Bounds`. It wraps
+words with balanced line lengths, preserves explicit newlines, and shrinks only to
+85% of the size unless `min_font_size` is passed. Copy over a role's word or line
+budget, or text that cannot fit, raises `TextBudgetError` (a `ValueError`) with
+`kind` "words", "lines" or "fit": shorten the copy, split the beat, or let
+narration carry it. `budget=False` disables role budgets. Use plain Text for exact
+whitespace. Text itself never wraps; there is no rich text.
+
+`CLEAN_FLOW_FONT` is the bundled DM Sans path (same as `font_path("sans")`).
 
 Images accept PNG, JPG/JPEG, WebP, and GIF files. `contain` preserves the entire image
 with transparent padding; `cover` crops to fill. GIF timing starts when the component

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from ..components import Number
 from ..motion import rgba
-from ..typography import DEFAULT_FONT, load_font
+from ..typography import DEFAULT_FONT, OPSZ_NAMES, axis_name, load_font, optical_size
 from ._native import load_skia
 
 
@@ -28,22 +28,33 @@ class TextSession:
 
     def _font(self, c):
         path = str(Path(c.font or DEFAULT_FONT).resolve())
-        key = path, c.font_weight
+        key = path, c.font_weight, round(c.font_size)
         if key not in self.fonts:
             if len(self.fonts) >= 64:
                 self.close()
                 self._reset_fonts()
             # Keep the same variable-weight validation as legacy typography.
-            load_font(path, max(1, round(c.font_size)), c.font_weight)
+            pil = load_font(path, max(1, round(c.font_size)), c.font_weight, opsz=c.font_size)
+            try:
+                axes = pil.get_variation_axes()
+            except OSError:
+                axes = []
+            opsz_axis = next((a for a in axes if axis_name(a) in OPSZ_NAMES), None)
             s = self.skia
             tf = s.Typeface.MakeFromFile(path)
             if tf is None:
                 raise ValueError(f"Cannot load native font: {path}")
-            if c.font_weight is not None:
+            if c.font_weight is not None or opsz_axis is not None:
                 coordinates = s.FontArguments.VariationPosition.Coordinates()
-                coordinates.append(
-                    s.FontArguments.VariationPosition.Coordinate(int.from_bytes(b"wght", "big"), c.font_weight)
-                )
+                if c.font_weight is not None:
+                    coordinates.append(
+                        s.FontArguments.VariationPosition.Coordinate(int.from_bytes(b"wght", "big"), c.font_weight)
+                    )
+                if opsz_axis is not None:
+                    value = min(max(optical_size(c.font_size), opsz_axis["minimum"]), opsz_axis["maximum"])
+                    coordinates.append(
+                        s.FontArguments.VariationPosition.Coordinate(int.from_bytes(b"opsz", "big"), value)
+                    )
                 args = s.FontArguments().setVariationDesignPosition(s.FontArguments.VariationPosition(coordinates))
                 tf = tf.makeClone(args)
                 if tf is None:
@@ -64,6 +75,8 @@ class TextSession:
             c.font_weight,
             c.font_size,
             c.spacing,
+            getattr(c, "line_height", None),
+            getattr(c, "tracking", 0.0),
             c.align,
             getattr(c, "width", None),
             state["reveal"],
@@ -83,6 +96,8 @@ class TextSession:
             ts = s.textlayout.TextStyle()
             ts.setFontFamilies([alias])
             ts.setFontSize(c.font_size)
+            if getattr(c, "tracking", 0.0):
+                ts.setLetterSpacing(c.tracking * c.font_size)
             ts.setColor(s.ColorSetARGB(color[3], *color[:3]))
             ps = s.textlayout.ParagraphStyle()
             ps.setTextStyle(ts)
@@ -103,7 +118,8 @@ class TextSession:
                 raise ValueError("Number text exceeds its fixed width")
             width = fixed
         visible = full[: math.floor(len(full) * state["reveal"] + 1e-9)].split("\n")
-        lines, y = [], 2
+        line_height = getattr(c, "line_height", None)
+        lines, y, bottom = [], 2, 2
         for i, (line, base) in enumerate(zip(full_lines, measured)):
             shown = visible[i] if i < len(visible) else ""
             p = paragraph(shown) if shown != line else base
@@ -111,8 +127,9 @@ class TextSession:
             x = 0 if c.align == "left" else width - advance if c.align == "right" else (width - advance) / 2
             if shown:
                 lines.append((p, 2 + x, y))
-            y += math.ceil(base.Height) + c.spacing
-        result = ((max(1, math.ceil(width)) + 4, max(1, math.ceil(y - c.spacing + 2))), tuple(lines))
+            bottom = y + math.ceil(base.Height)
+            y += line_height * c.font_size if line_height is not None else math.ceil(base.Height) + c.spacing
+        result = ((max(1, math.ceil(width)) + 4, max(1, math.ceil(bottom + 2))), tuple(lines))
         self.layouts[key] = result
         while len(self.layouts) > 128:
             self.layouts.popitem(last=False)
@@ -131,12 +148,22 @@ class TextSession:
 
 
 @lru_cache(maxsize=128)
-def _measured(text, font, stamp, size, weight, spacing, align, width):
+def _measured(text, font, stamp, size, weight, spacing, align, width, line_height=None, tracking=0.0):
     from ..components import Text
 
     session = TextSession()
     try:
-        c = Text(text, font=font, font_size=size, font_weight=weight, spacing=spacing, align=align, text_engine="skia")
+        c = Text(
+            text,
+            font=font,
+            font_size=size,
+            font_weight=weight,
+            spacing=spacing,
+            align=align,
+            text_engine="skia",
+            line_height=line_height,
+            tracking=tracking,
+        )
         measured = session.layout(c, c.state())[0]
         return (max(measured[0], math.ceil(width) + 4), measured[1]) if width is not None else measured
     finally:
@@ -147,4 +174,15 @@ def text_size(c, state):
     path = Path(c.font or DEFAULT_FONT).resolve()
     stamp = path.stat().st_mtime_ns, path.stat().st_size
     text = c.format(state["value"]) if isinstance(c, Number) else c.text
-    return _measured(text, str(path), stamp, c.font_size, c.font_weight, c.spacing, c.align, getattr(c, "width", None))
+    return _measured(
+        text,
+        str(path),
+        stamp,
+        c.font_size,
+        c.font_weight,
+        c.spacing,
+        c.align,
+        getattr(c, "width", None),
+        getattr(c, "line_height", None),
+        getattr(c, "tracking", 0.0),
+    )
