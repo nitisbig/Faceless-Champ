@@ -57,7 +57,7 @@ def test_role_budgets_reject_paragraphs_and_can_be_disabled():
 
 def test_role_styles_and_explicit_overrides():
     title = Text("Revenue doubled", role="title")
-    assert (title.font_size, title.font_weight, title.line_height, title.tracking) == (84, 700, 1.06, -0.015)
+    assert (title.font_size, title.font_weight, title.line_height, title.tracking) == (84, 700, 1.06, -0.01)
     assert Text("x", role="title", font_size=40).font_size == 40
     serif = Text("Quote", role="heading", type_scale=TypeScale.named("editorial"))
     assert serif.font == font_path("serif")

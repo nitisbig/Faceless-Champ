@@ -158,3 +158,23 @@ Renderer identity includes the actual session and fonts, captured before close.
 A supplied renderer is not closed. Existing Project methods still return Path.
 Kit facades: media_probe(path), read_subtitle_cues(text), public_capabilities(),
 validate_rendering(compiled, settings), and the identical Core ExportProgress type.
+
+## Shot templates and theme bridge
+
+`facelesschamp_kit.shots` provides complete single-idea shots as blocks: `TitleCard(title,
+subtitle="", eyebrow="")`, `BigStat(value, label, prefix="", suffix="", context="")`,
+`QuoteCard(text, attribution="")`, `StepsCard(steps, title="")` (2-5 steps, at most 9 words each),
+`CompareCard(left_title, left, right_title, right)` and `EndCard(title, action="")`. They use
+the role budgets (KitError TEXT_BUDGET when copy is too long), scale with the canvas and
+animate with the theme entrance. `shot(name, content)` builds one from a mapping;
+`shot_video(name, content, theme=, duration=, size=)` returns a CompiledVideo.
+CLI: `fc-kit shot --list`, `fc-kit shot stat CONTENT.json --theme neon --frame 3` (also
+`--preview`, `--storyboard`, `--audit`, `--portrait`, `--output`).
+
+Kit themes: midnight, light, whiteboard, clean-flow, neon, documentary, paper. `Theme.core()`
+returns the matching faceless_champ Theme. It is active while blocks compose, so core
+primitives and role text inside blocks follow the kit theme. `Theme.from_core("neon",
+accent=...)` builds a kit theme from a core preset. `heading_font` sets a separate heading
+font. Block sizes scale with the canvas short side (1.0 at 1080p).
+`Stack(*blocks, gap=28, weights=None)` and `Split` accept relative weights.
+`Comparison(left, right, left_title="Before", right_title="After")`.

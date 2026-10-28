@@ -84,8 +84,8 @@ argument overrides the role. Roles at the 1080p reference:
 
 | Role | Size | Weight | Line height | Tracking | Budget |
 | --- | --- | --- | --- | --- | --- |
-| `display` | 120 | 700 | 1.0 | -0.025 em | 6 words / 2 lines |
-| `title` | 84 | 700 | 1.06 | -0.015 em | 8 words / 2 lines |
+| `display` | 120 | 700 | 1.0 | -0.015 em | 6 words / 2 lines |
+| `title` | 84 | 700 | 1.06 | -0.01 em | 8 words / 2 lines |
 | `heading` | 60 | 600 | 1.12 | -0.01 em | 10 words / 2 lines |
 | `body` | 42 | 400 | 1.35 | 0 | 22 words / 3 lines |
 | `label` | 32 | 500 | 1.2 | 0.01 em | 5 words / 1 line |
@@ -177,6 +177,65 @@ formula = Equation(
 )
 self.play(Write(formula))
 ```
+
+## Themes, layout, motion and primitives
+
+**Theme** bundles colors (`ColorScheme`), a `TypeScale`, a spacing scale, radius, shadow,
+safe margin and `MotionStyle`. Presets (`THEMES`, `Theme.named`): midnight, paper, ocean,
+clean-flow, neon, documentary, whiteboard. Components created inside `with theme.use():`
+take their defaults from it: `Text` colors follow the role (label=primary, caption=muted,
+others=text) and fall back to the text color when an accent is not readable on the
+background (WCAG 4.5:1, or 3:1 at 40 px and larger). `color=` also accepts role names
+("muted", "primary"). Helpers: `theme.canvas(w, h)`, `theme.text(text, role, color=)`,
+`theme.fit(text, bounds, role)`, `theme.card(bounds)`, `theme.space(i)`, `theme.color(role)`,
+`theme.readable(color, on=, large=)`, `theme.for_canvas(canvas)`. Without an active
+theme, components keep their legacy defaults. `current_theme()` returns the active or
+midnight theme; `set_theme(theme)` activates one for the current context.
+
+**Layout.** `canvas.bounds`, `canvas.safe_area(margin=None)` (64 px at 1080p, scaled) and
+`canvas.is_portrait`. `Bounds.columns(n | weights, gap=)`, `Bounds.rows(...)`,
+`Bounds.grid(rows, cols, gap=)` (row-major), `Bounds.inset(amount, x=, y=, left=, ...)`,
+`Bounds.fit(w, h, align=)` (aspect-preserving), `Bounds.aspect(ratio)`,
+`Bounds.point("top_left" | "center" | ...)`, `Bounds.from_center(c, w, h)`,
+`Bounds.from_size(left, top, w, h)`, `Bounds.union`, `Bounds.contains(box | point)`.
+
+**Easing.** `rate_func` accepts a function or a preset name: `standard`, `emphasized`,
+`decelerate`, `accelerate`, `snappy`, `gentle`, `overshoot`, `anticipate`, `linear`,
+`smooth`, `ease_in`, `ease_out`, `ease_in_out` (`EASINGS`). `cubic_bezier(x1, y1, x2, y2)`,
+`ease_out_expo`, `ease_out_quint` and `ease_in_out` are exported. Easings are picklable.
+
+**Motion helpers.** `scene.reveal(*components, at=None, until=None, style=None,
+duration=None, stagger=None, exit_style=None, rate_func=None)` adds components with an
+entrance (`rise`, `fade`, `pop`, `zoom`, `drop`, `left`, `right`, `none`; defaults from the
+theme motion) and, with `until`, exits and removes them so the exit ends at `until`.
+`scene.play_at(time, *animations, run_time=, rate_func=)` schedules at an absolute time.
+Neither moves the cursor; both extend `scene.duration`. Later animations of the same
+property must still be chronological. `component.animate.through(property, values,
+times=None)` animates through several values (colors as strings) in one `play`.
+
+**Primitives** (`faceless_champ`, theme-aware, all ordinary components):
+`Dot(position, radius=8, color=)`, `Arc(center, radius, start=-90, sweep=360, color=,
+width=8)` (use `Draw`), `Divider(bounds | start, end)`, `Pill(text, position, role="label",
+fill=, color=, stroke=)`, `Badge(text, position, color="primary")`, `Callout(text, target,
+offset=(140, -90))` (parts `dot`, `line`, `label`), `IconText(icon, text, position)`,
+`Stat(value, label, position, prefix=, suffix=, format_spec=)` (parts `value` Number,
+`label`) and `GlassCard(bounds, tint=, radius=, opacity=0.72)` (parts `body`, `sheen`).
+Composite primitives subclass `Composite(Group)` and expose parts as attributes.
+
+**Runner.** `run(target, argv=None, name=None, output_dir="output")` renders a Scene, a
+Scene subclass or a factory from the command line: no flags renders the full video;
+`--preview [S] --start T`, `--frame T ...`, `--storyboard [N]`, `--range A B`,
+`--audit`, `--quality low|medium|high|4k`, `--fps`, `--backend`, `--output`, `--keep`.
+The last stdout line is JSON with the written paths. `python -m faceless_champ.runner
+file.py[:name] [flags]` runs a file that has no `run(...)` call.
+
+**Design audit.** `design_audit(node, times=None, samples=8, ...)` returns a
+`DesignReport` (`ok`, `findings`, `to_dict()`). Codes: `TEXT_TOO_SMALL` (error below 22 px,
+warning below 28 px at 1080p), `LOW_CONTRAST` (WCAG), `TEXT_CLUTTER` (more than 30 visible
+words), `TOO_MANY_SIZES` (more than 4), `TOO_MANY_FONTS` (more than 2 families),
+`OUTSIDE_SAFE_AREA` and `OUTSIDE_FRAME`. Each finding has a `fix` hint. Backgrounds are
+the nearest solid shape or surface under the text; text over images is not
+contrast-checked. `contrast_ratio(a, b)` and `readable_color(background)` are exported.
 
 ## Card and backdrop surfaces
 

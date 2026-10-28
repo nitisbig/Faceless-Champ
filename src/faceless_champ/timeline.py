@@ -88,6 +88,7 @@ class Scene(Renderable):
         self.entries: list[Entry] = []
         self.audio: list[AudioClip] = []
         self._cursor = 0.0
+        self._horizon = 0.0
         self._built = False
         self._building = False
         self._objects: dict[Component, Entry] = {}
@@ -117,6 +118,7 @@ class Scene(Renderable):
                 self.audio.clear()
                 self._objects.clear()
                 self._cursor = 0.0
+                self._horizon = 0.0
                 self._invalidate()
                 raise
             finally:
@@ -134,7 +136,8 @@ class Scene(Renderable):
             for e in self.entries
             if isinstance(e.component, Captions)
         ]
-        return max([self._cursor] + [a.start + a.duration for a in self.audio] + caption_ends)
+        horizon = getattr(self, "_horizon", 0.0)
+        return max([self._cursor, horizon] + [a.start + a.duration for a in self.audio] + caption_ends)
 
     @property
     def time(self) -> float:
@@ -282,8 +285,14 @@ class Scene(Renderable):
         return evaluate_frame(self, time, resource_keys=False).geometry[index].ink
 
     def play(self, *animations, run_time=None, rate_func=None) -> Self:
+        """Run animations together from the cursor, then advance it by run_time.
+
+        ``rate_func`` is a function or preset name ("emphasized", "snappy"...).
+        """
+        from .easing import easing
         from .scheduling import Schedule, play_schedule
 
+        rate_func = easing(rate_func)
         if any(isinstance(a, Schedule) for a in animations):
             return play_schedule(self, animations, run_time, rate_func)
         return self._play(*animations, run_time=1 if run_time is None else run_time, rate_func=rate_func)
@@ -313,6 +322,10 @@ class Scene(Renderable):
             ):
                 raise TypeError("Animation.resolve must return an Animation for the same component")
             animation = resolved
+            if isinstance(animation.rate_func, str):
+                from .easing import easing
+
+                animation.rate_func = easing(animation.rate_func)
             if animation.rate_func is not None and not callable(animation.rate_func):
                 raise TypeError("Animation rate_func must be callable")
             if set(animation.starts or {}) - set(animation.targets):
@@ -395,6 +408,83 @@ class Scene(Renderable):
             self._objects[component].tracks.extend(tracks)
         self._cursor += duration
         self._invalidate()
+        return self
+
+    def play_at(self, time: float, *animations, run_time=None, rate_func=None) -> Self:
+        """Schedule animations at an absolute time without moving the cursor.
+
+        Use for overlapping motion (background drift, a pulse on an earlier
+        element) while sequential authoring continues with play()/wait().
+        """
+        time = finite(time, "time", 0)
+        previous = self._cursor
+        self._cursor = time
+        try:
+            self.play(*animations, run_time=run_time, rate_func=rate_func)
+            self._horizon = max(getattr(self, "_horizon", 0.0), self._cursor)
+        finally:
+            self._cursor = previous
+            self._invalidate()
+        return self
+
+    def reveal(
+        self,
+        *components: Component,
+        at: float | None = None,
+        until: float | None = None,
+        style: str | None = None,
+        duration: float | None = None,
+        stagger: float | None = None,
+        exit_style: str | None = None,
+        exit_duration: float | None = None,
+        rate_func=None,
+    ) -> Self:
+        """Add components with a polished entrance, and optionally exit them.
+
+        Styles: "rise" (default), "fade", "pop", "zoom", "drop", "left",
+        "right", "none". ``at`` defaults to the cursor; ``until`` schedules the
+        exit to finish at that time and removes the components. ``stagger``
+        offsets each component. Defaults come from the active Theme's motion.
+        The cursor does not move: chain with wait()/wait_until(). Example::
+
+            scene.reveal(title, subtitle, stagger=0.12, until=6)
+        """
+        from .easing import easing
+        from .theme import current_theme
+
+        if not components:
+            raise ValueError("reveal needs at least one component")
+        motion = current_theme().motion
+        style = style or motion.enter
+        duration = motion.duration if duration is None else finite(duration, "duration", 0.000001)
+        stagger = motion.stagger if stagger is None else finite(stagger, "stagger", 0)
+        exit_style = exit_style or ("fade" if style == "none" else style)
+        exit_duration = duration * 0.75 if exit_duration is None else finite(exit_duration, "exit_duration", 0.000001)
+        enter_ease = easing(rate_func) or easing(motion.ease)
+        start = self._cursor if at is None else finite(at, "at", 0)
+        if until is not None:
+            until = finite(until, "until", 0)
+            last_start = start + stagger * (len(components) - 1)
+            if until - exit_duration < last_start + (0 if style == "none" else duration) - 1e-9:
+                raise ValueError("until leaves no time for the entrance and exit; reveal earlier or exit later")
+        previous = self._cursor
+        try:
+            for index, component in enumerate(components):
+                begin = start + index * stagger
+                self._cursor = begin
+                self.add(component)
+                if style != "none":
+                    self.play(_entrance(component, style, motion.distance), run_time=duration, rate_func=enter_ease)
+                if until is not None:
+                    self._cursor = until - exit_duration
+                    self.play(
+                        _exit(component, exit_style, motion.distance), run_time=exit_duration, rate_func="accelerate"
+                    )
+                    self.remove(component)
+                self._horizon = max(getattr(self, "_horizon", 0.0), self._cursor)
+        finally:
+            self._cursor = previous
+            self._invalidate()
         return self
 
     def wait(self, duration: float = 1.0) -> Self:
@@ -571,3 +661,47 @@ class Layer(Renderable):
     @property
     def duration(self) -> float:
         return max(child.duration for child in self.children)
+
+
+_DIRECTIONS = {"rise": (0, 1), "drop": (0, -1), "left": (1, 0), "right": (-1, 0)}
+
+
+def _entrance(component, style, distance):
+    from .animation import Animation
+
+    if style == "fade":
+        return Animation(component, {"opacity": component.opacity}, {"opacity": 0.0})
+    if style in _DIRECTIONS:
+        dx, dy = _DIRECTIONS[style]
+        return Animation(
+            component,
+            {"position": (0, 0), "opacity": component.opacity},
+            {"position": (dx * distance, dy * distance), "opacity": 0.0},
+            relative=("position",),
+        )
+    if style in {"pop", "zoom"}:
+        start = 0.85 if style == "pop" else 0.94
+        return Animation(
+            component,
+            {"scale": 1, "opacity": component.opacity},
+            {"scale": start, "opacity": 0.0},
+            relative=("scale",),
+        )
+    raise ValueError("reveal style must be rise, fade, pop, zoom, drop, left, right or none")
+
+
+def _exit(component, style, distance):
+    from .animation import Animation
+
+    if style in _DIRECTIONS:
+        dx, dy = _DIRECTIONS[style]
+        return Animation(
+            component,
+            {"position": (-dx * distance * 0.5, -dy * distance * 0.5), "opacity": 0.0},
+            relative=("position",),
+        )
+    if style in {"pop", "zoom"}:
+        return Animation(component, {"scale": 0.96, "opacity": 0.0}, relative=("scale",))
+    if style in {"fade", "none"}:
+        return Animation(component, {"opacity": 0.0})
+    raise ValueError("exit style must be rise, fade, pop, zoom, drop, left, right or none")

@@ -97,6 +97,48 @@ COLOR_SCHEMES = MappingProxyType(
             tertiary="#E8B660",
             highlight="#A69AC6",
         ),
+        "neon": ColorScheme(
+            name="neon",
+            background="#07070C",
+            surface="#12121C",
+            text="#F5F7FF",
+            muted="#A3A8BF",
+            axis="#5E6380",
+            border="#2A2B40",
+            grid="#1A1B2A",
+            primary="#2EE6FF",
+            secondary="#FF4FA3",
+            tertiary="#B8FF4A",
+            highlight="#9A8CFF",
+        ),
+        "documentary": ColorScheme(
+            name="documentary",
+            background="#0F0D0B",
+            surface="#1B1815",
+            text="#F4EEE5",
+            muted="#B8AE9F",
+            axis="#7D7466",
+            border="#3A332B",
+            grid="#26211C",
+            primary="#E9A84C",
+            secondary="#8FB5A9",
+            tertiary="#D2724F",
+            highlight="#D8C8A6",
+        ),
+        "whiteboard": ColorScheme(
+            name="whiteboard",
+            background="#FFFFFF",
+            surface="#F5F7FA",
+            text="#1E293B",
+            muted="#5B6B82",
+            axis="#94A3B8",
+            border="#D5DCE6",
+            grid="#EEF2F7",
+            primary="#2563EB",
+            secondary="#E2683C",
+            tertiary="#0E9F6E",
+            highlight="#7C3AED",
+        ),
         "ocean": ColorScheme(
             name="ocean",
             background="#071a26",
@@ -113,3 +155,25 @@ COLOR_SCHEMES = MappingProxyType(
         ),
     }
 )
+
+
+def relative_luminance(color: str) -> float:
+    """WCAG relative luminance of a color (alpha ignored)."""
+    r, g, b, _ = ImageColor.getcolor(color, "RGBA") if isinstance(color, str) else tuple(color)
+
+    def channel(value):
+        value /= 255
+        return value / 12.92 if value <= 0.04045 else ((value + 0.055) / 1.055) ** 2.4
+
+    return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+
+
+def contrast_ratio(foreground: str, background: str) -> float:
+    """WCAG contrast ratio (1-21). Body text needs >= 4.5, large text >= 3."""
+    a, b = relative_luminance(foreground), relative_luminance(background)
+    return (max(a, b) + 0.05) / (min(a, b) + 0.05)
+
+
+def readable_color(background: str, light: str = "#FFFFFF", dark: str = "#111111") -> str:
+    """Whichever of ``light``/``dark`` contrasts more with ``background``."""
+    return light if contrast_ratio(light, background) >= contrast_ratio(dark, background) else dark

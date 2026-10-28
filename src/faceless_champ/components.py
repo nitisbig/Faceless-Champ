@@ -39,6 +39,22 @@ class Canvas:
     def aspect_ratio(self) -> float:
         return self.width / self.height
 
+    @property
+    def bounds(self):
+        """The full frame as Bounds(0, 0, width, height)."""
+        from .layout import Bounds
+
+        return Bounds(0, 0, self.width, self.height)
+
+    @property
+    def is_portrait(self) -> bool:
+        return self.height > self.width
+
+    def safe_area(self, margin: float | None = None):
+        """The frame inset by a title-safe margin (default 64 px at 1080p, scaled)."""
+        margin = min(self.width, self.height) * 64 / 1080 if margin is None else finite(margin, "margin", 0)
+        return self.bounds.inset(margin)
+
 
 class Component:
     relative_animation_properties = frozenset({"position", "scale", "rotation"})
@@ -204,6 +220,8 @@ class Text(Component):
     bundled name: "sans", "display", "serif", "serif-italic", "mono".
     ``line_height`` is a multiple of font size (replaces pixel ``spacing``);
     ``tracking`` is letter spacing in em. Text never wraps: use fit_text.
+    Inside ``Theme.use()`` the color defaults to the role's theme color and may
+    be a role name ("muted", "primary"); otherwise it defaults to white.
     """
 
     def __init__(
@@ -212,7 +230,7 @@ class Text(Component):
         *,
         font: str | Path | None = None,
         font_size: float | None = None,
-        color: str = "white",
+        color: str | None = None,
         align: str = "left",
         spacing: float = 8,
         font_weight: float | None = None,
@@ -223,9 +241,15 @@ class Text(Component):
         tracking: float | None = None,
         **kwargs: Any,
     ) -> None:
+        from .theme import active_theme
         from .typography import resolve_font, role_style
 
         super().__init__(**kwargs)
+        theme = active_theme()
+        if color is None:
+            color = theme.role_color(role) if theme is not None else "white"
+        elif theme is not None:
+            color = theme.color(color)
         if not isinstance(text, str):
             raise TypeError("text must be a string")
         if align not in {"left", "center", "right"}:

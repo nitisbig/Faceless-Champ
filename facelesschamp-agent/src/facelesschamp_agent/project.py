@@ -448,6 +448,9 @@ class AgentProject:
 
         compiled, plan, fingerprint = self._build()
         result = audit_layout(compiled, plan)
+        result["design"] = design_review(compiled, result["sample_times"])
+        if not result["design"]["ok"]:
+            result["status"] = "failed"
         record = self._record("audit-layout", fingerprint, **result)
         if detailed:
             return record
@@ -886,3 +889,20 @@ def init_project(destination):
         if staging.exists():
             shutil.rmtree(staging)
     return destination
+
+
+def design_review(compiled, sample_times, *, limit=12):
+    """Readability findings (text size, contrast, clutter, type sizes, fonts).
+
+    Geometry (frame/safe-area) problems are reported by the layout audit, so
+    they are excluded here. At most ``limit`` evenly spread times are sampled.
+    """
+    from faceless_champ import design_audit
+
+    times = list(sample_times)
+    if len(times) > limit:
+        step = len(times) / limit
+        times = [times[int(i * step)] for i in range(limit)]
+    report = design_audit(compiled.composition, times or None)
+    findings = [f.to_dict() for f in report.findings if not f.code.startswith("OUTSIDE_")]
+    return {"ok": not any(f["severity"] == "error" for f in findings), "findings": findings}

@@ -36,6 +36,12 @@ CATALOG = {
         "OSWalkthrough",
         "FinderWindow",
         "SettingsWindow",
+        "TitleCard",
+        "BigStat",
+        "QuoteCard",
+        "StepsCard",
+        "CompareCard",
+        "EndCard",
     ],
     "themes": list(THEMES),
     "templates": [
@@ -101,7 +107,46 @@ def doctor(root=".", *, gpu=False):
     return result
 
 
+def shot_main(argv):
+    """fc-kit shot TEMPLATE CONTENT [--theme T] [--duration S] [--portrait] [runner flags].
+
+    CONTENT is a JSON file or an inline JSON object. Runner flags are those of
+    faceless_champ.run: --frame T, --preview [S], --storyboard [N], --audit, --output.
+    """
+    from faceless_champ import run
+
+    from .shots import SHOTS, shot_fields, shot_video
+
+    parser = argparse.ArgumentParser(prog="fc-kit shot", description=shot_main.__doc__)
+    parser.add_argument("template", nargs="?", choices=list(SHOTS))
+    parser.add_argument("content", nargs="?", help="JSON file or inline JSON object")
+    parser.add_argument("--list", action="store_true", help="print templates and their fields")
+    parser.add_argument("--theme", default="midnight", choices=list(THEMES))
+    parser.add_argument("--duration", type=float, default=5.0)
+    parser.add_argument("--portrait", action="store_true", help="1080x1920 instead of 1920x1080")
+    args, rest = parser.parse_known_args(argv)
+    if args.list or not args.template:
+        print(json.dumps({name: shot_fields(name) for name in SHOTS}, indent=2))
+        return 0
+    if not args.content:
+        print(f"fc-kit shot: {args.template} needs content with fields {shot_fields(args.template)}", file=sys.stderr)
+        return 2
+    try:
+        text = args.content
+        content = json.loads(Path(text).read_text() if not text.lstrip().startswith("{") else text)
+        size = (1080, 1920) if args.portrait else (1920, 1080)
+        video = shot_video(args.template, content, theme=args.theme, duration=args.duration, size=size)
+    except (KitError, ValueError, OSError) as exc:
+        error = exc.as_dict() if isinstance(exc, KitError) else {"code": "SHOT", "message": str(exc)}
+        print(json.dumps({"ok": False, "error": error}))
+        return 1
+    return run(video.composition, argv=rest or ["--frame", str(args.duration * 0.6)], name=f"shot-{args.template}")
+
+
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "shot":
+        return shot_main(argv[1:])
     parser = argparse.ArgumentParser(prog="fc-kit")
     parser.add_argument("--project", default=".", help="Project directory or facelesschamp.toml")
     parser.add_argument("--json", action="store_true", help="Machine-readable results and errors")

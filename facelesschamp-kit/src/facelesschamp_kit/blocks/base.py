@@ -26,10 +26,20 @@ class Block(Protocol):
     def compose(self, context, bounds: Bounds) -> BlockBuild: ...
 
 
+def heading_font(theme, heading=False):
+    """The theme font for headings (heading_font) or body text."""
+    return (theme.heading_font or theme.font) if heading else theme.font
+
+
+def unit(ctx):
+    """Design-pixel scale relative to a 1080p short side (1.0 for 1920x1080 and 1080x1920)."""
+    return min(ctx.canvas.width, ctx.canvas.height) / 1080
+
+
 def text_weight(theme, heading=False):
     """Theme weight, or the role weight when the theme uses the bundled default font."""
     weight = theme.heading_weight if heading else theme.font_weight
-    if weight is None and theme.font is None:
+    if weight is None and heading_font(theme, heading) is None:
         weight = (TYPE_SCALE.title if heading else TYPE_SCALE.body).font_weight
     return weight
 
@@ -44,10 +54,10 @@ def fit_text(text, ctx, box, *, size=None, color=None, align="center", heading=F
     if not isinstance(text, str) or not text.strip():
         raise KitError("BLOCK_PROPS", "Text must be a nonempty string")
     theme = ctx.theme
-    size = size or theme.body_size
-    if size < theme.minimum_font_size:
+    size = size or theme.body_size * unit(ctx)
+    if size < theme.minimum_font_size * min(1.0, unit(ctx)):
         raise KitError("TEXT_FIT", "Requested font size is below theme minimum")
-    minimum = min(size, max(theme.minimum_font_size, size * 0.8))
+    minimum = min(size, max(theme.minimum_font_size * unit(ctx), size * 0.8))
     role = role or ("title" if heading else "body")
     try:
         return core_fit_text(
@@ -57,7 +67,7 @@ def fit_text(text, ctx, box, *, size=None, color=None, align="center", heading=F
             budget=theme.text_budgets,
             font_size=size,
             min_font_size=minimum,
-            font=theme.font,
+            font=heading_font(theme, heading),
             font_weight=text_weight(theme, heading),
             color=color or theme.foreground,
             align=align,

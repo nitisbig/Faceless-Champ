@@ -1,5 +1,12 @@
 # Choosing visual treatments
 
+Fastest premium route: if a beat is a title, a key number, a quote, a short process,
+a before/after or a closing call to action, use the kit shot blocks (TitleCard, BigStat,
+QuoteCard, StepsCard, CompareCard, EndCard) instead of custom layout. Otherwise follow
+CHEATSHEET.md patterns: one Theme, role text, safe_area/Bounds layout, core primitives
+(Stat, Callout, Pill, GlassCard, Arc) and scene.reveal. audit-layout includes a design
+section (text size, contrast, clutter, fonts); fix its errors before review.
+
 Premium defaults fill unspecified choices: landscape 1920×1080 at 30 fps (or
 1080×1920 when shorts is requested), clean-flow theme with its packaged DM Sans,
 body 44 px, heading 76 px, minimum 24 px, spacing 28 px, safe margin 64 px,

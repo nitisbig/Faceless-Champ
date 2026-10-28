@@ -226,7 +226,8 @@ def compile_video(video):
                 if placement.at >= segment.duration or placement_end > end + 1e-9:
                     raise KitError("PLACEMENT_WINDOW", "Placement exceeds segment")
                 bounds = placement.bounds or ctx.bounds
-                built = placement.block(ctx, bounds) if placement.core else placement.block.compose(ctx, bounds)
+                with ctx.theme.core().use():
+                    built = placement.block(ctx, bounds) if placement.core else placement.block.compose(ctx, bounds)
                 if not isinstance(built, BlockBuild):
                     built = BlockBuild(built) if placement.core else None
                 if built is None:

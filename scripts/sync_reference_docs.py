@@ -59,6 +59,7 @@ INCLUSION = {
     Path("llms.txt"): RESOURCES / "core-guide.txt",
     Path("facelesschamp-kit/llms.txt"): RESOURCES / "kit-guide.txt",
     Path("facelesschamp-agent/llms.txt"): RESOURCES / "agent-guide.txt",
+    Path("CHEATSHEET.md"): RESOURCES / "docs/core/cheatsheet.md",
     **{Path(f"docs/{name}.md"): RESOURCES / f"docs/core/{name}.md" for name in CORE_DOCS},
     **{Path(f"facelesschamp-kit/docs/{name}.md"): RESOURCES / f"docs/kit/{name}.md" for name in KIT_DOCS},
     **{Path(f"facelesschamp-agent/docs/{name}.md"): RESOURCES / f"docs/agent/{name}.md" for name in AGENT_DOCS},

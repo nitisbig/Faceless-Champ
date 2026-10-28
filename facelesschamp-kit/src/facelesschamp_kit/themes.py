@@ -1,6 +1,7 @@
 """Immutable, per-build semantic style tokens."""
 
 from dataclasses import dataclass, replace
+from functools import lru_cache
 from types import MappingProxyType
 
 from faceless_champ import CLEAN_FLOW_FONT, ShadowStyle
@@ -39,6 +40,7 @@ class Theme:
     surface_mode: str = "raster"
     code_theme: str = "midnight"
     text_budgets: bool = True
+    heading_font: str | None = None
 
     def __post_init__(self):
         if self.text_engine not in {"pillow", "skia"} or self.surface_mode not in {"raster", "vector"}:
@@ -69,6 +71,107 @@ class Theme:
             raise KitError("THEME", "Invalid theme color") from exc
         if self.minimum_font_size > min(self.heading_size, self.body_size):
             raise KitError("THEME", "Minimum font size exceeds the heading or body size")
+
+    # -- core bridge ---------------------------------------------------------
+
+    def core(self):
+        """The equivalent faceless_champ Theme (colors, type roles, radius, motion).
+
+        Kit activates it while blocks compose, so core primitives and role
+        text inside blocks match the kit theme.
+        """
+        return _to_core(self)
+
+    @classmethod
+    def from_core(cls, core, **overrides):
+        """A kit Theme from a faceless_champ Theme or preset name ("neon", ...)."""
+        from faceless_champ.colors import relative_luminance
+        from faceless_champ.theme import Theme as CoreTheme
+
+        core = CoreTheme.named(core) if isinstance(core, str) else core
+        title, body = core.type_scale.title, core.type_scale.body
+        enter = {"rise": "flow", "fade": "fade", "pop": "pop", "zoom": "pop"}.get(core.motion.enter, "flow")
+        values = {
+            "name": core.name,
+            "background": core.colors.background,
+            "surface": core.colors.surface,
+            "foreground": core.colors.text,
+            "muted": core.colors.muted,
+            "accent": core.colors.primary,
+            "font": body.font,
+            "heading_font": title.font if title.font != body.font else None,
+            "heading_size": title.font_size,
+            "body_size": body.font_size,
+            "minimum_font_size": min(28, body.font_size),
+            "font_weight": body.font_weight,
+            "heading_weight": title.font_weight,
+            "radius": core.radius,
+            "shadow": core.shadow,
+            "default_enter": enter,
+            "default_exit": "fade" if enter == "fade" else "flow",
+            "motion_duration": core.motion.duration,
+            "motion_distance": core.motion.distance,
+            "motion_stagger": core.motion.stagger,
+            "grid_color": core.colors.grid,
+            "code_theme": "paper" if relative_luminance(core.colors.background) > 0.5 else "midnight",
+        }
+        values.update(overrides)
+        return cls(**values)
+
+
+@lru_cache(maxsize=32)
+def _to_core(theme):
+    from faceless_champ import COLOR_SCHEMES, ColorScheme
+    from faceless_champ.theme import THEMES as CORE_THEMES
+    from faceless_champ.theme import MotionStyle
+    from faceless_champ.theme import Theme as CoreTheme
+    from faceless_champ.typography import TYPE_SCALE
+
+    base = CORE_THEMES.get(theme.name, CORE_THEMES["midnight"])
+    scheme = COLOR_SCHEMES.get(theme.name, base.colors)
+    colors = ColorScheme(
+        name=theme.name,
+        background=theme.background,
+        surface=theme.surface,
+        text=theme.foreground,
+        muted=theme.muted,
+        axis=scheme.axis,
+        border=scheme.border,
+        grid=theme.grid_color,
+        primary=theme.accent,
+        secondary=scheme.secondary,
+        tertiary=scheme.tertiary,
+        highlight=scheme.highlight,
+    )
+    roles = {}
+    for role in ("display", "title", "heading", "body", "label", "caption"):
+        style = TYPE_SCALE.style(role)
+        heading = role in {"display", "title", "heading"}
+        font = (theme.heading_font or theme.font) if heading else theme.font
+        weight = theme.heading_weight if heading else theme.font_weight
+        if weight is None and font is None:
+            weight = style.font_weight
+        size = style.font_size
+        if role == "title":
+            size = theme.heading_size
+        elif role == "body":
+            size = theme.body_size
+        roles[role] = replace(style, font=font, font_weight=weight, font_size=size)
+    enter = {"flow": "rise", "fade": "fade", "pop": "pop", "stagger": "rise"}.get(theme.default_enter, "rise")
+    return CoreTheme(
+        name=theme.name,
+        colors=colors,
+        type_scale=replace(TYPE_SCALE, **roles),
+        radius=theme.radius,
+        shadow=theme.shadow,
+        motion=MotionStyle(
+            duration=theme.motion_duration,
+            enter=enter,
+            distance=theme.motion_distance,
+            stagger=theme.motion_stagger,
+            ease=base.motion.ease,
+        ),
+    )
 
 
 MIDNIGHT = Theme()
@@ -109,4 +212,17 @@ CLEAN_FLOW = replace(
     default_exit="flow",
     code_theme="clean-flow",
 )
-THEMES = MappingProxyType({"midnight": MIDNIGHT, "light": LIGHT, "whiteboard": WHITEBOARD, "clean-flow": CLEAN_FLOW})
+NEON = Theme.from_core("neon")
+DOCUMENTARY = Theme.from_core("documentary")
+PAPER = Theme.from_core("paper")
+THEMES = MappingProxyType(
+    {
+        "midnight": MIDNIGHT,
+        "light": LIGHT,
+        "whiteboard": WHITEBOARD,
+        "clean-flow": CLEAN_FLOW,
+        "neon": NEON,
+        "documentary": DOCUMENTARY,
+        "paper": PAPER,
+    }
+)

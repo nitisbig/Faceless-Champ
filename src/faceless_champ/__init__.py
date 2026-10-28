@@ -32,10 +32,11 @@ if _TYPE_CHECKING:
         linear,
         smooth,
     )
+    from .audit import DesignReport, design_audit
     from .backends.moderngl import ModernGLRenderer
     from .backends.skia import SkiaRenderer
     from .cli import main as main
-    from .colors import COLOR_SCHEMES, ColorScheme, with_alpha
+    from .colors import COLOR_SCHEMES, ColorScheme, contrast_ratio, readable_color, with_alpha
     from .components import (
         Arrow,
         Canvas,
@@ -54,6 +55,7 @@ if _TYPE_CHECKING:
         Text,
         Triangle,
     )
+    from .easing import EASINGS, cubic_bezier, ease_in_out, ease_out_expo, ease_out_quint
     from .effects import Bloom, ChromaticAberration, Distortion, EffectStack, GaussianBlur, LightSweep, OuterGlow
     from .export import ExportSettings, render
     from .gpu import GPUOptions, renderer_capabilities
@@ -67,14 +69,17 @@ if _TYPE_CHECKING:
     from .paths import PathData, VectorPath
     from .prepared import PreparedFrameSource
     from .preview import StoryboardSample, render_storyboard, save_frame
+    from .primitives import Arc, Badge, Callout, Composite, Divider, Dot, GlassCard, IconText, Pill, Stat
     from .procedural import ParticleField, ProceduralBackground
     from .progress import ExportProgress
     from .renderer import PillowRenderer, Renderer, create_renderer, rendering_identity, validate_composition
+    from .runner import run
     from .scheduling import Repeat, Stagger, Succession
     from .sources import RasterSession, RasterSource, Viewport
     from .spring import Spring
     from .subtitles import Captions, SubtitleCue, SubtitleTrack, parse_srt_cues
     from .surfaces import ShadowStyle, Surface, card_content_bounds, card_surface, dot_grid, gradient_surface
+    from .theme import THEMES, MotionStyle, Theme, current_theme, set_theme
     from .timeline import Grid, Layer, Scene, Sequence
     from .transitions import DirectionalWipe, LuminanceWipe, ZoomBlurTransition
     from .typography import (
@@ -89,6 +94,31 @@ if _TYPE_CHECKING:
     )
 
 _EXPORTS = {
+    "Theme": ("theme", "Theme"),
+    "THEMES": ("theme", "THEMES"),
+    "MotionStyle": ("theme", "MotionStyle"),
+    "current_theme": ("theme", "current_theme"),
+    "set_theme": ("theme", "set_theme"),
+    "EASINGS": ("easing", "EASINGS"),
+    "cubic_bezier": ("easing", "cubic_bezier"),
+    "ease_in_out": ("easing", "ease_in_out"),
+    "ease_out_expo": ("easing", "ease_out_expo"),
+    "ease_out_quint": ("easing", "ease_out_quint"),
+    "Arc": ("primitives", "Arc"),
+    "Dot": ("primitives", "Dot"),
+    "Pill": ("primitives", "Pill"),
+    "Badge": ("primitives", "Badge"),
+    "Callout": ("primitives", "Callout"),
+    "GlassCard": ("primitives", "GlassCard"),
+    "Divider": ("primitives", "Divider"),
+    "IconText": ("primitives", "IconText"),
+    "Stat": ("primitives", "Stat"),
+    "Composite": ("primitives", "Composite"),
+    "run": ("runner", "run"),
+    "design_audit": ("audit", "design_audit"),
+    "DesignReport": ("audit", "DesignReport"),
+    "contrast_ratio": ("colors", "contrast_ratio"),
+    "readable_color": ("colors", "readable_color"),
     "FONTS": ("typography", "FONTS"),
     "TYPE_SCALE": ("typography", "TYPE_SCALE"),
     "TextBudgetError": ("typography", "TextBudgetError"),
@@ -391,6 +421,31 @@ __all__ = [  # noqa: RUF022
     "TextStyle",
     "TypeScale",
     "font_path",
+    "Theme",
+    "THEMES",
+    "MotionStyle",
+    "current_theme",
+    "set_theme",
+    "EASINGS",
+    "cubic_bezier",
+    "ease_in_out",
+    "ease_out_expo",
+    "ease_out_quint",
+    "Arc",
+    "Dot",
+    "Pill",
+    "Badge",
+    "Callout",
+    "GlassCard",
+    "Divider",
+    "IconText",
+    "Stat",
+    "Composite",
+    "run",
+    "design_audit",
+    "DesignReport",
+    "contrast_ratio",
+    "readable_color",
 ]
 
 

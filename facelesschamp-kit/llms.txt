@@ -59,6 +59,13 @@ also accept --json. KitError has stable code/message/scope. Build failures retur
 object on stderr; argument syntax errors remain plain text. Fingerprints are audit identities,
 not cross-machine byte-identical media promises. Inspect frames and fully decode exports.
 
+## Shots (fastest path to a premium scene)
+
+facelesschamp_kit.shots: TitleCard, BigStat, QuoteCard, StepsCard, CompareCard, EndCard are
+blocks with budgets and theme motion. shot_video(name, content, theme=) or the CLI
+fc-kit shot title|stat|quote|steps|compare|end CONTENT.json --theme neon --frame 3.
+Kit themes include neon, documentary, paper; Theme.from_core("neon") bridges core presets.
+
 ## Blocks, layouts, and assets
 
 Heading, TextPanel, MetricCard, ImageCard, Comparison, StepList, FlowDiagram, Stack, Split,

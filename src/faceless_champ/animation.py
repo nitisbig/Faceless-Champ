@@ -7,22 +7,9 @@ from dataclasses import dataclass
 from typing import Self
 
 from .components import Component, Equation, Number, Shape, Text, finite
+from .easing import ease_in, ease_out, linear, smooth
 
-
-def linear(t: float) -> float:
-    return t
-
-
-def smooth(t: float) -> float:
-    return t * t * (3 - 2 * t)
-
-
-def ease_in(t: float) -> float:
-    return t * t * t
-
-
-def ease_out(t: float) -> float:
-    return 1 - (1 - t) ** 3
+__all__ = ["Animation", "AnimationBuilder", "ease_in", "ease_out", "linear", "smooth"]
 
 
 @dataclass
@@ -129,6 +116,40 @@ class AnimationBuilder(Animation):
 
     def rotate_to(self, degrees: float) -> Self:
         self.targets["rotation"] = finite(degrees, "rotation")
+        return self
+
+    def through(self, property: str, values, times=None) -> Self:
+        """Animate one property through several values in a single play().
+
+        ``values`` are visited in order; ``times`` are matching progress points
+        in [0, 1] (evenly spaced when omitted). Colors may be strings::
+
+            scene.play(dot.animate.through("opacity", [0, 1, 1, 0]), run_time=2)
+            scene.play(card.animate.through("position", [(200, 500), (960, 420), (1700, 500)]))
+        """
+        from .motion import rgba
+
+        values = list(values)
+        if len(values) < 2:
+            raise ValueError("through() needs at least two values")
+        if times is None:
+            times = [i / (len(values) - 1) for i in range(len(values))]
+        times = [finite(t, "keyframe time", 0) for t in times]
+        if len(times) != len(values):
+            raise ValueError("through() needs one time per value")
+        if property in {"fill", "stroke", "color"}:
+            values = [rgba(v) if isinstance(v, str) else tuple(v) for v in values]
+        elif property in {"position", "mask_position"}:
+            values = [tuple(finite(c, property) for c in v) for v in values]
+        else:
+            values = [finite(v, property) for v in values]
+        if property not in self.component.state():
+            raise ValueError(f"Unsupported animation property: {property}")
+        for value in values:
+            self.component.validate_animation(property, value)
+        self.targets[property] = values[-1]
+        self.starts = {**(self.starts or {}), property: values[0]}
+        self.keyframes = {**(self.keyframes or {}), property: tuple(zip(times, values))}
         return self
 
     def opacity_to(self, value: float) -> Self:

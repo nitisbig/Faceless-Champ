@@ -5,6 +5,10 @@ description: Author and render Python videos with Faceless Champ scenes, animati
 
 # Faceless Champ authoring
 
+- Start from a [CHEATSHEET](../../CHEATSHEET.md) pattern: `with Theme.named(...).use():`,
+  role text, `canvas.safe_area()` + Bounds helpers, primitives (Stat, Callout, Pill,
+  GlassCard, Arc), `scene.reveal(...)`, and `run(build)`. Check `--frame` and `--audit`.
+
 - Style text with roles: Text("...", role="title"|"heading"|"body"|"label"|...) and
   fit_text(text, Bounds(...), role="body", color=...). Never hand-pick tiny sizes.
   A TextBudgetError means the copy is too long: shorten it or split the beat; do

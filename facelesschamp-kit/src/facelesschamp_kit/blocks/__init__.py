@@ -6,7 +6,7 @@ from pathlib import Path
 from faceless_champ import Bounds, ImageSlot, Number, Rectangle, card_content_bounds, card_surface
 
 from ..diagnostics import KitError, number
-from .base import Block, BlockBuild, build_group, centered, fit_text, text_weight
+from .base import Block, BlockBuild, build_group, centered, fit_text, heading_font, text_weight, unit
 from .coding import CodeEditor, CodingPlayground
 from .effects import EffectBlock, ParticleBackdrop, ProceduralBackdrop
 from .flow import FlowDiagram
@@ -67,7 +67,7 @@ class Heading:
             self.text,
             context,
             bounds,
-            size=context.theme.heading_size,
+            size=context.theme.heading_size * unit(context),
             color=palette(context, self.variant, self.color),
             heading=True,
         )
@@ -82,19 +82,19 @@ class TextPanel:
     color: str | None = None
 
     def compose(self, ctx, bounds):
-        box = centered(bounds, 600)
+        box = centered(bounds, 600 * unit(ctx))
         background = panel(ctx, box)
         box = panel_face(ctx, box)
-        p = min(ctx.theme.spacing, max(8, box.height / 12))
+        p = min(ctx.theme.spacing * unit(ctx), max(8, box.height / 12))
         children = {"background": background}
         top = box.top + p
         if self.title:
-            title_height = min(120, (box.height - 3 * p) * 0.38)
+            title_height = min(120 * unit(ctx), (box.height - 3 * p) * 0.38)
             children["title"] = fit_text(
                 self.title,
                 ctx,
                 Bounds(box.left + p, top, box.right - p, top + title_height),
-                size=min(ctx.theme.heading_size, ctx.theme.body_size * 1.4),
+                size=min(ctx.theme.heading_size, ctx.theme.body_size * 1.4) * unit(ctx),
                 color=ctx.theme.accent,
                 heading=True,
             )
@@ -117,21 +117,21 @@ class MetricCard:
 
     def compose(self, ctx, bounds):
         value = number(self.value, "MetricCard.value", minimum=-float("inf"))
-        box = centered(bounds, 460)
+        box = centered(bounds, 460 * unit(ctx))
         background = panel(ctx, box)
         box = panel_face(ctx, box)
-        p = ctx.theme.spacing
-        if box.height < 180:
-            raise KitError("LAYOUT", "MetricCard needs at least 180 design pixels in height")
+        p = ctx.theme.spacing * unit(ctx)
+        if box.height < 180 * unit(ctx):
+            raise KitError("LAYOUT", "MetricCard needs at least 180 design pixels (at 1080p) in height")
         children = {"background": background}
         area = Bounds(box.left + p, box.top + p, box.right - p, box.top + box.height * 0.62)
         metric = Number(
             value,
-            font=ctx.theme.font,
+            font=heading_font(ctx.theme, heading=True),
             font_weight=text_weight(ctx.theme, heading=True),
             tracking=-0.02,
             text_engine=ctx.theme.text_engine,
-            font_size=132,
+            font_size=132 * unit(ctx),
             color=palette(ctx, self.variant, self.color),
             position=area.center,
         )
@@ -151,12 +151,14 @@ class ImageCard:
     mode: str = "required"
 
     def compose(self, ctx, bounds):
-        box = centered(bounds, 760)
+        box = centered(bounds, 760 * unit(ctx))
         background = panel(ctx, box)
         box = panel_face(ctx, box)
-        p = ctx.theme.spacing
+        p = ctx.theme.spacing * unit(ctx)
         children = {"background": background}
-        image_box = Bounds(box.left + p, box.top + p, box.right - p, box.bottom - (120 if self.label else p))
+        image_box = Bounds(
+            box.left + p, box.top + p, box.right - p, box.bottom - (120 * unit(ctx) if self.label else p)
+        )
         path = ctx.assets.image(self.asset, self.mode)
         entry = ctx.assets.entries.get(self.asset, {})
         label = Path(entry.get("path", self.asset)).name
@@ -184,11 +186,15 @@ class ImageCard:
 class Comparison:
     left: str
     right: str
+    left_title: str = "Before"
+    right_title: str = "After"
 
     def compose(self, ctx, bounds):
         from ..layouts import Split
 
-        return Split(TextPanel(self.left, title="Before"), TextPanel(self.right, title="After")).compose(ctx, bounds)
+        return Split(
+            TextPanel(self.left, title=self.left_title), TextPanel(self.right, title=self.right_title)
+        ).compose(ctx, bounds)
 
 
 @dataclass(frozen=True)
@@ -204,7 +210,7 @@ class StepList:
         from ..layouts import Stack
 
         return Stack(*(Heading(f"{i}. {step}", variant="accent") for i, step in enumerate(self.steps, 1))).compose(
-            ctx, centered(bounds, 700)
+            ctx, centered(bounds, 700 * unit(ctx))
         )
 
 

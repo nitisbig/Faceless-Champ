@@ -80,6 +80,14 @@ _DOMAIN_EXPORTS = {
     "ArchLabel": ("engineering.annotations", "ArchLabel"),
     "ArchScript": ("engineering.script", "ArchScript"),
     "EquationTransform": ("mathematics", "EquationTransform"),
+    "TitleCard": ("shots", "TitleCard"),
+    "BigStat": ("shots", "BigStat"),
+    "QuoteCard": ("shots", "QuoteCard"),
+    "StepsCard": ("shots", "StepsCard"),
+    "CompareCard": ("shots", "CompareCard"),
+    "EndCard": ("shots", "EndCard"),
+    "shot": ("shots", "shot"),
+    "shot_video": ("shots", "shot_video"),
 }
 __all__ += list(_DOMAIN_EXPORTS)
 

@@ -245,8 +245,8 @@ class TypeScale:
     or ``scale.with_fonts(heading="serif", body="sans")``.
     """
 
-    display: TextStyle = TextStyle(120, 700, None, 1.0, -0.025, 6, 2)
-    title: TextStyle = TextStyle(84, 700, None, 1.06, -0.015, 8, 2)
+    display: TextStyle = TextStyle(120, 700, None, 1.0, -0.015, 6, 2)
+    title: TextStyle = TextStyle(84, 700, None, 1.06, -0.01, 8, 2)
     heading: TextStyle = TextStyle(60, 600, None, 1.12, -0.01, 10, 2)
     body: TextStyle = TextStyle(42, 400, None, 1.35, 0.0, 22, 3)
     label: TextStyle = TextStyle(32, 500, None, 1.2, 0.01, 5, 1)
@@ -303,9 +303,15 @@ TYPE_PAIRINGS = MappingProxyType(
 
 
 def role_style(role: str | None, type_scale: TypeScale | None = None) -> TextStyle | None:
+    """Style for a role from ``type_scale``, the active Theme, or TYPE_SCALE."""
     if role is None:
         return None
-    return (type_scale or TYPE_SCALE).style(role)
+    if type_scale is None:
+        from .theme import active_theme
+
+        theme = active_theme()
+        type_scale = theme.type_scale if theme is not None else TYPE_SCALE
+    return type_scale.style(role)
 
 
 # ---------------------------------------------------------------------------
@@ -487,7 +493,7 @@ def fit_text(
     min_font_size=None,
     font=None,
     font_weight=None,
-    color="white",
+    color=None,
     align="center",
     spacing=8,
     line_height=None,

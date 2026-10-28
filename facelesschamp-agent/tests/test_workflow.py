@@ -10,6 +10,7 @@ def test_layout_report_is_compact_and_evidence_becomes_stale(project):
     assert project.status().layout_validation == "pending"
     result = project.audit_layout()
     assert result["status"] == "passed", result["findings"]
+    assert result["design"]["ok"] and result["design"]["findings"] == [], result["design"]
     assert "sample_times" not in result and result["sample_count"] > 10
     full = json.loads(Path(result["report_path"]).read_text())
     assert len(full["sample_times"]) == result["sample_count"]

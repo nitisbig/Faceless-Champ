@@ -6,6 +6,21 @@ the final backend. Example: examples/skia_showcase.py.
 
 > Python 3.12+ programmatic video authoring. Current source 2.0.0rc1; Pillow frames and FFmpeg MP4. Core never imports kit.
 
+## Start here (agents)
+
+Read [CHEATSHEET.md](CHEATSHEET.md): tested copy-paste patterns for premium scenes.
+Fast path without custom code: `fc-kit shot title|stat|quote|steps|compare|end CONTENT.json
+--theme neon --frame 3` (kit). Otherwise author a Scene with these building blocks:
+- Theme.named("midnight"|"paper"|"ocean"|"clean-flow"|"neon"|"documentary"|"whiteboard").use()
+  sets colors, fonts, type roles, radius, shadow and motion for everything created inside.
+- Text(role=...), theme.fit(text, bounds, role) and fit_text(..., role=...) for all copy.
+- canvas.safe_area(), Bounds.columns/rows/grid/inset/fit/point for layout; no pixel math.
+- Primitives: Stat, Pill, Badge, Callout, Arc, Dot, Divider, GlassCard, IconText.
+- Motion: scene.reveal(*items, stagger=, until=), scene.play_at(t, ...),
+  obj.animate.through(prop, values), rate_func="emphasized"|"snappy"|"overshoot".
+- End scripts with run(build); `python scene.py --preview | --frame T | --storyboard | --audit`.
+- --audit / design_audit(scene) reports small text, low contrast, clutter and fixes.
+
 ## Entry points
 
 - [Quickstart and capability index](README.md)
@@ -72,19 +87,19 @@ No implicit URL downloads. ImageSlot mode auto/placeholder/required reserves mat
 geometry; missing auto files show a labeled box, but corrupt present files fail.
 Polyline(draw_by="x") requires strictly increasing open paths; rounded caps are supported.
 Equation uses the equations extra and supports symbol color_map and fixed-layout Write.
-Flag(country_code) uses 254 bundled case-insensitive codes; flag_path/supported_flags
+Flag(country_code) from facelesschamp_kit.maps.flags uses 254 bundled case-insensitive codes; flag_path/supported_flags
 work offline. [Image and flag APIs](docs/api.md).
 
 BarChart, RankedBarChart, LineChart, ScatterPlot, Histogram, Heatmap, NetworkGraph,
-SankeyChart, VectorField, PieChart use core Pillow. RankedBarChart.animate.data_to()
+SankeyChart, VectorField, PieChart come from facelesschamp_kit.charts. RankedBarChart.animate.data_to()
 interpolates ranks/values with stable category colors; None means missing data.
 Axis fixes limits; ChartStyle controls fonts, line width, and titles. [Charts](docs/charts.md).
-OutlineMap, SatelliteMap, EarthMap need maps; zoom_to/animate.rotate support geography.
+OutlineMap, SatelliteMap, EarthMap (facelesschamp_kit.maps) need maps; zoom_to/animate.rotate support geography.
 [Maps](docs/maps.md).
 
 ## CodingChamp editors
 
-Import CodingChamp, CodeTheme, CodeReveal from faceless_champ.
+Import CodingChamp, CodeTheme, CodeReveal from facelesschamp_kit.coding.
 CodingChamp(code, language="python", theme="midnight", filename="main.py", ...) is a
 fixed-layout editor. CodeReveal(panel, start=0, end=1) uses normalized progress.
 reveal_mode: typewriter (characters), word (whitespace-separated words), block (lines).
@@ -106,7 +121,7 @@ animate a terminal window; caller schedules visibility, typing, stdout and durat
 
 Import CodeCheckpoint, PlaygroundScript, CanvasItem, ValueBinding, EventBinding,
 prepare_playground, PreparedPlayground, CodeEditor, PlaygroundCanvas, PlaygroundOutput
-from faceless_champ. Complete checkpoint revisions execute explicitly during preparation.
+from facelesschamp_kit.playground. Complete checkpoint revisions execute explicitly during preparation.
 Animated intermediate edits never execute; outputs hold until the next publication.
 Use facelesschamp_kit.playground.runtime.emit/event/inputs in authored Python programs.
 ValueBinding maps emitted keys to authored items; EventBinding maps named events to
@@ -147,7 +162,7 @@ and overlapping actions fail before export. source_start preserves script time.
 ## FlowChamp
 
 Import FlowChamp, FlowGraph, FlowNode, FlowPort, FlowEdge, FlowScript, FlowTheme,
-FlowDataError from faceless_champ or facelesschamp_kit.diagrams.
+FlowDataError from facelesschamp_kit.diagrams.
 Python/JSON graph authoring supports stable IDs, ports, routes, labels, and arrows.
 FlowScript authors draws, signals, reveals, highlights and element transforms and signal/highlight colors.
 Recipes: workflow/system/network/idea-map/circuit in facelesschamp_kit.diagrams.examples.
