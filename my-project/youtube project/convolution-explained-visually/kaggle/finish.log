@@ -1,0 +1,9 @@
+10:56:33 51 chunks, 1 missing: ['c6_f013903-014068.mp4']
+10:57:42 rendering c6_f013903-014068.mp4
+Fontconfig warning: "/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf", line 6: unknown element "reset-dirs"
+(6, 13903, 14068, 'done', 446.01382851600647)
+11:05:08 RUN ffmpeg -v error -y -f concat -safe 0 -i /home/kingnit/Desktop/Faceless Champ/my-project/youtube project/convolution-explained-visually/kaggle/output/chapters/ch6_recap_4k.txt -ss 403.433333 -t 65.500000 -i /home/kingnit/Desktop/Faceless Champ/my-project/youtube project/convolution-explained-visually/audio.mp3 -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 320k -ar 48000 -movflags +faststart /home/kingnit/Desktop/Faceless Champ/my-project/youtube project/convolution-explained-visually/kaggle/output/chapters/ch6_recap_4k.part.mp4
+11:05:14 chapter ready ch6_recap_4k.mp4
+11:05:14 RUN ffmpeg -v error -y -f concat -safe 0 -i /home/kingnit/Desktop/Faceless Champ/my-project/youtube project/convolution-explained-visually/kaggle/output/final/convolution_explained_4k.txt -ss 0.000000 -i /home/kingnit/Desktop/Faceless Champ/my-project/youtube project/convolution-explained-visually/audio.mp3 -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 320k -ar 48000 -movflags +faststart /home/kingnit/Desktop/Faceless Champ/my-project/youtube project/convolution-explained-visually/kaggle/output/final/convolution_explained_4k.part.mp4
+11:06:10 FINAL convolution_explained_4k.mp4 (14068, 3840, 2160)
+11:06:10 final (14068, 3840, 2160)

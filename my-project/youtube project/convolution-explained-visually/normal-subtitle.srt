@@ -1,0 +1,624 @@
+1
+00:00:00,030 --> 00:00:02,360
+Clap your hands inside a cathedral and the
+
+2
+00:00:02,360 --> 00:00:06,150
+sound doesn't stop. It rings, it echoes, it
+
+3
+00:00:06,150 --> 00:00:09,170
+slowly fades. Now play a whole song in
+
+4
+00:00:09,170 --> 00:00:12,540
+that cathedral. Every note gets its own echo,
+
+5
+00:00:12,540 --> 00:00:14,500
+and all those echoes pile on top of
+
+6
+00:00:14,500 --> 00:00:16,960
+each other. What reaches your ears is a
+
+7
+00:00:16,960 --> 00:00:19,720
+perfect blend of the song and the room.
+
+8
+00:00:19,720 --> 00:00:23,060
+That blending has a name, convolution, and it's
+
+9
+00:00:23,060 --> 00:00:26,080
+everywhere. It blurs the photos on your phone.
+
+10
+00:00:26,080 --> 00:00:28,790
+It helps neural network see edges. It tells
+
+11
+00:00:28,790 --> 00:00:30,920
+you the odds when you roll two dice.
+
+12
+00:00:30,920 --> 00:00:33,860
+It's even hiding inside the long multiplication you
+
+13
+00:00:33,860 --> 00:00:38,040
+learned in school. One simple recipe, flip, slide,
+
+14
+00:00:38,040 --> 00:00:41,150
+multiply, and add. In the next few minutes,
+
+15
+00:00:41,150 --> 00:00:43,990
+we'll build convolution from scratch using nothing but
+
+16
+00:00:43,990 --> 00:00:46,630
+shapes sliding past each other. And at the
+
+17
+00:00:46,630 --> 00:00:49,210
+end, we'll see why the Fourier transform turns
+
+18
+00:00:49,210 --> 00:00:53,080
+all that sliding into a single, simple multiplication.
+
+19
+00:00:53,080 --> 00:00:55,260
+Let's start with something you can do by
+
+20
+00:00:55,260 --> 00:00:58,080
+hand. One a week of temperatures that jump
+
+21
+00:00:58,080 --> 00:01:02,150
+around, 20, 24, 18, 26. To smooth them
+
+22
+00:01:02,150 --> 00:01:04,440
+out, take three days at a time, multiply
+
+23
+00:01:04,440 --> 00:01:07,120
+each by one third, and add them up.
+
+24
+00:01:07,120 --> 00:01:10,130
+Then slide one day forward and repeat. That
+
+25
+00:01:10,130 --> 00:01:12,960
+little window of weights, one third, one third,
+
+26
+00:01:12,960 --> 00:01:15,530
+one third, is called a kernel. And sliding
+
+27
+00:01:15,530 --> 00:01:18,030
+a kernel along a signal, multiplying and adding
+
+28
+00:01:18,030 --> 00:01:21,560
+at every position, is exactly what convolution is.
+
+29
+00:01:21,560 --> 00:01:24,450
+Let's make it even smaller. Here's a signal
+
+30
+00:01:24,450 --> 00:01:27,770
+with just three numbers, one, two, three. And
+
+31
+00:01:27,770 --> 00:01:30,660
+here is a kernel with two numbers, one,
+
+32
+00:01:30,660 --> 00:01:33,650
+one. First we flip the kernel around. Then
+
+33
+00:01:33,650 --> 00:01:35,570
+we slide it in from the left, one
+
+34
+00:01:35,570 --> 00:01:38,080
+step at a time. At the first position,
+
+35
+00:01:38,080 --> 00:01:41,180
+only one pair overlaps. One times one gives
+
+36
+00:01:41,180 --> 00:01:44,970
+one. Slide again. Now two pairs overlap. One
+
+37
+00:01:44,970 --> 00:01:47,880
+times one plus two times one gives three.
+
+38
+00:01:47,880 --> 00:01:51,100
+Slide again. Two times one plus three times
+
+39
+00:01:51,100 --> 00:01:54,020
+one gives five. And one last time, and
+
+40
+00:01:54,020 --> 00:01:56,810
+only the three is left, three. So the
+
+41
+00:01:56,810 --> 00:02:00,730
+answer is one, three, five, three. Now here's
+
+42
+00:02:00,730 --> 00:02:04,980
+the surprise. Multiply 123 by 11. You get
+
+43
+00:02:04,980 --> 00:02:10,960
+1,353, one, three, five, three. The same digits.
+
+44
+00:02:10,960 --> 00:02:14,360
+Long multiplication is convolution, sliding one list of
+
+45
+00:02:14,360 --> 00:02:17,840
+digits across another. But why flip the kernel?
+
+46
+00:02:17,840 --> 00:02:20,190
+Think of the echo. What you hear right
+
+47
+00:02:20,190 --> 00:02:22,670
+now is the sound arriving this instant, plus
+
+48
+00:02:22,670 --> 00:02:24,910
+a quieter copy from a moment ago, plus
+
+49
+00:02:24,910 --> 00:02:27,670
+a fainter copy from before that. The output
+
+50
+00:02:27,670 --> 00:02:29,780
+looks backwards in time, and the flip is
+
+51
+00:02:29,780 --> 00:02:31,700
+how we line up the present with the
+
+52
+00:02:31,700 --> 00:02:34,560
+past. Now let's roll some dice. A fair
+
+53
+00:02:34,560 --> 00:02:36,560
+die gives each face a one in six
+
+54
+00:02:36,560 --> 00:02:39,450
+chance, six bars of equal height, a flat
+
+55
+00:02:39,450 --> 00:02:42,380
+shape. Roll two dice and add them. A
+
+56
+00:02:42,380 --> 00:02:45,240
+total of two can happen only one way.
+
+57
+00:02:45,270 --> 00:02:47,900
+A total of seven can happen six ways,
+
+58
+00:02:47,900 --> 00:02:50,820
+more than any other. Then the count falls
+
+59
+00:02:50,820 --> 00:02:53,080
+back to a single way to make twelve.
+
+60
+00:02:53,080 --> 00:02:55,970
+Watch it as convolution. Flip one row of
+
+61
+00:02:55,970 --> 00:02:58,560
+six bars and slide it across the other.
+
+62
+00:02:58,560 --> 00:03:02,240
+At first, only one bar overlaps. The overlap
+
+63
+00:03:02,240 --> 00:03:05,360
+grows until at seven all six line up.
+
+64
+00:03:05,360 --> 00:03:08,120
+Then it shrinks again. The flat shape has
+
+65
+00:03:08,120 --> 00:03:10,700
+become a triangle. Add a third die and
+
+66
+00:03:10,700 --> 00:03:13,770
+convolve again, and the triangle softens into a
+
+67
+00:03:13,770 --> 00:03:16,810
+hill. Keep adding dice and the hill becomes
+
+68
+00:03:16,810 --> 00:03:20,100
+a smooth bell. That's the central limit theorem,
+
+69
+00:03:20,100 --> 00:03:23,410
+seen as convolution repeated again and again. Now
+
+70
+00:03:23,410 --> 00:03:26,390
+let's make our shapes smooth. When our signals
+
+71
+00:03:26,390 --> 00:03:29,840
+become continuous curves, the sum becomes an integral.
+
+72
+00:03:29,840 --> 00:03:31,960
+Here is the formula. F star g of
+
+73
+00:03:31,960 --> 00:03:35,270
+t equals the integral from minus infinity to
+
+74
+00:03:35,270 --> 00:03:37,560
+infinity of f of tau times g of
+
+75
+00:03:37,560 --> 00:03:41,400
+t minus tau d tau. It looks intimidating,
+
+76
+00:03:41,400 --> 00:03:43,650
+but read it in pieces. g of minus
+
+77
+00:03:43,650 --> 00:03:46,530
+tau is just g flipped around. g of
+
+78
+00:03:46,530 --> 00:03:49,200
+t minus tau is that flipped copy slid
+
+79
+00:03:49,200 --> 00:03:52,180
+over to position t. We multiply it by
+
+80
+00:03:52,180 --> 00:03:55,160
+f point by point. And the integral measures
+
+81
+00:03:55,160 --> 00:03:57,470
+the total area of the overlap. So the
+
+82
+00:03:57,470 --> 00:04:00,740
+convolution at time t is simply this. Flip
+
+83
+00:04:00,740 --> 00:04:03,120
+one shape, slide it to t, and measure
+
+84
+00:04:03,120 --> 00:04:06,370
+the overlap. Let's try the classic example. Two
+
+85
+00:04:06,370 --> 00:04:09,160
+boxes, each of height one and width one.
+
+86
+00:04:09,190 --> 00:04:12,150
+Now apart, there's no overlap, so the output
+
+87
+00:04:12,150 --> 00:04:14,500
+is zero. Slide one into the other, and
+
+88
+00:04:14,500 --> 00:04:16,940
+the overlap grows in a straight line. When
+
+89
+00:04:16,940 --> 00:04:19,640
+they line up perfectly, it peaks at one.
+
+90
+00:04:19,640 --> 00:04:22,410
+Then it shrinks back to zero. Two boxes
+
+91
+00:04:22,410 --> 00:04:26,740
+have made a triangle. Convolution's smooths, spreads, and
+
+92
+00:04:26,740 --> 00:04:30,030
+blends. Now let's step into two dimensions. An
+
+93
+00:04:30,030 --> 00:04:32,740
+image is a grid of brightness values. Our
+
+94
+00:04:32,740 --> 00:04:35,350
+kernel becomes a small grid two, three by
+
+95
+00:04:35,350 --> 00:04:37,930
+three. Place it over a patch of pixels,
+
+96
+00:04:37,930 --> 00:04:40,200
+multiply each pixel by the weight above it,
+
+97
+00:04:40,200 --> 00:04:42,680
+add all nine, and write the result into
+
+98
+00:04:42,680 --> 00:04:45,650
+a new image. Then slide one pixel over,
+
+99
+00:04:45,650 --> 00:04:48,000
+and repeat. Fill the kernel with one ninth
+
+100
+00:04:48,000 --> 00:04:50,550
+everywhere, and each pixel becomes the average of
+
+101
+00:04:50,550 --> 00:04:54,090
+its neighbors, the image blurs. Now put minus
+
+102
+00:04:54,090 --> 00:04:56,150
+one on the left column, zero in the
+
+103
+00:04:56,150 --> 00:04:58,550
+middle, and plus one on the right. In
+
+104
+00:04:58,550 --> 00:05:01,440
+flat areas, left and right cancel to zero.
+
+105
+00:05:01,440 --> 00:05:04,710
+But wherever brightness suddenly changes, the kernel lights
+
+106
+00:05:04,710 --> 00:05:07,740
+up. We've built an edge detector, and here's
+
+107
+00:05:07,740 --> 00:05:11,600
+the remarkable part. Convolutional neural networks aren't told
+
+108
+00:05:11,600 --> 00:05:13,910
+which kernels to use. They learn them from
+
+109
+00:05:13,910 --> 00:05:16,870
+millions of examples, and their very first layers
+
+110
+00:05:16,870 --> 00:05:19,770
+discover edge detectors almost exactly like the one
+
+111
+00:05:19,770 --> 00:05:22,710
+we just built by hand. There's just one
+
+112
+00:05:22,710 --> 00:05:27,020
+problem, sliding is slow. Convolving a million samples
+
+113
+00:05:27,020 --> 00:05:29,670
+with a million samples takes around a trillion
+
+114
+00:05:29,670 --> 00:05:33,360
+multiplications. This is where the Fourier transform comes
+
+115
+00:05:33,360 --> 00:05:35,810
+to the rescue. Add a single pure tone
+
+116
+00:05:35,810 --> 00:05:38,740
+into the cathedral. Every echo is a copy
+
+117
+00:05:38,740 --> 00:05:41,960
+of that same tone, just delayed and quieter.
+
+118
+00:05:41,960 --> 00:05:44,380
+And adding copies of one sine wave always
+
+119
+00:05:44,380 --> 00:05:46,860
+gives back the same sine wave, only its
+
+120
+00:05:46,860 --> 00:05:50,410
+size and timing change. So every frequency passes
+
+121
+00:05:50,410 --> 00:05:54,240
+through a convolution untouched, just scaled and shifted.
+
+122
+00:05:54,240 --> 00:05:57,100
+We can split any signal into frequencies, scale
+
+123
+00:05:57,100 --> 00:06:00,210
+each one, and put everything back together. That
+
+124
+00:06:00,210 --> 00:06:03,340
+is the convolution theorem. The Fourier transform of
+
+125
+00:06:03,340 --> 00:06:05,550
+f star g equals the Fourier transform of
+
+126
+00:06:05,550 --> 00:06:09,450
+f times the Fourier transform of g. Convolution
+
+127
+00:06:09,450 --> 00:06:12,570
+in time becomes simple multiplication in frequency. With
+
+128
+00:06:12,570 --> 00:06:15,800
+the fast Fourier transform, that trillion multiplications drops
+
+129
+00:06:15,800 --> 00:06:19,220
+to roughly 100 million. This is how audio
+
+130
+00:06:19,220 --> 00:06:22,120
+software adds reverb in real time. Record a
+
+131
+00:06:22,120 --> 00:06:24,110
+single clap in a real cathedral, and that
+
+132
+00:06:24,110 --> 00:06:27,580
+recording is the room's impulse response. Hold any
+
+133
+00:06:27,580 --> 00:06:29,550
+song with it, and the song sounds as
+
+134
+00:06:29,550 --> 00:06:32,190
+if it were played inside that cathedral. And
+
+135
+00:06:32,190 --> 00:06:34,840
+the same idea lives inside the Laplace transform
+
+136
+00:06:34,840 --> 00:06:37,540
+and the Z-transform. Every time an engineer writes
+
+137
+00:06:37,540 --> 00:06:39,290
+that the output equals the input times a
+
+138
+00:06:39,290 --> 00:06:42,760
+transfer function, they are quietly using the convolution
+
+139
+00:06:42,760 --> 00:06:45,170
+theorem. So let's look back at what we
+
+140
+00:06:45,170 --> 00:06:49,590
+discovered. Convolution is one simple recipe. Flip, slide,
+
+141
+00:06:49,590 --> 00:06:52,740
+multiply, and add. With lists of numbers, it
+
+142
+00:06:52,740 --> 00:06:55,310
+smooths noisy data, and it is the hidden
+
+143
+00:06:55,310 --> 00:06:58,590
+engine behind long multiplication. With dice, it turns
+
+144
+00:06:58,590 --> 00:07:01,410
+flat chances into triangles, and then into the
+
+145
+00:07:01,410 --> 00:07:04,570
+bell curve. With continuous curves, it measures the
+
+146
+00:07:04,570 --> 00:07:06,880
+area of overlap as one shape slides across
+
+147
+00:07:06,880 --> 00:07:10,670
+another. With images, small kernels blur, sharpen, and
+
+148
+00:07:10,670 --> 00:07:13,860
+find edges, and neural networks learn those kernels
+
+149
+00:07:13,860 --> 00:07:16,730
+on their own. And through the Fourier transform,
+
+150
+00:07:16,730 --> 00:07:18,880
+all of that sliding collapses into a single
+
+151
+00:07:18,880 --> 00:07:22,700
+multiplication, frequency by frequency. The next time you
+
+152
+00:07:22,700 --> 00:07:24,670
+hear an echo, see a blurry photo, or
+
+153
+00:07:24,670 --> 00:07:26,530
+roll a pair of dice, you'll know the
+
+154
+00:07:26,530 --> 00:07:29,660
+same quiet operation is at work underneath. If
+
+155
+00:07:29,660 --> 00:07:32,460
+this helped convolution finally click, subscribe, and I'll
+
+156
+00:07:32,460 --> 00:07:33,680
+see you in the next one.
+
