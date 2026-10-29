@@ -65,6 +65,12 @@ def surface_sprite(c, factor):
     return source
 
 
+def _styled(c, state):
+    from ._strokes import styled
+
+    return styled(c, state)
+
+
 def shape_sprite(c, state, factor):
     from .components import Circle, Ellipse, Line, Polyline, Triangle
     from .paths import VectorPath
@@ -115,6 +121,15 @@ def shape_sprite(c, state, factor):
         view_state = {**state, "fill": (0, 0, 0, 0), "stroke": (255, 255, 255, 255)}
         with RasterPainter(source_cache_mb=0) as renderer:
             stroke = renderer.primitive(view, view_state, factor, 0).getchannel("A")
+    elif _styled(c, state):
+        from ._strokes import stroke_lines
+
+        draw = ImageDraw.Draw(stroke)
+        for line in stroke_lines(list(contours), state, closed, getattr(c, "dash", None), factor):
+            draw.line(line, fill=255, width=sw, joint="curve")
+            if getattr(c, "line_cap", "butt") == "round":
+                for x, y in (line[0], line[-1]):
+                    draw.ellipse((x - sw / 2, y - sw / 2, x + sw / 2, y + sw / 2), fill=255)
     else:
         draw = ImageDraw.Draw(stroke)
         lengths = [math.dist(a, b) for pts in contours for a, b in pairwise(pts)]

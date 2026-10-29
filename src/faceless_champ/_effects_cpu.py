@@ -100,6 +100,17 @@ def blur(a, radius):
 
 
 def content(source, stack, scale, time, content_box=None):
+    if stack is not None and stack.uses_skia:
+        # Skia-backed layer filters run first, on encoded pixels, then the float pipeline.
+        from . import _skia_fx
+
+        if stack.displacement is not None and stack.displacement.amplitude:
+            source = _skia_fx.displace(source, stack.displacement, time, scale, content_box)
+        if stack.shader is not None and stack.shader.mix > 0:
+            e = stack.shader
+            source = _skia_fx.layer_shader(
+                source, _skia_fx.compile_shader(e.sksl), e.uniforms, time, scale, content_box, e.mix
+            )
     if stack is None or not any((stack.blur, stack.distortion, stack.chromatic, stack.light_sweep)):
         return source.copy()
     np = numpy()

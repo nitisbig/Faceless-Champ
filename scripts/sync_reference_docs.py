@@ -26,6 +26,7 @@ CORE_DOCS = (
     "clean-flow",
     "coding-playgrounds",
     "coding",
+    "compositing",
     "flowchamp",
     "guide",
     "html-to-video",

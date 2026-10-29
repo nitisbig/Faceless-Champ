@@ -123,7 +123,7 @@ class SkiaRenderer:
         guard_size(size)
         from ..effects import needs_compositor
 
-        if needs_compositor(node):
+        if needs_compositor(node, native_blend=True):
             # The shared CPU reference uses existing Skia typography/path tiles.
             if self._effect_compositor is None:
                 from .._compositor import Compositor
@@ -226,7 +226,58 @@ class SkiaRenderer:
                 mask.makeImageSnapshot(), 0, 0, s.SamplingOptions(), s.Paint(BlendMode=s.BlendMode.kDstIn)
             )
 
+    def _perspective(self, entry, parent):
+        """3x3 projective matrix tilting the subtree around its world-space center."""
+        from ..motion import perspective_matrix, point
+
+        c, state = entry.component, entry.state
+        world, _ = entry_geometry(entry, entry.time, parent, self.raster)
+        cx, cy = point(world, *(c._origin if isinstance(c, Group) else (0, 0)))
+        m = perspective_matrix(
+            state.get("tilt_x", 0), state.get("tilt_y", 0), c.perspective * self._density(world), cx, cy
+        )
+        return self.skia.Matrix.MakeAll(*m[0], *m[1], *m[2])
+
     def _paint_node(self, entry, children, context):
+        state = entry.state
+        if getattr(entry.component, "perspective", None) is not None and (
+            state.get("tilt_x", 0) or state.get("tilt_y", 0)
+        ):
+            canvas = context[0]
+            canvas.save()
+            canvas.concat(self._perspective(entry, context[1]))
+            try:
+                self._paint_blended(entry, children, context)
+            finally:
+                canvas.restore()
+            return
+        self._paint_blended(entry, children, context)
+
+    def _paint_blended(self, entry, children, context):
+        from ..blending import UNBOUNDED_BLENDS, blends, skia_blend
+
+        c = entry.component
+        blend = getattr(c, "blend", "normal")
+        if not blends(c):
+            self._paint_plain(entry, children, context)
+            return
+        s, canvas = self.skia, context[0]
+        if blend == "normal":
+            # A group whose children blend becomes its own layer (pre-comp semantics).
+            canvas.saveLayer(None, None)
+        else:
+            bounds = None
+            if blend not in UNBOUNDED_BLENDS:
+                ink = self._ink_box(entry, entry.time, context[1])
+                bounds = s.Rect.MakeLTRB(ink.left - 2, ink.top - 2, ink.right + 2, ink.bottom + 2)
+            # The layer composites onto what is beneath with the blend mode on restore().
+            canvas.saveLayer(bounds, s.Paint(BlendMode=skia_blend(s, blend)))
+        try:
+            self._paint_plain(entry, children, context)
+        finally:
+            canvas.restore()
+
+    def _paint_plain(self, entry, children, context):
         canvas, parent, inherited, limit = context
         time = entry.time
         c, state = entry.component, entry.state

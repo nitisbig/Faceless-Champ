@@ -35,10 +35,13 @@ class CPUDevice:
     def upload(self, image, key=None):
         return image
 
-    def blit(self, target, source, box, world=IDENTITY, opacity=1):
+    def blit(self, target, source, box, world=IDENTITY, opacity=1, blend="normal", perspective=None):
         from ._rendering.evaluate import transformed_box
 
         if box.width <= 0 or box.height <= 0:
+            return
+        if blend != "normal" or perspective is not None:
+            self._blend_blit(target, source, box, world, opacity, blend, perspective)
             return
         area = transformed_box(box, world)
         l, t = max(0, math.floor(area.left)), max(0, math.floor(area.top))
@@ -61,6 +64,81 @@ class CPUDevice:
             if opacity != 1:
                 tile.putalpha(tile.getchannel("A").point(lambda a: round(a * opacity)))
             target.alpha_composite(tile, (l, t))
+
+    def _blend_blit(self, target, source, box, world, opacity, blend, perspective=None):
+        """Composite through a tight local tile: optional perspective warp, then a
+        Skia blend mode (stencil/silhouette affect the whole target)."""
+        from ._rendering.evaluate import transformed_box
+        from .blending import UNBOUNDED_BLENDS
+        from .motion import inverse3
+
+        area = transformed_box(box, world)
+        l, t = max(0, math.floor(area.left) - 1), max(0, math.floor(area.top) - 1)
+        r, b = min(target.width, math.ceil(area.right) + 1), min(target.height, math.ceil(area.bottom) + 1)
+        if perspective is not None:
+            # The warp may move content anywhere; render the whole affine footprint first.
+            l, t = max(0, math.floor(area.left) - 1), max(0, math.floor(area.top) - 1)
+            r, b = math.ceil(area.right) + 1, math.ceil(area.bottom) + 1
+        if r <= l or b <= t:
+            if blend == "stencil":  # an empty matte hides everything beneath it
+                target.paste((0, 0, 0, 0), (0, 0, *target.size))
+            return
+        with self.surface((r - l, b - t)) as tile:
+            self.blit(tile, source, box, multiply((1, 0, 0, 1, -l, -t), world), opacity)
+            if perspective is not None:
+                corners = []
+                for x, y in ((l, t), (r, t), (r, b), (l, b)):
+                    w = perspective[2][0] * x + perspective[2][1] * y + perspective[2][2]
+                    if w <= 1e-6:
+                        raise ValueError(
+                            "Perspective tilt is too steep for this layer; reduce tilt or raise perspective"
+                        )
+                    corners.append(
+                        (
+                            (perspective[0][0] * x + perspective[0][1] * y + perspective[0][2]) / w,
+                            (perspective[1][0] * x + perspective[1][1] * y + perspective[1][2]) / w,
+                        )
+                    )
+                left = max(0, math.floor(min(p[0] for p in corners)) - 1)
+                top = max(0, math.floor(min(p[1] for p in corners)) - 1)
+                right = min(target.width, math.ceil(max(p[0] for p in corners)) + 1)
+                bottom = min(target.height, math.ceil(max(p[1] for p in corners)) + 1)
+                if right <= left or bottom <= top:
+                    return
+                # Output (x, y) -> canvas (x + left, y + top) -> Pinv -> tile (u - l, v - t).
+                inv = inverse3(perspective)
+                rows = []
+                for row in inv:
+                    rows.append((row[0], row[1], row[0] * left + row[1] * top + row[2]))
+                m = (
+                    tuple(rows[0][j] - l * rows[2][j] for j in range(3)),
+                    tuple(rows[1][j] - t * rows[2][j] for j in range(3)),
+                    rows[2],
+                )
+                k = m[2][2]
+                coeffs = [v / k for row in m for v in row][:8]
+                warped = tile.transform(
+                    (right - left, bottom - top), Image.Transform.PERSPECTIVE, coeffs, Image.Resampling.BICUBIC
+                )
+                piece, (l, t) = warped, (left, top)
+            else:
+                r, b = min(r, target.width), min(b, target.height)
+                piece = tile.crop((0, 0, r - l, b - t))
+            try:
+                if blend == "normal":
+                    target.alpha_composite(piece, (l, t))
+                    return
+                from ._skia_fx import blend_images
+
+                if blend in UNBOUNDED_BLENDS:
+                    with self.surface(target.size) as full:
+                        full.paste(piece, (l, t))
+                        target.paste(blend_images(target, full, blend))
+                    return
+                region = target.crop((l, t, l + piece.width, t + piece.height))
+                target.paste(blend_images(region, piece, blend), (l, t))
+            finally:
+                piece.close()
 
     def mask(self, target, mask):
         target.putalpha(ImageChops.multiply(target.getchannel("A"), mask.getchannel("A")))

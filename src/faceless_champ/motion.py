@@ -26,6 +26,11 @@ def visual_state(c):
         )
         if hasattr(c, "corner_radius"):
             state["corner_radius"] = c.corner_radius
+        state.update(
+            trim_start=getattr(c, "trim_start", 0),
+            trim_offset=getattr(c, "trim_offset", 0),
+            dash_offset=getattr(c, "dash_offset", 0),
+        )
     if isinstance(c, Text):
         state["color"] = rgba(c.color)
     if c.mask is not None:
@@ -78,3 +83,34 @@ def inverse(m):
     a, b, c, d, x, y = m
     det = a * d - b * c
     return d / det, -c / det, (c * y - d * x) / det, -b / det, a / det, (b * x - a * y) / det
+
+
+def tilted(c, state):
+    """True when a component has an active 2.5D tilt."""
+    return getattr(c, "perspective", None) is not None and bool(state.get("tilt_x", 0) or state.get("tilt_y", 0))
+
+
+def perspective_matrix(tilt_x, tilt_y, distance, cx, cy):
+    """Row-major 3x3 projective matrix: rotate the z=0 plane about (cx, cy) by
+    tilt_x (around x) then tilt_y (around y) and project it from ``distance``."""
+    a, b = math.radians(tilt_x), math.radians(tilt_y)
+    ca, sa, cb, sb = math.cos(a), math.sin(a), math.cos(b), math.sin(b)
+    # R = Ry(b) @ Rx(a); x' = (r00 x + r01 y) / w, y' = (r10 x + r11 y) / w, w = 1 + (r20 x + r21 y) / d
+    m = ((cb, sb * sa, 0.0), (0.0, ca, 0.0), (-sb / distance, cb * sa / distance, 1.0))
+    t = ((1, 0, cx), (0, 1, cy), (0, 0, 1))
+    u = ((1, 0, -cx), (0, 1, -cy), (0, 0, 1))
+    return _mat3(_mat3(t, m), u)
+
+
+def _mat3(p, q):
+    return tuple(tuple(sum(p[i][k] * q[k][j] for k in range(3)) for j in range(3)) for i in range(3))
+
+
+def inverse3(m):
+    (a, b, c), (d, e, f), (g, h, i) = m
+    det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
+    return (
+        ((e * i - f * h) / det, (c * h - b * i) / det, (b * f - c * e) / det),
+        ((f * g - d * i) / det, (a * i - c * g) / det, (c * d - a * f) / det),
+        ((d * h - e * g) / det, (b * g - a * h) / det, (a * e - b * d) / det),
+    )

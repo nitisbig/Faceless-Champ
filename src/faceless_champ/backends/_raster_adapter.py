@@ -26,7 +26,12 @@ class PillowRasterAdapter:
         from ..components import Text
         from ..paths import VectorPath
 
-        if (isinstance(c, Text) and c.text_engine == "skia") or (isinstance(c, VectorPath) and not c.portable):
+        if (
+            (isinstance(c, Text) and c.text_engine == "skia")
+            or (isinstance(c, VectorPath) and not c.portable)
+            or getattr(c, "round_corners", 0)
+            or getattr(c, "jitter", None)
+        ):
             result = self._native_sprite(c, state, factor)
         else:
             result = self.painter.sprite(c, state, factor, age)

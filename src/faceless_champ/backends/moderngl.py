@@ -87,6 +87,9 @@ class ModernGLRenderer:
 
     def validate(self, node):
         self._check()
+        from .._rendering.support import preflight
+
+        preflight(node, "moderngl")
         self.raster.painter.validate(node, backend="skia")
 
     def _signature(self, node, time):

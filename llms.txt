@@ -77,6 +77,27 @@ RectangleMask/CircleMask/ShapeMask and Wipe affect the complete component.
 ProgressBar/ProgressRing/Gauge/LoadingDots/Checkmark use progress_to; Countdown uses value_to.
 [Motion graphics](docs/motion-graphics.md).
 
+## Compositing, shapes, shaders and math (Skia)
+
+Needs skia-python (faceless-champ[skia]); works on backend="skia" and "pillow" (CPU),
+not "moderngl". Every component takes blend= normal, multiply, screen, overlay, darken,
+lighten, color_dodge, color_burn, hard_light, soft_light, difference, exclusion, hue,
+saturation, color, luminosity, add, stencil, silhouette (BLEND_MODES). A Group whose
+child blends is its own layer; stencil/silhouette make a child a track matte for its group.
+Shapes: trim_start, draw (trim end), trim_offset, dash=(on, off, ...), dash_offset;
+animate.trim_to(start=, end=, offset=), animate.dash_offset_to(px), Trace(shape, length=0.2).
+PathData.from_svg(d), .rect/.ellipse/.polygon/.star, .from_text("Hi", font_size=),
+booleans a | b, a & b, a - b, a ^ b, .to_svg(); show with VectorPath(path, ...).
+SVG("icon.svg" or markup, width=, color=) renders vector art crisply at any size.
+ShaderFill(sksl, width=, height=, uniforms=) paints a custom SkSL program (iTime,
+iResolution built in). EffectStack(shader=ShaderEffect(sksl), displacement=DisplacementMap(
+amplitude=12, size=120, speed=0, map=None)). Equation(expr, engine="typst") typesets Typst
+math: mat(1, 2; 3, 4), cases(...), integral_0^oo, sqrt(x), a/b. MathGlyphs(expr, font_size=,
+position=, outline=True) gives one VectorPath per symbol (eq.glyphs) for Draw/reveal/color.
+Shapes: round_corners=r, jitter=(segment, deviation) (Skia). Any component: tilt_x, tilt_y,
+perspective=1400, animate.tilt_to(x=, y=) for 2.5D (Skia/Pillow).
+[Compositing guide](docs/compositing.md).
+
 ## Assets, charts, and maps
 
 Image.from_source accepts paths, bytes, or Pillow images; trim/tint preserve alpha.

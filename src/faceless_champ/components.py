@@ -104,6 +104,11 @@ class Component:
             "mask_position",
             "mask_width",
             "mask_height",
+            "trim_start",
+            "trim_offset",
+            "dash_offset",
+            "tilt_x",
+            "tilt_y",
         }
         if property not in self.state() or (property not in core and not property.startswith("effect.")):
             raise ValueError(f"Unsupported animation property '{property}'")
@@ -123,7 +128,22 @@ class Component:
         rotation: float = 0.0,
         opacity: float = 1.0,
         z_index: float = 0,
+        blend: str = "normal",
+        tilt_x: float = 0.0,
+        tilt_y: float = 0.0,
+        perspective: float | None = None,
     ) -> None:
+        from .blending import blend_mode
+
+        self.blend = blend_mode(blend)
+        # 2.5D: rotate around the horizontal (tilt_x) / vertical (tilt_y) axis through the
+        # component's center, seen from ``perspective`` design pixels away (Skia backend).
+        self.tilt_x, self.tilt_y = finite(tilt_x, "tilt_x"), finite(tilt_y, "tilt_y")
+        if max(abs(self.tilt_x), abs(self.tilt_y)) >= 90:
+            raise ValueError("tilt_x/tilt_y must be within (-90, 90) degrees")
+        if perspective is None and (self.tilt_x or self.tilt_y):
+            perspective = 1400
+        self.perspective = None if perspective is None else finite(perspective, "perspective", 50)
         if anchor not in {"center", "top_left"}:
             raise ValueError("anchor must be center or top_left")
         self.anchor = anchor
@@ -208,6 +228,9 @@ class Component:
             "opacity": self.opacity,
             "reveal": 1.0,
             "draw": 1.0,
+            **(
+                {"tilt_x": self.tilt_x, "tilt_y": self.tilt_y} if getattr(self, "perspective", None) is not None else {}
+            ),
         }
 
 
@@ -317,7 +340,14 @@ class Number(Text):
 
 
 class Equation(Component):
-    """TeX-style math typeset with the optional Matplotlib MathText engine.
+    """Typeset math.
+
+    ``engine="mathtext"`` (default) takes a TeX-style expression and uses the
+    optional Matplotlib MathText engine (no matrices or environments).
+    ``engine="typst"`` uses Typst math syntax and supports matrices, cases,
+    alignment and big operators, e.g. ``Equation("mat(1, 2; 3, 4)", engine="typst")``;
+    see ``faceless_champ.typst_math`` for setup and a LaTeX->Typst cheatsheet.
+    ``math_font`` picks a Typst math font by name (default New Computer Modern Math).
 
     Pass an expression without dollar delimiters. ``max_width`` scales long
     expressions down to fit a design-pixel width, retaining their aspect ratio.
@@ -332,12 +362,19 @@ class Equation(Component):
         fontset: str = "stix",
         max_width: float | None = None,
         color_map: Mapping[str, str] | None = None,
+        engine: str = "mathtext",
+        math_font: str | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         if not isinstance(expression, str):
             raise TypeError("expression must be a string")
-        if not expression.strip() or "$" in expression or "\n" in expression:
+        if engine not in {"mathtext", "typst"}:
+            raise ValueError("engine must be mathtext or typst")
+        self.engine, self.math_font = engine, math_font
+        if engine == "typst" and color_map:
+            raise ValueError("color_map is MathText-only; in Typst color a term with #text(fill: red, $x$)")
+        if not expression.strip() or (engine == "mathtext" and ("$" in expression or "\n" in expression)):
             raise ValueError("Equation needs a nonempty, single-line expression without dollar delimiters")
         if fontset not in {"stix", "stixsans", "cm", "dejavusans", "dejavuserif"}:
             raise ValueError("Unsupported MathText fontset")
@@ -446,6 +483,20 @@ class Icon(Image):
 
 
 class Shape(Component):
+    """Base vector shape.
+
+    Stroke styling, After Effects "Trim Paths" style: ``draw`` is the trim end,
+    ``trim_start`` the trim start (both 0..1 of the total stroke length) and
+    ``trim_offset`` shifts the visible span along the path (it wraps around
+    closed paths). ``dash`` is a pattern of on/off lengths in design pixels,
+    e.g. ``(18, 10)``; ``dash_offset`` slides it (animate it for marching ants).
+    All three numbers animate: ``shape.animate.trim_to(start=.., end=.., offset=..)``.
+
+    Skia path effects (backend="skia"): ``round_corners=24`` rounds every corner of
+    the outline (polygons, stars, polylines); ``jitter=(8, 2.5)`` roughens it into a
+    hand-drawn line (segment length, deviation, optional seed).
+    """
+
     def __init__(
         self,
         *,
@@ -454,12 +505,40 @@ class Shape(Component):
         fill: str | None = None,
         stroke: str | None = "white",
         stroke_width: float = 4,
+        trim_start: float = 0,
+        trim_offset: float = 0,
+        dash: tuple[float, ...] | None = None,
+        dash_offset: float = 0,
+        line_cap: str = "butt",
+        round_corners: float = 0,
+        jitter: tuple[float, float] | tuple[float, float, int] | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
+        if line_cap not in {"butt", "round", "square"}:
+            raise ValueError("line_cap must be butt, round, or square")
+        self.line_cap = line_cap
+        # Skia path effects: round every corner of the outline / roughen it (hand-drawn look).
+        self.round_corners = finite(round_corners, "round_corners", 0)
+        if jitter is not None:
+            jitter = tuple(jitter)
+            if len(jitter) not in {2, 3}:
+                raise ValueError("jitter is (segment_length, deviation) or (segment_length, deviation, seed)")
+            jitter = (finite(jitter[0], "jitter segment", 0.5), finite(jitter[1], "jitter deviation", 0), *jitter[2:])
+        self.jitter = jitter
         self.width, self.height = finite(width, "width", 1), finite(height, "height", 1)
         self.fill, self.stroke = fill, stroke
         self.stroke_width = finite(stroke_width, "stroke_width", 0)
+        self.trim_start = finite(trim_start, "trim_start", 0)
+        if self.trim_start > 1:
+            raise ValueError("trim_start must be <= 1")
+        self.trim_offset = finite(trim_offset, "trim_offset")
+        if dash is not None:
+            dash = tuple(finite(v, "dash", 0) for v in dash)
+            if not dash or len(dash) % 2 or sum(dash) <= 0 or len(dash) > 32:
+                raise ValueError("dash needs an even number (2-32) of on/off lengths with a positive total")
+        self.dash = dash
+        self.dash_offset = finite(dash_offset, "dash_offset")
 
 
 class Rectangle(Shape):
@@ -574,7 +653,9 @@ def _validate_animated_value(key: str, value) -> None:
             key,
             0.001
             if key in {"scale", "scale_x", "scale_y", "width", "height"}
-            else (None if key in {"rotation", "value"} else 0),
+            else (None if key in {"rotation", "value", "trim_offset", "dash_offset", "tilt_x", "tilt_y"} else 0),
         )
-        if key in {"opacity", "reveal", "draw", "progress", "wipe"} and value > 1:
+        if key in {"tilt_x", "tilt_y"} and abs(value) >= 90:
+            raise ValueError(f"{key} must be within (-90, 90) degrees")
+        if key in {"opacity", "reveal", "draw", "progress", "wipe", "trim_start"} and value > 1:
             raise ValueError(f"{key} must be <= 1")

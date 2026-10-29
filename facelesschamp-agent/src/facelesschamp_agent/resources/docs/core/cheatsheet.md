@@ -167,6 +167,29 @@ with theme.use():
         scene.wait(2)
 ```
 
+## 9. Trim paths, dashes and blend modes (needs skia-python)
+
+```python
+from faceless_champ import Circle, Group, Scene, Theme, Trace
+
+theme = Theme.named("neon")
+with theme.use():
+    scene = Scene(theme.canvas())
+    x, y = scene.canvas.bounds.center
+    guide = Circle(300, fill=None, stroke=theme.color("border"), stroke_width=4, position=(x, y), dash=(16, 14))
+    orbit = Circle(300, fill=None, stroke=theme.color("secondary"), stroke_width=14, position=(x, y), line_cap="round")
+    left = Circle(150, fill=theme.color("primary"), stroke=None, position=(x - 80, y))
+    right = Circle(150, fill=theme.color("highlight"), stroke=None, position=(x + 80, y), blend="screen")
+    scene.add(guide, Group(left, right), orbit)  # blending stays inside the group
+    scene.play(Trace(orbit, length=0.25), guide.animate.dash_offset_to(-60), run_time=2, rate_func="linear")
+    scene.play(orbit.animate.trim_to(start=0, end=1, offset=0), run_time=0.8)
+    scene.wait(1.5)
+```
+
+More: `PathData` booleans (`a - b`), `SVG("logo.svg")`, `ShaderFill(sksl)`,
+`EffectStack(displacement=DisplacementMap(...))` and `Equation("mat(1, 2; 3, 4)", engine="typst")`.
+See [docs/compositing.md](compositing.md).
+
 ## Narration timing (pattern, not executed)
 
 <!-- skip -->

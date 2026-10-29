@@ -118,6 +118,32 @@ class AnimationBuilder(Animation):
         self.targets["rotation"] = finite(degrees, "rotation")
         return self
 
+    def tilt_to(self, x=None, y=None) -> Self:
+        """Animate the 2.5D tilt in degrees (needs tilt/perspective set on the component; Skia)."""
+        if x is None and y is None:
+            raise ValueError("tilt_to needs x or y")
+        if x is not None:
+            self._to("tilt_x", x)
+        if y is not None:
+            self._to("tilt_y", y)
+        return self
+
+    def trim_to(self, *, start=None, end=None, offset=None) -> Self:
+        """Animate Trim Paths: ``start``/``end`` in [0, 1] of the stroke length, ``offset`` shifts the span."""
+        if start is None and end is None and offset is None:
+            raise ValueError("trim_to needs start, end, or offset")
+        if start is not None:
+            self._to("trim_start", start)
+        if end is not None:
+            self._to("draw", end)
+        if offset is not None:
+            self._to("trim_offset", offset)
+        return self
+
+    def dash_offset_to(self, value: float) -> Self:
+        """Slide a dashed stroke along its path (marching ants), in design pixels."""
+        return self._to("dash_offset", value)
+
     def through(self, property: str, values, times=None) -> Self:
         """Animate one property through several values in a single play().
 
@@ -185,6 +211,32 @@ def Draw(component: Shape) -> Animation:
     if not isinstance(component, Shape):
         raise TypeError("Draw requires a shape")
     return Animation(component, {"draw": 1.0}, {"draw": 0.0})
+
+
+def Trace(component: Shape, *, length: float = 0.2) -> Animation:
+    """A stroke segment of ``length`` (fraction of the path) travels from start to end.
+
+    Great for "energy flowing along a wire", tracing a curve or orbiting a circle.
+    The shape keeps its trimmed segment afterwards; play Draw() to reveal it fully.
+    """
+    if not isinstance(component, Shape):
+        raise TypeError("Trace requires a shape")
+    length = finite(length, "length", 0.001)
+    if length > 1:
+        raise ValueError("Trace length must be <= 1")
+    from .components import Line, Polyline
+
+    closed = not isinstance(component, Line) and (not isinstance(component, Polyline) or component.closed)
+    from .paths import VectorPath
+
+    if isinstance(component, VectorPath):
+        closed = component.path.commands[-1][0] == "Z"
+    travel = 1.0 if closed else 1.0 - length
+    return Animation(
+        component,
+        {"draw": length, "trim_start": 0.0, "trim_offset": travel},
+        {"draw": length, "trim_start": 0.0, "trim_offset": 0.0},
+    )
 
 
 def _component(component: Component) -> Component:

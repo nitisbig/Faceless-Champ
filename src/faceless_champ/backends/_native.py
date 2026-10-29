@@ -1,8 +1,10 @@
 """Lazy native loading and explicit pixel-format conversions."""
 
+from functools import lru_cache
 from importlib.metadata import version
 
 
+@lru_cache(maxsize=1)
 def load_skia():
     try:
         import skia

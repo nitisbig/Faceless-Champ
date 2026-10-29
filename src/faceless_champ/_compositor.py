@@ -18,7 +18,7 @@ from ._rendering.evaluate import (
 )
 from ._rendering.execute import walk_frame
 from .layout import Bounds, Group
-from .motion import IDENTITY
+from .motion import IDENTITY, perspective_matrix, point, tilted
 from .surfaces import _shadow_padding
 from .timeline import Scene, Sequence
 
@@ -220,4 +220,11 @@ class Compositor:
                 d.halos(layer, effects, q)
                 d.shadow(layer, c.drop_shadow, q)
             actual = Bounds(roi.left, roi.top, roi.left + size[0] / q, roi.top + size[1] / q)
-            d.blit(target, layer, actual, world, 1 if isinstance(c, Group) else opacity)
+            blend = getattr(c, "blend", "normal")
+            extra = {"blend": blend} if blend != "normal" else {}
+            if tilted(c, state):
+                cx, cy = point(world, *(c._origin if isinstance(c, Group) else (0, 0)))
+                extra["perspective"] = perspective_matrix(
+                    state.get("tilt_x", 0), state.get("tilt_y", 0), c.perspective * density(world), cx, cy
+                )
+            d.blit(target, layer, actual, world, 1 if isinstance(c, Group) else opacity, **extra)

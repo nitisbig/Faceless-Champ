@@ -95,6 +95,13 @@ if _TYPE_CHECKING:
     )
 
 _EXPORTS = {
+    "Trace": ("animation", "Trace"),
+    "BLEND_MODES": ("blending", "BLEND_MODES"),
+    "DisplacementMap": ("effects", "DisplacementMap"),
+    "ShaderEffect": ("effects", "ShaderEffect"),
+    "ShaderFill": ("shaders", "ShaderFill"),
+    "SVG": ("svg", "SVG"),
+    "MathGlyphs": ("typst_math", "MathGlyphs"),
     "Plugin": ("plugins", "Plugin"),
     "Capability": ("plugins", "Capability"),
     "FunctionSource": ("sources", "FunctionSource"),
@@ -455,6 +462,13 @@ __all__ = [  # noqa: RUF022
     "Capability",
     "FunctionSource",
     "raster_source",
+    "Trace",
+    "BLEND_MODES",
+    "DisplacementMap",
+    "ShaderEffect",
+    "ShaderFill",
+    "SVG",
+    "MathGlyphs",
 ]
 
 

@@ -9,6 +9,8 @@
   "packages": {
     "faceless_champ": {
       "dependencies": [
+        "kaggle>=2.2.5",
+        "manim>=0.22.0",
         "Pillow>=10.4,<13"
       ],
       "distribution": "faceless-champ",
@@ -21,6 +23,7 @@
         "ArchPart",
         "ArchStyle",
         "Arrow",
+        "BLEND_MODES",
         "Badge",
         "Bloom",
         "BounceIn",
@@ -42,6 +45,7 @@
         "CueScene",
         "DesignReport",
         "DirectionalWipe",
+        "DisplacementMap",
         "Distortion",
         "Divider",
         "Dot",
@@ -73,6 +77,7 @@
         "LinearGradient",
         "LoadingDots",
         "LuminanceWipe",
+        "MathGlyphs",
         "ModernGLRenderer",
         "MotionStyle",
         "Number",
@@ -98,8 +103,11 @@
         "RectangleMask",
         "Renderer",
         "Repeat",
+        "SVG",
         "Scene",
         "Sequence",
+        "ShaderEffect",
+        "ShaderFill",
         "ShadowStyle",
         "Shake",
         "ShapeMask",
@@ -122,6 +130,7 @@
         "TextBudgetError",
         "TextStyle",
         "Theme",
+        "Trace",
         "Triangle",
         "TypeScale",
         "Typewriter",

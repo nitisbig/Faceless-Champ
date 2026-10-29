@@ -7,8 +7,9 @@ from itertools import pairwise
 from math import nextafter
 from types import MappingProxyType
 
+from ..blending import blends
 from ..layout import Bounds, Group
-from ..motion import matrix, multiply, point, style_value
+from ..motion import matrix, multiply, point, style_value, tilted
 from .plan import CompositionSpec, Placement
 
 
@@ -119,6 +120,8 @@ def evaluate_frame(scene, time, *, measurement=None, geometry=True, resource_key
                     age=max(0, time - node.start),
                     effects=effects,
                     isolate=effects is not None
+                    or blends(c)
+                    or tilted(c, state)
                     or c.mask is not None
                     or c.drop_shadow is not None
                     or state["clip"] != (0, 0, 1, 1),
@@ -209,9 +212,7 @@ def render_signature(node, time, measurement=None):
                     e.visible,
                     tuple(e.state.items()),
                     measure.age_key(e.component, e.age) if e.visible else None,
-                    e.age
-                    if e.visible and e.effects is not None and (e.effects.distortion or e.effects.light_sweep)
-                    else None,
+                    e.age if e.visible and e.effects is not None and e.effects.time_dependent else None,
                 )
                 for e in frame.entries
             ),
@@ -223,7 +224,7 @@ def render_signature(node, time, measurement=None):
         progress,
         getattr(node, "transition", None),
         effects,
-        time if effects and (effects.distortion or effects.light_sweep) else None,
+        time if effects and effects.time_dependent else None,
         tuple((p.viewport, p.background, render_signature(p.node, p.time, measure)) for p in parts),
     )
 

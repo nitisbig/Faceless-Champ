@@ -188,9 +188,36 @@ class Measurement:
         return self._fonts[key]
 
     def _equation(self, c: Equation, factor: float):
-        key = (c.expression, c.font_size, c.fontset, c.color, c.max_width, tuple(sorted(c.color_map.items())), factor)
+        engine = getattr(c, "engine", "mathtext")
+        key = (
+            c.expression,
+            c.font_size,
+            c.fontset,
+            c.color,
+            c.max_width,
+            tuple(sorted(c.color_map.items())),
+            factor,
+            engine,
+            getattr(c, "math_font", None),
+        )
         if key in self._equations:
             return self._equations[key]
+        if engine == "typst":
+            from PIL import Image as _PILImage
+
+            from ..typst_math import sprite as typst_sprite
+
+            sprite = typst_sprite(c, factor)
+            if c.max_width is not None and sprite.width > c.max_width * factor:
+                ratio = c.max_width * factor / sprite.width
+                sprite = sprite.resize(
+                    (max(1, round(sprite.width * ratio)), max(1, round(sprite.height * ratio))),
+                    _PILImage.Resampling.LANCZOS,
+                )
+            self._equations[key] = sprite
+            while len(self._equations) > 256:
+                self._equations.pop(next(iter(self._equations)))
+            return sprite
         try:
             import numpy as np
             from matplotlib import rc_context

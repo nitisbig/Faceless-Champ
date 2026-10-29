@@ -91,6 +91,13 @@ def shape_path(s, c, state):
     return b.detach(), closed
 
 
+def _append_segment(s, measure, start, stop, result):
+    """skia-python's getSegment resets its destination, so collect each piece separately."""
+    piece = s.Path()
+    if measure.getSegment(start, stop, piece, True):
+        result.addPath(piece)
+
+
 def partial_path(s, path, progress):
     if progress >= 1:
         return path
@@ -105,24 +112,121 @@ def partial_path(s, path, progress):
     result = s.Path()
     for length in lengths:
         if remaining > 0 and length > 0:
-            measure.getSegment(0, min(length, remaining), result, True)
+            _append_segment(s, measure, 0, min(length, remaining), result)
         remaining -= length
         if not measure.nextContour():
             break
     return result
 
 
+def _on_spans(lo, hi, pattern, phase):
+    """Global-distance spans inside [lo, hi] where the dash pattern is on."""
+    import math as _math
+
+    pattern = [max(v, 1e-3) for v in pattern]
+    period = sum(pattern)
+    k = _math.floor((lo + phase) / period)
+    spans = []
+    while True:
+        origin = k * period - phase
+        if origin >= hi:
+            break
+        cursor = origin
+        for index, length in enumerate(pattern):
+            if index % 2 == 0:
+                a, b = max(lo, cursor), min(hi, cursor + length)
+                if b > a:
+                    spans.append((a, b))
+            cursor += length
+        k += 1
+        if len(spans) > 100_000:
+            raise ValueError("dash pattern is too fine for this path length")
+    return spans
+
+
+def styled_path(s, path, state, closed, pattern=None):
+    """Trim Paths + dashes over a native path: [trim_start, draw] shifted by
+    trim_offset (wrapping on closed paths); dashes anchored to the path start."""
+    from .._strokes import intervals
+
+    lengths = []
+    measure = s.PathMeasure(path, False)
+    while True:
+        lengths.append(measure.getLength())
+        if not measure.nextContour():
+            break
+    total = sum(lengths)
+    result = s.Path()
+    if total <= 0:
+        return result
+    for a, b in intervals(state.get("trim_start", 0), state["draw"], state.get("trim_offset", 0), closed):
+        spans = (
+            _on_spans(a * total, b * total, pattern, state.get("dash_offset", 0))
+            if pattern
+            else [(a * total, b * total)]
+        )
+        for lo, hi in spans:
+            base = 0.0
+            measure = s.PathMeasure(path, False)
+            for length in lengths:
+                s0, s1 = max(lo, base) - base, min(hi, base + length) - base
+                if length > 0 and s1 > s0:
+                    _append_segment(s, measure, s0, s1, result)
+                base += length
+                if base >= hi or not measure.nextContour():
+                    break
+    return result
+
+
+def path_effect(s, c):
+    """Skia path effects requested by a shape: round_corners, then jitter."""
+    effect = None
+    radius = getattr(c, "round_corners", 0)
+    if radius:
+        effect = s.CornerPathEffect.Make(radius)
+    jitter = getattr(c, "jitter", None)
+    if jitter:
+        rough = s.DiscretePathEffect.Make(jitter[0], jitter[1], int(jitter[2]) if len(jitter) > 2 else 0)
+        effect = rough if effect is None else s.PathEffect.MakeCompose(rough, effect)
+    return effect
+
+
 def draw_shape(s, canvas, c, state, opacity):
+    from .._strokes import styled
     from ..layout import Bounds
 
     path, closed = shape_path(s, c, state)
     w, h = state["width"], state["height"]
     progress = state["draw"]
     box = Bounds(-w / 2, -h / 2, w / 2, h / 2)
+    effect = path_effect(s, c)
     if closed and progress >= 1:
-        canvas.drawPath(path, paint(s, state["fill"], box, opacity))
+        p = paint(s, state["fill"], box, opacity)
+        if effect is not None:
+            p.setPathEffect(effect)
+        canvas.drawPath(path, p)
+    if state["stroke"][3] > 0 and state["stroke_width"] > 0 and styled(c, state):
+        p = paint(s, state["stroke"], box, opacity)
+        if effect is not None:
+            p.setPathEffect(effect)
+        p.setStyle(s.Paint.kStroke_Style)
+        p.setStrokeWidth(state["stroke_width"])
+        p.setStrokeJoin(s.Paint.kRound_Join)
+        p.setStrokeCap(
+            {"round": s.Paint.kRound_Cap, "square": s.Paint.kSquare_Cap}.get(
+                getattr(c, "line_cap", "butt"), s.Paint.kButt_Cap
+            )
+        )
+        canvas.drawPath(styled_path(s, path, state, closed, getattr(c, "dash", None)), p)
+        if isinstance(c, Arrow) and progress > 0:
+            tip, x = c.tip_size * min(1, progress / 0.15), -w / 2 + w * min(1, progress + state.get("trim_offset", 0))
+            b = s.PathBuilder().moveTo(x, 0).lineTo(x - tip, -tip / 2).lineTo(x - tip, tip / 2).close()
+            canvas.drawPath(b.detach(), paint(s, state["stroke"], box, opacity))
+        return
     if state["stroke"][3] > 0 and state["stroke_width"] > 0 and progress > 0:
         p = paint(s, state["stroke"], box, opacity)
+        if effect is not None:
+            p.setPathEffect(effect)
         p.setStyle(s.Paint.kStroke_Style)
         p.setStrokeWidth(state["stroke_width"])
         p.setStrokeJoin(s.Paint.kRound_Join)

@@ -279,6 +279,8 @@ class Group(Component):
             "mask_height",
             "wipe",
             "clip",
+            "tilt_x",
+            "tilt_y",
         }:
             raise ValueError("Groups support transforms, opacity, masks, and wipe animations")
         super().validate_animation(property, value)

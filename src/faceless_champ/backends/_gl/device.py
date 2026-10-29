@@ -13,6 +13,13 @@ from ...layout import Bounds
 from ...motion import IDENTITY
 
 
+def _styled_stroke(c, state):
+    """Trim/dash strokes use the raster sprite path instead of the analytic SDF shape."""
+    from ..._strokes import styled
+
+    return styled(c, state)
+
+
 def shader(name):
     return files(__package__).joinpath("shaders", name).read_text()
 
@@ -411,7 +418,7 @@ class GLDevice:
                 return False
             w, h, fill, radius = c.width, c.height, c.fill, c.radius
             stroke, sw = (0, 0, 0, 0), 0
-        elif isinstance(c, (Rectangle, Circle, Ellipse)) and state["draw"] >= 1:
+        elif isinstance(c, (Rectangle, Circle, Ellipse)) and state["draw"] >= 1 and not _styled_stroke(c, state):
             w, h, fill, radius = state["width"], state["height"], state["fill"], state.get("corner_radius", 0)
             stroke, sw = state["stroke"], state["stroke_width"]
         else:

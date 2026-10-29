@@ -280,7 +280,18 @@ class RasterPainter:
             static = state["draw"] == 1 and all(
                 state.get(k) == v
                 for k, v in c.state().items()
-                if k in {"fill", "stroke", "width", "height", "stroke_width", "corner_radius"}
+                if k
+                in {
+                    "fill",
+                    "stroke",
+                    "width",
+                    "height",
+                    "stroke_width",
+                    "corner_radius",
+                    "trim_start",
+                    "trim_offset",
+                    "dash_offset",
+                }
             )
             key = (c, factor, "retained")
             if static and key in self._sprites:
@@ -321,7 +332,19 @@ class RasterPainter:
         dynamic = any(
             key in state and state[key] != value
             for key, value in c.state().items()
-            if key in {"fill", "stroke", "color", "width", "height", "stroke_width", "corner_radius"}
+            if key
+            in {
+                "fill",
+                "stroke",
+                "color",
+                "width",
+                "height",
+                "stroke_width",
+                "corner_radius",
+                "trim_start",
+                "trim_offset",
+                "dash_offset",
+            }
         )
         if dynamic:
             original = c
@@ -508,7 +531,18 @@ class RasterPainter:
             can_fill = not isinstance(c, Line) and (not isinstance(c, Polyline) or c.closed)
             if c.fill and can_fill and progress >= 1:
                 draw.polygon(points, fill=c.fill)
-            if c.stroke and c.stroke_width > 0 and progress > 0:
+            from .._strokes import stroke_lines, styled
+
+            if c.stroke and c.stroke_width > 0 and styled(c, state):
+                closed = can_fill
+                round_cap = getattr(c, "line_cap", "butt") == "round"
+                for line in stroke_lines([points], state, closed, getattr(c, "dash", None), factor):
+                    draw.line(line, fill=c.stroke, width=width, joint="curve")
+                    if round_cap:
+                        radius = width / 2
+                        for px, py in (line[0], line[-1]):
+                            draw.ellipse((px - radius, py - radius, px + radius, py + radius), fill=c.stroke)
+            elif c.stroke and c.stroke_width > 0 and progress > 0:
                 lengths = [
                     b[0] - a[0] if isinstance(c, Polyline) and c.draw_by == "x" else math.dist(a, b)
                     for a, b in pairwise(points)
