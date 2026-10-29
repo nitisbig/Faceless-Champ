@@ -1,0 +1,148 @@
+time,sound,gain_dB,what happens on screen
+0:00.522,clap,-9,clap in the cathedral
+0:00.522,boom,-20,flash / camera kick
+0:08.188,trans,-20,song streams in
+0:19.384,riser,-18,build to the name
+0:20.727,hit,-15,CONVOLUTION title
+0:23.939,whoosh,-17,panel flips in: blurs
+0:24.492,pop2,-22,panel lands: blurs
+0:26.273,whoosh,-17,panel flips in: neural
+0:26.822,pop2,-22,panel lands: neural
+0:30.356,whoosh,-17,panel flips in: dice
+0:30.642,pop2,-22,panel lands: dice
+0:32.139,whoosh,-17,panel flips in: long
+0:32.692,pop2,-22,panel lands: long
+0:36.759,pop,-18,recipe pill FLIP
+0:37.292,pop,-18,recipe pill SLIDE
+0:38.032,pop,-18,recipe pill MULTIPLY
+0:39.259,pop,-18,recipe pill ADD
+0:39.792,slide,-19,box slides over box
+0:47.193,shine,-20,Fourier teaser
+0:51.592,chime,-20,single multiplication
+0:54.865,trans,-16,chapter 1 in
+0:58.625,tick,-19,temperature 1
+0:59.259,tick,-19,temperature 2
+0:59.859,tick,-19,temperature 3
+1:00.592,tick,-19,temperature 4
+1:02.559,pop,-18,window appears
+1:06.059,click,-19,window sum
+1:07.393,swish,-16,window slides a day
+1:08.493,swish,-16,window slides a day
+1:09.093,swish,-16,window slides a day
+1:09.493,swish,-16,window slides a day
+1:14.202,glass,-19,KERNEL label
+1:26.132,pop,-18,signal tile 1
+1:26.462,pop,-18,signal tile 2
+1:26.812,pop,-18,signal tile 3
+1:30.302,pop,-18,kernel tile 1
+1:30.652,pop,-18,kernel tile 2
+1:32.046,flip,-19,kernel flips
+1:33.725,slide,-19,kernel slides in
+1:41.172,drop,-16,output tile (p0g)
+1:42.126,swish,-16,slide step (slide2)
+1:47.182,drop,-16,output tile (p1g)
+1:48.226,swish,-16,slide step (slide3)
+1:51.802,drop,-16,output tile (p2g)
+1:52.693,swish,-16,slide step (last)
+1:55.642,drop,-16,output tile (p3g)
+1:57.459,tick,-19,answer digit 1
+1:57.925,tick,-19,answer digit 2
+1:59.092,tick,-19,answer digit 3
+1:59.342,tick,-19,answer digit 4
+2:01.916,whoosh,-17,123 x 11 appears
+2:06.592,tick,-19,product digit 1
+2:07.182,tick,-19,product digit 2
+2:07.862,tick,-19,product digit 3
+2:08.472,tick,-19,product digit 4
+2:09.692,sparkle,-21,the same digits!
+2:15.855,trans,-16,why flip? scene
+2:20.692,glass,-19,echo now
+2:22.592,glass,-24,quieter copy
+2:25.042,glass,-29,fainter copy
+2:30.013,flip,-19,the flip lines up past
+2:33.455,trans,-16,chapter 2 in
+2:37.125,pop,-18,six equal bars
+2:40.506,whoosh,-17,two dice
+2:45.912,glass,-19,seven: six ways
+2:55.280,flip,-19,flip one row
+2:56.558,slide,-19,slide across
+3:02.637,swish2,-21,overlap grows
+3:03.382,chime,-20,all six line up
+3:05.337,swish2,-21,overlap shrinks
+3:08.959,sparkle,-21,flat -> triangle
+3:10.306,whoosh,-17,third die
+3:13.762,pop,-18,hill
+3:16.703,shine,-20,bell curve
+3:24.325,trans,-16,chapter 3 in
+3:27.306,whoosh,-17,bars melt into curves
+3:31.272,click,-19,formula f1
+3:32.812,click,-19,formula int
+3:38.892,click,-19,formula dtau
+3:44.780,flip,-19,g flipped
+3:49.160,swish,-16,slid to t
+3:50.859,pop,-18,multiply point by point
+3:55.692,glass,-19,area of overlap
+4:00.459,pop,-18,summary flip
+4:01.472,pop,-18,summary slide
+4:02.582,pop,-18,summary measure
+4:06.192,pop2,-18,two boxes
+4:12.625,slide,-19,box slides in
+4:18.642,chime,-20,peaks at one
+4:20.020,swish2,-21,shrinks to zero
+4:23.232,sparkle,-21,boxes -> triangle
+4:27.222,trans,-14,step into 2D
+4:33.873,whoosh,-17,3x3 kernel
+4:35.992,drop,-16,kernel placed
+4:40.359,click,-19,add all nine
+4:41.259,pop,-18,write into new image
+4:43.960,swish,-16,slide one pixel
+4:47.702,pop,-18,1/9 kernel
+4:52.336,shine,-20,image blurs
+4:52.939,whoosh,-17,edge kernel scene
+4:53.732,tick,-19,column minus
+4:55.482,tick,-19,column zero
+4:56.832,tick,-19,column plus
+5:04.825,glass,-19,kernel lights up
+5:06.282,chime,-20,edge detector
+5:09.055,trans,-16,CNN
+5:13.306,whoosh,-17,learned filters
+5:17.022,sparkle,-21,they discover edges
+5:22.625,boom,-21,one problem
+5:27.004,riser,-20,build to a trillion
+5:28.727,hit,-15,a trillion multiplications
+5:33.070,shine,-20,Fourier to the rescue
+5:36.759,bell,-24,pure tone in the cathedral
+5:54.739,whoosh,-17,split into frequencies
+5:58.726,swish,-16,put back together
+6:00.865,trans,-16,convolution theorem
+6:02.112,click,-19,theorem F1
+6:03.882,click,-19,theorem equals
+6:05.902,click,-19,theorem times
+6:08.325,pop,-18,theorem complete
+6:10.625,chime,-20,time -> multiplication
+6:12.106,whoosh,-17,FFT
+6:15.359,down,-24,trillion drops
+6:16.982,pop,-18,a hundred million
+6:22.762,clap,-18,recorded clap
+6:29.155,trans,-19,song inside cathedral
+6:33.659,pop,-18,Laplace
+6:35.092,pop,-18,Z transform
+6:39.282,click,-19,transfer function
+6:42.692,chime,-20,convolution theorem at work
+6:44.775,trans,-16,recap in
+6:48.359,pop,-18,recap pill flip
+6:48.892,pop,-18,recap pill slide
+6:49.525,pop,-18,recap pill multiply
+6:50.659,pop,-18,recap pill add
+6:52.173,swish,-16,recap card numbers
+6:57.833,swish,-16,recap card dice
+7:03.393,swish,-16,recap card curves
+7:08.273,swish,-16,recap card images
+7:15.693,swish,-16,recap card fourier
+7:18.073,whoosh,-17,collapses
+7:18.692,chime,-20,single multiplication
+7:22.992,glass,-21,echo
+7:23.802,tick,-19,blurry photo
+7:25.272,tick,-19,dice
+7:31.522,pop2,-18,subscribe
+7:32.603,shine,-22,end card

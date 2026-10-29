@@ -1,0 +1,17 @@
+{
+  "id": "nitesh1230/convolution-explained-4k-render",
+  "title": "convolution-explained-4k-render",
+  "code_file": "kaggle_render.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "nitesh1230/convolution-explained-4k-input"
+  ],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": []
+}
