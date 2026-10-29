@@ -1,0 +1,71 @@
+{
+  "mode": "built-in image_gen",
+  "reference_basis": "project refined ArchChamp render references",
+  "assets": [
+    {
+      "key": "hero",
+      "filename": "hero_front.png",
+      "prompt": "Use case: stylized-concept. Asset type: 16:9 cinematic still for an advanced engineering film. A premium engineering documentary opening hero: the exact same angular white clay concept coupe in the reference, same proportions and five-spoke wheels and faceted dark glass canopy, front three-quarter view, facing frame right, overhead white strip light and crisp cyan neon contour rim lighting, black studio, subtle black floor reflection. Car fills lower-middle two thirds, upper quarter completely black negative space for separately composited typography. Maintain the vehicle identity and schematic mechanical geometry of the supplied reference. Pure black outer background, restrained white/cyan neon palette, exceptionally high quality. No text, no labels, no equations, no watermark, no logos. Wide landscape composition. This is an illustrative engineering reconstruction.",
+      "origin": "/home/kingnit/.codex/generated_images/01a14914-509b-71f1-9e64-40a0659c4f64/exec-c5ff742c-1040-4191-822d-8340d4a1c33e.png",
+      "generator": "built-in image_gen",
+      "role": "illustrative cinematic asset; not measured engineering data",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "ffd851763305c01dc6f68eda306442f20f32dc47b6cfc6e09dcbfd4a776ebc2b"
+    },
+    {
+      "key": "ramp",
+      "filename": "ramp_stage.png",
+      "prompt": "Use case: stylized-concept. Asset type: 16:9 cinematic still for an advanced engineering film. A premium engineering documentary stage environment matching this idealized inside half-loop ramp reference: huge thin curved steel roadway, a white angular concept coupe small near the inverted apex, dark architectural stage, black background, cyan neon parallel rails, soft white overhead light, elegant monumental scale, camera world upright, no people, no extra vehicles, no scenery. Use the reference ramp geometry and car silhouette. Maintain the vehicle identity and schematic mechanical geometry of the supplied reference. Pure black outer background, restrained white/cyan neon palette, exceptionally high quality. No text, no labels, no equations, no watermark, no logos. Wide landscape composition. This is an illustrative engineering reconstruction.",
+      "origin": "/home/kingnit/.codex/generated_images/01a14914-509b-71f1-9e64-40a0659c4f64/exec-f8bfe94d-6628-4b40-9fd2-061814fea60a.png",
+      "generator": "built-in image_gen",
+      "role": "illustrative cinematic asset; not measured engineering data",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "e21d660005c5c70a14b5c565250623131009389dbfe7db5ec25198f81cd1dbb9"
+    },
+    {
+      "key": "fans",
+      "filename": "fan_macro.png",
+      "prompt": "Use case: stylized-concept. Asset type: 16:9 cinematic still for an advanced engineering film. A polished industrial engineering macro illustration of the supplied concept vehicle underbody with exactly four suction fans arranged two by two, cyan rotor accents, dark graphite casing, flexible perimeter skirts and pale white chassis, underside three-quarter angle, deep black studio background. Preserve the reference layout and the conceptual nature; refine material and illumination, do not add extra machinery. Maintain the vehicle identity and schematic mechanical geometry of the supplied reference. Pure black outer background, restrained white/cyan neon palette, exceptionally high quality. No text, no labels, no equations, no watermark, no logos. Wide landscape composition. This is an illustrative engineering reconstruction.",
+      "origin": "/home/kingnit/.codex/generated_images/01a14914-509b-71f1-9e64-40a0659c4f64/exec-d1a46efe-001b-4943-b5fe-9f75a3f7a180.png",
+      "generator": "built-in image_gen",
+      "role": "illustrative cinematic asset; not measured engineering data",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "7bb7a6fc1deaaefdf0f672f29a0dce3f44fd6aa872fbb98aca9b61855f29d0be"
+    },
+    {
+      "key": "gas",
+      "filename": "gas_macro.png",
+      "prompt": "Use case: stylized-concept. Asset type: 16:9 cinematic still for an advanced engineering film. A premium engineering documentary macro of the conceptual compressed-gas storage system in the reference chassis: two carbon-fiber overwrapped pressure vessels, compact metallic valve manifold and restrained piping, purple and cyan rim lights, partial ghosted vehicle outline, black studio, clean precise industrial product render, no fire or combustion. Maintain the vehicle identity and schematic mechanical geometry of the supplied reference. Pure black outer background, restrained white/cyan neon palette, exceptionally high quality. No text, no labels, no equations, no watermark, no logos. Wide landscape composition. This is an illustrative engineering reconstruction.",
+      "origin": "/home/kingnit/.codex/generated_images/01a14914-509b-71f1-9e64-40a0659c4f64/exec-8795b068-91e0-4144-b20e-905963ddd516.png",
+      "generator": "built-in image_gen",
+      "role": "illustrative cinematic asset; not measured engineering data",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "d112a1da8c7bdd9a14f92b0552c38ea933cd822ea8dffc0ac31c627e03fea567"
+    },
+    {
+      "key": "landing",
+      "filename": "landing_hero.png",
+      "prompt": "Use case: stylized-concept. Asset type: 16:9 cinematic still for an advanced engineering film. A premium engineering documentary closing hero with the exact same angular white concept coupe as the reference, same canopy shape and five-spoke wheels, lower front-quarter view just after a controlled touchdown on a black stage, small amount of cool white cold-gas mist close to the tires, cyan edge light, crisp sculpted surfaces, quiet cinematic lighting, upper quarter black negative space, world upright and car upright. Maintain the vehicle identity and schematic mechanical geometry of the supplied reference. Pure black outer background, restrained white/cyan neon palette, exceptionally high quality. No text, no labels, no equations, no watermark, no logos. Wide landscape composition. This is an illustrative engineering reconstruction.",
+      "origin": "/home/kingnit/.codex/generated_images/01a14914-509b-71f1-9e64-40a0659c4f64/exec-f4d0b5e1-c278-4205-b64c-907866e50219.png",
+      "generator": "built-in image_gen",
+      "role": "illustrative cinematic asset; not measured engineering data",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "10393ece6850402debb67ae4f1c93df8dbc2aa14453f9eb7cbfb98140097b399"
+    }
+  ]
+}

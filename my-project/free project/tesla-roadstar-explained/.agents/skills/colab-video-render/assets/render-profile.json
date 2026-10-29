@@ -1,0 +1,54 @@
+{
+  "profile": "colab-t4-manim-cairo-4k30-cq18",
+  "accelerator": "T4",
+  "python": "3.12",
+  "video": {
+    "renderer": "cairo",
+    "width": 3840,
+    "height": 2160,
+    "fps": 30,
+    "codec": "h264_nvenc",
+    "pixel_format": "yuv420p",
+    "container": "mp4",
+    "container_options": {"movflags": "+faststart"},
+    "encoder_options": {
+      "preset": "p6",
+      "tune": "hq",
+      "rc": "vbr",
+      "cq": "18",
+      "b": "0",
+      "rc-lookahead": "8"
+    },
+    "writer_threads": 1,
+    "max_pending_frames": 2,
+    "encoder_thread_cap": 8
+  },
+  "audio": {
+    "codec": "aac",
+    "bitrate": "192k",
+    "sample_rate": 48000,
+    "start_time_seconds": 0,
+    "ffmpeg_threads": 2,
+    "copy_video_on_mux": true
+  },
+  "python_packages": {
+    "manim": "0.21.0",
+    "av": "18.1.0",
+    "numpy": "2.5.3",
+    "Pillow": "12.3.0"
+  },
+  "apt_packages": [
+    "ffmpeg", "python3.12", "python3.12-dev", "python3.12-venv",
+    "libcairo2-dev", "libpango1.0-dev", "pkg-config", "build-essential",
+    "dvisvgm", "texlive-latex-extra", "texlive-fonts-recommended",
+    "texlive-science", "fonts-dejavu"
+  ],
+  "environment": {
+    "PYTHONUNBUFFERED": "1",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "2",
+    "MPLCONFIGDIR": "/tmp/colab-render-matplotlib",
+    "DEBIAN_FRONTEND": "noninteractive"
+  }
+}

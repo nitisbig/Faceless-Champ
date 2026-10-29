@@ -1,0 +1,547 @@
+{
+  "assets": [
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_wireframe_threequarter",
+      "svg": "01_Vehicle/roadster_wireframe_threequarter.svg",
+      "png": "01_Vehicle/roadster_wireframe_threequarter.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_wireframe_side",
+      "svg": "01_Vehicle/roadster_wireframe_side.svg",
+      "png": "01_Vehicle/roadster_wireframe_side.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_wireframe_rear",
+      "svg": "01_Vehicle/roadster_wireframe_rear.svg",
+      "png": "01_Vehicle/roadster_wireframe_rear.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_wireframe_front",
+      "svg": "01_Vehicle/roadster_wireframe_front.svg",
+      "png": "01_Vehicle/roadster_wireframe_front.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_wireframe_top",
+      "svg": "01_Vehicle/roadster_wireframe_top.svg",
+      "png": "01_Vehicle/roadster_wireframe_top.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_wireframe_elevated",
+      "svg": "01_Vehicle/roadster_wireframe_elevated.svg",
+      "png": "01_Vehicle/roadster_wireframe_elevated.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_ghost_double",
+      "svg": "01_Vehicle/roadster_ghost_double.svg",
+      "png": "01_Vehicle/roadster_ghost_double.png",
+      "background": "transparent"
+    },
+    {
+      "category": "01_Vehicle",
+      "name": "roadster_inverted",
+      "svg": "01_Vehicle/roadster_inverted.svg",
+      "png": "01_Vehicle/roadster_inverted.png",
+      "background": "transparent"
+    },
+    {
+      "category": "02_Ramps_and_Road",
+      "name": "curved_half_loop",
+      "svg": "02_Ramps_and_Road/curved_half_loop.svg",
+      "png": "02_Ramps_and_Road/curved_half_loop.png",
+      "background": "transparent"
+    },
+    {
+      "category": "02_Ramps_and_Road",
+      "name": "wall_and_ceiling",
+      "svg": "02_Ramps_and_Road/wall_and_ceiling.svg",
+      "png": "02_Ramps_and_Road/wall_and_ceiling.png",
+      "background": "transparent"
+    },
+    {
+      "category": "02_Ramps_and_Road",
+      "name": "holographic_track",
+      "svg": "02_Ramps_and_Road/holographic_track.svg",
+      "png": "02_Ramps_and_Road/holographic_track.png",
+      "background": "transparent"
+    },
+    {
+      "category": "02_Ramps_and_Road",
+      "name": "road_tire_contact",
+      "svg": "02_Ramps_and_Road/road_tire_contact.svg",
+      "png": "02_Ramps_and_Road/road_tire_contact.png",
+      "background": "transparent"
+    },
+    {
+      "category": "03_Suction_and_Airflow",
+      "name": "suction_fan_top",
+      "svg": "03_Suction_and_Airflow/suction_fan_top.svg",
+      "png": "03_Suction_and_Airflow/suction_fan_top.png",
+      "background": "transparent"
+    },
+    {
+      "category": "03_Suction_and_Airflow",
+      "name": "four_fan_assembly",
+      "svg": "03_Suction_and_Airflow/four_fan_assembly.svg",
+      "png": "03_Suction_and_Airflow/four_fan_assembly.png",
+      "background": "transparent"
+    },
+    {
+      "category": "03_Suction_and_Airflow",
+      "name": "suction_pressure_cutaway",
+      "svg": "03_Suction_and_Airflow/suction_pressure_cutaway.svg",
+      "png": "03_Suction_and_Airflow/suction_pressure_cutaway.png",
+      "background": "transparent"
+    },
+    {
+      "category": "03_Suction_and_Airflow",
+      "name": "deployable_skirt_cross_section",
+      "svg": "03_Suction_and_Airflow/deployable_skirt_cross_section.svg",
+      "png": "03_Suction_and_Airflow/deployable_skirt_cross_section.png",
+      "background": "transparent"
+    },
+    {
+      "category": "03_Suction_and_Airflow",
+      "name": "underbody_airflow_streamlines",
+      "svg": "03_Suction_and_Airflow/underbody_airflow_streamlines.svg",
+      "png": "03_Suction_and_Airflow/underbody_airflow_streamlines.png",
+      "background": "transparent"
+    },
+    {
+      "category": "03_Suction_and_Airflow",
+      "name": "pressure_field_heatmap",
+      "svg": "03_Suction_and_Airflow/pressure_field_heatmap.svg",
+      "png": "03_Suction_and_Airflow/pressure_field_heatmap.png",
+      "background": "transparent"
+    },
+    {
+      "category": "04_Thrusters",
+      "name": "pressure_vessel_wireframe",
+      "svg": "04_Thrusters/pressure_vessel_wireframe.svg",
+      "png": "04_Thrusters/pressure_vessel_wireframe.png",
+      "background": "transparent"
+    },
+    {
+      "category": "04_Thrusters",
+      "name": "twin_pressure_vessels",
+      "svg": "04_Thrusters/twin_pressure_vessels.svg",
+      "png": "04_Thrusters/twin_pressure_vessels.png",
+      "background": "transparent"
+    },
+    {
+      "category": "04_Thrusters",
+      "name": "cold_gas_thruster_nozzle",
+      "svg": "04_Thrusters/cold_gas_thruster_nozzle.svg",
+      "png": "04_Thrusters/cold_gas_thruster_nozzle.png",
+      "background": "transparent"
+    },
+    {
+      "category": "04_Thrusters",
+      "name": "thruster_jet_plume",
+      "svg": "04_Thrusters/thruster_jet_plume.svg",
+      "png": "04_Thrusters/thruster_jet_plume.png",
+      "background": "transparent"
+    },
+    {
+      "category": "04_Thrusters",
+      "name": "valve_piping_schematic",
+      "svg": "04_Thrusters/valve_piping_schematic.svg",
+      "png": "04_Thrusters/valve_piping_schematic.png",
+      "background": "transparent"
+    },
+    {
+      "category": "04_Thrusters",
+      "name": "vehicle_thruster_layout",
+      "svg": "04_Thrusters/vehicle_thruster_layout.svg",
+      "png": "04_Thrusters/vehicle_thruster_layout.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "gravity_vector",
+      "svg": "05_Force_Vectors/gravity_vector.svg",
+      "png": "05_Force_Vectors/gravity_vector.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "normal_vector",
+      "svg": "05_Force_Vectors/normal_vector.svg",
+      "png": "05_Force_Vectors/normal_vector.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "friction_vector",
+      "svg": "05_Force_Vectors/friction_vector.svg",
+      "png": "05_Force_Vectors/friction_vector.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "suction_vector",
+      "svg": "05_Force_Vectors/suction_vector.svg",
+      "png": "05_Force_Vectors/suction_vector.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "velocity_vector",
+      "svg": "05_Force_Vectors/velocity_vector.svg",
+      "png": "05_Force_Vectors/velocity_vector.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "thrust_vector",
+      "svg": "05_Force_Vectors/thrust_vector.svg",
+      "png": "05_Force_Vectors/thrust_vector.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "xyz_axes",
+      "svg": "05_Force_Vectors/xyz_axes.svg",
+      "png": "05_Force_Vectors/xyz_axes.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "torque_roll_arc",
+      "svg": "05_Force_Vectors/torque_roll_arc.svg",
+      "png": "05_Force_Vectors/torque_roll_arc.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "center_of_mass_target",
+      "svg": "05_Force_Vectors/center_of_mass_target.svg",
+      "png": "05_Force_Vectors/center_of_mass_target.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "incline_angle_arc",
+      "svg": "05_Force_Vectors/incline_angle_arc.svg",
+      "png": "05_Force_Vectors/incline_angle_arc.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "force_decomposition",
+      "svg": "05_Force_Vectors/force_decomposition.svg",
+      "png": "05_Force_Vectors/force_decomposition.png",
+      "background": "transparent"
+    },
+    {
+      "category": "05_Force_Vectors",
+      "name": "six_dof_axes",
+      "svg": "05_Force_Vectors/six_dof_axes.svg",
+      "png": "05_Force_Vectors/six_dof_axes.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "perspective_grid",
+      "svg": "06_Simulation_Overlays/perspective_grid.svg",
+      "png": "06_Simulation_Overlays/perspective_grid.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "data_panel_blank",
+      "svg": "06_Simulation_Overlays/data_panel_blank.svg",
+      "png": "06_Simulation_Overlays/data_panel_blank.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "trajectory_parabola",
+      "svg": "06_Simulation_Overlays/trajectory_parabola.svg",
+      "png": "06_Simulation_Overlays/trajectory_parabola.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "angular_velocity_plot",
+      "svg": "06_Simulation_Overlays/angular_velocity_plot.svg",
+      "png": "06_Simulation_Overlays/angular_velocity_plot.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "thrust_curve",
+      "svg": "06_Simulation_Overlays/thrust_curve.svg",
+      "png": "06_Simulation_Overlays/thrust_curve.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "altitude_velocity_graph",
+      "svg": "06_Simulation_Overlays/altitude_velocity_graph.svg",
+      "png": "06_Simulation_Overlays/altitude_velocity_graph.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "control_loop",
+      "svg": "06_Simulation_Overlays/control_loop.svg",
+      "png": "06_Simulation_Overlays/control_loop.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "measurement_reticle",
+      "svg": "06_Simulation_Overlays/measurement_reticle.svg",
+      "png": "06_Simulation_Overlays/measurement_reticle.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "timeline_beats",
+      "svg": "06_Simulation_Overlays/timeline_beats.svg",
+      "png": "06_Simulation_Overlays/timeline_beats.png",
+      "background": "transparent"
+    },
+    {
+      "category": "06_Simulation_Overlays",
+      "name": "equation_frame",
+      "svg": "06_Simulation_Overlays/equation_frame.svg",
+      "png": "06_Simulation_Overlays/equation_frame.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "01_gravity",
+      "svg": "07_Equations/01_gravity.svg",
+      "png": "07_Equations/01_gravity.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "02_normal",
+      "svg": "07_Equations/02_normal.svg",
+      "png": "07_Equations/02_normal.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "03_friction",
+      "svg": "07_Equations/03_friction.svg",
+      "png": "07_Equations/03_friction.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "04_friction_limit",
+      "svg": "07_Equations/04_friction_limit.svg",
+      "png": "07_Equations/04_friction_limit.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "05_suction_pressure",
+      "svg": "07_Equations/05_suction_pressure.svg",
+      "png": "07_Equations/05_suction_pressure.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "06_suction_normal",
+      "svg": "07_Equations/06_suction_normal.svg",
+      "png": "07_Equations/06_suction_normal.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "07_centripetal",
+      "svg": "07_Equations/07_centripetal.svg",
+      "png": "07_Equations/07_centripetal.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "08_loop_contact",
+      "svg": "07_Equations/08_loop_contact.svg",
+      "png": "07_Equations/08_loop_contact.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "09_rocket_thrust",
+      "svg": "07_Equations/09_rocket_thrust.svg",
+      "png": "07_Equations/09_rocket_thrust.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "10_torque",
+      "svg": "07_Equations/10_torque.svg",
+      "png": "07_Equations/10_torque.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "11_roll",
+      "svg": "07_Equations/11_roll.svg",
+      "png": "07_Equations/11_roll.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "12_roll_accel",
+      "svg": "07_Equations/12_roll_accel.svg",
+      "png": "07_Equations/12_roll_accel.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "13_euler_rotation",
+      "svg": "07_Equations/13_euler_rotation.svg",
+      "png": "07_Equations/13_euler_rotation.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "14_vertical_flight",
+      "svg": "07_Equations/14_vertical_flight.svg",
+      "png": "07_Equations/14_vertical_flight.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "15_freefall",
+      "svg": "07_Equations/15_freefall.svg",
+      "png": "07_Equations/15_freefall.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "16_energy",
+      "svg": "07_Equations/16_energy.svg",
+      "png": "07_Equations/16_energy.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "17_thrust_flow",
+      "svg": "07_Equations/17_thrust_flow.svg",
+      "png": "07_Equations/17_thrust_flow.png",
+      "background": "transparent"
+    },
+    {
+      "category": "07_Equations",
+      "name": "18_braking",
+      "svg": "07_Equations/18_braking.svg",
+      "png": "07_Equations/18_braking.png",
+      "background": "transparent"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_01_the_impossible_maneuver",
+      "svg": "08_Scene_Layouts/scene_01_the_impossible_maneuver.svg",
+      "png": "08_Scene_Layouts/scene_01_the_impossible_maneuver.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_02_vehicle_reconstruction",
+      "svg": "08_Scene_Layouts/scene_02_vehicle_reconstruction.svg",
+      "png": "08_Scene_Layouts/scene_02_vehicle_reconstruction.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_03_friction_limit",
+      "svg": "08_Scene_Layouts/scene_03_friction_limit.svg",
+      "png": "08_Scene_Layouts/scene_03_friction_limit.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_04_powered_suction",
+      "svg": "08_Scene_Layouts/scene_04_powered_suction.svg",
+      "png": "08_Scene_Layouts/scene_04_powered_suction.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_05_inverted_curvature",
+      "svg": "08_Scene_Layouts/scene_05_inverted_curvature.svg",
+      "png": "08_Scene_Layouts/scene_05_inverted_curvature.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_06_cold-gas_propulsion",
+      "svg": "08_Scene_Layouts/scene_06_cold-gas_propulsion.svg",
+      "png": "08_Scene_Layouts/scene_06_cold-gas_propulsion.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_07_controlled_half-roll",
+      "svg": "08_Scene_Layouts/scene_07_controlled_half-roll.svg",
+      "png": "08_Scene_Layouts/scene_07_controlled_half-roll.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_08_six-axis_control",
+      "svg": "08_Scene_Layouts/scene_08_six-axis_control.svg",
+      "png": "08_Scene_Layouts/scene_08_six-axis_control.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_09_powered_descent",
+      "svg": "08_Scene_Layouts/scene_09_powered_descent.svg",
+      "png": "08_Scene_Layouts/scene_09_powered_descent.png",
+      "background": "black"
+    },
+    {
+      "category": "08_Scene_Layouts",
+      "name": "scene_10_the_complete_physics",
+      "svg": "08_Scene_Layouts/scene_10_the_complete_physics.svg",
+      "png": "08_Scene_Layouts/scene_10_the_complete_physics.png",
+      "background": "black"
+    }
+  ],
+  "palette": {
+    "bg": "#050911",
+    "panel": "#0B1827",
+    "panel2": "#0C2131",
+    "grid": "#1C4055",
+    "muted": "#678BA2",
+    "cyan": "#57EDFF",
+    "blue": "#359CFF",
+    "purple": "#AF82FF",
+    "pink": "#FF6CCB",
+    "orange": "#FF985A",
+    "amber": "#FFC46B",
+    "green": "#72F7BA",
+    "white": "#F3FAFF",
+    "dim": "#53728C",
+    "red": "#FF6572"
+  },
+  "canvas": {
+    "width": 1600,
+    "height": 900,
+    "PNG_export": [
+      1920,
+      1080
+    ]
+  }
+}
