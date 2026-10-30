@@ -16,6 +16,8 @@ CPU-only machines. `backend="moderngl"` rejects them with a clear error, and
 | SVG import | `SVG("logo.svg", width=400)` | Importing vector artwork |
 | Custom shaders | `ShaderFill`, `ShaderEffect` (SkSL) | Pixel Bender / custom effects |
 | Displacement | `DisplacementMap(amplitude, size, speed, map)` | Turbulent Displace / Displacement Map |
+| Lighting | `Lighting(light, azimuth, elevation, bevel, depth, specular)` | Bevel and Emboss / Lights |
+| Morphology | `Morphology(radius, mode="dilate" or "erode")` | Minimax / Simple Choker |
 | Path effects | `round_corners=24`, `jitter=(8, 2.5)` | Round Corners / Roughen Edges |
 | 2.5D layers | `tilt_x`, `tilt_y`, `perspective`, `animate.tilt_to()` | 3D layer rotation + camera |
 | Math | `Equation("mat(1, 2; 3, 4)", engine="typst")`, `MathGlyphs(...)` | (none built in) |
@@ -213,6 +215,45 @@ scene.play(title.animate.effect_to("displacement", amplitude=0), run_time=1.2)  
 
 With `map="assets/map.png"` the red/green channels of an image displace x/y
 (mid grey means no shift), stretched over the component.
+
+## Lighting (bevel and emboss)
+
+`Lighting` treats a layer's alpha as a height map and shades it with Skia's
+diffuse and specular lighting filters. Flat areas keep their color; edges
+facing the light brighten and the far edges darken.
+
+```python
+from faceless_champ import Canvas, EffectStack, Lighting, Scene, Text
+
+scene = Scene(Canvas(1920, 1080, bg="#0E1116"))
+emboss = EffectStack(lighting=Lighting(azimuth=225, elevation=40, bevel=8, depth=5, specular=0.6))
+title = Text("CHROME", font_size=200, color="#8FA3BF", effects=emboss, position=(960, 540))
+scene.add(title)
+scene.play(title.animate.effect_to("lighting", azimuth=315), run_time=2)  # the light swings round
+```
+
+- `light="distant"` (default): `azimuth` degrees (0 = from the right, 90 = from
+  below, 225 = top-left) and `elevation` (0-90).
+- `light="point"` / `"spot"`: placed at `x`, `y` (fractions of the component
+  box, may lie outside it) and `height` design pixels above it. A spot aims at
+  the box centre with a `cone` half-angle in degrees.
+- `bevel` (edge softness, design px), `depth` (negative debosses), `diffuse`,
+  `specular`, `shininess` (1-128), `color` (light tint) and `mix` (0-1).
+
+## Morphology (dilate and erode)
+
+```python
+from faceless_champ import EffectStack, Morphology, Text
+
+bold = Text("Grow", font_size=120, effects=EffectStack(morphology=Morphology(radius=6)))
+thin = Text("Thin", font_size=120, effects=EffectStack(morphology=Morphology(radius=2, mode="erode")))
+# scene.play(bold.animate.effect_to("morphology", radius=0))
+```
+
+`radius` is in design pixels and is applied in whole output pixels. Dilate
+thickens strokes, fills small gaps and merges nearby shapes; erode thins them
+and removes fine detail. Morphology runs first, then displacement, lighting and
+any `ShaderEffect`, so a dilated shape is also what gets lit.
 
 ## Typst math
 

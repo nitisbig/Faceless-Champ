@@ -55,7 +55,7 @@ _LABELS = {
     "compound_paths": "Compound paths",
     "path_masks": "PathMask",
     "blend_modes": "Blend modes",
-    "skia_effects": "DisplacementMap/ShaderEffect",
+    "skia_effects": "DisplacementMap/ShaderEffect/Lighting/Morphology",
     "path_effects": "round_corners/jitter",
     "perspective": "Perspective tilt",
 }

@@ -1,4 +1,5 @@
-"""Blend modes, Trim Paths/dashes, path booleans, SVG, SkSL shaders, displacement, Typst math."""
+"""Blend modes, Trim Paths/dashes, path booleans, SVG, SkSL shaders, displacement, lighting,
+morphology, Typst math."""
 
 import pytest
 
@@ -11,7 +12,9 @@ from faceless_champ import (
     EffectStack,
     Equation,
     Group,
+    Lighting,
     Line,
+    Morphology,
     PathData,
     PillowRenderer,
     Rectangle,
@@ -279,6 +282,93 @@ def test_effect_stack_static_fields():
     assert stack.time_dependent and stack.uses_skia
     assert stack.evaluated({"effect.shader.mix": 0.25}).shader.mix == 0.25
     assert stack.padding >= 12
+
+
+@pytest.mark.parametrize("make", BACKENDS, ids=IDS)
+def test_morphology_dilates_and_erodes(make):
+    s = Scene(Canvas(80, 40, bg="#000000"))
+    s.add(
+        Rectangle(
+            width=20,
+            height=20,
+            fill="#FFFFFF",
+            stroke=None,
+            position=(20, 20),
+            effects=EffectStack(morphology=Morphology(radius=4)),
+        )
+    )
+    s.add(
+        Rectangle(
+            width=20,
+            height=20,
+            fill="#FFFFFF",
+            stroke=None,
+            position=(60, 20),
+            effects=EffectStack(morphology=Morphology(radius=4, mode="erode")),
+        )
+    )
+    s.wait(1)
+    image = frame(make, s)
+    assert image.getpixel((8, 20))[0] > 200  # grown past the left edge (x=10)
+    assert image.getpixel((52, 20))[0] < 50  # shrunk inside the left edge (x=50)
+    assert image.getpixel((60, 20))[0] > 200
+
+
+@pytest.mark.parametrize("make", BACKENDS, ids=IDS)
+def test_lighting_bevels_toward_the_light(make):
+    s = Scene(Canvas(80, 80, bg="#000000"))
+    s.add(
+        Rectangle(
+            width=60,
+            height=60,
+            fill="#808080",
+            stroke=None,
+            position=(40, 40),
+            effects=EffectStack(lighting=Lighting(azimuth=180, elevation=30, specular=0)),
+        )
+    )
+    s.wait(1)
+    image = frame(make, s)
+    lit, shaded, flat = image.getpixel((12, 40)), image.getpixel((68, 40)), image.getpixel((40, 40))
+    assert lit[0] > flat[0] + 10 and shaded[0] < flat[0] - 10  # light from the left
+    assert close(flat[:3], (128, 128, 128), tol=12)  # flat areas keep their color
+    assert image.getpixel((5, 5))[:3] == (0, 0, 0)  # nothing lit outside the shape
+
+
+@pytest.mark.parametrize("light", ["point", "spot"])
+def test_point_and_spot_lighting_render(light):
+    s = Scene(Canvas(60, 60, bg="#000000"))
+    s.add(
+        Circle(
+            25,
+            fill="#4060C0",
+            stroke=None,
+            position=(30, 30),
+            effects=EffectStack(lighting=Lighting(light=light, x=0.2, y=0.2, height=40)),
+        )
+    )
+    s.wait(1)
+    image = frame(lambda: SkiaRenderer(1), s)
+    assert image.getpixel((30, 30))[3] == 255 and image.getpixel((2, 2))[:3] == (0, 0, 0)
+
+
+def test_lighting_and_morphology_validation_and_animation():
+    with pytest.raises(ValueError, match="mode"):
+        Morphology(mode="open")
+    with pytest.raises(ValueError, match="light"):
+        Lighting(light="area")
+    with pytest.raises(ValueError, match="elevation"):
+        Lighting(elevation=120)
+    stack = EffectStack(lighting=Lighting(), morphology=Morphology(radius=6))
+    assert stack.uses_skia and not stack.time_dependent and stack.padding >= 6
+    state = stack.state()
+    assert "effect.lighting.azimuth" in state and "effect.lighting.light" not in state
+    assert "effect.morphology.mode" not in state
+    assert stack.evaluated({"effect.lighting.azimuth": 315}).lighting.azimuth == 315
+    r = Rectangle(width=10, height=10, effects=stack)
+    r.animate.effect_to("lighting", azimuth=-45, depth=-3)
+    with pytest.raises(ValueError, match="exceeds"):
+        r.animate.effect_to("lighting", elevation=95)
 
 
 # ----- Typst math -------------------------------------------------------------------------

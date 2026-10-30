@@ -99,6 +99,8 @@ _EXPORTS = {
     "BLEND_MODES": ("blending", "BLEND_MODES"),
     "DisplacementMap": ("effects", "DisplacementMap"),
     "ShaderEffect": ("effects", "ShaderEffect"),
+    "Lighting": ("effects", "Lighting"),
+    "Morphology": ("effects", "Morphology"),
     "ShaderFill": ("shaders", "ShaderFill"),
     "SVG": ("svg", "SVG"),
     "MathGlyphs": ("typst_math", "MathGlyphs"),
@@ -469,6 +471,8 @@ __all__ = [  # noqa: RUF022
     "ShaderFill",
     "SVG",
     "MathGlyphs",
+    "Lighting",
+    "Morphology",
 ]
 
 

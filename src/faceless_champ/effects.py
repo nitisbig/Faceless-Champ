@@ -133,6 +133,68 @@ class ShaderEffect(_Effect):
             pass
 
 
+@dataclass(frozen=True)
+class Morphology(_Effect):
+    """Grow (``mode="dilate"``) or shrink (``"erode"``) a layer's shapes (CPU/Skia).
+
+    ``radius`` is in design pixels and animatable; Skia applies it in whole
+    output pixels, so slow animations step. Dilate thickens strokes and text
+    or merges nearby shapes; erode thins them and removes small details.
+    """
+
+    _static = ("mode",)
+    radius: float = 4
+    mode: str = "dilate"
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.mode not in {"dilate", "erode"}:
+            raise ValueError("Morphology mode must be 'dilate' or 'erode'")
+
+
+@dataclass(frozen=True)
+class Lighting(_Effect):
+    """Light a layer as a raised surface, using its alpha as a height map (CPU/Skia).
+
+    ``light`` is ``"distant"`` (sun-like: ``azimuth`` degrees, 0 = from the
+    right, 90 = from below, 225 = top-left; ``elevation`` 0-90 degrees),
+    ``"point"`` or ``"spot"`` (at ``x``/``y`` as fractions of the component
+    box, ``height`` design pixels above it; a spot aims at the box centre with
+    a ``cone`` half-angle in degrees). ``bevel`` is the edge softness in design
+    pixels, ``depth`` the surface height (negative = debossed), ``diffuse``
+    the shading strength (flat areas keep their color), ``specular`` and
+    ``shininess`` the highlight. ``color`` tints the light. All numbers
+    animate, e.g. ``animate.effect_to("lighting", azimuth=315)``.
+    """
+
+    _static = ("color", "light")
+    light: str = "distant"
+    azimuth: float = 225
+    elevation: float = 40
+    x: float = 0.2
+    y: float = 0.2
+    height: float = 240
+    cone: float = 35
+    bevel: float = 6
+    depth: float = 4
+    diffuse: float = 1
+    specular: float = 0.5
+    shininess: float = 32
+    color: str = "#FFFFFF"
+    mix: float = 1
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.light not in {"distant", "point", "spot"}:
+            raise ValueError("Lighting light must be 'distant', 'point' or 'spot'")
+        if not 0 <= self.elevation <= 90:
+            raise ValueError("Lighting elevation must be in [0, 90] degrees")
+        if not 0 < self.cone <= 90:
+            raise ValueError("Lighting cone must be in (0, 90] degrees")
+        if not 1 <= self.shininess <= 128:
+            raise ValueError("Lighting shininess must be in [1, 128]")
+
+
 _TYPES = {
     "blur": GaussianBlur,
     "glow": OuterGlow,
@@ -142,10 +204,12 @@ _TYPES = {
     "light_sweep": LightSweep,
     "displacement": DisplacementMap,
     "shader": ShaderEffect,
+    "morphology": Morphology,
+    "lighting": Lighting,
 }
 
 # Effects implemented with Skia on the CPU compositor only (not the ModernGL shaders).
-SKIA_EFFECTS = frozenset({"displacement", "shader"})
+SKIA_EFFECTS = frozenset({"displacement", "shader", "morphology", "lighting"})
 
 
 def _phase(time, speed, period=math.tau):
@@ -153,17 +217,20 @@ def _phase(time, speed, period=math.tau):
     return math.remainder(time, period / abs(speed)) * speed if speed else 0.0
 
 
+_LIMITS = {
+    **dict.fromkeys(("threshold", "width", "mix"), 1),
+    **dict.fromkeys(("radius", "offset", "amplitude", "size", "seed", "height"), 4096),
+    **dict.fromkeys(("elevation", "cone"), 90),
+    "azimuth": 720,
+    "shininess": 128,
+}
+
+
 def validate_effect_value(key, value):
     parameter = key.rsplit(".", 1)[-1]
-    signed = parameter in {"offset", "amplitude", "speed"}
+    signed = parameter in {"offset", "amplitude", "speed", "azimuth", "x", "y", "depth"}
     value = finite(value, key, None if signed else 0)
-    limit = (
-        1
-        if parameter in {"threshold", "width", "mix"}
-        else 4096
-        if parameter in {"radius", "offset", "amplitude", "size", "seed"}
-        else 64
-    )
+    limit = _LIMITS.get(parameter, 64)
     if abs(value) > limit:
         raise ValueError(f"{key} exceeds {limit}")
     return value
@@ -179,6 +246,8 @@ class EffectStack:
     light_sweep: LightSweep | None = None
     displacement: DisplacementMap | None = None
     shader: ShaderEffect | None = None
+    morphology: Morphology | None = None
+    lighting: Lighting | None = None
 
     def __post_init__(self):
         for name, cls in _TYPES.items():
@@ -230,6 +299,7 @@ class EffectStack:
         return math.ceil(
             (abs(self.distortion.amplitude) if self.distortion else 0)
             + (abs(self.displacement.amplitude) if self.displacement else 0)
+            + (self.morphology.radius if self.morphology and self.morphology.mode == "dilate" else 0)
             + (abs(self.chromatic.offset) if self.chromatic else 0)
             + (3 * self.blur.radius if self.blur else 0)
             + max(3 * self.glow.radius if self.glow else 0, 3 * self.bloom.radius if self.bloom else 0)
@@ -274,6 +344,8 @@ __all__ = [
     "EffectStack",
     "GaussianBlur",
     "LightSweep",
+    "Lighting",
+    "Morphology",
     "OuterGlow",
     "ShaderEffect",
 ]

@@ -187,7 +187,7 @@ with theme.use():
 ```
 
 More: `PathData` booleans (`a - b`), `SVG("logo.svg")`, `ShaderFill(sksl)`,
-`EffectStack(displacement=DisplacementMap(...))` and `Equation("mat(1, 2; 3, 4)", engine="typst")`.
+`EffectStack(displacement=DisplacementMap(...), lighting=Lighting(), morphology=Morphology(radius=4))` and `Equation("mat(1, 2; 3, 4)", engine="typst")`.
 See [docs/compositing.md](compositing.md).
 
 ## Narration timing (pattern, not executed)

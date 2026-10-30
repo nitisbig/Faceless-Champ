@@ -91,7 +91,9 @@ booleans a | b, a & b, a - b, a ^ b, .to_svg(); show with VectorPath(path, ...).
 SVG("icon.svg" or markup, width=, color=) renders vector art crisply at any size.
 ShaderFill(sksl, width=, height=, uniforms=) paints a custom SkSL program (iTime,
 iResolution built in). EffectStack(shader=ShaderEffect(sksl), displacement=DisplacementMap(
-amplitude=12, size=120, speed=0, map=None)). Equation(expr, engine="typst") typesets Typst
+amplitude=12, size=120, speed=0, map=None), lighting=Lighting(light="distant"|"point"|"spot",
+azimuth=225, elevation=40, bevel=6, depth=4, specular=0.5), morphology=Morphology(radius=4,
+mode="dilate"|"erode")). Equation(expr, engine="typst") typesets Typst
 math: mat(1, 2; 3, 4), cases(...), integral_0^oo, sqrt(x), a/b. MathGlyphs(expr, font_size=,
 position=, outline=True) gives one VectorPath per symbol (eq.glyphs) for Draw/reveal/color.
 Shapes: round_corners=r, jitter=(segment, deviation) (Skia). Any component: tilt_x, tilt_y,

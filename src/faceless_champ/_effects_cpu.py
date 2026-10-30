@@ -104,8 +104,12 @@ def content(source, stack, scale, time, content_box=None):
         # Skia-backed layer filters run first, on encoded pixels, then the float pipeline.
         from . import _skia_fx
 
+        if stack.morphology is not None and stack.morphology.radius > 0:
+            source = _skia_fx.morphology(source, stack.morphology, scale)
         if stack.displacement is not None and stack.displacement.amplitude:
             source = _skia_fx.displace(source, stack.displacement, time, scale, content_box)
+        if stack.lighting is not None and stack.lighting.mix > 0:
+            source = _skia_fx.lighting(source, stack.lighting, scale, content_box)
         if stack.shader is not None and stack.shader.mix > 0:
             e = stack.shader
             source = _skia_fx.layer_shader(
