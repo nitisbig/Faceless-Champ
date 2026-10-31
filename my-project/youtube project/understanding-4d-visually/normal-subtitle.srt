@@ -1,0 +1,720 @@
+1
+00:00:00,030 --> 00:00:02,990
+This is a cheetah at full sprint, but
+
+2
+00:00:02,990 --> 00:00:06,470
+slow it down and something strange appears. Every
+
+3
+00:00:06,470 --> 00:00:09,360
+video is just a stack of flat pictures.
+
+4
+00:00:09,360 --> 00:00:12,150
+Stack them one behind another and time becomes
+
+5
+00:00:12,150 --> 00:00:14,790
+a direction you can point to. Playing the
+
+6
+00:00:14,790 --> 00:00:17,430
+video is simply sliding a flat slice through
+
+7
+00:00:17,430 --> 00:00:20,040
+a solid block. Now take a cube. We
+
+8
+00:00:20,040 --> 00:00:22,630
+only ever see its flat shadow, yet our
+
+9
+00:00:22,630 --> 00:00:25,710
+brains understand it instantly. So if a cube
+
+10
+00:00:25,710 --> 00:00:29,770
+casts a two-dimensional shadow, what casts a three-dimensional
+
+11
+00:00:29,770 --> 00:00:32,980
+one? An object from the fourth dimension, and
+
+12
+00:00:32,980 --> 00:00:35,360
+this is what its shadow looks like. By
+
+13
+00:00:35,360 --> 00:00:37,100
+the end of this video, you will not
+
+14
+00:00:37,100 --> 00:00:40,240
+just see this shape. You will understand it.
+
+15
+00:00:40,240 --> 00:00:42,470
+Using vectors and a little linear algebra, we
+
+16
+00:00:42,470 --> 00:00:45,710
+will count its corners, measure its diagonal, slice
+
+17
+00:00:45,710 --> 00:00:47,410
+it, and rotate it in a way that
+
+18
+00:00:47,410 --> 00:00:50,820
+is impossible in our world. So first, what
+
+19
+00:00:50,820 --> 00:00:54,030
+actually is a dimension? Imagine an ant on
+
+20
+00:00:54,030 --> 00:00:56,160
+a wire. To say where it is, you
+
+21
+00:00:56,160 --> 00:00:58,960
+need one number, how far along the wire,
+
+22
+00:00:58,960 --> 00:01:01,460
+one dimension. Put the ant on a table
+
+23
+00:01:01,460 --> 00:01:03,710
+and you need two, how far right, and
+
+24
+00:01:03,710 --> 00:01:06,150
+how far forward. Let it fly into the
+
+25
+00:01:06,150 --> 00:01:08,640
+room and you need a third, how high.
+
+26
+00:01:08,640 --> 00:01:11,300
+So a dimension is simply the number of
+
+27
+00:01:11,300 --> 00:01:14,120
+independent numbers you need to describe a position.
+
+28
+00:01:14,120 --> 00:01:16,580
+We write those numbers as a vector. The
+
+29
+00:01:16,580 --> 00:01:19,770
+vector three to five means three steps along
+
+30
+00:01:19,770 --> 00:01:22,920
+x, two along y, and five along z.
+
+31
+00:01:22,950 --> 00:01:25,580
+Each direction has its own unit arrow, called
+
+32
+00:01:25,580 --> 00:01:27,600
+a basis vector, and every point is just
+
+33
+00:01:27,600 --> 00:01:30,150
+a mix of those arrows. Now here is
+
+34
+00:01:30,150 --> 00:01:32,900
+the trick. Nothing forces us to stop at
+
+35
+00:01:32,900 --> 00:01:35,410
+three. Add a fourth number, w, and a
+
+36
+00:01:35,410 --> 00:01:37,990
+fourth arrow, at right angles to x, y,
+
+37
+00:01:37,990 --> 00:01:40,710
+and z all at once. You cannot picture
+
+38
+00:01:40,710 --> 00:01:42,700
+where it points, but you can add it,
+
+39
+00:01:42,700 --> 00:01:45,130
+scale it, and measure it exactly like the
+
+40
+00:01:45,130 --> 00:01:48,120
+others. The algebra does not even flinch. You
+
+41
+00:01:48,120 --> 00:01:50,610
+have already seen a space like this. Three
+
+42
+00:01:50,610 --> 00:01:53,080
+pixel in the Cheetah video needs three numbers.
+
+43
+00:01:53,080 --> 00:01:55,880
+It's x, it's y, and it's frame. The
+
+44
+00:01:55,880 --> 00:01:58,840
+video is a three-dimensional block, where the third
+
+45
+00:01:58,840 --> 00:02:01,560
+direction is time. Add one more number, and
+
+46
+00:02:01,560 --> 00:02:04,010
+you have four dimensions. So let's build a
+
+47
+00:02:04,010 --> 00:02:07,670
+four-dimensional object with one simple move. Drag a
+
+48
+00:02:07,670 --> 00:02:10,300
+shape along a new direction. Drag a point
+
+49
+00:02:10,300 --> 00:02:12,340
+along x, and you get a line segment
+
+50
+00:02:12,340 --> 00:02:14,880
+with two ends. Drag the segment along y,
+
+51
+00:02:14,880 --> 00:02:17,240
+and you get a square with four corners.
+
+52
+00:02:17,270 --> 00:02:19,340
+Drag the square along z, and you get
+
+53
+00:02:19,340 --> 00:02:21,820
+a cube with eight corners. Now drag the
+
+54
+00:02:21,820 --> 00:02:24,720
+cube along w, the direction we cannot see.
+
+55
+00:02:24,720 --> 00:02:28,290
+The result is a tesseract, a hypercube. Every
+
+56
+00:02:28,290 --> 00:02:31,160
+drag copies the shape, so the corners double.
+
+57
+00:02:31,160 --> 00:02:35,080
+One, two, four, eight, sixteen. A cube in
+
+58
+00:02:35,080 --> 00:02:37,670
+end dimensions has two to the power n
+
+59
+00:02:37,670 --> 00:02:40,890
+corners. Edges follow a pattern, too. You keep
+
+60
+00:02:40,890 --> 00:02:43,060
+the edges of both copies and add one
+
+61
+00:02:43,060 --> 00:02:45,450
+new edge for every corner that moved. A
+
+62
+00:02:45,450 --> 00:02:48,520
+cube has two times four plus four, which
+
+63
+00:02:48,520 --> 00:02:51,690
+is twelve edges. A tesseract has two times
+
+64
+00:02:51,690 --> 00:02:55,240
+twelve plus eight, which is thirty-two edges. It
+
+65
+00:02:55,240 --> 00:02:58,600
+also has twenty-four square faces and eight cubes
+
+66
+00:02:58,600 --> 00:03:01,930
+as its walls. In coordinates, every corner is
+
+67
+00:03:01,930 --> 00:03:05,230
+made of zeros and ones. Zero, zero, zero,
+
+68
+00:03:05,230 --> 00:03:08,360
+zero is one corner. One, one, one, one
+
+69
+00:03:08,360 --> 00:03:12,840
+is the opposite corner. Sixteen combinations, sixteen corners.
+
+70
+00:03:12,870 --> 00:03:16,840
+Third we can measure it. By Pythagoras, the
+
+71
+00:03:16,840 --> 00:03:18,140
+diagonal of a unit square is the square
+
+72
+00:03:18,140 --> 00:03:19,410
+root of one plus one, which is the
+
+73
+00:03:19,410 --> 00:03:21,790
+square root of two. A cube adds one
+
+74
+00:03:21,790 --> 00:03:24,720
+more term, giving the square root of three.
+
+75
+00:03:24,720 --> 00:03:27,600
+A tesseract adds one more, giving the square
+
+76
+00:03:27,600 --> 00:03:30,910
+root of four. Exactly two. The length of
+
+77
+00:03:30,910 --> 00:03:32,860
+any vector is the square root of the
+
+78
+00:03:32,860 --> 00:03:34,890
+sum of its squared parts, whether it has
+
+79
+00:03:34,890 --> 00:03:37,900
+two parts or two thousand. But how would
+
+80
+00:03:37,900 --> 00:03:41,230
+we actually see a four-dimensional object? Only in
+
+81
+00:03:41,230 --> 00:03:44,660
+pieces. To understand why, shrink down by one
+
+82
+00:03:44,660 --> 00:03:47,250
+dimension. Imagine a flat creature living on a
+
+83
+00:03:47,250 --> 00:03:49,740
+sheet of paper. A ball falls through its
+
+84
+00:03:49,740 --> 00:03:52,360
+world. The creature never sees a ball. It
+
+85
+00:03:52,360 --> 00:03:55,080
+sees a dot appear, growing to a circle,
+
+86
+00:03:55,080 --> 00:03:58,310
+shrink, and vanish. Each moment is one slice
+
+87
+00:03:58,310 --> 00:04:00,980
+of the sphere. One level up, a four-dimensional
+
+88
+00:04:00,980 --> 00:04:03,120
+ball passing through our space would look like
+
+89
+00:04:03,120 --> 00:04:06,700
+a tiny sphere appearing from nowhere, swelling, shrinking,
+
+90
+00:04:06,700 --> 00:04:09,540
+and disappearing. That is exactly what playing the
+
+91
+00:04:09,540 --> 00:04:12,120
+Cheetah video did. Each frame was one slice
+
+92
+00:04:12,120 --> 00:04:15,680
+of a three-dimensional block. Slices of a tesseract
+
+93
+00:04:15,680 --> 00:04:18,400
+are even stranger. Push it through corner first,
+
+94
+00:04:18,400 --> 00:04:20,380
+and you first see a tiny tetrahedron, a
+
+95
+00:04:20,380 --> 00:04:24,290
+triangular pyramid. It grows, its corners get clipped,
+
+96
+00:04:24,290 --> 00:04:26,310
+and at the middle it becomes a perfect
+
+97
+00:04:26,310 --> 00:04:29,800
+octahedron, like two pyramids glued base to base.
+
+98
+00:04:29,800 --> 00:04:32,760
+Then it all plays in reverse. Same object,
+
+99
+00:04:32,760 --> 00:04:36,560
+completely different slices, depending only on its angle.
+
+100
+00:04:36,590 --> 00:04:39,220
+Just show one piece at a time, shadows
+
+101
+00:04:39,220 --> 00:04:41,850
+show everything at once. And a shadow is
+
+102
+00:04:41,850 --> 00:04:45,040
+pure linear algebra. Shine a light straight down
+
+103
+00:04:45,040 --> 00:04:46,760
+on a cube, and the shadow forgets the
+
+104
+00:04:46,760 --> 00:04:49,940
+height. Every point x, y, z lands at
+
+105
+00:04:49,940 --> 00:04:53,280
+x, y. That forgetting is a matrix that
+
+106
+00:04:53,280 --> 00:04:55,500
+keeps x, keeps y, and multiplies z by
+
+107
+00:04:55,500 --> 00:04:58,980
+zero. From four dimensions to three, a three
+
+108
+00:04:58,980 --> 00:05:01,270
+by four matrix keeps x, y, and z
+
+109
+00:05:01,270 --> 00:05:04,350
+drops w. The straight shadow stacks corners on
+
+110
+00:05:04,350 --> 00:05:06,980
+top of each other, so we use perspective.
+
+111
+00:05:06,980 --> 00:05:09,960
+The same rule your eyes use, farther things
+
+112
+00:05:09,960 --> 00:05:13,440
+look smaller. Place a camera out along w.
+
+113
+00:05:13,440 --> 00:05:16,100
+Each point is scaled by the camera distance
+
+114
+00:05:16,100 --> 00:05:19,290
+divided by the camera distance minus w. Points
+
+115
+00:05:19,290 --> 00:05:22,040
+with a large w come closer and grow.
+
+116
+00:05:22,040 --> 00:05:24,700
+Points with a small w move away and
+
+117
+00:05:24,700 --> 00:05:26,981
+shrink. So the eight near corners form a
+
+118
+00:05:26,980 --> 00:05:29,360
+big cube, and the eight far corners form
+
+119
+00:05:29,360 --> 00:05:32,400
+a small cube. Find them along w, and
+
+120
+00:05:32,400 --> 00:05:35,090
+you get the famous picture, a cube inside
+
+121
+00:05:35,090 --> 00:05:37,810
+a cube. The six lopsided shapes between them
+
+122
+00:05:37,810 --> 00:05:41,540
+are real cubes, seen in four-dimensional perspective. Now
+
+123
+00:05:41,540 --> 00:05:44,990
+let's make it move. In two dimensions, rotating
+
+124
+00:05:44,990 --> 00:05:46,620
+by an angle theta is a two by
+
+125
+00:05:46,620 --> 00:05:49,410
+two matrix. The new x is cosine theta
+
+126
+00:05:49,410 --> 00:05:52,470
+times x minus sine theta times y. The
+
+127
+00:05:52,470 --> 00:05:54,860
+new y is sine theta times x plus
+
+128
+00:05:54,860 --> 00:05:58,100
+cosine theta times y. In three dimensions, we
+
+129
+00:05:58,100 --> 00:06:00,700
+say an object rotates around an axis. But
+
+130
+00:06:00,700 --> 00:06:03,110
+when a cube spins around the vertical axis,
+
+131
+00:06:03,110 --> 00:06:05,560
+it's height never changes, only the other two
+
+132
+00:06:05,560 --> 00:06:09,030
+coordinates mix. So rotation really happens in a
+
+133
+00:06:09,030 --> 00:06:11,450
+plane. The axis is just what is left
+
+134
+00:06:11,450 --> 00:06:15,190
+over. That idea unlocks four dimensions. With three
+
+135
+00:06:15,190 --> 00:06:18,860
+axes, there are three planes. xy, xz, and
+
+136
+00:06:18,860 --> 00:06:22,690
+yz. With four axes, there are six. xy,
+
+137
+00:06:22,690 --> 00:06:28,340
+xz, xw, yz, yw, and zw. The formula
+
+138
+00:06:28,340 --> 00:06:30,680
+is n times n minus 1 divided by
+
+139
+00:06:30,680 --> 00:06:33,380
+2. Four times 3 divided by 2 is
+
+140
+00:06:33,380 --> 00:06:36,290
+six ways to rotate. Let's rotate in the
+
+141
+00:06:36,290 --> 00:06:38,800
+zw plane. The matrix leaves x and y
+
+142
+00:06:38,800 --> 00:06:41,120
+alone and mixes z with w using the
+
+143
+00:06:41,120 --> 00:06:44,270
+same cosine and sine. Watch the shadow. The
+
+144
+00:06:44,270 --> 00:06:46,760
+inner cube grows, the outer cube shrinks, and
+
+145
+00:06:46,760 --> 00:06:49,680
+they pass through each other. The tesoract seems
+
+146
+00:06:49,680 --> 00:06:52,680
+to turn inside out. But nothing bends. The
+
+147
+00:06:52,680 --> 00:06:55,940
+matrix is orthogonal. This determinant is 1, and
+
+148
+00:06:55,940 --> 00:06:58,190
+every edge keeps its length. It is a
+
+149
+00:06:58,190 --> 00:07:01,000
+rigid object, turning in a direction we can
+
+150
+00:07:01,000 --> 00:07:03,750
+only see as a shadow. Four dimensions even
+
+151
+00:07:03,750 --> 00:07:06,250
+allow a double rotation. In the xy plane
+
+152
+00:07:06,250 --> 00:07:08,960
+and the zw plane at the same time.
+
+153
+00:07:08,960 --> 00:07:11,010
+No axis is left over, and the only
+
+154
+00:07:11,010 --> 00:07:13,760
+point that stays still is the very center.
+
+155
+00:07:13,760 --> 00:07:16,030
+So is any of this real? We may
+
+156
+00:07:16,030 --> 00:07:18,840
+never step into a fourth direction of space,
+
+157
+00:07:18,840 --> 00:07:22,070
+but its mathematics is everywhere. This treats time
+
+158
+00:07:22,070 --> 00:07:24,620
+as a fourth coordinate of space time. Game
+
+159
+00:07:24,620 --> 00:07:27,720
+engines and spacecraft use quaternions, numbers with four
+
+160
+00:07:27,720 --> 00:07:30,830
+parts, to rotate objects smoothly. An inside a
+
+161
+00:07:30,830 --> 00:07:33,150
+model like chat gpt, a single word is
+
+162
+00:07:33,150 --> 00:07:36,540
+a vector with thousands of dimensions, measured and
+
+163
+00:07:36,540 --> 00:07:39,000
+projected with the same tools we just used
+
+164
+00:07:39,000 --> 00:07:41,600
+on a tesoract. That is the real lesson.
+
+165
+00:07:41,600 --> 00:07:44,860
+Your eyes stop at three dimensions. Linear algebra
+
+166
+00:07:44,860 --> 00:07:47,830
+does not. Let's recap. A dimension is the
+
+167
+00:07:47,830 --> 00:07:51,050
+number of independent numbers needed to describe a
+
+168
+00:07:51,050 --> 00:07:54,620
+position. Adding a fourth number creates a fourth
+
+169
+00:07:54,620 --> 00:07:57,530
+direction. Dragging a cube along it builds a
+
+170
+00:07:57,530 --> 00:08:00,640
+tesoract with 16 corners, 32 edges and a
+
+171
+00:08:00,640 --> 00:08:04,030
+long diagonal of exactly two. We see it
+
+172
+00:08:04,030 --> 00:08:06,530
+through slices, like frames of the video, and
+
+173
+00:08:06,530 --> 00:08:10,940
+through shadows, which are projection matrices. And rotation
+
+174
+00:08:10,940 --> 00:08:14,550
+happens in planes, giving four dimensions six ways
+
+175
+00:08:14,550 --> 00:08:16,560
+to turn. So the next time you watch
+
+176
+00:08:16,560 --> 00:08:19,180
+a video, remember, you are already sliding through
+
+177
+00:08:19,180 --> 00:08:22,800
+a higher dimension, one frame at a time.
+
+178
+00:08:22,800 --> 00:08:24,720
+If this made the fourth dimension a little
+
+179
+00:08:24,720 --> 00:08:27,780
+less mysterious, subscribe for more complex math made
+
+180
+00:08:27,780 --> 00:08:29,800
+visual. See you in the next dimension!
+

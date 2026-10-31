@@ -45,6 +45,9 @@ output/
 .pytest_cache/
 .ruff_cache/
 
+kaggle/
+**/kaggle/
+
 # Track the generated API guide site.
 !website/dist/
 !website/dist/**
