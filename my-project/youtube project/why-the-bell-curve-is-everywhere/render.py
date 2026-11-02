@@ -13,13 +13,17 @@ Times are narration source-clock seconds. Full-quality renders sit behind --fina
 overwrite finals by accident. --final turns motion blur on (FC_MOTION_BLUR, 5 subframes) unless
 --blur is given; previews and stills render without it. Every video render normalizes the narration to
 -14 LUFS (YouTube), and finals print a delivery report (loudness, true peak, colour tags, black frames).
+Video renders use every CPU core (--workers N to change). Finals keep their chunks in output/chunks/, keyed
+by the project's source files, so an interrupted final resumes and any code edit starts fresh chunks.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib
 import os
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -41,6 +45,15 @@ CHAPTERS = {
 OUT = ROOT / "output"
 
 
+def source_fingerprint() -> str:
+    """Changes whenever any project .py file changes, so resumed finals never reuse stale chunks."""
+    h = hashlib.sha1()
+    for path in sorted(ROOT.rglob("*.py")):
+        if "output" not in path.parts:
+            h.update(f"{path.relative_to(ROOT)}:{path.stat().st_mtime_ns}:{path.stat().st_size}".encode())
+    return h.hexdigest()[:10]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--chapter", default="0", choices=list(CHAPTERS))
@@ -57,6 +70,7 @@ def main():
     ap.add_argument("--backend", default="skia", choices=["skia", "pillow", "moderngl", "auto"])
     ap.add_argument("--codec", default="h264", choices=["h264", "hevc10", "prores"], help="--final codec")
     ap.add_argument("--lut", type=Path, default=None, help="--final .cube colour grade")
+    ap.add_argument("--workers", type=int, default=os.cpu_count() or 1, help="parallel render processes")
     args = ap.parse_args()
 
     blur = args.blur if args.blur is not None else (5 if args.final else 1)
@@ -85,13 +99,13 @@ def main():
     ranged = args.start is not None or args.end is not None
     if args.final:
         settings = ExportSettings(quality=args.quality, fps=args.fps, antialias=1, backend=args.backend, preset="slow",
-                                  crf=16, codec=args.codec, lut=args.lut, loudness=-14)
+                                  crf=16, codec=args.codec, lut=args.lut, loudness=-14, workers=args.workers)
         out = OUT / f"{tag}_{args.quality}{settings.suffix}"
         if ranged:
             out = OUT / "sections" / f"{tag}_{args.quality}_{start + off:g}-{end + off:g}{settings.suffix}"
     else:
         settings = ExportSettings(quality="720p", fps=args.fps, antialias=1, backend=args.backend, preset="veryfast",
-                                  crf=20, loudness=-14)
+                                  crf=20, loudness=-14, workers=args.workers)
         suffix = f"_{start + off:g}-{end + off:g}" if ranged else ""
         out = OUT / "previews" / f"{tag}_720p{suffix}.mp4"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -103,7 +117,11 @@ def main():
             last[0] = time.time()
             print(f"  {done}/{total} frames  {time.time() - t0:.0f}s", flush=True)
 
-    render(scene, out, settings=settings, overwrite=True, start_time=start, end_time=end, progress=progress)
+    chunks = OUT / "chunks" / f"{out.stem}-{source_fingerprint()}" if args.final else None
+    render(scene, out, settings=settings, overwrite=True, start_time=start, end_time=end, progress=progress,
+           chunk_dir=chunks)
+    if chunks is not None:
+        shutil.rmtree(chunks)  # the final is published; its chunks are only resume material
     print(f"wrote {out}  ({time.time() - t0:.0f}s)")
     if args.final:
         print(delivery_report(out))

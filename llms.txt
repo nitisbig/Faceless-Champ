@@ -216,6 +216,8 @@ on a Layer preserves chapter source timing.
 
 ExportSettings finishing: codec="h264"|"hevc10"|"prores" (.mov 10-bit master), lut="grade.cube",
 loudness=-14 (two-pass loudnorm), true_peak=-1, audio_bitrate. All exports are converted/tagged BT.709.
+workers=N renders chunk_frames-long chunks in forked processes (pillow/skia), identical output;
+render(..., chunk_dir=...) keeps chunks so an interrupted render resumes (clear it after scene edits).
 Before upload: delivery_report(path) or python -m faceless_champ check FILE (loudness, true peak,
 color tags, black/frozen/silent spans; report.ok fails only on clipping).
 save_frame and render_storyboard sample source-time stills with output protection.

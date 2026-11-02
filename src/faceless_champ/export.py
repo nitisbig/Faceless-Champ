@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+import multiprocessing
+import multiprocessing.connection
 import os
 import re
 import shutil
 import subprocess
 import tempfile
+import traceback
 from collections.abc import Callable
+from concurrent.futures import CancelledError
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -52,6 +57,8 @@ class ExportSettings:
     loudness: float | None = None
     true_peak: float = -1.0
     audio_bitrate: str = "192k"
+    workers: int = 1
+    chunk_frames: int = 300
 
     @property
     def suffix(self) -> str:
@@ -100,6 +107,10 @@ class ExportSettings:
             raise ValueError("true_peak is a dBTP ceiling between -9 and 0")
         if not isinstance(self.audio_bitrate, str) or not self.audio_bitrate.rstrip("k").isdigit():
             raise ValueError("audio_bitrate must look like '192k'")
+        for name in ("workers", "chunk_frames"):
+            value = getattr(self, name)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+                raise ValueError(f"{name} must be a positive integer")
         if (self.width is None) != (self.height is None):
             raise ValueError("Specify both width and height")
         if self.width is not None:
@@ -214,6 +225,7 @@ def render(
     start_time: float = 0.0,
     end_time: float | None = None,
     cancel: Callable[[], bool] | None = None,
+    chunk_dir: str | Path | None = None,
     **options,
 ) -> Path:
     """Render to MP4 (or MOV for ``codec="prores"``). ``progress(completed_frames, total_frames)`` is optional.
@@ -228,6 +240,11 @@ def render(
     ``cancel()`` raises concurrent.futures.CancelledError when true. Pipe writes
     and encoder completion are bounded by ``encoder_timeout`` (seconds per
     operation). Cancellation is checked between frames and while waiting on I/O.
+
+    ``workers > 1`` renders ``chunk_frames``-long video-only chunks in forked processes (each makes its
+    own renderer from ``backend``), then joins them without re-encoding and adds the mixed audio.
+    ``chunk_dir`` keeps chunks in a folder so an interrupted render resumes; chunks are matched by
+    settings and frame range, not scene content, so clear the folder after editing the scene.
     """
     if settings is not None and options:
         raise ValueError("Use settings or keyword export options, not both")
@@ -261,75 +278,216 @@ def render(
         measured = measure_loudness(events, export_duration, start_time, settings)
         if measured is not None:
             post = (_loudnorm(settings, measured),)
-    _, video_args, audio_args = CODECS[settings.codec]
-    pix_fmt = video_args[video_args.index("-pix_fmt") + 1]
+    chunked = settings.workers > 1 or chunk_dir is not None
+    if settings.workers > 1:
+        if settings.backend not in {"pillow", "skia"}:
+            raise ValueError("workers > 1 needs backend='pillow' or 'skia' (GPU contexts cannot be forked)")
+        if "fork" not in multiprocessing.get_all_start_methods():
+            raise RuntimeError("workers > 1 needs the fork start method (Linux); use workers=1 here")
     if progress is not None:
         progress(0, frame_count)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="faceless-champ-", dir=output.parent) as temporary:
         temporary = Path(temporary)
         encoded = temporary / f"encoded{settings.suffix}"
-        video_filters = []
         if settings.lut is not None:
             # FFmpeg runs in the temporary folder, so the LUT path never needs filtergraph escaping.
             shutil.copyfile(settings.lut, temporary / "grade.cube")
-            video_filters.append("lut3d=file=grade.cube")
-        video_filters += ["scale=out_color_matrix=bt709:out_range=tv", f"format={pix_fmt}"]
-        command = [
-            "ffmpeg",
-            "-hide_banner",
-            "-loglevel",
-            "error",
-            "-y",
-            "-f",
-            "rawvideo",
-            "-pix_fmt",
-            "rgb24",
-            "-s",
-            f"{size[0]}x{size[1]}",
-            "-r",
-            str(settings.fps),
-            "-i",
-            "pipe:0",
-        ]
         if events:
             inputs, graph = _audio_command(events, export_duration, start_time, post=post)
-            audio = audio_args or ["-c:a", "aac", "-b:a", settings.audio_bitrate]
-            command.extend(inputs + ["-filter_complex", graph, "-map", "0:v:0", "-map", "[audio]", *audio])
+            audio = CODECS[settings.codec][2] or ["-c:a", "aac", "-b:a", settings.audio_bitrate]
+            audio_args = [*inputs, "-filter_complex", graph, "-map", "0:v:0", "-map", "[audio]", *audio]
         else:
-            command.extend(["-map", "0:v:0", "-an"])
-        command.extend(["-vf", ",".join(video_filters), *video_args, *COLOR])
-        if settings.codec == "h264":
-            command.extend(["-crf", str(settings.crf), "-preset", settings.preset])
-        elif settings.codec == "hevc10":
-            command.extend(["-crf", str(settings.crf), "-preset", settings.preset, "-x265-params", "log-level=error"])
-        command.extend(["-t", str(export_duration), "-movflags", "+faststart", str(encoded)])
-        with (temporary / "ffmpeg.log").open("w+b") as log:
-            process = subprocess.Popen(
-                command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=log, cwd=temporary
+            audio_args = ["-map", "0:v:0", "-an"]
+        tail = ["-t", str(export_duration), "-movflags", "+faststart", str(encoded)]
+        if not chunked:
+            command = [*_FFMPEG, *_raw_input(size, settings.fps), *audio_args, *_video_args(settings), *tail]
+            times = [start_time + index / settings.fps for index in range(frame_count)]
+            _stream(renderer, node, times, size, command, temporary, settings, cancel, progress, frame_count)
+        else:
+            folder = Path(chunk_dir) if chunk_dir is not None else temporary / "chunks"
+            folder.mkdir(parents=True, exist_ok=True)
+            step = settings.chunk_frames
+            if chunk_dir is None:  # nothing to resume: split short renders so every worker has work
+                step = min(step, math.ceil(frame_count / settings.workers))
+            chunks = _render_chunks(
+                renderer, node, settings, size, start_time, frame_count, step, folder, temporary, progress, cancel
             )
-            try:
-                with ProcessIO(process, timeout=settings.encoder_timeout, cancel=cancel) as pipe:
-                    for index in range(frame_count):
-                        pipe.check_cancelled()
-                        frame = renderer.frame(node, start_time + index / settings.fps, size).convert("RGB")
-                        payload = frame.tobytes()
-                        pipe.call(lambda payload=payload: process.stdin.write(payload))
-                        if progress is not None:
-                            progress(index + 1, frame_count)
-                    pipe.call(process.stdin.close)
-                    returncode = pipe.call(process.wait)
-                if returncode:
-                    log.seek(0)
-                    raise RuntimeError("FFmpeg failed: " + log.read().decode(errors="replace"))
-            except BaseException as exc:
-                if isinstance(exc, BrokenPipeError):
-                    log.seek(0)
-                    raise RuntimeError("FFmpeg failed: " + log.read().decode(errors="replace")) from exc  # noqa: TRY004
-                raise
+            listing = temporary / "chunks.txt"
+            listing.write_text("".join("file '" + str(c).replace("'", "'\\''") + "'\n" for c in chunks))
+            command = [*_FFMPEG, "-f", "concat", "-safe", "0", "-i", str(listing), *audio_args, "-c:v", "copy", *tail]
+            result = subprocess.run(command, capture_output=True, cwd=temporary, check=False)
+            if result.returncode:
+                raise RuntimeError("FFmpeg failed joining chunks: " + result.stderr.decode(errors="replace"))
         if overwrite:
             os.replace(encoded, output)
         else:
             # Atomic exclusive publication avoids overwriting a file created during rendering.
             os.link(encoded, output)
     return output
+
+
+_FFMPEG = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"]
+
+
+def _raw_input(size, fps):
+    return ["-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{size[0]}x{size[1]}", "-r", str(fps), "-i", "pipe:0"]
+
+
+def _video_args(settings):
+    """Filters and encoder arguments shared by single-pass and chunked exports (cwd holds grade.cube)."""
+    video_args = CODECS[settings.codec][1]
+    pix_fmt = video_args[video_args.index("-pix_fmt") + 1]
+    filters = ["lut3d=file=grade.cube"] if settings.lut is not None else []
+    filters += ["scale=out_color_matrix=bt709:out_range=tv", f"format={pix_fmt}"]
+    args = ["-vf", ",".join(filters), *video_args, *COLOR]
+    if settings.codec == "h264":
+        args += ["-crf", str(settings.crf), "-preset", settings.preset]
+    elif settings.codec == "hevc10":
+        args += ["-crf", str(settings.crf), "-preset", settings.preset, "-x265-params", "log-level=error"]
+    return args
+
+
+def _stream(renderer, node, times, size, command, cwd, settings, cancel, progress=None, total=None, on_frame=None):
+    """Pipe rendered frames at ``times`` into an FFmpeg ``command`` and wait for it."""
+    with tempfile.TemporaryFile() as log:
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=log, cwd=cwd)
+        try:
+            with ProcessIO(process, timeout=settings.encoder_timeout, cancel=cancel) as pipe:
+                for index, time in enumerate(times):
+                    pipe.check_cancelled()
+                    payload = renderer.frame(node, time, size).convert("RGB").tobytes()
+                    pipe.call(lambda payload=payload: process.stdin.write(payload))
+                    if progress is not None:
+                        progress(index + 1, total)
+                    if on_frame is not None:
+                        on_frame()
+                pipe.call(process.stdin.close)
+                returncode = pipe.call(process.wait)
+            if returncode:
+                log.seek(0)
+                raise RuntimeError("FFmpeg failed: " + log.read().decode(errors="replace"))
+        except BaseException as exc:
+            if isinstance(exc, BrokenPipeError):
+                log.seek(0)
+                raise RuntimeError("FFmpeg failed: " + log.read().decode(errors="replace")) from exc  # noqa: TRY004
+            raise
+
+
+# ---------------------------------------------------------------- chunked export
+
+
+def _chunk_key(settings, size, start_time, step) -> str:
+    """Identity of everything that changes chunk pixels except the scene itself."""
+    lut = hashlib.sha1(Path(settings.lut).read_bytes()).hexdigest() if settings.lut is not None else ""
+    fields = (size, settings.fps, settings.codec, settings.crf, settings.preset, settings.antialias, settings.backend)
+    return hashlib.sha1(repr((fields, lut, round(start_time, 6), step)).encode()).hexdigest()[:10]
+
+
+def _frame_count(path) -> int | None:
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-count_packets", "-select_streams", "v:0"]
+        + ["-show_entries", "stream=nb_read_packets", "-of", "csv=p=0", str(path)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    try:
+        return int(result.stdout.strip())
+    except ValueError:
+        return None
+
+
+def _encode_chunk(renderer, node, settings, size, start_time, chunk, cwd, on_frame=None, cancel=None):
+    f0, f1, path = chunk
+    part = path.with_name(path.stem + ".part" + path.suffix)
+    command = [*_FFMPEG, *_raw_input(size, settings.fps), "-map", "0:v:0", "-an", *_video_args(settings), str(part)]
+    times = [start_time + index / settings.fps for index in range(f0, f1)]
+    _stream(renderer, node, times, size, command, cwd, settings, cancel, on_frame=on_frame)
+    if _frame_count(part) != f1 - f0:
+        raise RuntimeError(f"chunk {path.name} has the wrong frame count")
+    os.replace(part, path)
+
+
+def _chunk_worker(node, settings, size, start_time, todo, cwd, claimed, frames, number):
+    """Forked worker: claim chunks until none are left. Errors go to ``worker-N.err``."""
+    try:
+        from .renderer import create_renderer
+
+        def tick():
+            with frames.get_lock():
+                frames.value += 1
+
+        with create_renderer(settings.backend, antialias=settings.antialias, gpu=settings.gpu) as renderer:
+            renderer.validate(node)
+            while True:
+                with claimed.get_lock():
+                    index = claimed.value
+                    claimed.value += 1
+                if index >= len(todo):
+                    return
+                _encode_chunk(renderer, node, settings, size, start_time, todo[index], cwd, on_frame=tick)
+    except Exception:  # noqa: BLE001 -- any worker failure is reported to the parent
+        (Path(cwd) / f"worker-{number}.err").write_text(traceback.format_exc())
+        raise SystemExit(1) from None
+
+
+def _render_chunks(renderer, node, settings, size, start_time, frame_count, step, folder, cwd, progress, cancel):
+    """Render the frame grid as ``step``-frame video-only chunks in ``folder``; finished chunks are reused."""
+    key = _chunk_key(settings, size, start_time, step)
+    plan = []
+    for f0 in range(0, frame_count, step):
+        f1 = min(f0 + step, frame_count)
+        plan.append((f0, f1, folder / f"chunk-{key}-{f0:07d}-{f1:07d}{settings.suffix}"))
+    todo = [c for c in plan if not (c[2].is_file() and _frame_count(c[2]) == c[1] - c[0])]
+    done = frame_count - sum(f1 - f0 for f0, f1, _ in todo)
+    if progress is not None and done:
+        progress(done, frame_count)
+    if settings.workers <= 1 or len(todo) <= 1:
+        count = [done]
+
+        def tick():
+            count[0] += 1
+            if progress is not None:
+                progress(count[0], frame_count)
+
+        for chunk in todo:
+            _encode_chunk(renderer, node, settings, size, start_time, chunk, cwd, on_frame=tick, cancel=cancel)
+        return [path for _, _, path in plan]
+    context = multiprocessing.get_context("fork")
+    claimed, frames = context.Value("i", 0), context.Value("q", 0)
+    workers = [
+        context.Process(
+            target=_chunk_worker,
+            args=(node, settings, size, start_time, todo, cwd, claimed, frames, number),
+            daemon=True,
+        )
+        for number in range(min(settings.workers, len(todo)))
+    ]
+    reported = done
+    try:
+        for worker in workers:
+            worker.start()
+        while True:
+            multiprocessing.connection.wait([w.sentinel for w in workers], timeout=0.25)
+            failed = [w for w in workers if w.exitcode not in (None, 0)]
+            if failed:
+                errors = sorted(Path(cwd).glob("worker-*.err"))
+                detail = errors[0].read_text() if errors else f"exit code {failed[0].exitcode}"
+                raise RuntimeError("A render worker failed:\n" + detail)
+            if cancel is not None and cancel():
+                raise CancelledError("Video export cancelled")
+            current = done + frames.value
+            if progress is not None and current != reported:
+                reported = current
+                progress(current, frame_count)
+            if all(w.exitcode == 0 for w in workers):
+                break
+    finally:
+        for worker in workers:
+            if worker.is_alive():
+                worker.terminate()
+            worker.join()
+    if progress is not None and reported != frame_count:
+        progress(frame_count, frame_count)
+    return [path for _, _, path in plan]

@@ -45,6 +45,9 @@ def main() -> int:
     command.add_argument("--codec", choices=("h264", "hevc10", "prores"), default="h264")
     command.add_argument("--lut", type=Path, help="apply a .cube color grade")
     command.add_argument("--loudness", type=float, help="normalize audio to this integrated LUFS (YouTube: -14)")
+    command.add_argument("--workers", type=int, default=1, help="render chunks in N processes (pillow/skia)")
+    command.add_argument("--chunk-frames", type=int, default=300)
+    command.add_argument("--chunk-dir", type=Path, help="keep chunks here so an interrupted render resumes")
     command.add_argument("--overwrite", action="store_true")
     sub.add_parser("plugins", help="List discovered plugins, their status and capabilities")
     check = sub.add_parser(
@@ -81,7 +84,8 @@ def main() -> int:
         options = vars(args).copy()
         for key in ("command", "file", "name", "output"):
             options.pop(key)
-        print(render(node, args.output, **options))
+        chunk_dir = options.pop("chunk_dir")
+        print(render(node, args.output, chunk_dir=chunk_dir, **options))
         return 0
     except (ValueError, TypeError, OSError, RuntimeError) as exc:
         print(f"faceless-champ: {exc}", file=sys.stderr)

@@ -659,10 +659,36 @@ I/O; they do not interrupt a renderer or progress callback running user code.
 | `loudness` | `None` | Integrated LUFS target for the mixed audio (YouTube: `-14`); two-pass `loudnorm` |
 | `true_peak` | `-1.0` | dBTP ceiling used with `loudness` |
 | `audio_bitrate` | `"192k"` | AAC bitrate for `h264`/`hevc10` |
+| `workers` | `1` | Processes rendering chunks in parallel (`pillow`/`skia` backends, fork start method) |
+| `chunk_frames` | `300` | Frames per chunk when `workers > 1` or `render(..., chunk_dir=...)` is used |
 
 Quality presets set the shorter dimension to 720, 1080, or 2160 and preserve aspect
 ratio, rounding to even dimensions. Explicit dimensions override preset resolution
 and must preserve the design aspect ratio to rounding tolerance.
+
+### Parallel and resumable renders
+
+```python
+render(scene, "final.mp4", settings=ExportSettings(quality="4k", workers=os.cpu_count(),
+       loudness=-14), chunk_dir="output/chunks/final-4k")
+```
+
+With `workers > 1`, the frame grid is split into `chunk_frames` chunks. Forked worker
+processes claim chunks one at a time, and each worker builds its own renderer from
+`backend`. Because the workers are forked, scenes built from closures and
+`FunctionSource` lambdas work without pickling. Each chunk is encoded video-only with
+the final codec, LUT and BT.709 settings, then checked by frame count. The parent
+joins the chunks without re-encoding and mixes the audio, including `loudness`, in
+the same step. Frames, audio and timing are identical to a single-pass render.
+Progress and `cancel` cover all workers. A failing worker's traceback is raised as
+`RuntimeError`, and the output is not published.
+
+`chunk_dir=` keeps the chunks in a folder, which works even with `workers=1`. Run the
+same render again after an interruption and only missing chunks are rendered. Chunks
+are matched by settings and frame range, not scene content, so delete the folder after
+editing the scene. GPU backends (`moderngl`, `auto`) cannot be forked and need
+`workers=1`. Each worker uses its own copy of memory, so on a small machine use fewer
+workers than cores. The CLI accepts `--workers`, `--chunk-frames` and `--chunk-dir`.
 
 ### Finishing and delivery
 
