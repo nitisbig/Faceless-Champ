@@ -502,12 +502,45 @@ class Scene(Renderable):
         volume: float = 1,
         fade_in: float = 0,
         fade_out: float = 0,
+        role: str = "mix",
+        duck: float = 0,
+        rate: float = 1,
     ) -> Self:
-        self.audio.append(
-            AudioClip(path, self._cursor if start is None else start, trim_start, trim_end, volume, fade_in, fade_out)
-        )
+        """Schedule audio without advancing the cursor.
+
+        role="voice" marks narration; a clip with duck=-12 drops 12 dB while any voice clip speaks.
+        """
+        start = self._cursor if start is None else start
+        self.audio.append(AudioClip(path, start, trim_start, trim_end, volume, fade_in, fade_out, role, duck, rate))
         self._invalidate()
         return self
+
+    def add_sfx(
+        self,
+        path: str | Path,
+        at: float | None = None,
+        *,
+        align: str = "onset",
+        volume: float = 1,
+        rate: float = 1,
+        fade_out: float = 0,
+    ) -> Self:
+        """Place a sound effect so its first transient (align="onset") or loudest moment ("peak") lands on ``at``.
+
+        Leading silence in the file is skipped. ``at`` defaults to the cursor.
+        """
+        from .audio import sound_marks
+
+        if align not in {"onset", "peak"}:
+            raise ValueError("align must be 'onset' or 'peak'")
+        at = finite(self._cursor if at is None else at, "at", 0)
+        rate = finite(rate, "rate", 0.25)
+        onset, peak = sound_marks(path)
+        start = at - ((peak - onset) / rate if align == "peak" else 0.0)
+        trim_start = onset + max(0.0, -start) * rate  # a peak before 0 s cuts into the attack
+        return self.add_audio(
+            path, start=max(0.0, start), trim_start=trim_start, volume=volume, fade_out=fade_out, role="sfx", rate=rate
+        )
 
 
 def _validate_spring_track(track: Track) -> None:

@@ -11,6 +11,7 @@ would notice, so an agent can repair a scene without a human critique:
 * ``OUTSIDE_SAFE_AREA`` / ``OUTSIDE_FRAME``  text leaves the title-safe area / frame
 
 Each finding carries a ``fix`` hint. Thresholds are keyword arguments.
+``audio_audit(scene)`` measures the mix the same way (clipping, loudness gain, music over voice).
 """
 
 from __future__ import annotations
@@ -46,7 +47,7 @@ class DesignReport:
 
     def __str__(self):
         if not self.findings:
-            return "design audit: no findings"
+            return "audit: no findings"
         return "\n".join(f"[{f.severity}] {f.code} t={f.time:.2f}s {f.message} -> {f.fix}" for f in self.findings)
 
 
@@ -272,4 +273,105 @@ def design_audit(
                     f"{len(families)} font families in one frame",
                     "use one heading and one body font (TypeScale.named pairing)",
                 )
+    return report
+
+
+def _ebur128(events, duration, spans):
+    """(integrated LUFS, true peak dBTP) of ``events`` mixed exactly as export mixes them."""
+    import re
+    import subprocess
+
+    from .export import _audio_command
+
+    inputs, graph = _audio_command(events, duration, first_input=0, post=("ebur128=peak=true",), spans=spans)
+    command = ["ffmpeg", "-hide_banner", "-nostats", *inputs, "-filter_complex", graph, "-map", "[audio]"]
+    result = subprocess.run([*command, "-f", "null", "-"], capture_output=True, text=True, check=False)
+    if result.returncode:
+        raise RuntimeError("FFmpeg audio analysis failed: " + result.stderr[-2000:])
+    summary = result.stderr.rsplit("Summary:", 1)[-1]
+    found = [re.search(pattern, summary) for pattern in (r"I:\s+(-?[\d.]+|-inf) LUFS", r"Peak:\s+(-?[\d.]+|-inf)")]
+    return tuple(float(m.group(1)) if m else float("-inf") for m in found)
+
+
+def audio_audit(
+    node,
+    *,
+    loudness: float | None = -14.0,
+    true_peak: float = -1.0,
+    music_below_voice: float = 10.0,
+    max_gain: float = 6.0,
+) -> DesignReport:
+    """Measure the scene's mix before rendering (EBU R128, the same FFmpeg graph export uses).
+
+    * ``AUDIO_CLIPPING`` / ``AUDIO_PEAK``  the unnormalized mix peaks above 0 / ``true_peak`` dBTP
+      (only when ``loudness`` is None; a loudness target re-levels and limits the mix on export)
+    * ``AUDIO_GAIN``  the loudness target needs more than ``max_gain`` dB of change, which raises noise or squashes
+    * ``MUSIC_MASKS_VOICE``  music sits less than ``music_below_voice`` LU under the narration
+    * ``DUCK_WITHOUT_VOICE``  clips ask to duck but no clip has role="voice"
+    """
+    from .export import _audio_events, voice_spans
+
+    report = DesignReport(())
+    events = _audio_events(node)
+    if not events:
+        return report
+    duration = node.duration
+    voices = [e for e in events if e[0].role == "voice"]
+    music = [e for e in events if e[0].role == "music"]
+    if not voices and any(e[0].duck for e in events):
+        report.findings.append(
+            Finding(
+                "DUCK_WITHOUT_VOICE",
+                "warning",
+                0.0,
+                "clips set duck= but no audio has role='voice', so nothing ducks",
+                "add the narration with add_audio(path, role='voice')",
+            )
+        )
+    spans = voice_spans(events) if voices else []
+    level, peak = _ebur128(events, duration, spans)
+    if loudness is None:
+        if peak > 0:
+            report.findings.append(
+                Finding(
+                    "AUDIO_CLIPPING",
+                    "error",
+                    0.0,
+                    f"the mix peaks at {peak:+.1f} dBTP",
+                    "lower clip volumes or export with loudness=-14",
+                )
+            )
+        elif peak > true_peak:
+            report.findings.append(
+                Finding(
+                    "AUDIO_PEAK",
+                    "warning",
+                    0.0,
+                    f"the mix peaks at {peak:.1f} dBTP, above {true_peak:g}",
+                    "export with loudness=-14 so the mix is limited",
+                )
+            )
+    elif level != float("-inf") and abs(loudness - level) > max_gain:
+        report.findings.append(
+            Finding(
+                "AUDIO_GAIN",
+                "warning",
+                0.0,
+                f"the mix is {level:.1f} LUFS; reaching {loudness:g} needs {loudness - level:+.1f} dB",
+                "level the voice first: faceless_champ.voice.process_voice(path)",
+            )
+        )
+    if voices and music:
+        voice_level, _ = _ebur128(voices, duration, spans)
+        music_level, _ = _ebur128(music, duration, spans)
+        if voice_level != float("-inf") and music_level > voice_level - music_below_voice:
+            report.findings.append(
+                Finding(
+                    "MUSIC_MASKS_VOICE",
+                    "warning",
+                    0.0,
+                    f"music is {music_level:.1f} LUFS against narration at {voice_level:.1f} LUFS",
+                    f"keep music {music_below_voice:g} LU under the voice: lower its volume or set duck=-12",
+                )
+            )
     return report

@@ -13,7 +13,7 @@ Then::
     python scene.py --frame 3.5 9       # PNG stills
     python scene.py --storyboard 6      # 6 evenly spaced stills + storyboard.png
     python scene.py --range 10 20 --quality high
-    python scene.py --audit             # design audit (text size, contrast, clutter)
+    python scene.py --audit             # design and mix audit (text size, contrast, clutter, loudness)
 
 Outputs are overwritten unless --keep is given. The final stdout line is JSON
 listing the written files, so agents can parse it.
@@ -52,7 +52,7 @@ def build_parser(prog=None):
     mode.add_argument("--frame", nargs="+", type=float, metavar="T", help="save PNG stills at times")
     mode.add_argument("--storyboard", nargs="?", type=int, const=6, metavar="N", help="N evenly spaced stills")
     mode.add_argument("--range", nargs=2, type=float, metavar=("START", "END"), help="render a time range")
-    mode.add_argument("--audit", action="store_true", help="report design problems at sampled times")
+    mode.add_argument("--audit", action="store_true", help="report design and audio-mix problems")
     parser.add_argument("--start", type=float, default=0.0, help="preview start time (default 0)")
     parser.add_argument("--quality", choices=tuple(QUALITY), help="low=540p medium=720p high=1080p 4k=2160p")
     parser.add_argument("--fps", type=float, help="frames per second (preview default 15, else 30)")
@@ -95,9 +95,10 @@ def _execute(node, args, name, out_dir, overwrite):
     size = _size(canvas, QUALITY[quality])
 
     if args.audit:
-        from .audit import design_audit
+        from .audit import audio_audit, design_audit
 
         report = design_audit(node)
+        report.findings.extend(audio_audit(node).findings)
         for finding in report.findings:
             print(f"[{finding.severity}] t={finding.time:.2f}s {finding.message}", file=sys.stderr)
         return {"audit": report.to_dict()}

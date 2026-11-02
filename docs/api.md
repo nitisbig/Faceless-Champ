@@ -244,6 +244,7 @@ words), `TOO_MANY_SIZES` (more than 4), `TOO_MANY_FONTS` (more than 2 families),
 `OUTSIDE_SAFE_AREA` and `OUTSIDE_FRAME`. Each finding has a `fix` hint. Backgrounds are
 the nearest solid shape or surface under the text; text over images is not
 contrast-checked. `contrast_ratio(a, b)` and `readable_color(background)` are exported.
+`audio_audit(node)` checks the mix the same way; see [Audio](#audio).
 
 ## Card and backdrop surfaces
 
@@ -399,6 +400,7 @@ You can also use a plain Scene and call authoring methods directly.
 | `wait_until(time)` | Advance to an absolute time; rejects moving backward |
 | `remove(*components)` | End visual lifetimes at the cursor; use new instances to reintroduce visuals |
 | `add_audio(path, ...)` | Schedule audio without advancing the cursor |
+| `add_sfx(path, at=None, align="onset", ...)` | Land a sound effect's first transient or peak on a time |
 | `build()` | Construct once and return the scene |
 | `duration` | Maximum of visual cursor, audio clip ends, and caption track ends |
 | `render(output, **options)` | Export through the top-level render function |
@@ -555,7 +557,7 @@ children hold their final frames; sounds keep their original durations.
 ## Audio
 
 `scene.add_audio(path, start=None, trim_start=0, trim_end=None, volume=1,
-fade_in=0, fade_out=0)` accepts WAV, MP3, and M4A.
+fade_in=0, fade_out=0, role="mix", duck=0, rate=1)` accepts WAV, MP3, M4A, FLAC and OGG.
 
 - `start=None` means the current visual cursor; `start=0` means the scene beginning.
 - Trim times refer to the source. `trim_end=None` uses the source duration.
@@ -564,6 +566,63 @@ fade_in=0, fade_out=0)` accepts WAV, MP3, and M4A.
   to prevent clipping when summing loud tracks.
 - Exports with audio use 48 kHz stereo AAC at 192 kbit/s. Exports without clips have
   no audio stream. Silence pads audio to the video duration.
+
+### Voice, music and sound effects
+
+```python
+from faceless_champ.voice import process_voice   # faceless-champ[audio]
+
+scene.add_audio(process_voice("audio.mp3"), start=0, role="voice")
+scene.add_audio("music/bed.mp3", start=0, role="music", volume=0.4, duck=-12, fade_out=3)
+scene.add_sfx("sfx/whoosh.wav", 12.4, align="peak", volume=0.3)
+scene.add_sfx("sfx/pop.wav", 14.0, rate=1.06)   # 6% higher and shorter
+```
+
+- `role` is `"mix"` (default), `"voice"`, `"music"` or `"sfx"`. Voice clips key ducking;
+  the audio audit compares music to voice.
+- `duck=-12` lowers a clip by 12 dB whenever any voice clip is speaking. FFmpeg's
+  `silencedetect` (-40 dB, 0.3 s) finds speech once per file. The bed eases down over
+  0.15 s and back over 0.45 s. Pauses shorter than 0.6 s stay ducked, so the bed doesn't pump
+  between sentences.
+- `rate` (0.25-4) changes playback speed and pitch together; `duration` is the trimmed
+  length divided by `rate`.
+- `add_sfx(path, at=None, *, align="onset", volume=1, rate=1, fade_out=0)` skips leading
+  silence. `align="onset"` lands the first transient on `at`; `"peak"` lands the loudest 10 ms
+  instead, which suits whooshes and risers. A peak before 0 s trims into the attack.
+  `sound_marks(path)` in `faceless_champ.audio` returns `(onset, peak)`.
+
+`faceless_champ.voice` (needs `faceless-champ[audio]`: pedalboard, pyloudnorm, scipy) finishes
+narration before it is mixed:
+
+- `process_voice(path, chain=None, *, output=None, **overrides)` writes a 48 kHz 24-bit WAV.
+  The file is cached under `FC_CACHE_DIR` or `~/.cache/faceless_champ/voice`, keyed by the
+  file's path, mtime, size and chain settings, so a scene can call it on every run.
+- The chain, in order:
+  - 24 dB/octave high-pass (80 Hz)
+  - level match to -24 LUFS
+  - optional noise gate
+  - EQ: mud cut at 250 Hz, presence at 3.5 kHz, air shelf above 10 kHz
+  - compressor
+  - split-band de-esser above 5.5 kHz (at most `de_ess` dB, and only where that band
+    dominates)
+  - loudness normalization (pyloudnorm, default -16 LUFS)
+  - look-ahead limiter (-1.5 dBFS)
+- `VoiceChain.named("narration" | "warm" | "broadcast" | "clean", **overrides)`, or build
+  `VoiceChain(...)` directly. Pass a preset name as `chain`. Overrides such as `loudness=-18`
+  or `de_ess=0` are keyword arguments to `process_voice`.
+- `loudness(path)` returns integrated LUFS (ITU-R BS.1770).
+
+Leave final loudness to export: `render(..., loudness=-14)` re-levels the finished mix in two
+passes and limits its true peak.
+
+**Audio audit.** `audio_audit(node, *, loudness=-14, true_peak=-1, music_below_voice=10, max_gain=6)`
+measures the mix with EBU R128 through the same FFmpeg graph export uses, without rendering
+video. `python scene.py --audit` includes it. Codes:
+
+- `AUDIO_CLIPPING` (error) and `AUDIO_PEAK`: only with `loudness=None`.
+- `AUDIO_GAIN`: reaching the target needs more than `max_gain` dB.
+- `MUSIC_MASKS_VOICE`: the music bus is less than 10 LU under the voice bus.
+- `DUCK_WITHOUT_VOICE`: a clip sets `duck` but no clip has `role="voice"`.
 
 ## SRT and captions
 

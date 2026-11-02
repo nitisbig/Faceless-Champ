@@ -146,6 +146,7 @@
         "ZoomBlurTransition",
         "ZoomIn",
         "ZoomOut",
+        "audio_audit",
         "card_content_bounds",
         "card_surface",
         "contrast_ratio",
@@ -180,6 +181,7 @@
       ],
       "extras": [
         "3d",
+        "audio",
         "cad",
         "effects",
         "equations",

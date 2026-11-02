@@ -46,6 +46,10 @@ Coordinates are design pixels, top-left origin, positive Y down; anchors default
 add(), play(), wait(), wait_until(), remove(), and with scene.at(time) schedule the timeline.
 play arguments run concurrently; successive calls advance the cursor. Audio defaults to
 the current cursor: attach master narration explicitly with add_audio(path, start=0).
+Mix roles: add_audio(path, role="voice"|"music"|"sfx", duck=-12, rate=1); duck lowers a clip
+while any voice clip speaks. add_sfx(path, at, align="onset"|"peak") lands a hit on a beat.
+faceless_champ.voice.process_voice(path) (faceless-champ[audio]) is a cached pedalboard narration chain
+(high-pass, EQ, compressor, de-esser, -16 LUFS, limiter); audio_audit(scene) and --audit check the mix.
 
 Typography: use roles, not raw sizes. Text("...", role="title") with roles display,
 title, heading, body, label, caption sets size/weight/line_height/tracking; explicit

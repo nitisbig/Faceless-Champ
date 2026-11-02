@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ._rendering.process import ProcessIO
-from .audio import require_tools
+from .audio import require_tools, speech_spans
 from .components import Canvas, finite
 from .gpu import GPUOptions
 from .renderer import PillowRenderer, Renderer, managed_renderer
@@ -38,6 +38,8 @@ CODECS = {
 # SDR web video is BT.709: convert with its matrix and tag the stream so players do not guess.
 COLOR = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", "-color_range", "tv"]
 LOUDNESS_RANGE = 11.0
+# Ducking ramps (seconds). Pauses shorter than the hold keep the bed down between sentences.
+DUCK_ATTACK, DUCK_RELEASE, DUCK_HOLD = 0.15, 0.45, 0.6
 
 
 @dataclass(frozen=True)
@@ -150,28 +152,56 @@ def _audio_events(node, offset=0.0, envelopes=()):
     return result
 
 
-def _audio_command(events, duration, start_time=0.0, *, first_input=1, post=()):
+def voice_spans(events) -> list[tuple[float, float]]:
+    """Timeline spans where any voice clip speaks, merged so that duck ramps never overlap."""
+    spans = sorted(
+        (start + a, start + b) for clip, start, _ in events if clip.role == "voice" for a, b in speech_spans(clip)
+    )
+    merged = []
+    for a, b in spans:
+        if merged and a - merged[-1][1] < DUCK_ATTACK + DUCK_RELEASE + DUCK_HOLD:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], b))
+        else:
+            merged.append((a, b))
+    return merged
+
+
+def _duck_filter(duck, spans, start, end):
+    """A volume filter on the timeline clock easing to ``duck`` dB around each speech span in [start, end]."""
+    terms = [
+        f"min(clip((t-{a - DUCK_ATTACK:.4f})/{DUCK_ATTACK},0,1),clip(({b + DUCK_RELEASE:.4f}-t)/{DUCK_RELEASE},0,1))"
+        for a, b in spans
+        if b + DUCK_RELEASE > start and a - DUCK_ATTACK < end
+    ]
+    if not terms:
+        return None
+    return f"volume='pow(10,{duck / 20:.5f}*({'+'.join(terms)}))':eval=frame"
+
+
+def _audio_command(events, duration, start_time=0.0, *, first_input=1, post=(), spans=None):
     """FFmpeg inputs and a filter graph mixing ``events`` into ``[audio]``.
 
     ``first_input`` is the input index of the first clip (0 when there is no video input);
-    ``post`` filters run on the finished mix (loudness normalization).
+    ``post`` filters run on the finished mix (loudness normalization). ``spans`` are the voice
+    spans that duck clips with ``duck < 0``; by default they come from the voice clips in ``events``.
     """
+    if spans is None and any(clip.duck for clip, _, _ in events):
+        spans = voice_spans(events)
     inputs, filters, labels = [], [], []
     for i, (clip, start, envelopes) in enumerate(events):
         inputs.extend(["-i", str(clip.path.resolve())])
-        chain = [
-            f"atrim=start={clip.trim_start}:end={clip.trim_end}",
-            "asetpts=PTS-STARTPTS",
-            "aresample=48000",
-            "aformat=channel_layouts=stereo",
-            f"volume={clip.volume}",
-        ]
+        chain = [f"atrim=start={clip.trim_start}:end={clip.trim_end}", "asetpts=PTS-STARTPTS", "aresample=48000"]
+        if clip.rate != 1:
+            chain += [f"asetrate={round(48000 * clip.rate)}", "aresample=48000"]
+        chain += ["aformat=channel_layouts=stereo", f"volume={clip.volume}"]
         if clip.fade_in:
             chain.append(f"afade=t=in:st=0:d={clip.fade_in}")
         if clip.fade_out:
             chain.append(f"afade=t=out:st={clip.duration - clip.fade_out}:d={clip.fade_out}")
         # FFmpeg 6.1 may emit unset timestamps for inserted silence. Rebase by sample count.
         chain.extend([f"adelay={round(start * 48000)}S:all=1", "asetpts=N/SR/TB"])
+        if clip.duck and spans and (duck := _duck_filter(clip.duck, spans, start, start + clip.duration)):
+            chain.append(duck)
         for direction, at, length in envelopes:
             chain.append(f"afade=t={direction}:st={at}:d={length}")
         label = f"a{i}"

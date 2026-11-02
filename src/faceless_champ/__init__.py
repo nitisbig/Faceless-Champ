@@ -32,7 +32,7 @@ if _TYPE_CHECKING:
         linear,
         smooth,
     )
-    from .audit import DesignReport, design_audit
+    from .audit import DesignReport, audio_audit, design_audit
     from .backends.moderngl import ModernGLRenderer
     from .backends.skia import SkiaRenderer
     from .cli import main as main
@@ -99,6 +99,7 @@ _EXPORTS = {
     "DeliveryFinding": ("delivery", "DeliveryFinding"),
     "DeliveryReport": ("delivery", "DeliveryReport"),
     "delivery_report": ("delivery", "delivery_report"),
+    "audio_audit": ("audit", "audio_audit"),
     "Trace": ("animation", "Trace"),
     "BLEND_MODES": ("blending", "BLEND_MODES"),
     "DisplacementMap": ("effects", "DisplacementMap"),
@@ -480,6 +481,7 @@ __all__ = [  # noqa: RUF022
     "delivery_report",
     "DeliveryReport",
     "DeliveryFinding",
+    "audio_audit",
 ]
 
 

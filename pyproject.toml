@@ -23,6 +23,7 @@ effects = ["numpy>=1.26,<3"]
 skia = ["skia-python>=144.0.post2,<145", "numpy>=1.26,<3"]
 equations = ["matplotlib>=3.9,<4"]
 manim = ["manim>=0.22,<0.23"]
+audio = ["pedalboard>=0.9.16,<0.10", "pyloudnorm>=0.1.1,<0.3", "scipy>=1.16,<2", "numpy>=1.26,<3"]
 
 [project.scripts]
 faceless-champ = "faceless_champ:main"
