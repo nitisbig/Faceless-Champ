@@ -214,6 +214,10 @@ CueScene.cue_time/at_cue translates source cues to local chapter clocks; finish 
 exactly to its interval and rejects overflow. Cut-only Sequence with continuous audio
 on a Layer preserves chapter source timing.
 
+ExportSettings finishing: codec="h264"|"hevc10"|"prores" (.mov 10-bit master), lut="grade.cube",
+loudness=-14 (two-pass loudnorm), true_peak=-1, audio_bitrate. All exports are converted/tagged BT.709.
+Before upload: delivery_report(path) or python -m faceless_champ check FILE (loudness, true peak,
+color tags, black/frozen/silent spans; report.ok fails only on clipping).
 save_frame and render_storyboard sample source-time stills with output protection.
 render(start_time=0, end_time=None) exports ranges preserving animation/audio offsets;
 render(progress=callback) reports frames. Check frames/storyboards before a full export.

@@ -9,6 +9,24 @@ from .export import render
 from .timeline import Renderable
 
 
+def _check(args) -> int:
+    import json
+    from dataclasses import asdict
+
+    from .delivery import delivery_report
+
+    try:
+        report = delivery_report(args.file, loudness=args.loudness, true_peak=args.true_peak)
+    except (ValueError, OSError, RuntimeError) as exc:
+        print(f"faceless-champ: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps(asdict(report) | {"path": str(report.path), "ok": report.ok}, indent=2))
+    else:
+        print(report)
+    return 0 if report.ok else 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="faceless-champ")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -24,9 +42,21 @@ def main() -> int:
     command.add_argument("--preset", default="medium")
     command.add_argument("--antialias", type=int, default=2)
     command.add_argument("--backend", choices=("pillow", "skia", "moderngl", "auto"), default="pillow")
+    command.add_argument("--codec", choices=("h264", "hevc10", "prores"), default="h264")
+    command.add_argument("--lut", type=Path, help="apply a .cube color grade")
+    command.add_argument("--loudness", type=float, help="normalize audio to this integrated LUFS (YouTube: -14)")
     command.add_argument("--overwrite", action="store_true")
     sub.add_parser("plugins", help="List discovered plugins, their status and capabilities")
+    check = sub.add_parser(
+        "check", help="Pre-upload checks: loudness, true peak, color tags, black/frozen/silent spans"
+    )
+    check.add_argument("file", type=Path)
+    check.add_argument("--loudness", type=float, default=-14.0, help="integrated LUFS target (default -14)")
+    check.add_argument("--true-peak", type=float, default=-1.0, help="dBTP ceiling (default -1)")
+    check.add_argument("--json", action="store_true")
     args = parser.parse_args()
+    if args.command == "check":
+        return _check(args)
     if args.command == "plugins":
         import json
 

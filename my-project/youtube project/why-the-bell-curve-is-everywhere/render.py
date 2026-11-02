@@ -6,11 +6,13 @@
     python render.py --chapter 0 --preview --start 20 --end 36
     python render.py --chapter 0 --final               # 1080p, crf 16, motion blur on
     python render.py --chapter full --final --quality 4k
+    python render.py --chapter full --final --codec prores --lut grades/look.cube   # 10-bit .mov master
     python render.py --chapter test --stills           # Stage A component sheet
 
 Times are narration source-clock seconds. Full-quality renders sit behind --final so previews never
 overwrite finals by accident. --final turns motion blur on (FC_MOTION_BLUR, 5 subframes) unless
---blur is given; previews and stills render without it.
+--blur is given; previews and stills render without it. Every video render normalizes the narration to
+-14 LUFS (YouTube), and finals print a delivery report (loudness, true peak, colour tags, black frames).
 """
 
 from __future__ import annotations
@@ -53,12 +55,14 @@ def main():
     ap.add_argument("--quality", default="1080p", choices=["1080p", "4k"], help="--final resolution")
     ap.add_argument("--blur", type=int, default=None, help="motion-blur subframes (default: 5 for --final, else off)")
     ap.add_argument("--backend", default="skia", choices=["skia", "pillow", "moderngl", "auto"])
+    ap.add_argument("--codec", default="h264", choices=["h264", "hevc10", "prores"], help="--final codec")
+    ap.add_argument("--lut", type=Path, default=None, help="--final .cube colour grade")
     args = ap.parse_args()
 
     blur = args.blur if args.blur is not None else (5 if args.final else 1)
     os.environ["FC_MOTION_BLUR"] = str(blur)
 
-    from faceless_champ import ExportSettings, render, save_frame
+    from faceless_champ import ExportSettings, delivery_report, render, save_frame
 
     mod = importlib.import_module(CHAPTERS[args.chapter])
     scene = mod.build(audio=not (args.stills or args.frame))
@@ -81,13 +85,13 @@ def main():
     ranged = args.start is not None or args.end is not None
     if args.final:
         settings = ExportSettings(quality=args.quality, fps=args.fps, antialias=1, backend=args.backend, preset="slow",
-                                  crf=16)
-        out = OUT / f"{tag}_{args.quality}.mp4"
+                                  crf=16, codec=args.codec, lut=args.lut, loudness=-14)
+        out = OUT / f"{tag}_{args.quality}{settings.suffix}"
         if ranged:
-            out = OUT / "sections" / f"{tag}_{args.quality}_{start + off:g}-{end + off:g}.mp4"
+            out = OUT / "sections" / f"{tag}_{args.quality}_{start + off:g}-{end + off:g}{settings.suffix}"
     else:
         settings = ExportSettings(quality="720p", fps=args.fps, antialias=1, backend=args.backend, preset="veryfast",
-                                  crf=20)
+                                  crf=20, loudness=-14)
         suffix = f"_{start + off:g}-{end + off:g}" if ranged else ""
         out = OUT / "previews" / f"{tag}_720p{suffix}.mp4"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -101,6 +105,8 @@ def main():
 
     render(scene, out, settings=settings, overwrite=True, start_time=start, end_time=end, progress=progress)
     print(f"wrote {out}  ({time.time() - t0:.0f}s)")
+    if args.final:
+        print(delivery_report(out))
 
 
 if __name__ == "__main__":

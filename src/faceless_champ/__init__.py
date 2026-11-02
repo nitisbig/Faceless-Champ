@@ -55,6 +55,7 @@ if _TYPE_CHECKING:
         Text,
         Triangle,
     )
+    from .delivery import DeliveryFinding, DeliveryReport, delivery_report
     from .easing import EASINGS, cubic_bezier, ease_in_out, ease_out_expo, ease_out_quint
     from .effects import Bloom, ChromaticAberration, Distortion, EffectStack, GaussianBlur, LightSweep, OuterGlow
     from .export import ExportSettings, render
@@ -95,6 +96,9 @@ if _TYPE_CHECKING:
     )
 
 _EXPORTS = {
+    "DeliveryFinding": ("delivery", "DeliveryFinding"),
+    "DeliveryReport": ("delivery", "DeliveryReport"),
+    "delivery_report": ("delivery", "delivery_report"),
     "Trace": ("animation", "Trace"),
     "BLEND_MODES": ("blending", "BLEND_MODES"),
     "DisplacementMap": ("effects", "DisplacementMap"),
@@ -473,6 +477,9 @@ __all__ = [  # noqa: RUF022
     "MathGlyphs",
     "Lighting",
     "Morphology",
+    "delivery_report",
+    "DeliveryReport",
+    "DeliveryFinding",
 ]
 
 

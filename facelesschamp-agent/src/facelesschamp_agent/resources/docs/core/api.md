@@ -654,10 +654,53 @@ I/O; they do not interrupt a renderer or progress callback running user code.
 | `preset` | `"medium"` | x264 presets from ultrafast through veryslow |
 | `antialias` | `2` | Supersampling factor 1, 2, 3, or 4 |
 | `encoder_timeout` | `60` | Positive finite seconds per encoder I/O/completion operation |
+| `codec` | `"h264"` | `h264` (8-bit MP4), `hevc10` (10-bit HEVC MP4), `prores` (ProRes 422 HQ 10-bit MOV master, PCM audio) |
+| `lut` | `None` | Path to a `.cube` 3D LUT applied in RGB before encoding |
+| `loudness` | `None` | Integrated LUFS target for the mixed audio (YouTube: `-14`); two-pass `loudnorm` |
+| `true_peak` | `-1.0` | dBTP ceiling used with `loudness` |
+| `audio_bitrate` | `"192k"` | AAC bitrate for `h264`/`hevc10` |
 
 Quality presets set the shorter dimension to 720, 1080, or 2160 and preserve aspect
 ratio, rounding to even dimensions. Explicit dimensions override preset resolution
 and must preserve the design aspect ratio to rounding tolerance.
+
+### Finishing and delivery
+
+Every export converts RGB with the BT.709 matrix and tags the stream BT.709 limited
+range. Players and YouTube read the tags instead of guessing a color matrix. The
+output suffix follows the codec: `.mp4` for `h264`/`hevc10` and `.mov` for `prores`.
+`hevc10` and `prores` keep 10 bits through YUV conversion and compression, which
+reduces banding in dark gradients and glows. Frames are still rendered at 8 bits.
+x265 CRF values are not equal to x264 values; around 20 gives similar quality to
+x264 at 18. `prores` ignores `crf` and `preset`.
+
+```python
+from faceless_champ import ExportSettings, delivery_report, render
+
+render(scene, "final.mov", settings=ExportSettings(quality="4k", codec="prores",
+       lut="grades/teal-warm.cube", loudness=-14))
+print(delivery_report("final.mov"))   # or: python -m faceless_champ check final.mov
+```
+
+`loudness` analyses the mixed audio once before any frame renders, then applies a
+linear `loudnorm` so the integrated loudness lands on target without pumping. A
+silent mix is left unchanged.
+
+`delivery_report(path, loudness=-14, true_peak=-1, tolerance=1, black=1, freeze=3,
+silence=3)` decodes the file once and returns a `DeliveryReport`. It contains the
+stream facts, integrated loudness, loudness range, true peak and a tuple of
+`DeliveryFinding(severity, code, message, start, end)`:
+
+- **Errors:** `CLIPPING` (true peak above 0 dBTP). `report.ok` is false only when
+  there are errors.
+- **Warnings:** `COLOR_TAGS`, `LOUDNESS`, `TRUE_PEAK`, `NO_AUDIO` and `BLACK` (fully
+  black frames).
+- **Notes:** `FREEZE`, `SILENCE`, `SAMPLE_RATE`, `FPS` and `ASPECT`. Explainers hold
+  still frames and end screens are often silent, so these never fail a check.
+
+`python -m faceless_champ check FILE [--loudness -14] [--true-peak -1] [--json]`
+prints the report and exits 1 when it is not ok. The `render` command accepts
+`--codec`, `--lut` and `--loudness`.
 
 Frames sample times `i / fps` for `ceil(duration * fps)` frames. Duration is rounded
 up by less than one frame; the exact endpoint is not an additional output frame.
