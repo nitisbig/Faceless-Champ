@@ -281,6 +281,9 @@ vignette, grain, finish(). Timing: lin, smooth, ease_*, env, pulse, chroma_kick,
 beat/word. Modules: hud (glass_card, pill, readout, coord_chip, arrow, axis3d, dot_grid), mathtype
 (Typst draw/morph/number/tc), space (Camera, orbit_path, draw_box, text3d), mesh3d (PyVista matched
 to space.Camera, disk-cached). motion_blur(draw, t, size, weight=) reads FC_MOTION_BLUR.
+noise (faceless-champ[motion]): shake(t, amount), wobble(points, t, fps=12), drift(count, t, area),
+field(t); pure in t. physics: World(gravity).ball/box/peg/segment/walls, bake(duration) -> cached
+Simulation; sim.at(t) bodies, sim.impacts(min_speed) for add_sfx. Bake before rendering.
 [Frame drawing](docs/core/draw.md).
 
 ## Plugins

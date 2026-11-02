@@ -18,16 +18,17 @@ scene components::
 
 Modules: ``timing`` (envelopes, easing, CueClock; no Skia), ``palette`` (theme color tokens; no Skia),
 ``frame`` (Frame, fonts, glow, finish, motion blur), ``hud``, ``space`` (3D cameras and boxes),
-``mathtype`` (Typst glyphs and morphs) and ``mesh3d`` (PyVista solids matched to ``space.Camera``).
+``mathtype`` (Typst glyphs and morphs), ``mesh3d`` (PyVista solids matched to ``space.Camera``),
+``noise`` (OpenSimplex shake, wobble, drift, fields) and ``physics`` (baked pymunk worlds).
 Frame, hud, space and mathtype need skia-python (``faceless-champ[skia]``); mesh3d also needs
-``faceless-champ[3d]``.
+``faceless-champ[3d]``; noise and physics need ``faceless-champ[motion]`` and no Skia.
 """
 
 from importlib import import_module
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from . import frame, hud, mathtype, mesh3d, palette, space, timing
+    from . import frame, hud, mathtype, mesh3d, noise, palette, physics, space, timing
     from .frame import (
         DESIGN,
         LINEAR,
@@ -86,7 +87,7 @@ _EXPORTS = {
     "text_width": "frame",
     "typeface": "frame",
 }
-_MODULES = ("timing", "palette", "frame", "hud", "space", "mathtype", "mesh3d")
+_MODULES = ("timing", "palette", "frame", "hud", "space", "mathtype", "mesh3d", "noise", "physics")
 
 __all__ = [
     "DESIGN",
@@ -118,8 +119,10 @@ __all__ = [
     "mesh3d",
     "mix",
     "motion_blur",
+    "noise",
     "offscreen",
     "palette",
+    "physics",
     "pulse",
     "quad_matrix",
     "set_default_palette",
