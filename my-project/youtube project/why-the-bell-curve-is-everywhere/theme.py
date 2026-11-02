@@ -5,9 +5,11 @@ Red (``tail``) appears only once the bell fails. See scene-plan.md §1.2.
 """
 
 from dataclasses import replace
+from pathlib import Path
 
 from faceless_champ import Theme
 from faceless_champ.colors import ColorScheme
+from faceless_champ.draw import Palette, set_default_palette
 
 TOKENS = {
     "bg": "#000000",
@@ -43,4 +45,9 @@ SCHEME = ColorScheme(
 
 THEME = replace(Theme.named("midnight"), name="bell-noir", colors=SCHEME)
 
+# Every faceless_champ.draw helper resolves these tokens: Frame(size), col("ball"), tc("pi", "pi"), hud.*.
+PALETTE = Palette.from_theme(THEME, **TOKENS, glass="#0E131C", glass_deep="#04060A", floor="#8FA0BF")
+set_default_palette(PALETTE)
+
 W, H = 1920, 1080
+PV_CACHE = Path(__file__).resolve().parent / "output" / "cache" / "pyvista"

@@ -17,16 +17,17 @@ from pathlib import Path
 
 import numpy as np
 import skia
-import typmath
-from components import crowd, hud
+from faceless_champ.draw import mathtype as typmath
+from components import crowd
+from faceless_champ.draw import hud
 from components.bell import Bell, band_share, pdf
 from components.dials import dial_pair
 from components.histogram import Axes
 from cues import AUDIO, beat, cue
-from fx import Frame, ease_io, ease_out, env, font, lin, pulse, smooth
+from faceless_champ.draw import Frame, ease_io, ease_out, env, font, lin, pulse, smooth
 from scipy.special import ndtr
 from theme import THEME, H, W
-from typmath import tc
+from faceless_champ.draw.mathtype import tc
 
 from scenes import ch3_formula as ch3
 

@@ -22,17 +22,18 @@ from pathlib import Path
 
 import numpy as np
 import skia
-import typmath
-from components import crowd, hud
+from faceless_champ.draw import mathtype as typmath
+from components import crowd
+from faceless_champ.draw import hud
 from components.bell import Bell
 from components.darts import Target, draw_dots
 from components.galton import Board, warp
 from components.histogram import Axes, bars_from_samples, draw_bars
 from cues import AUDIO, beat, cue
-from fx import Frame, chroma_kick, ease_io, ease_out, env, lin, motion_blur, smooth, text_path
+from faceless_champ.draw import Frame, chroma_kick, ease_io, ease_out, env, lin, motion_blur, smooth, text_path
 from scipy.special import ndtri
 from theme import THEME, TOKENS, H, W
-from typmath import tc
+from faceless_champ.draw.mathtype import tc
 
 START = 0.0
 END = cue(168)  # 56.72 "Let's go back to the board of pegs."

@@ -23,13 +23,13 @@ from pathlib import Path
 
 import numpy as np
 import skia
-import typmath
-from components import hud
+from faceless_champ.draw import mathtype as typmath
+from faceless_champ.draw import hud
 from components.bell import Bell
 from components.galton import Board, binom_row
 from components.histogram import Axes, bars_from, draw_bars, spring, stagger
 from cues import AUDIO, beat, cue
-from fx import Frame, back, chroma_kick, clamp, ease_in, ease_io, ease_out, env, lin, mix, motion_blur, smooth
+from faceless_champ.draw import Frame, back, chroma_kick, clamp, ease_in, ease_io, ease_out, env, lin, mix, motion_blur, smooth
 from theme import THEME, H, W
 
 START = cue(168)  # 56.72 "Let's go back to the board of pegs."

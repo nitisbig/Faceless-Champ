@@ -20,16 +20,17 @@ if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
-import typmath
-from components import crowd, hud
+from faceless_champ.draw import mathtype as typmath
+from components import crowd
+from faceless_champ.draw import hud
 from components.bell import Bell, band_share, pdf
 from components.darts import Target, draw_dots
 from components.dials import dial_pair
 from components.galton import Board, binom_row, warp
 from components.histogram import Axes, bars_from, die_pmf, draw_bars, label_bars, morph, stagger, sum_pmf
-from fx import Frame, chroma_kick, ease_io, ease_out, env, lin, motion_blur, smooth, text_path
-from theme import THEME, TOKENS, H, W
-from typmath import tc
+from faceless_champ.draw import Frame, chroma_kick, ease_io, ease_out, env, lin, motion_blur, smooth, text_path
+from theme import PV_CACHE, THEME, TOKENS, H, W
+from faceless_champ.draw.mathtype import tc
 
 DURATION = 20.0
 OFFSET = 0.0
@@ -193,9 +194,9 @@ def draw_crowd_panel(fr, t):
 
 
 def draw_3d(fr, t, a):
-    from pv3d import render as pv3
+    from faceless_champ.draw import mesh3d as pv3
     from pv3d import solids
-    from space import orbit
+    from faceless_champ.draw.space import orbit
 
     cam = orbit((0.0, 0.7, 0.0), 8.0, 0.30, 0.35 + 0.08 * (t - 16.0), focal=1250.0, center=(1460.0, 600.0))
     size = pv3.frame_size(fr)
@@ -203,8 +204,8 @@ def draw_3d(fr, t, a):
         k = ease_out(lin(t, 16.0, 17.8))
         R = solids.rotation(5.0 * (1 - k) + 0.5, 4.0 * (1 - k) + 0.6, 2.5 * (1 - k))
         centre = (0.0, 0.9 + 1.4 * (1 - k) * abs(math.cos(6 * k)), 0.0)
-        rgba = pv3.render([(solids.die(centre, 0.9, R), dict(pv3.GLASS, opacity=0.34, smooth_shading=True))], cam, size,
-                          cache="stage_a_die")
+        rgba = pv3.render([(solids.die(centre, 0.9, R), pv3.glass(opacity=0.34, smooth_shading=True))], cam, size,
+                          cache="stage_a_die", root=PV_CACHE)
         pv3.composite(fr, rgba, a)
         for p, nrm, r, _ in solids.pip_points(centre, 0.9, R):
             facing = float(np.dot(nrm, cam.eye - p) / np.linalg.norm(cam.eye - p))
@@ -218,7 +219,7 @@ def draw_3d(fr, t, a):
         style = {"color": TOKENS["bell"], "opacity": 0.42, "specular": 0.9, "specular_power": 70, "diffuse": 0.75,
                  "ambient": 0.25, "smooth_shading": True}
         rgba = pv3.render([(solids.gaussian_surface(height=2.2, extent=2.4, sigma=0.8), style)], cam, size,
-                          cache="stage_a_surface")
+                          cache="stage_a_surface", root=PV_CACHE)
         pv3.composite(fr, rgba, a * b)
         th = np.linspace(0, 2 * np.pi, 120)
         radii = (0.3, 0.6, 0.9, 1.2, 1.5, 1.8)

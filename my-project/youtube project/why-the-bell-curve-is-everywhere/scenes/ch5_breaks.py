@@ -22,16 +22,17 @@ from pathlib import Path
 
 import numpy as np
 import skia
-import typmath
-from components import crowd, hud
+from faceless_champ.draw import mathtype as typmath
+from components import crowd
+from faceless_champ.draw import hud
 from components.bell import Bell
 from components.histogram import Axes, Bars, draw_bars, stagger
 from cues import AUDIO, beat, cue
-from fx import Frame, chroma_kick, col, ease_in, ease_io, ease_out, env, lin, smooth, text_path
+from faceless_champ.draw import Frame, chroma_kick, col, ease_in, ease_io, ease_out, env, lin, smooth, text_path
 from scipy.special import ndtr
 from scipy.stats import gaussian_kde
 from theme import THEME, H, W
-from typmath import tc
+from faceless_champ.draw.mathtype import tc
 
 from scenes import ch4_ruler as ch4
 

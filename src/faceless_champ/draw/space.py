@@ -1,7 +1,8 @@
-"""Tiny 3D toolkit: look-at cameras, painter-sorted shaded boxes, projected text.
+"""Small 3D toolkit for Frame drawing: look-at cameras, eased camera paths, shaded boxes, projected text.
 
-Geometry is real 3D (numpy), projected with a pinhole camera and drawn with
-skia through fx.Frame, so 3D shots share the exact line quality of the 2D ones.
+Geometry is real 3D (numpy), projected with a pinhole camera and drawn through the Frame, so 3D
+shots share the exact line quality of the 2D ones. View coordinates: x right, y up, z depth.
+``mesh3d.render`` renders PyVista meshes through the same Camera.
 """
 
 from __future__ import annotations
@@ -10,11 +11,11 @@ import math
 
 import numpy as np
 import skia
-from fx import mix
-from theme import TOKENS
 
 
 class Camera:
+    """Pinhole camera. ``focal`` and ``center`` are in design px (1920x1080 by default)."""
+
     def __init__(self, eye, target, focal=1000.0, center=(960.0, 540.0), up=(0.0, 1.0, 0.0)):
         self.eye = np.asarray(eye, float)
         self.target = np.asarray(target, float)
@@ -26,6 +27,7 @@ class Camera:
         self.focal, self.cx, self.cy = focal, center[0], center[1]
 
     def project(self, points):
+        """Points (N x 3) -> screen xs, ys and depth z (clamped above zero)."""
         p = np.atleast_2d(np.asarray(points, float)) - self.eye
         z = np.maximum(p @ self.f, 1e-3)
         return self.cx + self.focal * (p @ self.r) / z, self.cy - self.focal * (p @ self.u) / z, z
@@ -35,14 +37,14 @@ class Camera:
 
 
 def orbit(target, dist, elev, azim, focal=1000.0, center=(960.0, 540.0)):
-    """Camera on a sphere around ``target``; azim 0 looks along +z, elev lifts it."""
+    """Camera on a sphere around ``target``; azim 0 looks along +z, elev lifts it (radians)."""
     t = np.asarray(target, float)
     eye = t + dist * np.array([math.cos(elev) * math.sin(azim), math.sin(elev), -math.cos(elev) * math.cos(azim)])
     return Camera(eye, t, focal, center)
 
 
 def to_view(p):
-    """Math coordinates (x right, y forward, z up) -> view/world coordinates (x, up, depth)."""
+    """Math coordinates (x right, y forward, z up) -> view coordinates (x, up, depth)."""
     p = np.asarray(p, float)
     return p[..., [0, 2, 1]]
 
@@ -103,9 +105,12 @@ def rot_z(a):
 CORNERS = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)], float)
 # (outward normal, corner indices in winding order)
 FACES = [
-    ((1, 0, 0), (4, 5, 7, 6)), ((-1, 0, 0), (0, 2, 3, 1)),
-    ((0, 1, 0), (2, 6, 7, 3)), ((0, -1, 0), (0, 1, 5, 4)),
-    ((0, 0, 1), (1, 3, 7, 5)), ((0, 0, -1), (0, 4, 6, 2)),
+    ((1, 0, 0), (4, 5, 7, 6)),
+    ((-1, 0, 0), (0, 2, 3, 1)),
+    ((0, 1, 0), (2, 6, 7, 3)),
+    ((0, -1, 0), (0, 1, 5, 4)),
+    ((0, 0, 1), (1, 3, 7, 5)),
+    ((0, 0, -1), (0, 4, 6, 2)),
 ]
 LIGHT = np.array([-0.35, 0.85, -0.45]) / np.linalg.norm([-0.35, 0.85, -0.45])
 
@@ -129,8 +134,20 @@ def _poly_path(xs, ys):
     return p
 
 
-def draw_box(fr, cam, center, half, fill, stroke, alpha=1.0, R=None, fill_strength=0.22, stroke_width=1.6,
-             glow=0.0, on_face=None):
+def draw_box(
+    fr,
+    cam,
+    center,
+    half,
+    fill,
+    stroke,
+    alpha=1.0,
+    R=None,
+    fill_strength=0.22,
+    stroke_width=1.6,
+    glow=0.0,
+    on_face=None,
+):
     """Opaque flat-shaded box with emissive edges. ``on_face(normal, pts, path)`` decorates visible faces."""
     if alpha <= 0.003:
         return
@@ -140,7 +157,7 @@ def draw_box(fr, cam, center, half, fill, stroke, alpha=1.0, R=None, fill_streng
         xs, ys, _ = cam.project(pts)
         path = _poly_path(xs, ys)
         shade = 0.45 + 0.55 * max(0.0, float(normal @ LIGHT))
-        face = mix(TOKENS["bg"], TOKENS.get(fill, fill), fill_strength * shade)
+        face = fr.mix("bg", fill, fill_strength * shade)
         fr.path_fill(path, face, alpha)
         fr.path_stroke(path, stroke, stroke_width, alpha, glow=glow)
         if on_face is not None:
@@ -155,7 +172,7 @@ def draw_boxes(fr, cam, boxes):
 
 
 def text3d(fr, cam, s, point, size, color, alpha=1.0, weight=600, family="display", glow=0.0):
-    """Text whose size follows perspective, centred on a 3D point."""
+    """Text whose size follows perspective, centred on a 3D point (``size`` in world units)."""
     x, y, z = cam.project(point)
     px = size * cam.focal / float(z[0])
     if px < 4:

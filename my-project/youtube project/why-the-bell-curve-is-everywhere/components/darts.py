@@ -26,11 +26,11 @@ def draw_dots(fr, xy, r, color, alpha=1.0, glow=0.0):
     if alpha <= 0.003 or len(xy) == 0:
         return
     pts = [skia.Point(float(x), float(y)) for x, y in xy]
-    paint = fr._stroke(color, 2 * r, alpha)
+    paint = fr.stroke_paint(color, 2 * r, alpha)
     fr.c.drawPoints(skia.Canvas.kPoints_PointMode, pts, paint)
     if glow > 0:
         fr.glow_used = True
-        fr.g.drawPoints(skia.Canvas.kPoints_PointMode, pts, fr._stroke(color, 4.4 * r, alpha * glow))
+        fr.g.drawPoints(skia.Canvas.kPoints_PointMode, pts, fr.stroke_paint(color, 4.4 * r, alpha * glow))
 
 
 class Target:

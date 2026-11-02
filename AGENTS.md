@@ -13,6 +13,8 @@ There are three packages:
 2. [llms.txt](llms.txt): a compact map of the core API. Then [facelesschamp-kit/llms.txt](facelesschamp-kit/llms.txt) for kit.
 3. [docs/api.md](docs/api.md): only the sections for the components you use.
 4. [docs/plugins.md](docs/plugins.md): `FunctionSource` for external renderers, and plugins.
+5. [docs/draw.md](docs/draw.md): `faceless_champ.draw` for films drawn frame by frame with Skia
+   (math explainers): Frame, Palette, hud, mathtype, space, mesh3d.
 
 Skip `docs/archive/`, `docs/v2/`, `output/`, `build/`, `scratch/`, `my-project/` and `project-map/`.
 They are history, user work and generated files, not instructions.

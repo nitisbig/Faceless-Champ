@@ -21,17 +21,17 @@ from pathlib import Path
 
 import numpy as np
 import skia
-import typmath
-from components import hud
+from faceless_champ.draw import mathtype as typmath
+from faceless_champ.draw import hud
 from components.bell import Bell, band_share, pdf
 from components.darts import Target
 from components.dials import dial_pair
 from components.galton import Board, binom_row
 from components.histogram import LOPSIDED, Axes, bars_from, die_pmf, draw_bars, morph, sum_pmf
 from cues import AUDIO, TOTAL, beat, cue
-from fx import Frame, card_quad, chroma_kick, ease_in, ease_io, ease_out, env, lin, quad_matrix, smooth, text_path
+from faceless_champ.draw import Frame, card_quad, chroma_kick, ease_in, ease_io, ease_out, env, lin, quad_matrix, smooth, text_path
 from theme import THEME, H, W
-from typmath import tc
+from faceless_champ.draw.mathtype import tc
 
 from scenes import ch0_intro as ch0
 from scenes import ch3_formula as ch3

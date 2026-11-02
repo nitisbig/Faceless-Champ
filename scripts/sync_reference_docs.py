@@ -27,6 +27,7 @@ CORE_DOCS = (
     "coding-playgrounds",
     "coding",
     "compositing",
+    "draw",
     "flowchamp",
     "guide",
     "html-to-video",

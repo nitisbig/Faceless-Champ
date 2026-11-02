@@ -1,4 +1,7 @@
-"""HUD pieces shared by every chapter: glass cards, pills, readouts, arrows, axes, floors, eyebrows."""
+"""HUD pieces for Frame drawing: glass cards, pills, readouts, arrows, 3D axes and floors.
+
+Every function takes the Frame first and resolves colors through ``fr.palette``.
+"""
 
 from __future__ import annotations
 
@@ -7,17 +10,24 @@ from functools import lru_cache
 
 import numpy as np
 import skia
-import typmath
-from fx import LINEAR, col, ease_out, env, font, lin, smooth
-from theme import TOKENS
+
+from . import mathtype
+from .frame import LINEAR, font
+from .palette import Palette
+from .timing import ease_out, env, lin, smooth
 
 # ------------------------------------------------------------------ glass card (cached, lit bevel)
 
 
 @lru_cache(maxsize=64)
-def _glass_image(w: int, h: int, r: int, k: float, tint: str):
-    """A dark translucent card with a gradient rim and a specular bevel (Skia lighting), rendered once per size."""
-    pw, ph = max(2, int(round(w * k))), max(2, int(round(h * k)))
+def _glass_image(w: int, h: int, r: int, k: float, tint: str, palette: Palette):
+    """A translucent card with a gradient rim and a specular bevel (Skia lighting), rendered once per size."""
+
+    def c4(value, alpha):
+        red, green, blue = palette.rgb(value)
+        return skia.Color4f(red, green, blue, alpha)
+
+    pw, ph = max(2, round(w * k)), max(2, round(h * k))
     surf = skia.Surface(pw, ph)
     c = surf.getCanvas()
     c.clear(skia.ColorTRANSPARENT)
@@ -25,15 +35,19 @@ def _glass_image(w: int, h: int, r: int, k: float, tint: str):
     rect = skia.Rect.MakeXYWH(1, 1, w - 2, h - 2)
     rr = skia.RRect.MakeRectXY(rect, r, r)
     body = skia.GradientShader.MakeLinear(
-        [skia.Point(0, 0), skia.Point(0, h)], [col("#0E131C", 0.88), col("#04060A", 0.82)]
+        [skia.Point(0, 0), skia.Point(0, h)], [c4("glass", 0.88), c4("glass_deep", 0.82)]
     )
     c.drawRRect(rr, skia.Paint(AntiAlias=True, Shader=body))
     if tint != "none":
-        c.drawRRect(rr, skia.Paint(AntiAlias=True, Color4f=col(tint, 0.05)))
+        c.drawRRect(rr, skia.Paint(AntiAlias=True, Color4f=c4(tint, 0.05)))
     # Bevel: a blurred alpha mask lit by a distant specular light, kept inside the card.
-    mask = skia.Paint(AntiAlias=True, Color4f=col("#ffffff", 1.0))
+    mask = skia.Paint(AntiAlias=True, Color4f=c4("#ffffff", 1.0))
     lit = skia.ImageFilters.DistantLitSpecular(
-        skia.Point3(-0.45, -0.75, 0.48), skia.Color4f(1, 1, 1, 1).toColor(), 2.2, 0.55, 18.0,
+        skia.Point3(-0.45, -0.75, 0.48),
+        skia.Color4f(1, 1, 1, 1).toColor(),
+        2.2,
+        0.55,
+        18.0,
         skia.ImageFilters.Blur(3.0, 3.0),
     )
     c.save()
@@ -44,32 +58,32 @@ def _glass_image(w: int, h: int, r: int, k: float, tint: str):
     c.restore()
     rim = skia.GradientShader.MakeLinear(
         [skia.Point(0, 0), skia.Point(w, h)],
-        [col(TOKENS["ink"], 0.34), col(TOKENS["line"], 0.9), col(TOKENS["ink"], 0.14)],
+        [c4("ink", 0.34), c4("line", 0.9), c4("ink", 0.14)],
         [0.0, 0.55, 1.0],
     )
     c.drawRRect(rr, skia.Paint(AntiAlias=True, Style=skia.Paint.kStroke_Style, StrokeWidth=1.2, Shader=rim))
-    c.drawLine(r, 2.2, w - r, 2.2, skia.Paint(AntiAlias=True, StrokeWidth=1.0, Color4f=col("#ffffff", 0.10)))
+    c.drawLine(r, 2.2, w - r, 2.2, skia.Paint(AntiAlias=True, StrokeWidth=1.0, Color4f=c4("#ffffff", 0.10)))
     return surf.makeImageSnapshot()
 
 
-def glass_card(fr, x, y, w, h, alpha=1.0, r=18, tint="none", glow=0.0, glow_color="ball"):
-    """Glass plaque with its top-left corner at (x, y) in design px."""
+def glass_card(fr, x, y, w, h, alpha=1.0, r=18, tint="none", glow=0.0, glow_color="primary"):
+    """Glass plaque with its top-left corner at (x, y) in design px (tokens ``glass``, ``glass_deep``)."""
     if alpha <= 0.003:
         return
-    img = _glass_image(int(round(w)), int(round(h)), int(r), round(fr.k, 4), tint)
+    img = _glass_image(round(w), round(h), int(r), round(fr.k, 4), tint, fr.palette)
     fr.c.drawImageRect(img, skia.Rect.MakeXYWH(x, y, w, h), LINEAR, skia.Paint(AntiAlias=True, Alphaf=alpha))
     if glow > 0:
         p = skia.Path()
         p.addRRect(skia.RRect.MakeRectXY(skia.Rect.MakeXYWH(x, y, w, h), r, r))
         fr.glow_used = True
-        fr.g.drawPath(p, fr._stroke(glow_color, 6.0, alpha * glow))
+        fr.g.drawPath(p, fr.stroke_paint(glow_color, 6.0, alpha * glow))
 
 
 # ------------------------------------------------------------------ text helpers
 
 
 def tabular(fr, s, x, y, size=30, color="ink", alpha=1.0, family="sans", weight=600, align="center", glow=0.0):
-    """Text with fixed-advance digits so counters and readouts never jitter."""
+    """Text with fixed-advance digits so counters and readouts never jitter; returns its width."""
     if alpha <= 0.003 or not s:
         return 0.0
     f = font(family, size, weight)
@@ -85,26 +99,40 @@ def tabular(fr, s, x, y, size=30, color="ink", alpha=1.0, family="sans", weight=
 
 
 def pill(fr, cx, cy, text, color="ink", alpha=1.0, size=24, fill=0.10, glow=0.3, family="sans", weight=600):
-    """Capsule label (e.g. '1D', '3D -> 2D')."""
+    """Capsule label (e.g. '1D', '3D -> 2D') centred on (cx, cy)."""
     if alpha <= 0.003:
         return
     f = font(family, size, weight)
     w = f.measureText(text) + size * 1.4
     h = size * 1.75
-    fr.rrect(cx - w / 2, cy - h / 2, w, h, h / 2, fill=color, fill_alpha=fill * alpha, stroke=color, width=1.6,
-             alpha=alpha, glow=glow)
+    fr.rrect(
+        cx - w / 2,
+        cy - h / 2,
+        w,
+        h,
+        h / 2,
+        fill=color,
+        fill_alpha=fill * alpha,
+        stroke=color,
+        width=1.6,
+        alpha=alpha,
+        glow=glow,
+    )
     fr.text(text, cx, cy + size * 0.36, family, size, weight, color, alpha)
 
 
 def readout(fr, x, y, label, value, color="ink", alpha=1.0, size=30, card=True, align="center"):
-    """A glass chip '<label> <value>' with a tabular value, centred on (x, y)."""
+    """A glass chip '<label> <value>' with a tabular value, centred on (x, y).
+
+    Labels with non-ASCII characters (Greek etc.) are typeset with Typst.
+    """
     if alpha <= 0.003:
         return
     lf = font("sans", size * 0.62, 600)
     vf = font("sans", size, 600)
-    math_label = bool(label) and any(ord(ch) > 127 for ch in label)  # Greek etc.: DM Sans has no glyphs, use Typst
+    math_label = bool(label) and any(ord(ch) > 127 for ch in label)
     if math_label:
-        lw = typmath.size_of(label, size * 0.8)[0]
+        lw = mathtype.size_of(label, size * 0.8)[0]
     else:
         lw = lf.measureText(label) if label else 0.0
     digit = vf.measureText("0")
@@ -117,18 +145,18 @@ def readout(fr, x, y, label, value, color="ink", alpha=1.0, size=30, card=True, 
         glass_card(fr, left, y - h / 2, w, h, alpha, r=int(h / 2.6))
     tx = left + size * 0.55
     if math_label:
-        typmath.draw(fr, label, tx + lw / 2, y, size * 0.8, color="muted", alpha=alpha)
+        mathtype.draw(fr, label, tx + lw / 2, y, size * 0.8, color="muted", alpha=alpha)
     elif label:
         fr.text(label, tx, y + size * 0.22, "sans", size * 0.62, 600, "muted", alpha, align="left")
     tabular(fr, value, tx + lw + gap, y + size * 0.36, size, color, alpha, align="left")
 
 
 def coord_chip(fr, cx, cy, values, colors, alpha=1.0, size=30.0, flash=None, card=True, gap=1.0):
-    """Glass chip '(2.4, 1.8, 2.6)' with each component in its axis colour; returns the x centre of each value.
+    """Glass chip '(2.4, 1.8, 2.6)' with each component in its own colour; returns each value's x centre.
 
-    values: preformatted strings; flash: {index: 0..1} brightens and glows a component; gap (>= 1) spreads the
-    components apart ("independent numbers"). The layout is returned even at alpha 0, so other elements can
-    take over the numbers' positions.
+    values: preformatted strings; flash: {index: 0..1} brightens and glows a component; gap (>= 1) spreads
+    the components apart. The layout is returned even at alpha 0, so other elements can take over the
+    numbers' positions.
     """
     if not values:
         return []
@@ -167,13 +195,12 @@ def coord_chip(fr, cx, cy, values, colors, alpha=1.0, size=30.0, flash=None, car
     return centers
 
 
-def eyebrow(fr, t, label, t0, hold=2.5):
-    """Chapter marker in the top-left safe area: '01 · DIMENSIONS'."""
+def eyebrow(fr, t, label, t0, hold=2.5, accent="secondary", x=96.0, y=96.0):
+    """Chapter marker in the top-left safe area ('01 · DIMENSIONS'), shown from t0 for ``hold`` s."""
     a = env(t, t0, t0 + hold, 0.5, 0.6)
     if a <= 0.003:
         return
-    x, y = 96.0, 96.0
-    fr.line(x, y - 8, x + 28 * ease_out(lin(t, t0, t0 + 0.5)), y - 8, "bell", 2.4, a, glow=0.4)
+    fr.line(x, y - 8, x + 28 * ease_out(lin(t, t0, t0 + 0.5)), y - 8, accent, 2.4, a, glow=0.4)
     fr.text(label, x + 44, y, "sans", 22, 700, "muted", a, align="left", tracking=0.22)
 
 
@@ -205,6 +232,7 @@ def arrow(fr, x0, y0, x1, y1, color, width=2.6, alpha=1.0, glow=0.6, head=16.0, 
 
 
 def arrow3d(fr, cam, p0, p1, color, width=2.6, alpha=1.0, glow=0.6, head=16.0, dashed=False):
+    """Arrow between two 3D points through a ``space.Camera``; returns the projected xs, ys."""
     xs, ys, z = cam.project(np.array([p0, p1], float))
     if np.all(z > 0.05):
         arrow(fr, xs[0], ys[0], xs[1], ys[1], color, width, alpha, glow, head, dashed)
@@ -213,7 +241,7 @@ def arrow3d(fr, cam, p0, p1, color, width=2.6, alpha=1.0, glow=0.6, head=16.0, d
 
 def axis3d(fr, cam, origin, vec, name, color, u=1.0, label_alpha=None, width=2.4, size=0.42, dashed=False):
     """An axis drawing on (u: 0 -> 1) with an italic letter past its tip."""
-    from space import text3d
+    from .space import text3d
 
     if u <= 0:
         return
@@ -234,7 +262,18 @@ def right_angle(fr, cam, corner, d1, d2, size=0.22, color="ink", alpha=1.0):
         fr.poly(xs, ys, color, 1.6, alpha)
 
 
-def dot_grid(fr, cam, height=0.0, extent=7.0, spacing=0.5, alpha=0.10, radius=1.6, center=(0.0, 0.0), reveal=None):
+def dot_grid(
+    fr,
+    cam,
+    height=0.0,
+    extent=7.0,
+    spacing=0.5,
+    alpha=0.10,
+    radius=1.6,
+    center=(0.0, 0.0),
+    reveal=None,
+    color="floor",
+):
     """Perspective dot floor (view y = height) fading with distance. ``reveal`` grows it from the centre."""
     if alpha <= 0.003:
         return
@@ -248,4 +287,4 @@ def dot_grid(fr, cam, height=0.0, extent=7.0, spacing=0.5, alpha=0.10, radius=1.
         fog *= np.clip((reveal * (extent + 1) - dist) / 1.2, 0, 1)
     for x, y, zz, f in zip(xs, ys, z, fog):
         if zz > 0.2 and f > 0.02:
-            fr.circle(x, y, radius * min(1.6, 6.0 / zz) ** 0.5, "#8FA0BF", alpha=alpha * f, fill=True)
+            fr.circle(x, y, radius * min(1.6, 6.0 / zz) ** 0.5, color, alpha=alpha * f, fill=True)

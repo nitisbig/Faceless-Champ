@@ -24,15 +24,16 @@ from pathlib import Path
 
 import numpy as np
 import skia
-from components import crowd, hud
+from components import crowd
+from faceless_champ.draw import hud
 from components.bell import Bell, pdf
 from components.dials import dial_pair
 from components.histogram import LOPSIDED, Axes, bars_from, die_pmf, draw_bars, label_bars, morph, stagger, sum_pmf
 from cues import AUDIO, beat, cue
-from fx import Frame, back, clamp, ease_in, ease_io, ease_out, env, lin, mix, smooth, text_path
+from faceless_champ.draw import Frame, back, clamp, ease_in, ease_io, ease_out, env, lin, mix, smooth, text_path
 from pv3d.solids import FACES, PIPS, rotation
 from scipy.spatial.transform import Rotation
-from space import Camera, draw_box
+from faceless_champ.draw.space import Camera, draw_box
 from theme import THEME, H, W
 
 from scenes import ch1_paths as ch1

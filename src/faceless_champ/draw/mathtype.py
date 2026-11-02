@@ -1,12 +1,13 @@
-"""Typst math as skia paths inside fx.Frame: the film's equation engine (no LaTeX needed).
+"""Typst math as skia paths inside a Frame: color, glow, write-on and glyph-matching morphs.
 
-Typst (CLI on PATH, or ``pip install typst``) compiles each expression to SVG once (disk cache,
-``faceless_champ.typst_math``); glyphs become skia paths we can colour, glow, reveal and morph per frame.
+Typst compiles each expression to SVG once (disk cache, see ``faceless_champ.typst_math``);
+the glyphs become skia paths drawn per frame::
 
-    tc("x", "x")                                   # '#text(fill: rgb("#FF5A4E"))[$x$]': colour a sub-term by token
+    tc("primary", "x")                             # color a sub-term: '#text(fill: rgb("#80caff"))[$x$]'
     draw(fr, "sqrt(1^2 + 1^2) = sqrt(2)", 960, 540, 72)
     draw(fr, expr, cx, cy, 64, reveal=0.4)         # left-to-right write-on (glyph by glyph)
     morph(fr, "sqrt(4)", "2", u, 960, 540, 72)     # matching glyphs fly, the rest cross-fade
+    number(fr, "0.62", cx, cy, 48)                 # live values from cached digit glyphs
 
 Typst syntax: a/b, sqrt(x), x^2, mat(1, 0; 0, 1), theta, dot, cos, "text", arrow(v), norm(v).
 """
@@ -20,18 +21,18 @@ from functools import lru_cache
 
 import numpy as np
 import skia
-from fx import ease_io, mix
-from theme import TOKENS
 
-from faceless_champ.backends._skia_paint import path_data
-from faceless_champ.typst_math import PT_PER_PX, glyph_paths
+from ..backends._skia_paint import path_data
+from ..typst_math import PT_PER_PX, glyph_paths
+from .palette import Palette, default_palette
+from .timing import ease_io
 
 BASE = 96.0  # glyphs are compiled once at this size and scaled
 
 
-def tc(token: str, body: str) -> str:
-    """Colour a math sub-expression with a theme token (or hex): tc('w', 'w') -> blue w."""
-    hexv = TOKENS.get(token, token).lstrip("#")
+def tc(token: str, body: str, palette: Palette | None = None) -> str:
+    """Color a math sub-expression with a token (or hex): tc('primary', 'w') -> a blue w."""
+    hexv = (palette or default_palette()).hex(token).lstrip("#")[:6]
     return f'#text(fill: rgb("#{hexv}"))[${body}$]'
 
 
@@ -46,8 +47,11 @@ class Glyph:
 
 
 @lru_cache(maxsize=512)
-def glyphs(expr: str, color: str = TOKENS["ink"]) -> tuple[tuple[Glyph, ...], tuple[float, float, float, float]]:
-    """Glyphs left to right, centred on (0, 0), plus the bounds (l, t, r, b) at BASE size."""
+def glyphs(expr: str, color: str = "#FFFFFF") -> tuple[tuple[Glyph, ...], tuple[float, float, float, float]]:
+    """Glyphs left to right, centred on (0, 0), plus the bounds (l, t, r, b) at BASE size.
+
+    ``color`` (hex) is the fill of glyphs not colored inside the expression with ``tc``.
+    """
     pieces = glyph_paths(expr, BASE, color)
     if not pieces:
         raise ValueError(f"Typst produced no glyphs for {expr!r}")
@@ -63,12 +67,25 @@ def glyphs(expr: str, color: str = TOKENS["ink"]) -> tuple[tuple[Glyph, ...], tu
         filled = fill not in (None, "none")
         shape = data.transformed(dx=-b.left, dy=-b.top).to_svg()
         key = hashlib.sha1(f"{round(b.width, 1)}:{round(b.height, 1)}:{shape[:400]}".encode()).hexdigest()[:16]
-        out.append(Glyph(path, fill if filled else stroke, 0.0 if filled else width / PT_PER_PX, key,
-                         (b.left + b.right) / 2, (b.top + b.bottom) / 2))
+        out.append(
+            Glyph(
+                path,
+                fill if filled else stroke,
+                0.0 if filled else width / PT_PER_PX,
+                key,
+                (b.left + b.right) / 2,
+                (b.top + b.bottom) / 2,
+            )
+        )
     return tuple(out), (left - ox, top - oy, right - ox, bottom - oy)
 
 
+def _ink(fr) -> str:
+    return fr.palette.hex("ink")
+
+
 def size_of(expr: str, size: float) -> tuple[float, float]:
+    """Width and height in design px of ``expr`` typeset at ``size``."""
     _, (lft, t, r, b) = glyphs(expr)
     k = size / BASE
     return (r - lft) * k, (b - t) * k
@@ -91,16 +108,29 @@ def _matrix(cx, cy, size, dx=0.0, dy=0.0):
     return m
 
 
-def draw(fr, expr, cx, cy, size=64.0, color=None, alpha=1.0, glow=0.0, reveal=1.0, colors=None, glows=None,
-         alphas=None, align="center"):
+def draw(
+    fr,
+    expr,
+    cx,
+    cy,
+    size=64.0,
+    color=None,
+    alpha=1.0,
+    glow=0.0,
+    reveal=1.0,
+    colors=None,
+    glows=None,
+    alphas=None,
+    align="center",
+):
     """Draw an expression centred on (cx, cy) (``align`` 'left'/'right' anchors that edge at cx).
 
-    color: recolour every glyph (token or hex); colors/glows/alphas: {glyph index: value} overrides.
+    color: recolor every glyph (token or hex); colors/glows/alphas: {glyph index: value} overrides.
     reveal: 0..1 writes glyphs on left to right with a short per-glyph fade.
     """
     if alpha <= 0.003:
         return
-    gs, (lft, _, r, _) = glyphs(expr)
+    gs, (lft, _, r, _) = glyphs(expr, _ink(fr))
     k = size / BASE
     shift = 0.0 if align == "center" else (-lft * k if align == "left" else -r * k)
     m = _matrix(cx + shift, cy, size)
@@ -112,12 +142,11 @@ def draw(fr, expr, cx, cy, size=64.0, color=None, alpha=1.0, glow=0.0, reveal=1.
             a *= float(np.clip(reveal * (n + 2) - i, 0.0, 1.0))
         if a <= 0.003:
             continue
-        c = colors.get(i, TOKENS.get(color, color) if color else g.color)
+        c = colors.get(i, fr.palette.hex(color) if color else g.color)
         _paint_glyph(fr, g, m, c, a, glows.get(i, glow))
 
 
-def morph(fr, a_expr, b_expr, u, cx, cy, size=64.0, alpha=1.0, glow=0.0, b_cx=None, b_cy=None, b_size=None,
-          arc=0.0):
+def morph(fr, a_expr, b_expr, u, cx, cy, size=64.0, alpha=1.0, glow=0.0, b_cx=None, b_cy=None, b_size=None, arc=0.0):
     """Matching-glyph transform: glyphs with the same shape fly from A to B; the rest cross-fade.
 
     u: 0 -> A, 1 -> B (eased inside). B can sit elsewhere (b_cx, b_cy, b_size). ``arc`` lifts flying glyphs.
@@ -132,8 +161,9 @@ def morph(fr, a_expr, b_expr, u, cx, cy, size=64.0, alpha=1.0, glow=0.0, b_cx=No
     if u >= 1.0:
         draw(fr, b_expr, bx, by, bs, alpha=alpha, glow=glow)
         return
-    ga, _ = glyphs(a_expr)
-    gb, _ = glyphs(b_expr)
+    ink = _ink(fr)
+    ga, _ = glyphs(a_expr, ink)
+    gb, _ = glyphs(b_expr, ink)
     used, pairs = set(), {}
     for j, g in enumerate(gb):
         best = None
@@ -157,7 +187,7 @@ def morph(fr, a_expr, b_expr, u, cx, cy, size=64.0, alpha=1.0, glow=0.0, b_cx=No
             m = skia.Matrix()
             m.setScale(s / BASE, s / BASE)
             m.postTranslate(x - g.cx * s / BASE, y - g.cy * s / BASE)
-            c = h.color if h.color == g.color else mix(h.color, g.color, u)
+            c = h.color if h.color == g.color else fr.mix(h.color, g.color, u)
             _paint_glyph(fr, g, m, c, alpha, glow)
         else:  # new B glyphs fade in
             _paint_glyph(fr, g, _matrix(bx, by, bs), g.color, alpha * u**2, glow)
@@ -172,7 +202,7 @@ _NUMERIC = re.compile(r"^[−\-+]?[0-9.,]+°?$")
 @lru_cache(maxsize=1)
 def _strip():
     """Per-character glyphs of the math digits on one baseline: {char: (path, advance, lead)} at BASE size."""
-    pieces = glyph_paths(_STRIP, BASE, TOKENS["ink"])
+    pieces = glyph_paths(_STRIP, BASE, "#FFFFFF")
     if len(pieces) != len(_STRIP):
         raise RuntimeError(f"digit strip produced {len(pieces)} glyphs for {len(_STRIP)} characters")
     baseline = pieces[1][0].bounds.bottom  # the foot of '1'
@@ -190,7 +220,7 @@ def _strip():
 
 
 def number(fr, s, cx, cy, size=48.0, color="ink", alpha=1.0, glow=0.0, align="center"):
-    """A live numeric value ('0.62', '−3', '72.5°') from cached digit glyphs: no Typst compile per frame."""
+    """A live numeric value ('0.62', '−3', '72.5°') from cached digit glyphs; returns its width."""
     if alpha <= 0.003 or not s:
         return 0.0
     strip = _strip()
@@ -199,7 +229,6 @@ def number(fr, s, cx, cy, size=48.0, color="ink", alpha=1.0, glow=0.0, align="ce
     total = sum(strip[c][1] for c in chars) * k
     x = cx - total / 2 if align == "center" else cx - total if align == "right" else cx
     baseline = cy + 0.335 * size  # digits are ~0.67 em tall: centre them on cy
-    hexv = TOKENS.get(color, color)
     for c in chars:
         path, adv, lead = strip[c]
         p = skia.Path(path)
@@ -207,7 +236,7 @@ def number(fr, s, cx, cy, size=48.0, color="ink", alpha=1.0, glow=0.0, align="ce
         m.setScale(k, k)
         m.postTranslate(x + lead * k, baseline)
         p.transform(m)
-        fr.path_fill(p, hexv, alpha, glow=glow)
+        fr.path_fill(p, color, alpha, glow=glow)
         x += adv * k
     return total
 
@@ -215,7 +244,7 @@ def number(fr, s, cx, cy, size=48.0, color="ink", alpha=1.0, glow=0.0, align="ce
 def term(fr, tex, cx, cy, size=48.0, color=None, alpha=1.0, glow=0.0):
     """Numbers go through the digit strip (fast, tabular); anything else is compiled by Typst once.
 
-    color None keeps the colours written into the expression with ``tc``.
+    color None keeps the colors written into the expression with ``tc``.
     """
     if _NUMERIC.match(tex.strip()):
         number(fr, tex.strip(), cx, cy, size, color or "ink", alpha, glow)
@@ -228,6 +257,3 @@ def glyph_centers(expr, cx, cy, size):
     gs, _ = glyphs(expr)
     k = size / BASE
     return [(cx + g.cx * k, cy + g.cy * k) for g in gs]
-
-
-__all__ = ["tc", "glyphs", "draw", "morph", "number", "term", "size_of", "glyph_centers"]

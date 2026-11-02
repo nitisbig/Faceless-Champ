@@ -258,6 +258,21 @@ read_subtitle_cues(text); Agent retains bounded inputs and source-clock diagnost
 Kit compiles once, then CompiledVideo.frame/save_frame/storyboard/export. Kit also exports
 media_probe, read_subtitle_cues, public_capabilities, validate_rendering and ExportProgress.
 
+## Frame drawing (immediate-mode Skia)
+
+Import Frame, Palette, draw_scene, CueClock from faceless_champ.draw. For films drawn frame by
+frame in code (math explainers, simulations): def draw(t, size): fr = Frame(size); ...; return
+fr.finish(), then scene = draw_scene(draw, duration, audio=..., audio_trim_start=...). Author in
+1920x1080 design px; output scales. Colors are Palette tokens: Palette.from_theme(theme, **extra)
+gives every ColorScheme role plus bg/ink/line/light/glass/glass_deep/floor; set_default_palette()
+in the project's theme module. Frame: path_stroke/fill, poly, line, circle, rrect, dashed, text,
+glow=, glow_dot, light_sweep, light_cone, glint, blurred(sigma), dim, chroma, zoom_blur, letterbox,
+vignette, grain, finish(). Timing: lin, smooth, ease_*, env, pulse, chroma_kick, CueClock(srt).cue/
+beat/word. Modules: hud (glass_card, pill, readout, coord_chip, arrow, axis3d, dot_grid), mathtype
+(Typst draw/morph/number/tc), space (Camera, orbit_path, draw_box, text3d), mesh3d (PyVista matched
+to space.Camera, disk-cached). motion_blur(draw, t, size, weight=) reads FC_MOTION_BLUR.
+[Frame drawing](docs/core/draw.md).
+
 ## Plugins
 
 Packages extend the library through the `faceless_champ.plugins` entry-point group (or

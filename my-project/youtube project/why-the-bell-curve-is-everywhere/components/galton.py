@@ -17,7 +17,7 @@ import math
 
 import numpy as np
 import skia
-from fx import smooth
+from faceless_champ.draw import smooth
 
 # Locked in Stage A by searching seeds 0-19,999 (stage_a_test.seed_report): the 12-row, 1,000-ball pour is
 # within 0.4 percentage points of the binomial in every bin, rises monotonically to the centre and is

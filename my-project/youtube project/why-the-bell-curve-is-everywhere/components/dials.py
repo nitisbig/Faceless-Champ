@@ -9,9 +9,9 @@ from __future__ import annotations
 import math
 
 import skia
-import typmath
+from faceless_champ.draw import mathtype as typmath
 
-from components import hud
+from faceless_champ.draw import hud
 
 SWEEP = math.radians(135)
 

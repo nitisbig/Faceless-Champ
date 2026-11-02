@@ -22,18 +22,18 @@ from pathlib import Path
 
 import numpy as np
 import skia
-import typmath
-from components import hud
+from faceless_champ.draw import mathtype as typmath
+from faceless_champ.draw import hud
 from components.bell import Bell, pdf
 from components.darts import Target
 from components.dials import dial_pair
 from components.histogram import Axes, Bars, bars_from_samples, draw_bars, morph
 from cues import AUDIO, beat, cue
-from fx import Frame, chroma_kick, clamp, ease_in, ease_io, ease_out, env, lin, smooth
+from faceless_champ.draw import Frame, chroma_kick, clamp, ease_in, ease_io, ease_out, env, lin, smooth
 from scipy.special import ndtr
-from space import orbit
+from faceless_champ.draw.space import orbit
 from theme import THEME, H, W
-from typmath import tc
+from faceless_champ.draw.mathtype import tc
 
 START = cue(560)  # 190.50 "So what is the exact shape of this curve?"
 END = cue(883)  # 295.22 "Those two dials ..."

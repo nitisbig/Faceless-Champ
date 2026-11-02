@@ -15,7 +15,7 @@ import math
 
 import numpy as np
 import skia
-from fx import ease_io, ease_out, lin, smooth
+from faceless_champ.draw import ease_io, ease_out, lin, smooth
 
 from components.histogram import Axes, Bars
 
