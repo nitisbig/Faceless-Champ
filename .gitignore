@@ -31,6 +31,7 @@ wheels/
 *.mpg
 *.wmv
 *.png
+*.npz
 media/
 # Keep reusable library sound effects.
 !assets/sfx/**/*.wav
